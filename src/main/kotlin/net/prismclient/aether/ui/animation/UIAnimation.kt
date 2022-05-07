@@ -21,15 +21,13 @@ import net.prismclient.aether.ui.util.UIAnimationPriority
  * @see UIKeyframe
  */
 class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimationPriority.NORMAL) { // TODO: Ease should be in the keyframe
-    val timeline: ArrayList<UIKeyframe> = ArrayList()
+    val timeline: ArrayList<UIKeyframe> = ArrayList() // TODO: Get rid of UIKeyframe lmfao
 
-    private var component: UIComponent<*>? = null
+    private lateinit var component: UIComponent<*>
     private var activeKeyframe: UIKeyframe? = null
     private var nextKeyframe: UIKeyframe? = null
     private var nextKeyframeIndex: Int = 0
 
-    lateinit var time: UILinear
-        private set
     private var animation: UIAnimation? = null
     var animationLength: Long = 0L
         private set
@@ -42,9 +40,12 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
             return
         }
 
-        timeline.sort()
-        time = UILinear(animationLength)
-        time.start()
+        animationLength = 0L
+        for (keyframe in timeline) {
+            if (keyframe.property.ease == null)
+                keyframe.property.ease = UILinear()
+            animationLength += keyframe.property.ease!!.duration
+        }
     }
 
     fun pause() {
@@ -56,33 +57,49 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
     }
 
     fun update() {
-        if (component == null) {
+        if (!this::component.isInitialized) {
             throw RuntimeException("Component cannot be null for animation")
         }
 
         if (activeKeyframe == null) {
             activeKeyframe = timeline[0]
-            nextKeyframe = if (timeline.size > 1) return else timeline[1]
-            nextKeyframe!!.property.ease.start()
+            nextKeyframe = if (timeline.size < 1) {
+                return
+            } else {
+                timeline[1]
+            }
+            nextKeyframe!!.property.ease!!.start()
+            nextKeyframeIndex = 1
         }
 
-        if (activeKeyframe == null || nextKeyframe == null) {
+        if (nextKeyframe == null) {
             println("null")
             return
+        } else {
+            // If current animation past the current time
+            if (nextKeyframe!!.property.ease!!.endTime <= System.currentTimeMillis()) {
+                if (timeline.size > ++nextKeyframeIndex) {
+                    activeKeyframe = nextKeyframe
+                    nextKeyframe = timeline[nextKeyframeIndex]
+                    nextKeyframe!!.property.ease!!.start()
+                } else {
+                    return // Next keyframe is null
+                }
+            }
         }
 
-        val position = nextKeyframe!!.property.ease.getValue()
+        val component = this.component!!
+        val akf = activeKeyframe!!
+        val kf = nextKeyframe!!
+        val p = kf.property
+        val ap = akf.property
+        val position = kf.property.ease!!.getValue().toFloat()
 
-        println(position)
-    }
 
-    fun searchForKeyframe(position: Float, start: Int, end: Int): Int {
-        val mid = (start + end) / 2
-        if (timeline[mid].position == position)
-            return mid
-        if (start == end - 1)
-            return if (timeline[end].position - position >= timeline[start].position - position) start else end
-        return if (timeline[mid].position > position) searchForKeyframe(position, start, mid) else searchForKeyframe(position, mid, end)
+        if (p.x != null) {
+            component.relX = ((p.x!!.value * position) + (ap.x?.value ?: 0f)) + component.getParentX()
+            println(component.relX)
+        }
     }
 
     /**
@@ -104,7 +121,8 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         val sheet = UIAnimationSheet()
         sheet.name = "anim-$name-$position"
         sheet.block()
-        return UIKeyframe(position, sheet).also { timeline.add(it) }
+
+        return UIKeyframe(sheet).also { timeline.add(it) }
     }
 
     /**
@@ -112,7 +130,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
      *
      * @param block The [UIStyleSheet] that adjusts the component's properties.
      */
-    inline fun from(block: UIStyleSheet.() -> Unit) =
+    inline fun from(block: UIAnimationSheet.() -> Unit) =
             keyframe(0f, block)
 
     /**
@@ -120,7 +138,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
      *
      * @param block The [UIStyleSheet] that adjusts the component's properties.
      */
-    inline fun to(block: UIStyleSheet.() -> Unit) =
+    inline fun to(block: UIAnimationSheet.() -> Unit) =
             keyframe(100f, block)
 
     //    fun update() {

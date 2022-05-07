@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.util.extensions
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
@@ -10,6 +11,14 @@ import net.prismclient.aether.ui.unit.util.UIOperation
 fun px(value: Number) = UIUnit(value.toFloat(), PIXELS)
 
 fun percent(value: Number) = UIUnit(value.toFloat() / 100f, RELATIVE)
+
+/**
+ * When in a [UIAnimation] style sheet, the value is equal to the value += this instead of value = this
+ *
+ * @author sen
+ * @since 6/5/2022
+ */
+fun rel(value: Number) = UIUnit(value.toFloat(), )
 
 /**
  * Calculates the x-axis of a [UIUnit] (or subclasses) given the width of the area to calculate.

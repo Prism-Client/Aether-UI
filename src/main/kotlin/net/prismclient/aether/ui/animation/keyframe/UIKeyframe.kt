@@ -9,10 +9,6 @@ import net.prismclient.aether.ui.util.UICopy
  * @author sen
  * @since 3/5/2022
  */
-class UIKeyframe(val position: Float, val property: UIAnimationSheet): Comparable<UIKeyframe>, UICopy<UIKeyframe> {
-    override fun compareTo(other: UIKeyframe): Int {
-        return if (position > other.position) 1 else -1
-    }
-
-    override fun copy(): UIKeyframe = UIKeyframe(position, property.copy() as UIAnimationSheet)
+class UIKeyframe(val property: UIAnimationSheet): UICopy<UIKeyframe> {
+    override fun copy(): UIKeyframe = UIKeyframe(property.copy() as UIAnimationSheet)
 }

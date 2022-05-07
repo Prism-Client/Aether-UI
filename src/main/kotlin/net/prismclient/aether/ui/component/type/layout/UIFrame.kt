@@ -60,9 +60,8 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
     open fun renderContent() {
         if (!style.clipContent)
             return
-        if (!this::framebuffer.isInitialized) {
+        if (!this::framebuffer.isInitialized)
             createFramebuffer()
-        }
         renderer {
             renderContent(framebuffer) {
                 if (style.background != null) {
@@ -84,6 +83,7 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
             components.forEach(UIComponent<*>::render)
             return
         }
+        animation?.update()
         renderer {
             renderFbo(
                 framebuffer,

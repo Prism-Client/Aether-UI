@@ -36,3 +36,13 @@ const val ASCENDER: Byte = 7
  * The descender portion of the current stylesheet's font
  */
 const val DESCENDER: Byte = 8
+
+/**
+ * A relative pixel position for a unit in an animation
+ */
+const val PXANIMRELATIVE: Byte = 9
+
+/**
+ * A relative percentage position for a unit in an animation
+ */
+const val RELANIMRELATIVE: Byte = 10

@@ -2,6 +2,8 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.animation.ease.impl.UILinear
+import net.prismclient.aether.ui.animation.ease.impl.UIQuad
+import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
@@ -98,6 +100,20 @@ class ExampleScreen : UIScreen() {
 
         val frame = UIFrame("frame")
         val textfield = UITextField("", "text here", UITextField.Companion.number, style = "textfield")
+        val animation = UIAnimation("test", )
+
+        animation.from {
+
+        }
+
+        animation.keyframe(50f) {
+            ease = UIQuart(1000)
+            x = px(100)
+        }
+
+        frame.animation = animation
+        frame.animation = animation
+        animation.start(frame)
 
         frame.addComponent(textfield)
 

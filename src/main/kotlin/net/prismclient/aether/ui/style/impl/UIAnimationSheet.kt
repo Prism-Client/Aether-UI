@@ -11,7 +11,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @since 5/5/2022
  */
 class UIAnimationSheet() : UIStyleSheet() {
-    val ease: UIEase by lazy { UILinear() }
+    var ease: UIEase? = null
 
     override fun copy(): UIStyleSheet = UIAnimationSheet().also {
         it.apply(this)

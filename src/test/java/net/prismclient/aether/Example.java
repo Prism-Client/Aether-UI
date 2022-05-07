@@ -141,7 +141,6 @@ public class Example {
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
-        glfwSwapInterval(10);
         glfwSetTime(0);
 
         // Create the core
