@@ -118,8 +118,8 @@ class ExampleScreen : UIScreen() {
             animationResult = UIAnimationSheet.AnimationResult.Reset
             ease = UIQuart(1000)
 //            x = px(200)
-            width = px(200)
-            height = px(200)
+            width = px(350)
+            height = px(350)
         }
 
         frame.animation = animation

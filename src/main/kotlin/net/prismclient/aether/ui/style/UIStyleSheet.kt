@@ -11,16 +11,16 @@ import net.prismclient.aether.ui.util.UICopy
 open class UIStyleSheet : UICopy<UIStyleSheet> {
     var name: String = ""
 
-    var background: UIBackground? = null
-    var font: UIFont? = null
+    open var background: UIBackground? = null
+    open var font: UIFont? = null
 
-    var x: UIUnit? = null
-    var y: UIUnit? = null
-    var width: UIUnit? = null
-    var height: UIUnit? = null
+    open var x: UIUnit? = null
+    open var y: UIUnit? = null
+    open var width: UIUnit? = null
+    open var height: UIUnit? = null
 
-    var padding: UIPadding? = null
-    var margin: UIMargin? = null
+    open var padding: UIPadding? = null
+    open var margin: UIMargin? = null
 
     override fun copy(): UIStyleSheet = UIStyleSheet().apply(this)
 

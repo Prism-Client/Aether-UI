@@ -30,6 +30,10 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
     protected val renderer = UIRendererDSL.instance.render
     protected lateinit var framebuffer: UIContentFBO
 
+    var frameWidth: Float = 0f
+        protected set
+    var frameHeight: Float = 0f
+
     override fun addComponent(component: UIComponent<*>) {
         components.add(component)
         component.parent = this
@@ -55,12 +59,14 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
         if (this::framebuffer.isInitialized)
             renderer.deleteContentFBO(framebuffer)
         if (relWidth >= 1f && relHeight >= 1f)
-            framebuffer = renderer.createContentFBO(relWidth, relHeight)
+            framebuffer = renderer.createContentFBO(frameWidth, frameHeight)
     }
 
     open fun updateFramebuffer() {
+        frameWidth = style.frameWidth.getX()
+        frameHeight = style.frameHeight.getY()
         if (style.clipContent) {
-            if (!this::framebuffer.isInitialized || relWidth != framebuffer.width || relHeight != framebuffer.height) {
+            if (!this::framebuffer.isInitialized || frameWidth != framebuffer.width || frameWidth != framebuffer.height) {
                 createFramebuffer()
             }
         }
@@ -106,8 +112,8 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
                     framebuffer,
                     relX,
                     relY,
-                    relWidth,
-                    relHeight,
+                    frameWidth,
+                    frameHeight,
                     style.contentRadius?.topLeft ?: 0f,
                     style.contentRadius?.topRight ?: 0f,
                     style.contentRadius?.bottomRight ?: 0f,

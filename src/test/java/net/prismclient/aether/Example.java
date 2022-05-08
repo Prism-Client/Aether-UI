@@ -1,5 +1,7 @@
 package net.prismclient.aether;
 
+import net.prismclient.aether.ui.renderer.UIRenderer;
+import net.prismclient.aether.ui.renderer.builder.UIRendererDSL;
 import net.prismclient.aether.ui.util.UIKey;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -143,6 +145,7 @@ public class Example {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
         glfwSetTime(0);
+        glfwSwapInterval(0);
 
         // Create the core
         core = new UICore(new DefaultRenderer());
