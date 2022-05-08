@@ -13,7 +13,7 @@ import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer
 
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
-    var style: T
+    var style: T = UIProvider.getStyle(style, false) as T
     var parent: UIComponent<*>? = null
     var animation: UIAnimation? = null
 
@@ -26,33 +26,41 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var relWidth = 0f
     var relHeight = 0f
 
-    init {
-        this.style = UIProvider.getStyle(style, false) as T
-    }
-
+    /**
+     * Invoked on creation, and screen resize
+     */
     open fun update() {
-
         // Update the position and size
         updatePosition()
         updateSize()
+
+        // Update the relative values
+        updateBounds()
 
         // Update the style
         updateStyle()
     }
 
     open fun updatePosition() {
+        x = +style.x + getParentX()
+        y = -style.y + getParentY()
+    }
+
+    open fun updateSize() {
         width = +style.width
         height = -style.height
+    }
+
+    /**
+     * Updates the relative values based on the absolute values
+     */
+    open fun updateBounds() {
+        relX = x - +style.padding?.paddingLeft
+        relY = y - -style.padding?.paddingTop
         relWidth = width + +style.padding?.paddingRight
         relHeight = height + -style.padding?.paddingBottom
     }
 
-    open fun updateSize() {
-        x = +style.x + getParentX()
-        y = -style.y + getParentY()
-        relX = x - +style.padding?.paddingLeft
-        relY = y - -style.padding?.paddingTop
-    }
 
     open fun updateStyle() {
         // Update font if not null
@@ -64,6 +72,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun render() {
+        updateAnimation()
         style.background?.render(relX, relY, relWidth, relHeight)
         renderer {
             scissor(relX, relY, relWidth, relHeight) {
@@ -104,15 +113,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun UIUnit?.getX(ignore: Boolean = false): Float = this.getX(getParentWidth(), ignore)
 
     @JvmOverloads
-    fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float = if (this == null) 0f else {
-        if (!ignore && this is UIOperationUnit) { this.getX(width, true) + this.otherUnit.getX(width) } else {
-            when (this.type) {
-                PIXELS -> this.value
-                RELATIVE -> this.value * width
-                EM -> this.value * (style.font?.fontSize ?: 0f)
-                ASCENDER -> this.value * (style.font?.getAscend() ?: 0f)
-                DESCENDER -> this.value * (style.font?.getDescend() ?: 0f)
-                else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
+    fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float =
+        calculateUnitX(this, width, ignore)
+
+    fun calculateUnitX(unit: UIUnit?, width: Float, ignore: Boolean): Float = if (unit == null) 0f else {
+        if (!ignore && unit is UIOperationUnit) {
+            unit.getX(width, true) + unit.otherUnit.getX(width)
+        } else {
+            when (unit.type) {
+                PIXELS, PXANIMRELATIVE -> unit.value
+                RELATIVE, RELANIMRELATIVE -> unit.value * width
+                EM -> unit.value * (style.font?.fontSize ?: 0f)
+                ASCENDER -> unit.value * (style.font?.getAscend() ?: 0f)
+                DESCENDER -> unit.value * (style.font?.getDescend() ?: 0f)
+                else -> throw UnsupportedOperationException("${unit.type} is not a valid type.")
             }
         }
     }
@@ -121,17 +135,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun UIUnit?.getY(ignore: Boolean = false): Float = this.getY(getParentHeight(), ignore)
 
     @JvmOverloads
-    fun UIUnit?.getY(height: Float, ignore: Boolean = false): Float = if (this == null) 0f else {
-        if (!ignore && this is UIOperationUnit) {
-            this.getY(height, true) + this.otherUnit.getY(height)
+    fun UIUnit?.getY(height: Float, ignore: Boolean = false) =
+        calculateUnitY(this, height, ignore)
+
+    fun calculateUnitY(unit: UIUnit?, height: Float, ignore: Boolean): Float = if (unit == null) 0f else {
+        if (!ignore && unit is UIOperationUnit) {
+            unit.getY(height, true) + unit.otherUnit.getY(height)
         } else {
-            when (this.type) {
-                PIXELS -> this.value
-                RELATIVE -> this.value * height
-                EM -> this.value * (style.font?.fontSize ?: 0f)
-                ASCENDER -> this.value * (style.font?.getAscend() ?: 0f)
-                DESCENDER -> this.value * (style.font?.getDescend() ?: 0f)
-                else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
+            when (unit.type) {
+                PIXELS, PXANIMRELATIVE -> unit.value
+                RELATIVE, RELANIMRELATIVE -> unit.value * height
+                EM -> unit.value * (style.font?.fontSize ?: 0f)
+                ASCENDER -> unit.value * (style.font?.getAscend() ?: 0f)
+                DESCENDER -> unit.value * (style.font?.getDescend() ?: 0f)
+                else -> throw UnsupportedOperationException("${unit.type} is not a valid type.")
             }
         }
     }
@@ -147,13 +164,19 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
 
     fun isMouseInside() =
-            (UICore.mouseX > x) && (UICore.mouseY > y) && (UICore.mouseX < x + width) && (UICore.mouseY < y + height)
+                (UICore.mouseX > x) &&
+                (UICore.mouseY > y) &&
+                (UICore.mouseX < x + width) &&
+                (UICore.mouseY < y + height)
 
     /**
      * Returns true if the mouse is inside the rel x, y, width and height
      */
     fun isMouseInsideBoundingBox() =
-        (UICore.mouseX > relX) && (UICore.mouseY > relY) && (UICore.mouseX < relX + relWidth) && (UICore.mouseY < relY + relHeight)
+                (UICore.mouseX > relX) &&
+                (UICore.mouseY > relY) &&
+                (UICore.mouseX < relX + relWidth) &&
+                (UICore.mouseY < relY + relHeight)
 
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 }

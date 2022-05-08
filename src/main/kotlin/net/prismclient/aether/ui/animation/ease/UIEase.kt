@@ -10,9 +10,10 @@ abstract class UIEase(var duration: Long = 1000L, var animationDirection: UIEase
     var finished: Boolean = false
     var startTime: Long = 0L
     var endTime: Long = 0L
+    var delay: Long = 0L
 
     fun start() {
-        startTime = System.currentTimeMillis()
+        startTime = System.currentTimeMillis() + delay
         endTime = startTime + duration
         animating = true
         finished = false

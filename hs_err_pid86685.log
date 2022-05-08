@@ -1,0 +1,30 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00000001b1d4a64c, pid=86685, tid=31747
+#
+# JRE version: OpenJDK Runtime Environment Corretto-17.0.3.6.1 (17.0.3+6) (build 17.0.3+6-LTS)
+# Java VM: OpenJDK 64-Bit Server VM Corretto-17.0.3.6.1 (17.0.3+6-LTS, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, bsd-aarch64)
+# Problematic frame:
+# C  [Metal+0x2064c]  MTLDispatchListApply+0x28
+#
+# No core dump will be written. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   https://github.com/corretto/corretto-17/issues/
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=127.0.0.1:54490 -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant net.prismclient.aether.Example
+
+Host: "MacBookAir10,1" arm64, 8 cores, 8G, Darwin 21.4.0, macOS 12.3 (21E230)
+Time: Sun May  8 11:30:27 2022 PDT elapsed time: 1.051925 seconds (0d 0h 0m 1s)
+
+---------------  T H R E A D  ---------------
+
+Current thread is native thread
+
+Stack: [0x000000016de00000,0x000000016de83000],  sp=0x000000016de82420,  free space=521k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [Metal+0x2064c]  MTLDispatchListApply+0x28

@@ -17,6 +17,7 @@ import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
+import net.prismclient.aether.ui.style.impl.UIAnimationSheet
 import net.prismclient.aether.ui.style.impl.UIFrameSheet
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
@@ -29,6 +30,7 @@ import net.prismclient.aether.ui.unit.util.UIOperation
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
+
     override fun initialize() {
         UIFontFamily(
             "Poppins",
@@ -102,13 +104,22 @@ class ExampleScreen : UIScreen() {
         val textfield = UITextField("", "text here", UITextField.Companion.number, style = "textfield")
         val animation = UIAnimation("test", )
 
-        animation.from {
+//        animation {
+//            x = px(0) to px(200)
+//        }
 
+        animation.keyframe {
+//            x = px(0)
+            width = px(0)
+            height = px(0)
         }
 
-        animation.keyframe(50f) {
+        animation.keyframe {
+            animationResult = UIAnimationSheet.AnimationResult.Reset
             ease = UIQuart(1000)
-            x = px(100)
+//            x = px(200)
+            width = px(200)
+            height = px(200)
         }
 
         frame.animation = animation

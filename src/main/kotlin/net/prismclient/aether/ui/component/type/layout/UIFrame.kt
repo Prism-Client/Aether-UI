@@ -4,22 +4,22 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.impl.UIFrameSheet
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
- * [UIFrame] is a clickable box which content is rendered
- * inside. Unlike other layout components, such as containers,
- * the frame is designed for everything, and does not control
- * layout for its components within. It also allows for more
- * advanced component content clipping (such as rounded rectangles),
- * and even custom shapes using your own custom UIFrame implementation.
+ * [UIFrame] is a "viewport" for components. The frame holds a list of
+ * children which are rendered. It is the superclass for components like
+ * layouts, such as a list, or grid layout. Unlike other layout components,
+ * [UIFrame] does not control the components inside it, and the components are
+ * free to act however they want. Because of how [UIFrame] is designed, more
+ * custom rendering features can be applied (such as shaders), by extending the
+ * class and applying your own code.
  *
- * Note: Backgrounds are rendered inside the renderContent method
- * instead of the UIBackground class to force the background to be rendered
- * into the content instead of outside it.
+ * [UIFrame] works by rendering all the content to an FBO if content clipping is
+ * enabled. If disabled, everything is rendered when the render method for this
+ * component is invoked.
  *
  * @author sen
  * @since 4/30/2022
@@ -42,73 +42,77 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
 
     override fun update() {
         super.update()
+        updateFramebuffer()
+        components.forEach(UIComponent<*>::update)
+    }
+
+    override fun updateBounds() {
+        super.updateBounds()
+        updateFramebuffer()
+    }
+
+    open fun createFramebuffer() {
+        if (this::framebuffer.isInitialized)
+            renderer.deleteContentFBO(framebuffer)
+        if (relWidth >= 1f && relHeight >= 1f)
+            framebuffer = renderer.createContentFBO(relWidth, relHeight)
+    }
+
+    open fun updateFramebuffer() {
         if (style.clipContent) {
             if (!this::framebuffer.isInitialized || relWidth != framebuffer.width || relHeight != framebuffer.height) {
                 createFramebuffer()
             }
         }
-        components.forEach(UIComponent<*>::update)
-    }
-
-    open fun createFramebuffer() {
-        if (this::framebuffer.isInitialized) {
-            renderer.deleteContentFBO(framebuffer)
-        }
-        framebuffer = renderer.createContentFBO(relWidth, relHeight)
     }
 
     open fun renderContent() {
         if (!style.clipContent)
             return
+        updateAnimation()
         if (!this::framebuffer.isInitialized)
             createFramebuffer()
+        // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
+        if (relWidth < 1f || relHeight < 1f)
+            return
         renderer {
             renderContent(framebuffer) {
-                if (style.background != null) {
-                    color(style.background!!.color)
-                    rect(0f, 0f, framebuffer.width, framebuffer.height)
-                }
                 components.forEach(UIComponent<*>::render)
             }
         }
     }
 
     override fun render() {
-        renderComponent()
+        // Remove updating animation as animations are updated when the content is rendered
+        if (!style.clipContent)
+            updateAnimation()
+        style.background?.render(relX, relY, relWidth, relHeight)
+        renderer {
+            scissor(relX, relY, relWidth, relHeight) {
+                renderComponent()
+            }
+        }
     }
 
     override fun renderComponent() {
         if (!style.clipContent) {
-            style.background?.render(relX, relY, relWidth, relHeight)
             components.forEach(UIComponent<*>::render)
             return
         }
-        animation?.update()
         renderer {
-            renderFbo(
-                framebuffer,
-                relX,
-                relY,
-                relWidth,
-                relHeight,
-                style.contentRadius?.topLeft ?: 0f,
-                style.contentRadius?.topRight ?: 0f,
-                style.contentRadius?.bottomRight ?: 0f,
-                style.contentRadius?.bottomLeft ?: 0f
-            )
-            if (style.background!!.border != null) {
-                outline(style.background!!.border!!.borderWidth, style.background!!.border!!.borderColor) {
-                    rect(
-                        relX,
-                        relY,
-                        relWidth,
-                        relHeight,
-                        style.background!!.radius.topLeft,
-                        style.background!!.radius.topRight,
-                        style.background!!.radius.bottomRight,
-                        style.background!!.radius.bottomLeft
-                    )
-                }
+            // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
+            if (relWidth >= 1f || relHeight >= 1f) {
+                renderFbo(
+                    framebuffer,
+                    relX,
+                    relY,
+                    relWidth,
+                    relHeight,
+                    style.contentRadius?.topLeft ?: 0f,
+                    style.contentRadius?.topRight ?: 0f,
+                    style.contentRadius?.bottomRight ?: 0f,
+                    style.contentRadius?.bottomLeft ?: 0f
+                )
             }
         }
     }
