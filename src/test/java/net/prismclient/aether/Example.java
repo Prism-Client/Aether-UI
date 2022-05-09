@@ -113,6 +113,8 @@ public class Example {
         glfwSetFramebufferSizeCallback(window, (handle, w, h) -> {
             framebufferWidth = w;
             framebufferHeight = h;
+            UICore.Companion.setWidth(w);
+            UICore.Companion.setHeight(h);
             core.update();
         });
         glfwSetWindowContentScaleCallback(window, (handle, xscale, yscale) -> {
@@ -149,6 +151,12 @@ public class Example {
 
         // Create the core
         core = new UICore(new DefaultRenderer());
+
+        UICore.Companion.setWidth(framebufferWidth / contentScaleX);
+        UICore.Companion.setHeight(framebufferHeight / contentScaleY);
+
+        // Set the active screen (set width, and height first)
+
         UICore.setActiveScreen(new ExampleScreen());
 
         while (!glfwWindowShouldClose(window)) {
