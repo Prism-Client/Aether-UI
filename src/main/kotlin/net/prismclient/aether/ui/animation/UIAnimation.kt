@@ -124,6 +124,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
             s.y = +k.y ?: s.y
             s.width = +k.width ?: s.width
             s.height = +k.height ?: s.height
+            component.update()
         }
     }
 
@@ -132,7 +133,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         completed = true
         animating = false
 
-        saveState(nextKeyframe!!)
+        saveState(timeline[timeline.size - 1])
     }
 
     /**
