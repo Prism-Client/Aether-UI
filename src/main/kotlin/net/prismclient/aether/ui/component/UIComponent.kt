@@ -42,8 +42,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun updatePosition() {
-        x = +style.x + getParentX()
-        y = -style.y + getParentY()
+        x = +style.x + getParentX() - getAnchorX()
+        y = -style.y + getParentY() - getAnchorY()
+        println(getAnchorX())
     }
 
     open fun updateSize() {
@@ -162,6 +163,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
 
     fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
+
+    fun getAnchorX() = +style.anchor?.x
+
+    fun getAnchorY() = -style.anchor?.y
 
     fun isMouseInside() =
                 (UICore.mouseX > x) &&

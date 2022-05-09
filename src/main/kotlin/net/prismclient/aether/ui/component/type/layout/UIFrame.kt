@@ -33,6 +33,7 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
     var frameWidth: Float = 0f
         protected set
     var frameHeight: Float = 0f
+        protected set
 
     override fun addComponent(component: UIComponent<*>) {
         components.add(component)

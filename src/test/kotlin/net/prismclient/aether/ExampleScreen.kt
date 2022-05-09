@@ -23,10 +23,7 @@ import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
-import net.prismclient.aether.ui.unit.util.DESCENDER
-import net.prismclient.aether.ui.unit.util.EM
-import net.prismclient.aether.ui.unit.util.RELATIVE
-import net.prismclient.aether.ui.unit.util.UIOperation
+import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
@@ -47,8 +44,10 @@ class ExampleScreen : UIScreen() {
         }
 
         style(UIFrameSheet(), "frame") {
-            x = px(10)
-            y = px(10)
+            anchor.align(UIAlignment.CENTER)
+
+            x = px(0)// rel(50)
+            y = px(0)//rel(50)
             width = px(350)
             height = px(350)
 
@@ -115,16 +114,37 @@ class ExampleScreen : UIScreen() {
         }
 
         animation.keyframe {
-            animationResult = UIAnimationSheet.AnimationResult.Reset
             ease = UIQuart(1000)
 //            x = px(200)
             width = px(350)
+            height = px(0)
+        }
+
+        animation.keyframe {
+            ease = UIQuart(1000)
             height = px(350)
         }
 
-        frame.animation = animation
-        frame.animation = animation
-        animation.start(frame)
+//        frame.animation = animation
+//        animation.start(frame)
+
+        val otherAnimation = UIAnimation("other-animation")
+
+        otherAnimation.keyframe {
+            width = px(0)
+            height = px(0)
+            y = px(-30)
+        }
+
+        otherAnimation.keyframe {
+            ease = UIQuart(1000)
+            ease.delay = 0L
+            y = UIUnit(1f, INITIAL)
+//            width = UIUnit(1f, INITIAL)
+        }
+
+        textfield.animation = otherAnimation
+        otherAnimation.start(textfield)
 
         frame.addComponent(textfield)
 

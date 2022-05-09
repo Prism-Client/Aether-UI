@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
+import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
 
@@ -21,6 +22,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
 
     open var padding: UIPadding? = null
     open var margin: UIMargin? = null
+    open var anchor: UIAnchorPoint = UIAnchorPoint()
 
     override fun copy(): UIStyleSheet = UIStyleSheet().apply(this)
 
@@ -40,6 +42,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
 
         this.padding = sheet.padding?.copy()
         this.margin = sheet.margin?.copy()
+        this.anchor = sheet.anchor?.copy()
 
         return this
     }

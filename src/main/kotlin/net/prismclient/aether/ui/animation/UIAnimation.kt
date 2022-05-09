@@ -50,9 +50,9 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         completed = false
 
         for (keyframe in timeline) {
-            if (keyframe.ease == null)
+            if (!keyframe.isEaseInitialized())
                 keyframe.ease = UILinear()
-            animationLength += keyframe.ease!!.duration
+            animationLength += keyframe.ease.duration
         }
     }
 
@@ -65,7 +65,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
     }
 
     fun update() {
-        if (completed)
+        if (completed || !animating)
             return
         if (!this::component.isInitialized)
             throw RuntimeException("Component cannot be null for animation")
@@ -73,7 +73,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         if (activeKeyframe == null) {
             activeKeyframe = timeline[0]
             nextKeyframe = timeline[1]
-            nextKeyframe!!.ease!!.start()
+            nextKeyframe!!.ease.start()
             nextKeyframeIndex = 1
         }
 
@@ -81,7 +81,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
             return
         } else {
             // If current animation past the current time
-            if (nextKeyframe!!.ease!!.endTime <= System.currentTimeMillis()) {
+            if (nextKeyframe!!.ease.endTime <= System.currentTimeMillis()) {
                 if (timeline.size > ++nextKeyframeIndex) {
                     swapKeyframe(timeline[nextKeyframeIndex])
                 } else {
@@ -95,7 +95,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         val c = this.component
         val p = nextKeyframe!!
         val ap = activeKeyframe!!
-        val prog = p.ease!!.getValue().toFloat()
+        val prog = p.ease.getValue().toFloat()
 
         c.update()
 
@@ -105,12 +105,13 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         p.height?.let { c.height = ap.height.updateY(c.height) + ((p.height.updateY(c.height) - ap.height.updateY(c.height)) * prog)}
 
         c.updateBounds()
+        c.updateStyle()
     }
 
     fun swapKeyframe(next: UIAnimationSheet) {
         activeKeyframe = nextKeyframe
         nextKeyframe = next
-        nextKeyframe!!.ease!!.start()
+        nextKeyframe!!.ease.start()
         saveState(activeKeyframe!!)
     }
 
@@ -119,10 +120,10 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
             component.update()
         } else {
             val s = component.style
-            s.x = k.x ?: s.x
-            s.y = k.y ?: s.y
-            s.width = k.width ?: s.width
-            s.height = k.height ?: s.height
+            s.x = +k.x ?: s.x
+            s.y = +k.y ?: s.y
+            s.width = +k.width ?: s.width
+            s.height = +k.height ?: s.height
         }
     }
 
@@ -135,21 +136,14 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
     }
 
     /**
-     * Returns true if the animation is active
-     */
-    fun isAnimating(): Boolean = false //this::ease.isInitialized && this.ease.animating
-
-    /**
      * Creates a keyframe at the specified position (0.0-100.0)
      *
      * @param block The [UIStyleSheet] that adjusts the component's properties.
      */
     inline fun keyframe(block: UIAnimationSheet.() -> Unit): UIAnimationSheet {
         // Check if the animation is active
-        if (isAnimating()) {
+        if (animating)
             throw RuntimeException("Cannot add keyframe while animating")
-        }
-
         val sheet = UIAnimationSheet()
         timeline.add(sheet)
         sheet.name = "anim-$name-${timeline.size}"
@@ -164,6 +158,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         if (this.type.isNormal())
             return component.calculateUnitX(this, component.getParentWidth(), false)
         return when (this.type) {
+            INITIAL -> x
             PXANIMRELATIVE -> x + this.value
             RELANIMRELATIVE -> x + component.getParentWidth() * this.value
             else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
@@ -176,9 +171,16 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         if (this.type.isNormal())
             return component.calculateUnitY(this, component.getParentHeight(), false)
         return when (this.type) {
+            INITIAL -> y
             PXANIMRELATIVE -> y + this.value
             RELANIMRELATIVE -> y + component.getParentHeight() * this.value
             else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
         }
     }
+
+    /**
+     * Returns null if type is INITIAL, as a component cannot have it set to that type
+     */
+    private operator fun UIUnit?.unaryPlus(): UIUnit? =
+            if (this?.type == INITIAL) null else this
 }
