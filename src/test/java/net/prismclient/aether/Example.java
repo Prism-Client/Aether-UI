@@ -113,8 +113,8 @@ public class Example {
         glfwSetFramebufferSizeCallback(window, (handle, w, h) -> {
             framebufferWidth = w;
             framebufferHeight = h;
-            UICore.Companion.setWidth(w);
-            UICore.Companion.setHeight(h);
+            UICore.Companion.setWidth(w / contentScaleX);
+            UICore.Companion.setHeight(h / contentScaleX);
             core.update();
         });
         glfwSetWindowContentScaleCallback(window, (handle, xscale, yscale) -> {
