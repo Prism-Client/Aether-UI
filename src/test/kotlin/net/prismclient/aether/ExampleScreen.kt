@@ -46,8 +46,8 @@ class ExampleScreen : UIScreen() {
         style(UIFrameSheet(), "frame") {
             anchor.align(UIAlignment.CENTER)
 
-            x = px(0)// rel(50)
-            y = px(0)//rel(50)
+            x = percent(50)
+            y = percent(50)
             width = px(350)
             height = px(350)
 
@@ -125,8 +125,8 @@ class ExampleScreen : UIScreen() {
             height = px(350)
         }
 
-//        frame.animation = animation
-//        animation.start(frame)
+        frame.animation = animation
+        animation.start(frame)
 
         val otherAnimation = UIAnimation("other-animation")
 
@@ -138,7 +138,7 @@ class ExampleScreen : UIScreen() {
 
         otherAnimation.keyframe {
             ease = UIQuart(1000)
-            ease.delay = 0L
+            ease.delay = 1000L
             y = UIUnit(1f, INITIAL)
 //            width = UIUnit(1f, INITIAL)
         }

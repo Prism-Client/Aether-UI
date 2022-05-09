@@ -44,7 +44,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     open fun updatePosition() {
         x = +style.x + getParentX() - getAnchorX()
         y = -style.y + getParentY() - getAnchorY()
-        println(getAnchorX())
     }
 
     open fun updateSize() {
@@ -89,6 +88,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun mouseClicked(mouseX: Float, mouseY: Float) {
+        println("$this, ${isMouseInsideBoundingBox()}")
+        println("${this.relX}, ${this.getMouseX()}")
         if (this is UIFocusable<*> && !isFocused() && isMouseInsideBoundingBox()) {
             UICore.instance.focus(this)
         }
@@ -115,7 +116,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     @JvmOverloads
     fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float =
-        calculateUnitX(this, width, ignore)
+            calculateUnitX(this, width, ignore)
 
     fun calculateUnitX(unit: UIUnit?, width: Float, ignore: Boolean): Float = if (unit == null) 0f else {
         if (!ignore && unit is UIOperationUnit) {
@@ -137,7 +138,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     @JvmOverloads
     fun UIUnit?.getY(height: Float, ignore: Boolean = false) =
-        calculateUnitY(this, height, ignore)
+            calculateUnitY(this, height, ignore)
 
     fun calculateUnitY(unit: UIUnit?, height: Float, ignore: Boolean): Float = if (unit == null) 0f else {
         if (!ignore && unit is UIOperationUnit) {
@@ -155,33 +156,43 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     fun getParentX() = if (parent != null)
-        if (parent is UIFrame && (parent as UIFrame).style.clipContent) 0f else parent!!.x else 0f
+            if (parent is UIFrame && (parent as UIFrame).style.clipContent) 0f else parent!!.x else 0f
 
     fun getParentY() = if (parent != null)
-        if (parent is UIFrame && (parent as UIFrame).style.clipContent) 0f else parent!!.y else 0f
+            if (parent is UIFrame && (parent as UIFrame).style.clipContent) 0f else parent!!.y else 0f
 
-    fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
+    fun getParentWidth() =
+            if (parent != null) parent!!.width else UICore.width
 
-    fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
+    fun getParentHeight() =
+            if (parent != null) parent!!.height else UICore.height
 
-    fun getAnchorX() = +style.anchor?.x
+    fun getAnchorX() =
+            calculateUnitX(style.anchor.x, width, false)
 
-    fun getAnchorY() = -style.anchor?.y
+    fun getAnchorY() =
+            calculateUnitY(style.anchor.y, height, false)
 
     fun isMouseInside() =
-                (UICore.mouseX > x) &&
-                (UICore.mouseY > y) &&
-                (UICore.mouseX < x + width) &&
-                (UICore.mouseY < y + height)
+            (getMouseX() > x) &&
+            (getMouseY() > y) &&
+            (getMouseX() < x + width) &&
+            (getMouseY() < y + height)
 
     /**
      * Returns true if the mouse is inside the rel x, y, width and height
      */
     fun isMouseInsideBoundingBox() =
-                (UICore.mouseX > relX) &&
-                (UICore.mouseY > relY) &&
-                (UICore.mouseX < relX + relWidth) &&
-                (UICore.mouseY < relY + relHeight)
+            (getMouseX() > relX) &&
+            (getMouseY() > relY) &&
+            (getMouseX() < relX + relWidth) &&
+            (getMouseY() < relY + relHeight)
 
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
+
+    private fun getMouseX(): Float =
+            UICore.mouseX - if (parent != null && parent is UIFrame) parent!!.relX else 0f
+
+    private fun getMouseY(): Float =
+            UICore.mouseY - if (parent != null && parent is UIFrame) parent!!.relY else 0f
 }

@@ -131,12 +131,12 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
 
     override fun mouseClicked(mouseX: Float, mouseY: Float) {
         super.mouseClicked(mouseX, mouseY)
-        components.forEach { it.mouseClicked(mouseX, mouseY) }
+        components.forEach { it.mouseClicked(mouseX + relX, mouseY + relY) }
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)
-        components.forEach { it.mouseReleased(mouseX, mouseY) }
+        components.forEach { it.mouseReleased(mouseX + relX, mouseY + relY) }
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
