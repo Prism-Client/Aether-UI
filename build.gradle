@@ -64,3 +64,8 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         ]
     }
 }
+compileKotlin {
+    kotlinOptions {
+        languageVersion = "1.7"
+    }
+}

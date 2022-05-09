@@ -1,6 +1,8 @@
 package net.prismclient.aether.ui.animation
 
+import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.ease.impl.UILinear
+import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.animation.keyframe.UIKeyframe
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIStyleSheet
@@ -22,22 +24,22 @@ import net.prismclient.aether.ui.util.extensions.isNormal
  * @since 3/5/2022
  * @see UIKeyframe
  */
-class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimationPriority.NORMAL) {
-    val timeline: ArrayList<UIAnimationSheet> = ArrayList()
+abstract class UIAnimation<T : UIStyleSheet & UIEase>(val name: String, var priority: UIAnimationPriority = UIAnimationPriority.NORMAL) {
+    val timeline: ArrayList<T> = ArrayList()
 
-    private lateinit var component: UIComponent<*>
-    private var activeKeyframe: UIAnimationSheet? = null
-    private var nextKeyframe: UIAnimationSheet? = null
-    private var nextKeyframeIndex: Int = 0
+    protected lateinit var component: UIComponent<*>
+    protected var activeKeyframe: T? = null
+    protected var nextKeyframe: T? = null
+    protected var nextKeyframeIndex: Int = 0
 
     var animationLength: Long = 0L
-        private set
+        protected set
     var animating: Boolean = false
-        private set
+        protected set
     var completed: Boolean = false
-        private set
+        protected set
 
-    fun start(component: UIComponent<*>) {
+    open fun start(component: UIComponent<*>) {
         this.component = component
 
         if (timeline.size < 1) {
@@ -56,15 +58,15 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         }
     }
 
-    fun pause() {
-
+    open fun pause() {
+        TODO("Pausing of animations have not yet been implemented")
     }
 
-    fun stop() {
-
+    open fun stop() {
+        TODO("Stopping of animations have not yet been implemented")
     }
 
-    fun update() {
+    open fun update() {
         if (completed || !animating)
             return
         if (!this::component.isInitialized)
@@ -91,24 +93,15 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
                 }
             }
         }
-
-        val c = this.component
-        val p = nextKeyframe!!
-        val ap = activeKeyframe!!
-        val prog = p.ease.getValue().toFloat()
-
-        c.update()
-
-        p.x?.let { c.x = ap.x.updateX(c.x) + ((p.x.updateX(c.x) - ap.x.updateX(c.x)) * prog) + c.getParentX() }
-        p.y?.let { c.y = ap.y.updateY(c.y) + ((p.y.updateY(c.y) - ap.y.updateY(c.y)) * prog) + c.getParentY() }
-        p.width?.let { c.width = ap.width.updateX(c.width) + ((p.width.updateX(c.width) - ap.width.updateX(c.width)) * prog) }
-        p.height?.let { c.height = ap.height.updateY(c.height) + ((p.height.updateY(c.height) - ap.height.updateY(c.height)) * prog)}
-
-        c.updateBounds()
-        c.updateStyle()
+        component.update()
+        updateKeyframes()
+        component.updateBounds()
+        component.updateStyle()
     }
 
-    fun swapKeyframe(next: UIAnimationSheet) {
+    abstract fun updateKeyframes()
+
+    fun swapKeyframe(next: T) {
         activeKeyframe = nextKeyframe
         nextKeyframe = next
         nextKeyframe!!.ease.start()
@@ -141,11 +134,10 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
      *
      * @param block The [UIStyleSheet] that adjusts the component's properties.
      */
-    inline fun keyframe(block: UIAnimationSheet.() -> Unit): UIAnimationSheet {
+    inline fun keyframe(sheet: T, block: UIAnimationSheet.() -> Unit): UIAnimationSheet {
         // Check if the animation is active
         if (animating)
             throw RuntimeException("Cannot add keyframe while animating")
-        val sheet = UIAnimationSheet()
         timeline.add(sheet)
         sheet.name = "anim-$name-${timeline.size}"
         sheet.block()
@@ -153,7 +145,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         return sheet
     }
 
-    private fun UIUnit?.updateX(x: Float): Float {
+    protected fun UIUnit?.updateX(x: Float): Float {
         if (this == null)
             return x
         if (this.type.isNormal())
@@ -166,7 +158,7 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
         }
     }
 
-    private fun UIUnit?.updateY(y: Float): Float {
+    protected fun UIUnit?.updateY(y: Float): Float {
         if (this == null)
             return y
         if (this.type.isNormal())
@@ -182,6 +174,6 @@ class UIAnimation(val name: String, var priority: UIAnimationPriority = UIAnimat
     /**
      * Returns null if type is INITIAL, as a component cannot have it set to that type
      */
-    private operator fun UIUnit?.unaryPlus(): UIUnit? =
+    protected operator fun UIUnit?.unaryPlus(): UIUnit? =
             if (this?.type == INITIAL) null else this
 }
