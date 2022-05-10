@@ -42,7 +42,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
 
         this.padding = sheet.padding?.copy()
         this.margin = sheet.margin?.copy()
-        this.anchor = sheet.anchor?.copy()
+        this.anchor = sheet.anchor.copy()
 
         return this
     }
@@ -73,7 +73,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         margin!!.block()
     }
 
-    fun animation(block: UIAnimation.() -> Unit) {
+    fun animation(block: UIAnimation<*>.() -> Unit) {
         TODO("Animation block missing")
     }
 }

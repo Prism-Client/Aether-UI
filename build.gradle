@@ -1,8 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
-    id 'org.jetbrains.dokka' version '1.6.20'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.0-Beta'
     id 'java'
 }
 
@@ -51,10 +50,6 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
 }
 
-dokkaHtml {
-    outputDirectory.set(file("${buildDir}/dokka"))
-}
-
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
@@ -64,6 +59,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         ]
     }
 }
+
 compileKotlin {
     kotlinOptions {
         languageVersion = "1.7"

@@ -1,15 +1,13 @@
 package net.prismclient.aether.ui.animation
 
-import net.prismclient.aether.ui.animation.ease.UIEase
-import net.prismclient.aether.ui.animation.ease.impl.UILinear
-import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
-import net.prismclient.aether.ui.animation.keyframe.UIKeyframe
+import net.prismclient.aether.ui.animation.util.UIAnimationResult
+import net.prismclient.aether.ui.animation.util.UIIEase
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIStyleSheet
-import net.prismclient.aether.ui.style.impl.UIAnimationSheet
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIAnimationPriority
+import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.isNormal
 
 /**
@@ -22,9 +20,11 @@ import net.prismclient.aether.ui.util.extensions.isNormal
  *
  * @author sen
  * @since 3/5/2022
- * @see UIKeyframe
  */
-abstract class UIAnimation<T : UIStyleSheet & UIEase>(val name: String, var priority: UIAnimationPriority = UIAnimationPriority.NORMAL) {
+abstract class UIAnimation<T>(
+        val name: String,
+        var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
+) : UICopy<UIAnimation<T>> where T : UIStyleSheet, T : UIIEase {
     val timeline: ArrayList<T> = ArrayList()
 
     protected lateinit var component: UIComponent<*>
@@ -51,11 +51,8 @@ abstract class UIAnimation<T : UIStyleSheet & UIEase>(val name: String, var prio
         animating = true
         completed = false
 
-        for (keyframe in timeline) {
-            if (!keyframe.isEaseInitialized())
-                keyframe.ease = UILinear()
+        for (keyframe in timeline)
             animationLength += keyframe.ease.duration
-        }
     }
 
     open fun pause() {
@@ -108,8 +105,8 @@ abstract class UIAnimation<T : UIStyleSheet & UIEase>(val name: String, var prio
         saveState(activeKeyframe!!)
     }
 
-    fun saveState(k: UIAnimationSheet) {
-        if (k.animationResult == UIAnimationSheet.AnimationResult.Reset) {
+    fun saveState(k: T) {
+        if (k.animationResult == UIAnimationResult.Reset) {
             component.update()
         } else {
             val s = component.style
@@ -134,7 +131,7 @@ abstract class UIAnimation<T : UIStyleSheet & UIEase>(val name: String, var prio
      *
      * @param block The [UIStyleSheet] that adjusts the component's properties.
      */
-    inline fun keyframe(sheet: T, block: UIAnimationSheet.() -> Unit): UIAnimationSheet {
+    inline fun keyframe(sheet: T, block: T.() -> Unit): T {
         // Check if the animation is active
         if (animating)
             throw RuntimeException("Cannot add keyframe while animating")

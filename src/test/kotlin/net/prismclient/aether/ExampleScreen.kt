@@ -1,23 +1,15 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.animation.ease.impl.UILinear
-import net.prismclient.aether.ui.animation.ease.impl.UIQuad
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
+import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
-import net.prismclient.aether.ui.renderer.impl.background.UIBackground
-import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
-import net.prismclient.aether.ui.renderer.impl.property.UIPadding
-import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
-import net.prismclient.aether.ui.style.impl.UIAnimationSheet
 import net.prismclient.aether.ui.style.impl.UIFrameSheet
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
@@ -30,13 +22,13 @@ class ExampleScreen : UIScreen() {
 
     override fun initialize() {
         UIFontFamily(
-            "Poppins",
-            "/fonts/",
-            "regular",
-            "black",
-            "bold",
-            "light",
-            "thin"
+                "Poppins",
+                "/fonts/",
+                "regular",
+                "black",
+                "bold",
+                "light",
+                "thin"
         )
 
         renderer {
@@ -101,7 +93,7 @@ class ExampleScreen : UIScreen() {
 
         val frame = UIFrame("frame")
         val textfield = UITextField("", "text here", UITextField.Companion.number, style = "textfield")
-        val animation = UIAnimation("test", )
+        val animation = UIDefaultAnimation("test")
 
 //        animation {
 //            x = px(0) to px(200)
@@ -125,10 +117,7 @@ class ExampleScreen : UIScreen() {
             height = px(350)
         }
 
-        frame.animation = animation
-        animation.start(frame)
-
-        val otherAnimation = UIAnimation("other-animation")
+        val otherAnimation = UIDefaultAnimation("other-animation")
 
         otherAnimation.keyframe {
             width = px(0)
@@ -143,8 +132,12 @@ class ExampleScreen : UIScreen() {
 //            width = UIUnit(1f, INITIAL)
         }
 
-        textfield.animation = otherAnimation
-        otherAnimation.start(textfield)
+        UIProvider.addAnimation(animation)
+        UIProvider.addAnimation(otherAnimation)
+
+        UIProvider.dispatchAnimation("test", frame)
+        UIProvider.dispatchAnimation("other-animation", textfield)
+
 
         frame.addComponent(textfield)
 
@@ -155,9 +148,9 @@ class ExampleScreen : UIScreen() {
     }
 
     override fun render() {
-        renderer {
-            renderImage("background", 0f, 0f, UICore.width, UICore.height)
-        }
+//        renderer {
+//            renderImage("background", 0f, 0f, UICore.width, UICore.height)
+//        }
         super.render()
     }
 }

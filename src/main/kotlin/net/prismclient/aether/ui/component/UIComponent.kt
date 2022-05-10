@@ -15,7 +15,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var style: T = UIProvider.getStyle(style, false) as T
     var parent: UIComponent<*>? = null
-    var animation: UIAnimation? = null
+    var animation: UIAnimation<*>? = null
 
     var x = 0f
     var y = 0f

@@ -1,5 +1,6 @@
 package net.prismclient.aether
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.defaults.UIDefaults
@@ -8,6 +9,8 @@ import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.util.UIKey
+import java.util.concurrent.Executors
+import java.util.concurrent.Semaphore
 
 open class UICore(renderer: UIRenderer) {
     companion object {
@@ -28,6 +31,15 @@ open class UICore(renderer: UIRenderer) {
 
         fun apply(style: UIDefaults) {
             UIDefaults.instance = style
+        }
+    }
+
+    val updateThreads = Executors.newFixedThreadPool(16)
+    val animationLock = Semaphore(0)
+    val animationThread = Thread {
+        while (true) {
+            animationLock.acquire()
+            UIProvider.activeAnimations.forEach(UIAnimation<*>::update)
         }
     }
 
@@ -54,6 +66,8 @@ open class UICore(renderer: UIRenderer) {
     }
 
     open fun render(screenWidth: Float, screenHeight: Float) {
+
+
         activeScreen?.render()
     }
 
@@ -83,7 +97,9 @@ open class UICore(renderer: UIRenderer) {
     }
 
     open fun update() {
-        activeScreen?.update()
+        updateThreads.execute {
+            activeScreen?.update()
+        }
     }
 
     fun focus(component: UIComponent<*>) {

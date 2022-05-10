@@ -47,7 +47,7 @@ public class Example {
         }
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
-        long window = glfwCreateWindow(1000, 600, "Prism UI", NULL, NULL);
+        long window = glfwCreateWindow(1000, 600, "i want to shoot my foot", NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new RuntimeException();
@@ -190,6 +190,8 @@ public class Example {
             } else {
                 actualFps++;
             }
+
+            UICore.getInstance().getAnimationLock().release();
         }
         //core.delete();
 

@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.style
 
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
 import net.prismclient.aether.ui.style.util.UIFontFamily
@@ -10,7 +11,8 @@ object UIProvider {
 
     val styles = HashMap<String, UIStyleSheet>()
     val fonts = HashMap<String, UIFontFamily>()
-    val animations = ArrayList<UIAnimation>()
+    val animations = HashMap<String, UIAnimation<*>>()
+    val activeAnimations = ArrayList<UIAnimation<*>>()
 
     /**
      * Initializes the UIProvider
@@ -45,11 +47,14 @@ object UIProvider {
         return if (original) style else style.copy()
     }
 
-    fun addAnimation() {
-
+    fun addAnimation(animation: UIAnimation<*>) {
+        animations[animation.name] = animation
     }
 
-    fun dispatchAnimation() {
-
+    // TODO: Priorities
+    fun dispatchAnimation(animationName: String, component: UIComponent<*>) {
+        component.animation = animations[animationName]!!.copy()
+        component.animation!!.start(component)
+        activeAnimations.add(component.animation!!)
     }
 }

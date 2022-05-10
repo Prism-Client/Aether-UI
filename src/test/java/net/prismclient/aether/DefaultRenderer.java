@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.nanovg.*;
 import org.lwjgl.stb.STBImage;
+import org.lwjgl.stb.STBTruetype;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
