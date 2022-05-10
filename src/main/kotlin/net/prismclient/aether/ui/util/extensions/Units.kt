@@ -10,6 +10,8 @@ fun px(value: Number) = UIUnit(value.toFloat(), PIXELS)
 
 fun percent(value: Number) = UIUnit(value.toFloat() / 100f, RELATIVE)
 
+fun unit(value: Number, type: Byte) = UIUnit(value.toFloat(), type)
+
 /**
  * When in a [UIAnimation] style sheet, the value is equal to the value += this instead of value = this
  *

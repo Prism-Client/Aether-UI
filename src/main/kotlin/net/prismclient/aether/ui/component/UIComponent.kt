@@ -26,6 +26,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var relWidth = 0f
     var relHeight = 0f
 
+    var wasInside = false
+
     /**
      * Invoked on creation, and screen resize
      */
@@ -84,12 +86,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     abstract fun renderComponent()
 
     open fun mouseMoved(mouseX: Float, mouseY: Float) {
-
+        if (isMouseInsideBoundingBox() && !wasInside) {
+            wasInside = true
+            onMouseEnter()
+        } else if (wasInside) {
+            onMouseLeave()
+            wasInside = false
+        }
     }
 
     open fun mouseClicked(mouseX: Float, mouseY: Float) {
-        println("$this, ${isMouseInsideBoundingBox()}")
-        println("${this.relX}, ${this.getMouseX()}")
         if (this is UIFocusable<*> && !isFocused() && isMouseInsideBoundingBox()) {
             UICore.instance.focus(this)
         }
@@ -104,6 +110,14 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
+
+    }
+
+    open fun onMouseEnter() {
+
+    }
+
+    open fun onMouseLeave() {
 
     }
 

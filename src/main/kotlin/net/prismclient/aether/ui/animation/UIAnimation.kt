@@ -151,6 +151,10 @@ abstract class UIAnimation<T>(
             INITIAL -> x
             PXANIMRELATIVE -> x + this.value
             RELANIMRELATIVE -> x + component.getParentWidth() * this.value
+            XANIM -> component.x * this.value
+            YANIM -> component.y * this.value
+            WIDTHANIM -> component.width * this.value
+            HEIGHTANIM -> component.height * this.value
             else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
         }
     }
@@ -164,6 +168,10 @@ abstract class UIAnimation<T>(
             INITIAL -> y
             PXANIMRELATIVE -> y + this.value
             RELANIMRELATIVE -> y + component.getParentHeight() * this.value
+            XANIM -> component.x * this.value
+            YANIM -> component.y * this.value
+            WIDTHANIM -> component.width * this.value
+            HEIGHTANIM -> component.height * this.value
             else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
         }
     }

@@ -14,18 +14,23 @@ const val RELATIVE: Byte = 1
  * The height of the active component
  */
 const val EM: Byte = 2
-const val AUTO: Byte = 3
+
+/**
+ * The border width of the active component
+ */
+const val BORDER: Byte = 3
+
+const val AUTO: Byte = 4
 
 /**
  *  Used only for grids. Like relatives, except for the remaining space in a grid
  */
-const val FRACTION: Byte = 4
+const val FRACTION: Byte = 5
 
 /**
  *  Used for grids. Keeps the initial size of the component
  */
-const val INITIAL: Byte = 5
-const val COPY: Byte = 6
+const val INITIAL: Byte = 6
 
 /**
  * The ascender of the current stylesheet's font
@@ -46,3 +51,23 @@ const val PXANIMRELATIVE: Byte = 9
  * A relative percentage position for a unit in an animation
  */
 const val RELANIMRELATIVE: Byte = 10
+
+/**
+ * The x of the component, for animations
+ */
+const val XANIM: Byte = 11
+
+/**
+ * The y of the component, for animations
+ */
+const val YANIM: Byte = 12
+
+/**
+ * The width of the component, for animations
+ */
+const val WIDTHANIM: Byte = 13
+
+/**
+ * The height of the component, for animations
+ */
+const val HEIGHTANIM: Byte = 14

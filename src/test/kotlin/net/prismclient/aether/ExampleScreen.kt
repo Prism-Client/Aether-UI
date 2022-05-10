@@ -93,47 +93,20 @@ class ExampleScreen : UIScreen() {
 
         val frame = UIFrame("frame")
         val textfield = UITextField("", "text here", UITextField.Companion.number, style = "textfield")
-        val animation = UIDefaultAnimation("test")
 
-//        animation {
-//            x = px(0) to px(200)
-//        }
-
-        animation.keyframe {
-//            x = px(0)
-            width = px(0)
-            height = px(0)
+        animation(UIDefaultAnimation("test")) {
+            keyframe {
+                y = unit(-1, HEIGHTANIM)
+            }
+            keyframe(UIQuart(1000))
         }
 
-        animation.keyframe {
-            ease = UIQuart(1000)
-//            x = px(200)
-            width = px(350)
-            height = px(0)
+        animation(UIDefaultAnimation("other-animation")) {
+            keyframe {
+                width = px(0)
+            }
+            keyframe(UIQuart(1000), 1000L)
         }
-
-        animation.keyframe {
-            ease = UIQuart(1000)
-            height = px(350)
-        }
-
-        val otherAnimation = UIDefaultAnimation("other-animation")
-
-        otherAnimation.keyframe {
-            width = px(0)
-            height = px(0)
-            y = px(-30)
-        }
-
-        otherAnimation.keyframe {
-            ease = UIQuart(1000)
-            ease.delay = 1000L
-            y = UIUnit(1f, INITIAL)
-//            width = UIUnit(1f, INITIAL)
-        }
-
-        UIProvider.addAnimation(animation)
-        UIProvider.addAnimation(otherAnimation)
 
         UIProvider.dispatchAnimation("test", frame)
         UIProvider.dispatchAnimation("other-animation", textfield)

@@ -47,7 +47,7 @@ object UIProvider {
         return if (original) style else style.copy()
     }
 
-    fun addAnimation(animation: UIAnimation<*>) {
+    fun registerAnimation(animation: UIAnimation<*>) {
         animations[animation.name] = animation
     }
 
