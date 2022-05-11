@@ -66,8 +66,6 @@ open class UICore(renderer: UIRenderer) {
     }
 
     open fun render(screenWidth: Float, screenHeight: Float) {
-
-
         activeScreen?.render()
     }
 
@@ -102,12 +100,31 @@ open class UICore(renderer: UIRenderer) {
         }
     }
 
-    fun focus(component: UIComponent<*>) {
+    open fun focus(component: UIComponent<*>) {
         if (component is UIFocusable<*>) {
             focusedComponent = component
             component.focus()
         } else {
             println("$component is not a instance of a UIFocusable")
         }
+    }
+
+    /**
+     * Returns the first match with a component of the given style
+     */
+    open fun getComponentByStyle(styleName: String): UIComponent<*> {
+        if (activeScreen == null)
+            throw RuntimeException("Attempted to retrieve component by style without an active screen")
+        for (component in activeScreen!!.components) {
+            if (component.style.name == styleName)
+                return component
+        }
+        return throw RuntimeException("Component with given style name not found")
+    }
+
+    open fun getComponentsByStyle(styleName: String): List<UIComponent<*>> {
+        if (activeScreen == null)
+            throw RuntimeException("Attempted to retrieve component by style without an active screen")
+        return activeScreen!!.components.filter { it.style.name == styleName }
     }
 }

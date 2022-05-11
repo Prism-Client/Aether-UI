@@ -30,11 +30,13 @@ abstract class UIScreen {
     }
 
     open fun renderContent() {
-        frames.forEach(UIFrame::renderContent)
+        for (i in 0 until frames.size)
+            frames[i].renderContent()
     }
 
     open fun render() {
-        components.forEach(UIComponent<*>::render)
+        for (i in 0 until components.size)
+            frames[i].render()
     }
 
     open fun mouseMoved(mouseX: Float, mouseY: Float) {
