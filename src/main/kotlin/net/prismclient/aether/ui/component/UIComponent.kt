@@ -10,6 +10,8 @@ import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
 import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIKey
+import net.prismclient.aether.ui.util.extensions.calculateX
+import net.prismclient.aether.ui.util.extensions.calculateY
 import net.prismclient.aether.ui.util.extensions.renderer
 
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
@@ -133,18 +135,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             calculateUnitX(this, width, ignore)
 
     fun calculateUnitX(unit: UIUnit?, width: Float, ignore: Boolean): Float = if (unit == null) 0f else {
-        if (!ignore && unit is UIOperationUnit) {
-            unit.getX(width, true) + unit.otherUnit.getX(width)
-        } else {
-            when (unit.type) {
-                PIXELS, PXANIMRELATIVE -> unit.value
-                RELATIVE, RELANIMRELATIVE -> unit.value * width
-                EM -> unit.value * (style.font?.fontSize ?: 0f)
-                ASCENDER -> unit.value * (style.font?.getAscend() ?: 0f)
-                DESCENDER -> unit.value * (style.font?.getDescend() ?: 0f)
-                else -> throw UnsupportedOperationException("${unit.type} is not a valid type.")
-            }
-        }
+        calculateX(unit, this, ignore, width)
     }
 
     @JvmOverloads
@@ -155,18 +146,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             calculateUnitY(this, height, ignore)
 
     fun calculateUnitY(unit: UIUnit?, height: Float, ignore: Boolean): Float = if (unit == null) 0f else {
-        if (!ignore && unit is UIOperationUnit) {
-            unit.getY(height, true) + unit.otherUnit.getY(height)
-        } else {
-            when (unit.type) {
-                PIXELS, PXANIMRELATIVE -> unit.value
-                RELATIVE, RELANIMRELATIVE -> unit.value * height
-                EM -> unit.value * (style.font?.fontSize ?: 0f)
-                ASCENDER -> unit.value * (style.font?.getAscend() ?: 0f)
-                DESCENDER -> unit.value * (style.font?.getDescend() ?: 0f)
-                else -> throw UnsupportedOperationException("${unit.type} is not a valid type.")
-            }
-        }
+        calculateY(unit, this, ignore, height)
     }
 
     fun getParentX() = if (parent != null)

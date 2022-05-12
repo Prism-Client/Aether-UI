@@ -34,7 +34,7 @@ open class UICore(renderer: UIRenderer) {
         }
     }
 
-    val updateThreads = Executors.newFixedThreadPool(16)
+    val updateThreads = Executors.newFixedThreadPool(1)
     val animationLock = Semaphore(0)
     val animationThread = Thread {
         while (true) {

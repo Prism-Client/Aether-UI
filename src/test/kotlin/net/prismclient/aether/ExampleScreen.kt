@@ -83,7 +83,9 @@ class ExampleScreen : UIScreen() {
                 textAlignment = ALIGNLEFT or ALIGNMIDDLE
 
                 // Adjust the font to be the center of the text
-                y = UIOperationUnit(0.5f, RELATIVE, UIUnit(0.5f, DESCENDER), UIOperation.ADD)
+                y = rel(0.5) + unit(0.5f, DESCENDER)
+
+
             }
 
             padding {
@@ -110,7 +112,6 @@ class ExampleScreen : UIScreen() {
 
         UIProvider.dispatchAnimation("test", frame)
         UIProvider.dispatchAnimation("other-animation", textfield)
-
 
         frame.addComponent(textfield)
 

@@ -1,9 +1,11 @@
 package net.prismclient.aether.ui.animation
 
+import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.animation.util.UIIEase
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.style.impl.animation.UIAnimationSheet
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIAnimationPriority

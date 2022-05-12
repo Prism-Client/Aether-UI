@@ -3,6 +3,7 @@ package net.prismclient.aether;
 import net.prismclient.aether.ui.renderer.UIRenderer;
 import net.prismclient.aether.ui.renderer.builder.UIRendererDSL;
 import net.prismclient.aether.ui.util.UIKey;
+import net.prismclient.aether.ui.util.extensions.UnitsKt;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
