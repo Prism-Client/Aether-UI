@@ -66,12 +66,14 @@ val orderOfOperations = px(100) - px(10) / px(2) // 100 - (10 / 2) = 100 - 5 = 9
 Unfortunately, Java doesn't provide the ability to overload operators.
 
 ```java
-/* 50 - 10 = 40px */
-UIUnit operation1 = operation(px(50), px(10), UIOperation.SUBTRACT);
-/* (100 - 10) / 2 = 45px */
-UIUnit operation2 = operation(operation(px(100), px(10), SUBTRACT), px(2), DIVIDE);
-/* 100 - (10 / 2) = 95px */
-UIUnit operation3 = operation(px(100), operation(px(10), px(2), DIVIDE), SUBTRACT);
+class Operations {
+    /* 50 - 10 = 40px */
+    UIUnit operation1 = operation(px(50), px(10), UIOperation.SUBTRACT);
+    /* (100 - 10) / 2 = 45px */
+    UIUnit operation2 = operation(operation(px(100), px(10), SUBTRACT), px(2), DIVIDE);
+    /* 100 - (10 / 2) = 95px */
+    UIUnit operation3 = operation(px(100), operation(px(10), px(2), DIVIDE), SUBTRACT);
+}
 ```
 
 Keep in mind, however you wrote it is how aether interprets it. It will look at the first unit, then the second unit 
@@ -93,4 +95,7 @@ To be done.
 
 # Custom Units
 
-To be done.
+Some styles, such as UIAnimationSheet have their own unique units. In the case of animations, the units are needed to 
+tell aether that you want it to be relative to the component's position, instead of an actual position on screen. The 
+UIUnit class represents the type as a Byte, so to create a unit, simply create a new unit that isn't one of the already 
+used one in the UIUnitType (any number within a byte that is greater than 14).
