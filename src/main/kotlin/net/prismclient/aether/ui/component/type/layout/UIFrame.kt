@@ -9,13 +9,8 @@ import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
- * [UIFrame] is a "viewport" for components. The frame holds a list of
- * children which are rendered. It is the superclass for components like
- * layouts, such as a list, or grid layout. Unlike other layout components,
  * [UIFrame] does not control the components inside it, and the components are
- * free to act however they want. Because of how [UIFrame] is designed, more
- * custom rendering features can be applied (such as shaders), by extending the
- * class and applying your own code.
+ * free to act however they want.
  *
  * [UIFrame] works by rendering all the content to an FBO if content clipping is
  * enabled. If disabled, everything is rendered when the render method for this

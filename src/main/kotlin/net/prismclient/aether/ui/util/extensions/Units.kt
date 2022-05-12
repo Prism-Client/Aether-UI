@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui.util.extensions
 
-import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
@@ -11,6 +10,9 @@ import net.prismclient.aether.ui.unit.util.*
 /** General Units **/
 
 fun px(value: Number) = UIUnit(value.toFloat(), PIXELS)
+
+
+fun rel(value: Number) = UIUnit(value.toFloat(), RELATIVE)
 
 fun percent(value: Number) = UIUnit(value.toFloat() / 100f, RELATIVE)
 
@@ -24,16 +26,8 @@ fun unit(value: Number, type: Byte) = UIUnit(value.toFloat(), type)
 
 fun operation(unit1: UIUnit, unit2: UIUnit, operation: UIOperation) = UIOperationUnit(unit1, unit2, operation)
 
-/**
- * When in a [UIAnimation] style sheet, the value is equal to the value += this instead of value = this
- */
-fun rel(value: Number) = UIUnit(value.toFloat())
-
 /** Operator functions **/
 
-/**
- * Creates an addition [UIOperationUnit] from two units
- */
 operator fun UIUnit.plus(unit: UIUnit) = UIOperationUnit(this, unit, ADD)
 
 operator fun UIUnit.minus(unit: UIUnit) = UIOperationUnit(this, unit, SUBTRACT)
@@ -65,11 +59,11 @@ fun calculateX(unit: UIUnit,  component: UIComponent<*>, ignoreOperation: Boolea
 /**
  * Returns the value of a [UIOperationUnit] on the y-axis
  */
-fun calculateX(operationUnit: UIOperationUnit, component: UIComponent<*>): Float = when (operationUnit.operation) {
-    ADD -> calculateX(operationUnit.unit1, component) + calculateX(operationUnit.unit2, component)
-    SUBTRACT -> calculateX(operationUnit.unit1, component) - calculateX(operationUnit.unit2, component)
-    MULTIPLY -> calculateX(operationUnit.unit1, component) * calculateX(operationUnit.unit2, component)
-    DIVIDE -> calculateX(operationUnit.unit1, component) / calculateX(operationUnit.unit2, component)
+fun calculateX(operationUnit: UIOperationUnit, component: UIComponent<*>, width: Float): Float = when (operationUnit.operation) {
+    ADD -> calculateX(operationUnit.unit1, component, false, width) + calculateX(operationUnit.unit2, component, false, width)
+    SUBTRACT -> calculateX(operationUnit.unit1, component, false, width) - calculateX(operationUnit.unit2, component, false, width)
+    MULTIPLY -> calculateX(operationUnit.unit1, component, false, width) * calculateX(operationUnit.unit2, component, false, width)
+    DIVIDE -> calculateX(operationUnit.unit1, component, false, width) / calculateX(operationUnit.unit2, component, false, width)
 }
 
 /**
@@ -78,8 +72,10 @@ fun calculateX(operationUnit: UIOperationUnit, component: UIComponent<*>): Float
  * @param ignoreOperation When true, the calculation will to care if the [UIUnit] is an instance of [UIOperationUnit]
  */
 @JvmOverloads
-fun calculateY(unit: UIUnit, component: UIComponent<*>, ignoreOperation: Boolean = false, height: Float = component.getParentHeight()): Float {
-    return if (!ignoreOperation && unit is UIOperationUnit) calculateY(unit, component)
+fun calculateY(unit: UIUnit, component: UIComponent<*>, ignoreOperation: Boolean = false, height: Float): Float {
+    return if (!ignoreOperation && unit is UIOperationUnit) {
+        calculateY(unit, component, height)
+    }
     else when (unit.type) {
         PIXELS, PXANIMRELATIVE -> unit.value
         RELATIVE, RELANIMRELATIVE -> unit.value * height
@@ -93,11 +89,11 @@ fun calculateY(unit: UIUnit, component: UIComponent<*>, ignoreOperation: Boolean
 /**
  * Returns the value of a [UIOperationUnit] on the y-axis
  */
-fun calculateY(operationUnit: UIOperationUnit, component: UIComponent<*>): Float = when (operationUnit.operation) {
-    ADD -> calculateY(operationUnit.unit1, component) + calculateY(operationUnit.unit2, component)
-    SUBTRACT -> calculateY(operationUnit.unit1, component) - calculateY(operationUnit.unit2, component)
-    MULTIPLY -> calculateY(operationUnit.unit1, component) * calculateY(operationUnit.unit2, component)
-    DIVIDE -> calculateY(operationUnit.unit1, component) / calculateY(operationUnit.unit2, component)
+fun calculateY(operationUnit: UIOperationUnit, component: UIComponent<*>, height: Float): Float = when (operationUnit.operation) {
+    ADD -> calculateY(operationUnit.unit1, component, false, height) + calculateY(operationUnit.unit2, component, false, height)
+    SUBTRACT -> calculateY(operationUnit.unit1, component, false, height) - calculateY(operationUnit.unit2, component, false, height)
+    MULTIPLY -> calculateY(operationUnit.unit1, component, false, height) * calculateY(operationUnit.unit2, component, false, height)
+    DIVIDE -> calculateY(operationUnit.unit1, component, false, height) / calculateY(operationUnit.unit2, component, false, height)
 }
 
 /** Other **/

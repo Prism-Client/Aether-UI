@@ -83,9 +83,7 @@ class ExampleScreen : UIScreen() {
                 textAlignment = ALIGNLEFT or ALIGNMIDDLE
 
                 // Adjust the font to be the center of the text
-                y = rel(0.5) + unit(0.5f, DESCENDER)
-
-
+                y += descender(0.5)
             }
 
             padding {
@@ -94,7 +92,7 @@ class ExampleScreen : UIScreen() {
         }
 
         val frame = UIFrame("frame")
-        val textfield = UITextField("", "text here", UITextField.Companion.number, style = "textfield")
+        val textfield = UITextField("some jjjjggaa textg", "text here", UITextField.Companion.any, style = "textfield")
 
         animation(UIDefaultAnimation("test")) {
             keyframe {
@@ -110,8 +108,8 @@ class ExampleScreen : UIScreen() {
             keyframe(UIQuart(1000), 1000L)
         }
 
-        UIProvider.dispatchAnimation("test", frame)
-        UIProvider.dispatchAnimation("other-animation", textfield)
+//        UIProvider.dispatchAnimation("test", frame)
+//        UIProvider.dispatchAnimation("other-animation", textfield)
 
         frame.addComponent(textfield)
 

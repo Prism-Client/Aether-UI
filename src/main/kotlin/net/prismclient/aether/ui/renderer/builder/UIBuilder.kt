@@ -1,23 +1,48 @@
-//package net.prismclient.aether.ui.renderer.builder
-//
-//import net.prismclient.aether.ui.component.UIComponent
-//import net.prismclient.aether.ui.component.impl.UIBlankComponent
-//import net.prismclient.aether.ui.component.impl.UIGenericComponent
-//import net.prismclient.aether.ui.component.impl.button.UICheckBoxComponent
-//import net.prismclient.aether.ui.component.impl.button.UIImageTextButtonComponent
-//import net.prismclient.aether.ui.component.impl.button.UITextButtonComponent
-//import net.prismclient.aether.ui.component.impl.container.UIContainer
-//import net.prismclient.aether.ui.component.impl.container.grid.UIGridLayoutComponent
-//import net.prismclient.aether.ui.component.impl.container.list.UIHorizontalListComponent
-//import net.prismclient.aether.ui.component.impl.container.list.UIVerticalListComponent
-//import net.prismclient.aether.ui.component.impl.image.UIImageComponent
-//import net.prismclient.aether.ui.component.impl.input.UITextFieldComponent
-//import java.util.*
-//
-///**
-// * A class intended to be used inside the initialize block of a [UIScreen].
-// */
-//object UIBuilder {
+package net.prismclient.aether.ui.renderer.builder
+
+import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.style.UIStyleSheet
+import java.util.Stack
+
+/**
+ * [UIBuilder] is a DSL class to make it easier to define components.
+ *
+ * @author sen
+ * @since 12/5/2022
+ */
+object UIBuilder {
+    private var components: ArrayList<UIComponent<*>>? = null
+    private val frameStack = Stack<UIFrame>()
+    private val styleStack = Stack<String>()
+    var activeComponent: UIComponent<*>? = null
+    var activeStyle: String = ""
+
+    fun create() {
+        components = ArrayList()
+    }
+
+    fun finalize() {
+        components = null
+        componentStack.clear()
+        styleStack.clear()
+        activeStyle = ""
+    }
+
+    fun addComponent(component: UIComponent<*>) {
+
+    }
+
+    /** Layout components **/
+
+    /** General components **/
+
+    /**
+     * Returns an ArrayList of components created
+     */
+    fun get(): ArrayList<UIComponent<*>> = components!!
+}
+
 //    var components: ArrayList<UIComponent> = ArrayList()
 //    private val componentStack = Stack<UIComponent>()
 //    private val styleQueue = Stack<String>()

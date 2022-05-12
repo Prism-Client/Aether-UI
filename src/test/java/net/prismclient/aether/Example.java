@@ -118,6 +118,7 @@ public class Example {
             UICore.Companion.setHeight(h / contentScaleX);
             core.update();
         });
+
         glfwSetWindowContentScaleCallback(window, (handle, xscale, yscale) -> {
             contentScaleX = xscale;
             contentScaleY = yscale;
