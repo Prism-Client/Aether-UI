@@ -1,11 +1,13 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
  * [UIContainer] is the superclass for all layouts. It introduces scrollbars
- * into the component, so content outside of the frame can be viewed.
+ * into the component, so content outside the frame can be viewed.
  *
  * [UIContainer] itself can also be created with [UIContainerSheet] as the sheet.
  *
@@ -47,35 +49,67 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
     }
 
     open fun updateScrollbar() {
-        style.scrollbarX.update(this)
-        style.scrollbarY.update(this)
+        style.verticalScrollbar.update(this)
+        style.horizontalScrollbar.update(this)
     }
 
     open fun renderScrollbar() {
-        style.scrollbarX.render()
-        style.scrollbarY.render()
+        style.verticalScrollbar.render()
+        style.horizontalScrollbar.render()
+    }
+
+    override fun renderContent() {
+        if (!style.clipContent)
+            return
+        updateAnimation()
+        updateFramebuffer()
+        // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
+        if (relWidth < 1f || relHeight < 1f)
+            return
+        renderer {
+            renderContent(framebuffer) {
+                translate(0f, -(style.verticalScrollbar.value * expandedHeight)) {
+                    components.forEach(UIComponent<*>::render)
+                }
+            }
+        }
     }
 
     override fun render() {
-        super.render()
+        // Overwrite the UIFrame renderer to apply the translations
+        // and update the FBO if needed
+        if (!style.clipContent)
+            updateAnimation()
+        style.background?.render(relX, relY, relWidth, relHeight)
+        renderer {
+            if (!style.clipContent) {
+                translate(0f, -(style.verticalScrollbar.value * expandedHeight)) {
+                    renderComponent()
+                }
+            } else {
+                scissor(relX, relY, relWidth, relHeight) {
+                    renderComponent()
+                }
+            }
+        }
         renderScrollbar()
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float) {
         super.mouseClicked(mouseX, mouseY)
-        style.scrollbarX.mousePressed(mouseX, mouseY)
-        style.scrollbarY.mousePressed(mouseX, mouseY)
+        style.verticalScrollbar.mousePressed(mouseX, mouseY)
+        style.horizontalScrollbar.mousePressed(mouseX, mouseY)
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)
-        style.scrollbarX.release()
-        style.scrollbarY.release()
+        style.verticalScrollbar.release()
+        style.horizontalScrollbar.release()
     }
 
     override fun mouseMoved(mouseX: Float, mouseY: Float) {
         super.mouseMoved(mouseX, mouseY)
-        style.scrollbarX.mouseMoved(mouseX, mouseY)
-        style.scrollbarY.mouseMoved(mouseX, mouseY)
+        style.verticalScrollbar.mouseMoved(mouseX, mouseY)
+        style.horizontalScrollbar.mouseMoved(mouseX, mouseY)
     }
 }

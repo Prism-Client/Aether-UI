@@ -8,6 +8,7 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
+import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
@@ -55,12 +56,15 @@ class ExampleScreen : UIScreen() {
 
             overflowX = UIContainerSheet.Overflow.Scroll
 
-            scrollbarX.x = px(10)
-            scrollbarX.y = percent(10)
-            scrollbarX.width = px(5)
-            scrollbarX.height = percent(80)
+            verticalScrollbar.x = px(10)
+            verticalScrollbar.y = percent(10)
+            verticalScrollbar.width = px(5)
+            verticalScrollbar.height = percent(80)
 
-            scrollbarX.radius = radius(2.5f)
+            verticalScrollbar.radius = radius(2.5f)
+
+            verticalScrollbar.background = UIBackground()
+            verticalScrollbar.background!!.color = asRGBA(255, 0, 0)
 
 
             clipContent = true
@@ -70,7 +74,7 @@ class ExampleScreen : UIScreen() {
             x = px(10) + px(10)
             y = percent(100) - px(10)
             width = rel(1) - px(10) - px(10)
-            height = px(30)
+            height = px(1000)
 
             caretY = UIUnit(-0.5f, EM)
             caretWidth = px(1)

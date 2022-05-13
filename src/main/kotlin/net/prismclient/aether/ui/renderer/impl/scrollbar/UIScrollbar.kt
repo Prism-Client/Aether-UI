@@ -7,9 +7,13 @@ import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.extensions.limit
 import net.prismclient.aether.ui.util.extensions.renderer
+import java.lang.Float.max
 
 class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
+    private lateinit var component: UIContainer<*>
+
     var color = -1
     var border: UIBorder? = null
     var radius: UIRadius? = null
@@ -26,14 +30,15 @@ class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
     var cachedWidth = 0f
     var cachedHeight = 0f
 
+    var value = 0f
     var shouldRender = false
-        private set
     var selected = false
-        private set
-    var offsetX = 0f
-    var offsetY = 0f
+    private var sliderSize = 0f // Width/Height of the overall slider
+    private var mouseOffset = 0f
 
     fun update(container: UIContainer<*>) {
+        component = container
+
         // Check based on the overflow if the scrollbar should be rendered or not
         shouldRender = if (type == Scrollbar.Vertical) {
             when (container.style.overflowX) {
@@ -49,6 +54,7 @@ class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
             }
         }
 
+        // Update the values
         cachedX = container.relX + container.calculateUnitX(x, container.relWidth, false)
         cachedY = container.relY + container.calculateUnitY(y, container.relHeight, false)
         cachedWidth = container.calculateUnitX(width, container.relWidth, false)
@@ -56,25 +62,73 @@ class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
 
         // Update the width/height of the scrollbar
         if (type == Scrollbar.Vertical) {
+            sliderSize = cachedHeight
             cachedHeight *= (cachedHeight / (container.expandedHeight + cachedHeight))
+//            leftoverSpace = (1f - (cachedHeight / (container.expandedHeight + cachedHeight))) * container.relHeight
+//            value = (cachedHeight / (container.expandedHeight + cachedHeight))
+//            cachedHeight *= (cachedHeight / (container.expandedHeight + cachedHeight))
         } else if (type == Scrollbar.Horizontal) {
+            sliderSize = cachedWidth
             cachedWidth *= (cachedWidth / (container.expandedWidth + cachedWidth))
+//            leftoverSpace = (1f - (cachedWidth / (container.expandedWidth + cachedWidth))) * container.relWidth
+//            value = (cachedWidth / (container.expandedWidth + cachedWidth))
+//            cachedWidth *= (cachedWidth / (container.expandedWidth + cachedWidth))
         }
     }
 
     fun render() {
         if (!shouldRender) return
-        background?.render(cachedX, cachedY, cachedWidth, cachedHeight)
+
+        var x = this.cachedX
+        var y = this.cachedY
+        var w = this.cachedWidth
+        var h = this.cachedHeight
+
+        if (type == Scrollbar.Vertical) {
+            background?.render(x, y, cachedWidth, sliderSize)
+            y += (sliderSize - cachedHeight) * value
+        } else {
+            background?.render(x, y, sliderSize, cachedHeight)
+            x += (sliderSize - cachedHeight) * value
+        }
         renderer {
             color(color)
-            rect(cachedX, cachedY, cachedWidth, cachedHeight, radius)
-            border?.render(cachedX, cachedY, cachedWidth, cachedHeight, radius)
+            rect(x, y, w, h, radius)
+            border?.render(x, y, w, h, radius)
         }
     }
 
+    // TODO: Fix scrollbar calculation
     fun mousePressed(mouseX: Float, mouseY: Float) {
-        if (mouseX >= cachedX && mouseY >= cachedY && mouseX <= cachedX + cachedWidth && mouseY <= cachedY + cachedHeight) {
-            selected = true
+        var x = cachedX
+        var y = cachedY
+        var w = cachedWidth
+        var h = cachedHeight
+        if (type == Scrollbar.Vertical) {
+            y += (sliderSize - cachedHeight) * value
+            h = sliderSize
+        } else {
+            x += (sliderSize - cachedHeight) * value
+            w = sliderSize
+        }
+        // Check if inside the bound box of the scorllbar
+        if (mouseX >= cachedX && mouseY >= cachedY && mouseX <= cachedX + w && mouseY <= cachedY + h) {
+            // If inside the actual scrollbar
+            if (mouseX >= x && y >= y && mouseX <= x + cachedWidth && mouseY <= y + cachedHeight) {
+                selected = true
+                mouseOffset = if (type == Scrollbar.Vertical) {
+                    mouseY - cachedY
+                } else {
+                    mouseX - cachedX
+                }
+            } else {
+                if (type == Scrollbar.Vertical) {
+                    value = ((mouseY - mouseOffset)) / (sliderSize - cachedHeight)
+                } else {
+                    value = ((mouseX - mouseOffset)) / (sliderSize - cachedWidth)
+                }
+                value = value.limit()
+            }
         }
     }
 
@@ -84,7 +138,12 @@ class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
 
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         if (selected) {
-
+            if (type == Scrollbar.Vertical) {
+                value = ((mouseY - mouseOffset) - cachedY) / (sliderSize - cachedHeight)
+            } else {
+                value = ((mouseX - mouseOffset) - cachedX) / (sliderSize - cachedWidth)
+            }
+            value = value.limit()
         }
     }
 
@@ -107,6 +166,7 @@ class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
         it.color = color
         it.radius = radius?.copy()
         it.border = border?.copy()
+        it.background = background?.copy()
         it.x = x?.copy()
         it.y = y?.copy()
         it.width = width?.copy()

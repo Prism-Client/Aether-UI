@@ -13,8 +13,8 @@ open class UIContainerSheet : UIFrameSheet() {
     var overflowX: Overflow = Overflow.Auto
     var overflowY: Overflow = Overflow.None
 
-    var scrollbarX: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
-    var scrollbarY: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Horizontal)
+    var verticalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
+    var horizontalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Horizontal)
 
     /**
      * [Overflow] defines what the vertical, and horizontal scrollbars
@@ -53,8 +53,8 @@ open class UIContainerSheet : UIFrameSheet() {
         it.overflowX = overflowX
         it.overflowY = overflowY
 
-        it.scrollbarX = scrollbarX.copy()
-        it.scrollbarY = scrollbarY.copy()
+        it.verticalScrollbar = verticalScrollbar.copy()
+        it.horizontalScrollbar = horizontalScrollbar.copy()
 
         return it
     }
