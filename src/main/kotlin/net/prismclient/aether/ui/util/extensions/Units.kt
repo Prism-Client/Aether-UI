@@ -45,7 +45,7 @@ operator fun UIUnit.div(unit: UIUnit) = UIOperationUnit(this, unit, DIVIDE)
  */
 @JvmOverloads
 fun calculateX(unit: UIUnit,  component: UIComponent<*>, ignoreOperation: Boolean = false, width: Float = component.getParentWidth()): Float {
-    return if (!ignoreOperation && unit is UIOperationUnit) calculateX(unit, component)
+    return if (!ignoreOperation && unit is UIOperationUnit) calculateX(unit, component, width)
     else when (unit.type) {
         PIXELS, PXANIMRELATIVE -> unit.value
         RELATIVE, RELANIMRELATIVE -> unit.value * width
@@ -73,9 +73,7 @@ fun calculateX(operationUnit: UIOperationUnit, component: UIComponent<*>, width:
  */
 @JvmOverloads
 fun calculateY(unit: UIUnit, component: UIComponent<*>, ignoreOperation: Boolean = false, height: Float): Float {
-    return if (!ignoreOperation && unit is UIOperationUnit) {
-        calculateY(unit, component, height)
-    }
+    return if (!ignoreOperation && unit is UIOperationUnit) calculateY(unit, component, height)
     else when (unit.type) {
         PIXELS, PXANIMRELATIVE -> unit.value
         RELATIVE, RELANIMRELATIVE -> unit.value * height

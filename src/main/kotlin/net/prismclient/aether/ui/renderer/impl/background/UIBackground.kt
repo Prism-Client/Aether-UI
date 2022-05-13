@@ -14,49 +14,28 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 4/26/2022
  */
-open class UIBackground() : UICopy<UIBackground> {
-    var color = UIDefaults.instance.fontColor
-    var radius: UIRadius = UIDefaults.instance.backgroundRadius.copy()
-    var border: UIBorder? = UIDefaults.instance.backgroundBorder?.copy()
+open class UIBackground : UICopy<UIBackground> {
+    var color = UIDefaults.instance.backgroundColor
+    var border: UIBorder? = null
+    var radius: UIRadius? = null
+
 
     open fun render(x: Float, y: Float, width: Float, height: Float) {
         renderer {
             color(color)
-            rect(
-                x,
-                y,
-                width,
-                height,
-                radius.topLeft,
-                radius.topRight,
-                radius.bottomRight,
-                radius.bottomLeft
-            )
-            if (border != null) {
-                outline(border!!.borderWidth, border!!.borderColor) {
-                    rect(
-                        x,
-                        y,
-                        width,
-                        height,
-                        radius.topLeft,
-                        radius.topRight,
-                        radius.bottomRight,
-                        radius.bottomLeft
-                    )
-                }
-            }
+            rect(x, y, width, height, radius)
+            border?.render(x, y, width, height, radius)
         }
     }
 
-    fun border(block: UIBorder.() -> Unit) {
+    inline fun border(block: UIBorder.() -> Unit) {
         border = UIBorder()
         border!!.block()
     }
 
     override fun copy(): UIBackground = UIBackground().also {
         it.color = color
-        it.radius = radius.copy()
+        it.radius = radius?.copy()
         it.border = border?.copy()
     }
 }

@@ -2,18 +2,17 @@ package net.prismclient.aether.ui.renderer.builder
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.Stack
 
 /**
- * [UIBuilder] is a DSL class to make it easier to define components.
+ * [UIBuilder]
  *
  * @author sen
  * @since 12/5/2022
  */
 object UIBuilder {
     private var components: ArrayList<UIComponent<*>>? = null
-    private val frameStack = Stack<UIFrame>()
+    private val frameStack = Stack<UIFrame<*>>()
     private val styleStack = Stack<String>()
     var activeComponent: UIComponent<*>? = null
     var activeStyle: String = ""
@@ -24,7 +23,7 @@ object UIBuilder {
 
     fun finalize() {
         components = null
-        componentStack.clear()
+        frameStack.clear()
         styleStack.clear()
         activeStyle = ""
     }

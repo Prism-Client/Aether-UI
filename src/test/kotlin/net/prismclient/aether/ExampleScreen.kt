@@ -3,18 +3,16 @@ package net.prismclient.aether
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.component.type.input.UITextField
-import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.component.type.layout.container.UIContainer
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.style.UIProvider
-import net.prismclient.aether.ui.style.impl.UIFrameSheet
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.type.UIOperationUnit
 import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.extensions.*
 
@@ -35,7 +33,7 @@ class ExampleScreen : UIScreen() {
             loadImage("background", "/images/background.png")
         }
 
-        style(UIFrameSheet(), "frame") {
+        style(UIContainerSheet(), "frame") {
             anchor.align(UIAlignment.CENTER)
 
             x = percent(50)
@@ -55,13 +53,23 @@ class ExampleScreen : UIScreen() {
                 }
             }
 
+            overflowX = UIContainerSheet.Overflow.Scroll
+
+            scrollbarX.x = px(10)
+            scrollbarX.y = percent(10)
+            scrollbarX.width = px(5)
+            scrollbarX.height = percent(80)
+
+            scrollbarX.radius = radius(2.5f)
+
+
             clipContent = true
         }
 
         style(UITextFieldSheet(), "textfield") {
-            x = px(15)
-            y = px(5)
-            width = px(250)
+            x = px(10) + px(10)
+            y = percent(100) - px(10)
+            width = rel(1) - px(10) - px(10)
             height = px(30)
 
             caretY = UIUnit(-0.5f, EM)
@@ -91,8 +99,8 @@ class ExampleScreen : UIScreen() {
             }
         }
 
-        val frame = UIFrame("frame")
-        val textfield = UITextField("some jjjjggaa textg", "text here", UITextField.Companion.any, style = "textfield")
+        val frame = UIContainer<UIContainerSheet>("frame")
+        val textfield = UITextField("The quick brown fox jumps over the lazy dog", "text here", UITextField.Companion.any, style = "textfield")
 
         animation(UIDefaultAnimation("test")) {
             keyframe {

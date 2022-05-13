@@ -4,22 +4,30 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.style.impl.UIFrameSheet
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
- * [UIFrame] does not control the components inside it, and the components are
- * free to act however they want.
+ * [UIFrame] is a "viewport" for components. The window holds a list of
+ * children which are rendered. It is the superclass for components like
+ * layouts, such as a list, or grid layout. If you are looking for simply
+ * a window that does not control the layout of its components, take a look
+ * at [UIContainer].
  *
  * [UIFrame] works by rendering all the content to an FBO if content clipping is
  * enabled. If disabled, everything is rendered when the render method for this
  * component is invoked.
  *
+ * Because of how [UIFrame] is designed, more custom rendering features can be applied
+ * (such as shaders), by extending the class and applying your own code.
+ *
  * @author sen
- * @since 4/30/2022
+ * @since 5/12/2022
+ *
+ * @see UIContainer
  */
-open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
+abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style), UILayout {
     protected val components = ArrayList<UIComponent<*>>()
 
     protected val renderer = UIRendererDSL.instance.render
@@ -44,6 +52,7 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
         super.update()
         updateFramebuffer()
         components.forEach(UIComponent<*>::update)
+        updateLayout()
     }
 
     override fun updateBounds() {
@@ -90,6 +99,10 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
             updateAnimation()
         style.background?.render(relX, relY, relWidth, relHeight)
         renderer {
+            if (!style.clipContent) {
+                renderComponent()
+                return
+            }
             scissor(relX, relY, relWidth, relHeight) {
                 renderComponent()
             }
@@ -105,15 +118,15 @@ open class UIFrame(style: String) : UIComponent<UIFrameSheet>(style), UILayout {
             // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
             if (relWidth >= 1f || relHeight >= 1f) {
                 renderFbo(
-                    framebuffer,
-                    relX,
-                    relY,
-                    frameWidth,
-                    frameHeight,
-                    style.contentRadius?.topLeft ?: 0f,
-                    style.contentRadius?.topRight ?: 0f,
-                    style.contentRadius?.bottomRight ?: 0f,
-                    style.contentRadius?.bottomLeft ?: 0f
+                        framebuffer,
+                        relX,
+                        relY,
+                        frameWidth,
+                        frameHeight,
+                        style.contentRadius?.topLeft ?: 0f,
+                        style.contentRadius?.topRight ?: 0f,
+                        style.contentRadius?.bottomRight ?: 0f,
+                        style.contentRadius?.bottomLeft ?: 0f
                 )
             }
         }

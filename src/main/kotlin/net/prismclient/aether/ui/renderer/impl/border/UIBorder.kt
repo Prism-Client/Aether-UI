@@ -1,9 +1,11 @@
 package net.prismclient.aether.ui.renderer.impl.border
 
+import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
- * [UIBorder] represents a border renderer
+ * [UIBorder]
  *
  * @author sen
  * @since 4/26/2022
@@ -13,8 +15,12 @@ open class UIBorder : UICopy<UIBorder> {
     var borderColor = 0
     // TODO: border-style
 
-    open fun render(x: Float, y: Float, width: Float, height: Float) {
-        TODO("Not yet implemented")
+    open fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
+        renderer {
+            outline(borderWidth, borderColor) {
+                rect(x, y, width,height, radius)
+            }
+        }
     }
 
     override fun copy(): UIBorder = UIBorder().also {

@@ -47,28 +47,22 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         return this
     }
 
-    /**
-     * A DSL block for [UIBackground]
-     */
-    fun background(block: UIBackground.() -> Unit) {
+    inline fun background(block: UIBackground.() -> Unit) {
         background = UIBackground()
         background!!.block()
     }
 
-    /**
-     * A DSL block for [UIFont]
-     */
-    fun font(block: UIFont.() -> Unit) {
+    inline fun font(block: UIFont.() -> Unit) {
         font = UIFont()
         font!!.block()
     }
 
-    fun padding(block: UIPadding.() -> Unit) {
+    inline fun padding(block: UIPadding.() -> Unit) {
         padding = UIPadding()
         padding!!.block()
     }
 
-    fun margin(block: UIMargin.() -> Unit) {
+    inline fun margin(block: UIMargin.() -> Unit) {
         margin = UIMargin()
         margin!!.block()
     }

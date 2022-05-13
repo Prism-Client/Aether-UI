@@ -10,9 +10,8 @@ import net.prismclient.aether.ui.component.UIComponent
  * @since 5/1/2022
  */
 interface UILayout {
-    /**
-     * Adds a [UIComponent] to the Layout
-     */
+    fun updateLayout()
+
     fun addComponent(component: UIComponent<*>)
 
     fun removeComponent(component: UIComponent<*>)

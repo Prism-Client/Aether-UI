@@ -3,12 +3,11 @@ package net.prismclient.aether.ui.screen
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 //import net.prismclient.aether.ui.renderer.builder.UIBuilder
-import net.prismclient.aether.ui.renderer.builder.UIStyle
 import net.prismclient.aether.ui.util.UIKey
 
 abstract class UIScreen {
     var components: ArrayList<UIComponent<*>> = ArrayList()
-    var frames: ArrayList<UIFrame> = ArrayList()
+    var frames: ArrayList<UIFrame<*>> = ArrayList()
 
     init {
 //        UIBuilder.start()
@@ -26,7 +25,7 @@ abstract class UIScreen {
 
     open fun update() {
         components.forEach(UIComponent<*>::update)
-        frames.forEach(UIFrame::update)
+        frames.forEach(UIFrame<*>::update)
     }
 
     open fun renderContent() {

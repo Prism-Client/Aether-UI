@@ -119,7 +119,7 @@ open class UICore(renderer: UIRenderer) {
             if (component.style.name == styleName)
                 return component
         }
-        return throw RuntimeException("Component with given style name not found")
+        throw RuntimeException("Component with given style name not found")
     }
 
     open fun getComponentsByStyle(styleName: String): List<UIComponent<*>> {

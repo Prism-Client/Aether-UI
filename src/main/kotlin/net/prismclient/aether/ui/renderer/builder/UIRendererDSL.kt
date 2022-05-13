@@ -9,6 +9,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.MIPMAP
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATX
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATY
+import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO

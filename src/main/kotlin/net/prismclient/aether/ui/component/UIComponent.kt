@@ -3,11 +3,11 @@ package net.prismclient.aether.ui.component
 import net.prismclient.aether.UICore
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.type.UIOperationUnit
 import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.calculateX
@@ -150,10 +150,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     fun getParentX() = if (parent != null)
-            if (parent is UIFrame && (parent as UIFrame).style.clipContent) 0f else parent!!.x else 0f
+            if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
 
     fun getParentY() = if (parent != null)
-            if (parent is UIFrame && (parent as UIFrame).style.clipContent) 0f else parent!!.y else 0f
+            if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
 
     fun getParentWidth() =
             if (parent != null) parent!!.width else UICore.width
@@ -184,9 +184,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 
-    private fun getMouseX(): Float =
+    protected fun getMouseX(): Float =
             UICore.mouseX - if (parent != null && parent is UIFrame) parent!!.relX else 0f
 
-    private fun getMouseY(): Float =
+    protected fun getMouseY(): Float =
             UICore.mouseY - if (parent != null && parent is UIFrame) parent!!.relY else 0f
 }

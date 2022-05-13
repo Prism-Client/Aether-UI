@@ -1,11 +1,11 @@
-package net.prismclient.aether.ui.style.impl
+package net.prismclient.aether.ui.component.type.layout.styles
 
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
 
-open class UIWindowSheet : UIStyleSheet() {
+open class UIFrameSheet : UIStyleSheet() {
     override var width: UIUnit? = null
         set(value) {
             if (frameWidth == width)
@@ -33,7 +33,7 @@ open class UIWindowSheet : UIStyleSheet() {
     var contentRadius: UIRadius? = null
 
     override fun copy(): UIStyleSheet {
-        val it = UIWindowSheet()
+        val it = UIFrameSheet()
 
         it.apply(this)
 
