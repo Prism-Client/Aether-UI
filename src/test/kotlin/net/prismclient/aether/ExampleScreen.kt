@@ -34,6 +34,10 @@ class ExampleScreen : UIScreen() {
             loadImage("background", "/images/background.png")
         }
 
+        renderer {
+            loadImage("color-picker", "/aether/colorpicker/color-space.png")
+        }
+
         style(UIContainerSheet(), "frame") {
             anchor.align(UIAlignment.CENTER)
 
@@ -136,5 +140,11 @@ class ExampleScreen : UIScreen() {
 //            renderImage("background", 0f, 0f, UICore.width, UICore.height)
 //        }
         super.render()
+        renderer {
+            color(asRGBA(0, 255, 0))
+            rect(0f, 0f, 200f, 200f)
+            color(-1)
+            renderImage("color-picker", 0f, 0f, 200f, 200f)
+        }
     }
 }
