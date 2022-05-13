@@ -14,7 +14,8 @@ import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.util.*
+import net.prismclient.aether.ui.unit.util.EM
+import net.prismclient.aether.ui.unit.util.HEIGHTANIM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
@@ -140,11 +141,19 @@ class ExampleScreen : UIScreen() {
 //            renderImage("background", 0f, 0f, UICore.width, UICore.height)
 //        }
         super.render()
+        //renderGradient(50f, 50f, 500f, 500f)
+    }
+
+    // Rendering a colorpicker gradient
+    fun renderGradient(x: Float, y: Float, w: Float, h: Float) {
         renderer {
-            color(asRGBA(0, 255, 0))
-            rect(0f, 0f, 200f, 200f)
-            color(-1)
-            renderImage("color-picker", 0f, 0f, 200f, 200f)
+            scissor(x, y, w, h) {
+                // Gradient color
+                color(asRGBA(0, 255, 255))
+                render.rect(x, y, w - 0.5f, h - 0.5f)
+                render.linearGradient(x, y, w, h, 0f, x, y, x + w, y, -1, asRGBA(0, 0, 0, 0))
+                render.linearGradient(x, y, w, h, 0f, x, y, x, y + h, asRGBA(0, 0, 0, 0), asRGBA(0, 0, 0))
+            }
         }
     }
 }
