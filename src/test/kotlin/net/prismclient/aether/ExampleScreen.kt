@@ -2,6 +2,8 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
+import net.prismclient.aether.ui.component.type.color.UIColorSwatch
+import net.prismclient.aether.ui.component.type.color.UIColorSwatchSheet
 import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
@@ -44,8 +46,8 @@ class ExampleScreen : UIScreen() {
 
             x = percent(50)
             y = percent(50)
-            width = px(350)
-            height = px(350)
+            width = px(700)
+            height = px(700)
 
             contentRadius = radius(10f)
 
@@ -59,7 +61,7 @@ class ExampleScreen : UIScreen() {
                 }
             }
 
-            overflowX = UIContainerSheet.Overflow.Scroll
+//            overflowX = UIContainerSheet.Overflow.Scroll
 
             verticalScrollbar.x = px(10)
             verticalScrollbar.y = percent(10)
@@ -108,27 +110,26 @@ class ExampleScreen : UIScreen() {
             }
         }
 
+        style(UIColorSwatchSheet(), "swatch") {
+            swatchColor = asRGBA(0, 71, 255)
+
+            x = px(50)
+            y = px(50)
+            width = px(250)
+            height = px(250)
+
+            background {
+                border {
+                    borderColor = asRGBA(255, 255,  255, 0.5f)
+                    borderWidth = 1f
+                }
+            }
+        }
+
         val frame = UIContainer<UIContainerSheet>("frame")
-        val textfield = UITextField("The quick brown fox jumps over the lazy dog", "text here", UITextField.Companion.any, style = "textfield")
+        val swatch = UIColorSwatch("swatch")
 
-        animation(UIDefaultAnimation("test")) {
-            keyframe {
-                y = unit(-1, HEIGHTANIM)
-            }
-            keyframe(UIQuart(1000))
-        }
-
-        animation(UIDefaultAnimation("other-animation")) {
-            keyframe {
-                width = px(0)
-            }
-            keyframe(UIQuart(1000), 1000L)
-        }
-
-//        UIProvider.dispatchAnimation("test", frame)
-//        UIProvider.dispatchAnimation("other-animation", textfield)
-
-        frame.addComponent(textfield)
+        frame.addComponent(swatch)
 
         frames.add(frame)
         components.add(frame)
@@ -142,18 +143,5 @@ class ExampleScreen : UIScreen() {
 //        }
         super.render()
         //renderGradient(50f, 50f, 500f, 500f)
-    }
-
-    // Rendering a colorpicker gradient
-    fun renderGradient(x: Float, y: Float, w: Float, h: Float) {
-        renderer {
-            scissor(x, y, w, h) {
-                // Gradient color
-                color(asRGBA(0, 255, 255))
-                render.rect(x, y, w - 0.5f, h - 0.5f)
-                render.linearGradient(x, y, w, h, 0f, x, y, x + w, y, -1, asRGBA(0, 0, 0, 0))
-                render.linearGradient(x, y, w, h, 0f, x, y, x, y + h, asRGBA(0, 0, 0, 0), asRGBA(0, 0, 0))
-            }
-        }
     }
 }
