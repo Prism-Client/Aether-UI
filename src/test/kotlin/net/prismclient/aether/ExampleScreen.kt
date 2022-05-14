@@ -2,6 +2,8 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
+import net.prismclient.aether.ui.component.type.color.UIColorSwatch
+import net.prismclient.aether.ui.component.type.color.UIColorSwatchSheet
 import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
@@ -14,7 +16,8 @@ import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.util.*
+import net.prismclient.aether.ui.unit.util.EM
+import net.prismclient.aether.ui.unit.util.HEIGHTANIM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
@@ -40,8 +43,8 @@ class ExampleScreen : UIScreen() {
 
             x = percent(50)
             y = percent(50)
-            width = px(350)
-            height = px(350)
+            width = px(700)
+            height = px(700)
 
             contentRadius = radius(10f)
 
@@ -55,7 +58,7 @@ class ExampleScreen : UIScreen() {
                 }
             }
 
-            overflowX = UIContainerSheet.Overflow.Scroll
+//            overflowX = UIContainerSheet.Overflow.Scroll
 
             verticalScrollbar.x = px(10)
             verticalScrollbar.y = percent(10)
@@ -104,27 +107,26 @@ class ExampleScreen : UIScreen() {
             }
         }
 
+        style(UIColorSwatchSheet(), "swatch") {
+            swatchColor = asRGBA(0, 71, 255)
+
+            x = px(50)
+            y = px(50)
+            width = px(250)
+            height = px(250)
+
+            background {
+                border {
+                    borderColor = asRGBA(255, 255,  255, 0.5f)
+                    borderWidth = 1f
+                }
+            }
+        }
+
         val frame = UIContainer<UIContainerSheet>("frame")
-        val textfield = UITextField("The quick brown fox jumps over the lazy dog", "text here", UITextField.Companion.any, style = "textfield")
+        val swatch = UIColorSwatch("swatch")
 
-        animation(UIDefaultAnimation("test")) {
-            keyframe {
-                y = unit(-1, HEIGHTANIM)
-            }
-            keyframe(UIQuart(1000))
-        }
-
-        animation(UIDefaultAnimation("other-animation")) {
-            keyframe {
-                width = px(0)
-            }
-            keyframe(UIQuart(1000), 1000L)
-        }
-
-//        UIProvider.dispatchAnimation("test", frame)
-//        UIProvider.dispatchAnimation("other-animation", textfield)
-
-        frame.addComponent(textfield)
+        frame.addComponent(swatch)
 
         frames.add(frame)
         components.add(frame)

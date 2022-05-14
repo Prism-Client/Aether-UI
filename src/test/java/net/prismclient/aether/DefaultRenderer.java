@@ -196,7 +196,7 @@ public class DefaultRenderer extends UIRenderer {
         NVGPaint p = NVGPaint.calloc();
 
         nvgRGBA((byte) net.prismclient.aether.ui.util.extensions.ColorKt.getRed(color1), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getGreen(color1), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getBlue(color1), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getAlpha(color1), c1);
-        nvgRGBA((byte) net.prismclient.aether.ui.util.extensions.ColorKt.getRed(color2), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getGreen(color2), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getBlue(color2), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getAlpha(color1), c2);
+        nvgRGBA((byte) net.prismclient.aether.ui.util.extensions.ColorKt.getRed(color2), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getGreen(color2), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getBlue(color2), (byte) net.prismclient.aether.ui.util.extensions.ColorKt.getAlpha(color2), c2);
 
         nvgLinearGradient(ctx, gradientX, gradientY, gradientWidth, gradientHeight, c1, c2, p);
         nvgBeginPath(ctx);
@@ -274,7 +274,6 @@ public class DefaultRenderer extends UIRenderer {
         UIImageData img = images.get(imageName); int handle = 0;
         if (img != null) handle = img.getHandle();
         nvgImagePattern(ctx, x, y, width, height, 0, handle, 1f, paint);
-        color(-1);
         paint.innerColor(color);
         paint.outerColor(color);
         nvgBeginPath(ctx);

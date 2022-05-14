@@ -185,8 +185,14 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 
     protected fun getMouseX(): Float =
-            UICore.mouseX - if (parent != null && parent is UIFrame) parent!!.relX else 0f
+            UICore.mouseX - getParentXOffset()
 
     protected fun getMouseY(): Float =
-            UICore.mouseY - if (parent != null && parent is UIFrame) parent!!.relY else 0f
+            UICore.mouseY - getParentYOffset()
+
+    protected fun getParentXOffset(): Float =
+            if (parent != null && parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) parent!!.relX else 0f
+
+    protected fun getParentYOffset(): Float =
+            if (parent != null && parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) parent!!.relY else 0f
 }

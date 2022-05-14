@@ -11,8 +11,8 @@
 //    var step: Float = 1f,
 //    style: String
 //) : UIComponent(style) {
-//    private var sliderWidth = 0f
-//    private var sliderHeight = 0f
+//    private var controlWidth = 0f
+//    private var controlHeight = 0f
 //
 //    private var mouseOffset = 0f
 //    private var sliderPosition = 0f
@@ -21,8 +21,8 @@
 //
 //    override fun update() {
 //        super.update()
-//        sliderWidth = slider.width.calculate(width)
-//        sliderHeight = slider.height.calculate(height)
+//        controlWidth = slider.width.calculate(width)
+//        controlHeight = slider.height.calculate(height)
 //    }
 //
 //    override fun renderComponent() {

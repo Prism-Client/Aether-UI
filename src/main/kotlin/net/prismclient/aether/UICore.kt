@@ -1,6 +1,7 @@
 package net.prismclient.aether
 
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.callback.UICoreCallback
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.defaults.UIDefaults
@@ -12,7 +13,7 @@ import net.prismclient.aether.ui.util.UIKey
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 
-open class UICore(renderer: UIRenderer) {
+open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     companion object {
         @JvmStatic
         lateinit var instance: UICore

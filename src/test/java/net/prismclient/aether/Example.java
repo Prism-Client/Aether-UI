@@ -1,13 +1,11 @@
 package net.prismclient.aether;
 
-import net.prismclient.aether.ui.renderer.UIRenderer;
-import net.prismclient.aether.ui.renderer.builder.UIRendererDSL;
+import net.prismclient.aether.ui.callback.UICoreCallback;
 import net.prismclient.aether.ui.util.UIKey;
-import net.prismclient.aether.ui.util.extensions.UnitsKt;
+import net.prismclient.aether.ui.util.extensions.ColorKt;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
 
@@ -152,7 +150,7 @@ public class Example {
         glfwSwapInterval(0);
 
         // Create the core
-        core = new UICore(new DefaultRenderer());
+        core = new UICore(new DefaultRenderer(), new UICoreCallbackImpl());
 
         UICore.Companion.setWidth(framebufferWidth / contentScaleX);
         UICore.Companion.setHeight(framebufferHeight / contentScaleY);
@@ -195,13 +193,19 @@ public class Example {
 
             UICore.getInstance().getAnimationLock().release();
         }
-        //core.delete();
-
         GL.setCapabilities(null);
-
         glfwFreeCallbacks(window);
         glfwTerminate();
         glfwSetErrorCallback(null).free();
+    }
+
+    private static final class UICoreCallbackImpl implements UICoreCallback {
+        @Override
+        public int getPixelColor(float x, float y) {
+            int[] color = new int[]{0, 0, 0};
+            glReadPixels((int) x, framebufferHeight - (int) (y), 1, 1, GL_RGB, GL_UNSIGNED_INT, color);
+            return ColorKt.asRGBA(color[0], color[1], color[2], 255);
+        }
     }
 
     public static float getWidth() {
