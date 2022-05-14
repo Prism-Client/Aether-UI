@@ -7,7 +7,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
 class UIColorPicker(style: String) : UIComponent<UIStyleSheet>(style) {
     init {
         renderer {
-            loadImage("color-picker", "/aether/colorpicker/color-space.png")
+            loadImage("color-picker", "/aether/svg/color-space.png")
         }
     }
 

@@ -453,6 +453,12 @@ abstract class UIRenderer {
     abstract fun stringDescender(): Float
 
     /**
+     * Accepts a svg from a [ByteBuffer] and rasterizes it as an image and places
+     * the rasterized image into the image list with the given [svgName]
+     */
+    abstract fun loadSVG(svgName: String, scale: Float, buffer: ByteBuffer)
+
+    /**
      * Returns the red of the active color
      */
     protected fun r() = activeColor.getRed()

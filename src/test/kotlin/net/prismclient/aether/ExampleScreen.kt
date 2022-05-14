@@ -32,10 +32,7 @@ class ExampleScreen : UIScreen() {
 
         renderer {
             loadImage("background", "/images/background.png")
-        }
-
-        renderer {
-            loadImage("color-picker", "/aether/colorpicker/color-space.png")
+            render.loadSVG("svg", 2f, "/aether/svg/message-text.svg".toTerminatingByteBuffer())
         }
 
         style(UIContainerSheet(), "frame") {
@@ -136,15 +133,13 @@ class ExampleScreen : UIScreen() {
     }
 
     override fun render() {
-//        renderer {
-//            renderImage("background", 0f, 0f, UICore.width, UICore.height)
-//        }
+        renderer {
+            renderImage("background", 0f, 0f, UICore.width, UICore.height)
+        }
         super.render()
         renderer {
-            color(asRGBA(0, 255, 0))
-            rect(0f, 0f, 200f, 200f)
             color(-1)
-            renderImage("color-picker", 0f, 0f, 200f, 200f)
+            renderImage("svg", 0f, 0f, 18f, 18f)
         }
     }
 }

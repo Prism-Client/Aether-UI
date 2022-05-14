@@ -9,10 +9,13 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.nanovg.*;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBTruetype;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
+import static org.lwjgl.nanovg.NanoSVG.*;
 import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -367,6 +370,39 @@ public class DefaultRenderer extends UIRenderer {
     public float stringDescender() {
         nvgTextMetrics(ctx, null, decender, null);
         return Math.abs(decender[0]);
+    }
+
+    @Override
+    public void loadSVG(@NotNull String svgName, float scale, @NotNull ByteBuffer buffer) {
+        NSVGImage image;
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            image = nsvgParse(buffer, stack.ASCII("px"), 96f);
+            if (image == null) {
+                throw new RuntimeException("Failed to parse SVG. name: " + svgName + ", scale:" + scale);
+            }
+        }
+
+        long rasterizer = nsvgCreateRasterizer();
+
+        int w = (int) (image.width() * scale);
+        int h = (int) (image.height() * scale);
+
+        ByteBuffer rast = MemoryUtil.memAlloc(w * h * 4);
+
+        nsvgRasterize(
+                rasterizer,
+                image,
+                0, 0,
+                scale,
+                rast, w, h,
+                w * 4
+        );
+
+        nsvgDeleteRasterizer(rasterizer);
+
+        images.put(svgName,
+                new UIImageData(
+                        nvgCreateImageRGBA(ctx, w, h, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_GENERATE_MIPMAPS, rast), w, h, rast));
     }
 
     private void fill() {
