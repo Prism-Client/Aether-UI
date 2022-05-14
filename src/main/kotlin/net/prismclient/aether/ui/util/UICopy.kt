@@ -1,7 +1,7 @@
 package net.prismclient.aether.ui.util
 
 /**
- * Returns a new instance of it's self
+ * Returns a new instance of [Self]
  *
  * @author sen
  * @since 4/26/2022

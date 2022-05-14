@@ -6,6 +6,7 @@ import net.prismclient.aether.ui.util.extensions.ColorKt;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
 
@@ -116,6 +117,7 @@ public class Example {
             UICore.Companion.setHeight(h / contentScaleX);
             core.update();
         });
+
 
         glfwSetWindowContentScaleCallback(window, (handle, xscale, yscale) -> {
             contentScaleX = xscale;

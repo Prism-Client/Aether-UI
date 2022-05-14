@@ -17,7 +17,7 @@ abstract class UIScreen {
 //        components.forEach(UIComponent::initialize)
     }
 
-   // protected inline fun style(block: UIStyle.() -> Unit) = UIStyle.block()
+    // protected inline fun style(block: UIStyle.() -> Unit) = UIStyle.block()
 
 //    protected inline fun build(block: UIBuilder.() -> Unit) = UIBuilder.block()
 
@@ -29,25 +29,23 @@ abstract class UIScreen {
     }
 
     open fun renderContent() {
-        for (i in 0 until frames.size)
-            frames[i].renderContent()
+        for (i in 0 until frames.size) frames[i].renderContent()
     }
 
     open fun render() {
-        for (i in 0 until components.size)
-            frames[i].render()
+        for (i in 0 until components.size) components[i].render()
     }
 
     open fun mouseMoved(mouseX: Float, mouseY: Float) {
-        components.forEach { it.mouseMoved(mouseX, mouseY) }
+        components.forEach { it.mouseMoved(it.getMouseX(), it.getMouseY()) }
     }
 
     open fun mousePressed(mouseX: Float, mouseY: Float) {
-        components.forEach { it.mouseClicked(mouseX, mouseY) }
+        components.forEach { it.mouseClicked(it.getMouseX(), it.getMouseY()) }
     }
 
     open fun mouseReleased(mouseX: Float, mouseY: Float) {
-        components.forEach { it.mouseReleased(mouseX, mouseY) }
+        components.forEach { it.mouseReleased(it.getMouseX(), it.getMouseY()) }
     }
 
     open fun keyPressed(key: UIKey, character: Char) {
@@ -55,7 +53,7 @@ abstract class UIScreen {
     }
 
     open fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
-        components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
+        components.forEach { it.mouseScrolled(it.getMouseX(), it.getMouseY(), scrollAmount) }
     }
 
 }

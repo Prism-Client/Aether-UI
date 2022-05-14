@@ -13,7 +13,7 @@ class UIRadius(
     var topRight: Float = 0f,
     var bottomRight: Float = 0f,
     var bottomLeft: Float = 0f
-) : UICopy<UIRadius> { // TODO: Convert to UIUnit
+) : UICopy<UIRadius> {
     constructor(radius: Float) : this(radius, radius, radius, radius)
 
     fun set(radius: Float) {

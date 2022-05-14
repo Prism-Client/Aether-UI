@@ -1,7 +1,6 @@
 package net.prismclient.aether.ui.component.type.input.slider
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
  * [UISlider]
@@ -9,29 +8,51 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 5/13/2022
  */
-open class UISlider<T : Number>(
-        var value: T,
-        var min: T,
-        var max: T,
-        var step: T,
-        style: String
-) : UIComponent<UISliderSheet>(style) {
-    protected var controlX = 0f
-    protected var controlY = 0f
-    protected var controlWidth = 0f
-    protected var controlHeight = 0f
+open class UISlider(value: Float, var min: Float, var max: Float, var step: Float, style: String) : UIComponent<UISliderSheet>(style) {
+    var value: Float = value
+        set(value) {
+            field = value //.coerceAtLeast(min).coerceAtMost(max)
+            normalizedValue = value / (max - min)
+        }
+
+    private var normalizedValue = 0f
+
+    private var offsetX = 0f
+    private var selected = false
 
     override fun update() {
         super.update()
-        controlX = style.controlX.getX(relWidth)
-        controlY = style.controlY.getY(relHeight)
-        controlWidth = style.controlWidth.getX(relWidth)
-        controlHeight = style.controlHeight.getY(relHeight)
+        style.sliderControl.update(this)
     }
 
     override fun renderComponent() {
-        renderer {
-            
+        style.sliderControl.offsetX = normalizedValue * (relWidth - style.sliderControl.cachedWidth)
+        style.sliderControl.render()
+    }
+
+    override fun mouseMoved(mouseX: Float, mouseY: Float) {
+        super.mouseMoved(mouseX, mouseY)
+        if (selected) {
+            normalizedValue = (((mouseX - offsetX - style.sliderControl.cachedX)) / (relWidth - style.sliderControl.cachedWidth)).coerceAtLeast(0f).coerceAtMost(1f)
         }
+    }
+
+    override fun mouseClicked(mouseX: Float, mouseY: Float) {
+        super.mouseClicked(mouseX, mouseY)
+
+        if (isWithinBounds(
+                        style.sliderControl.cachedX + style.sliderControl.offsetX,
+                        style.sliderControl.cachedY + style.sliderControl.offsetY,
+                        style.sliderControl.cachedWidth,
+                        style.sliderControl.cachedHeight
+        )) {
+            offsetX = mouseX - (style.sliderControl.cachedX + style.sliderControl.offsetX)
+            selected = true
+        }
+    }
+
+    override fun mouseReleased(mouseX: Float, mouseY: Float) {
+        super.mouseReleased(mouseX, mouseY)
+        selected = false
     }
 }

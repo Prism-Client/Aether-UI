@@ -5,6 +5,8 @@ import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.component.type.color.UIColorSwatch
 import net.prismclient.aether.ui.component.type.color.UIColorSwatchSheet
 import net.prismclient.aether.ui.component.type.input.UITextField
+import net.prismclient.aether.ui.component.type.input.slider.UISlider
+import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
@@ -35,10 +37,6 @@ class ExampleScreen : UIScreen() {
 
         renderer {
             loadImage("background", "/images/background.png")
-        }
-
-        renderer {
-            loadImage("color-picker", "/aether/colorpicker/color-space.png")
         }
 
         style(UIContainerSheet(), "frame") {
@@ -110,29 +108,33 @@ class ExampleScreen : UIScreen() {
             }
         }
 
-        style(UIColorSwatchSheet(), "swatch") {
-            swatchColor = asRGBA(0, 71, 255)
+        style(UISliderSheet(), "slider") {
+            position(px(50), px(50))
+            size(px(400), px(5))
 
-            x = px(50)
-            y = px(50)
-            width = px(250)
-            height = px(250)
+            sliderControl.color = -1
 
             background {
+                radius = radius(2.5f)
+                color = asRGBA(255, 255, 255, 0.3f)
                 border {
-                    borderColor = asRGBA(255, 255,  255, 0.5f)
                     borderWidth = 1f
+                    borderColor = asRGBA(255, 255, 255, 0.75f)
                 }
             }
         }
 
-        val frame = UIContainer<UIContainerSheet>("frame")
-        val swatch = UIColorSwatch("swatch")
+//        val frame = UIContainer<UIContainerSheet>("frame")
+//        val swatch = UIColorSwatch("swatch")
+//
+//        frame.addComponent(swatch)
+//
+//        frames.add(frame)
+//        components.add(frame)
 
-        frame.addComponent(swatch)
+        val slider = UISlider(5f, 0f, 10f, 1f, "slider")
 
-        frames.add(frame)
-        components.add(frame)
+        components.add(slider)
 
         update()
     }

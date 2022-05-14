@@ -47,6 +47,16 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         return this
     }
 
+    fun position(x: UIUnit, y: UIUnit) {
+        this.x = x
+        this.y = y
+    }
+
+    fun size(width: UIUnit, height: UIUnit) {
+        this.width = width
+        this.height = height
+    }
+
     inline fun background(block: UIBackground.() -> Unit) {
         background = UIBackground()
         background!!.block()

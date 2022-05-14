@@ -8,7 +8,6 @@ import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.calculateX
 import net.prismclient.aether.ui.util.extensions.calculateY
@@ -135,7 +134,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             calculateUnitX(this, width, ignore)
 
     fun calculateUnitX(unit: UIUnit?, width: Float, ignore: Boolean): Float = if (unit == null) 0f else {
-        calculateX(unit, this, ignore, width)
+        calculateX(unit, this, width, ignore)
     }
 
     @JvmOverloads
@@ -146,7 +145,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             calculateUnitY(this, height, ignore)
 
     fun calculateUnitY(unit: UIUnit?, height: Float, ignore: Boolean): Float = if (unit == null) 0f else {
-        calculateY(unit, this, ignore, height)
+        calculateY(unit, this, height, ignore)
     }
 
     fun getParentX() = if (parent != null)
@@ -184,10 +183,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 
-    protected fun getMouseX(): Float =
+    fun getMouseX(): Float =
             UICore.mouseX - getParentXOffset()
 
-    protected fun getMouseY(): Float =
+    fun getMouseY(): Float =
             UICore.mouseY - getParentYOffset()
 
     protected fun getParentXOffset(): Float =
@@ -195,4 +194,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     protected fun getParentYOffset(): Float =
             if (parent != null && parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) parent!!.relY else 0f
+
+    protected fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) =
+            (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
 }
