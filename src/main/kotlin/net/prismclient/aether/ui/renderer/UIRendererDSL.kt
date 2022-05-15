@@ -106,20 +106,28 @@ object UIRendererDSL {
      * @param ignoreLastSpace If true, the last space (if applicable) is omitted.
      */
     @JvmOverloads
-    fun String.render(x: Float, y: Float, width: Float, appendedString: String, ignoreLastSpace: Boolean = true) {
+    fun String.render(x: Float, y: Float, width: Float, appendedString: String = "", ignoreLastSpace: Boolean = true) {
+        if (width >= this.width()) {
+            this.render(x, y)
+            return
+        }
         var new = ""
         var w = 0f
         var aw = appendedString.width()
         for (c in 0 until this.length) {
             val char = this[c]
             w += char.toString().width()
-            new += char
-            if (w > width - aw) {
-                if (ignoreLastSpace && new[new.length - 1] == ' ')
-                    new = new.substring(0, new.length - 2)
-                new += appendedString
+            if (w >= width - aw) {
+                if (new.isEmpty())
+                    break
+                val flag = (this.length != new.length)
+                if (ignoreLastSpace && new[new.length - 1] == ' ') // Omit the space if applicable
+                    new = new.substring(0, new.length - 1)
+                if (flag) // Append the appendedString if the length is less than the inital
+                    new += appendedString
                 break
             }
+            new += char
         }
         new.render(x, y)
     }
