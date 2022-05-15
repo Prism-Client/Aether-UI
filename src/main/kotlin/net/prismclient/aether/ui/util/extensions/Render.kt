@@ -1,5 +1,5 @@
 package net.prismclient.aether.ui.util.extensions
 
-import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
+import net.prismclient.aether.ui.renderer.UIRendererDSL
 
-inline fun renderer(block: UIRendererDSL.() -> Unit) = UIRendererDSL.instance.block().also { UIRendererDSL.instance.resetCalls() }
+inline fun renderer(block: UIRendererDSL.() -> Unit) = UIRendererDSL.block()//.also { UIRendererDSL.resetCalls() }

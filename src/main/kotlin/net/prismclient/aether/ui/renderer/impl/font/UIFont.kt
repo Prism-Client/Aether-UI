@@ -3,7 +3,7 @@ package net.prismclient.aether.ui.renderer.impl.font
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
+import net.prismclient.aether.ui.renderer.UIRendererDSL
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.px
@@ -43,7 +43,7 @@ class UIFont : UICopy<UIFont> {
     var fontColor = UIDefaults.instance.fontColor
 
     /**
-     * Specifies the font type e.g. Regular, Bold, Thin etc...
+     * Specifies the font type e.g. Regular, Bold, Thin etc..
      *
      * @see FontType
      */
@@ -97,16 +97,16 @@ class UIFont : UICopy<UIFont> {
      * Returns the position of the ascender line in the current font
      */
     fun getAscend(): Float {
-        UIRendererDSL.instance.font(this)
-        return UIRendererDSL.instance.ascender()
+        UIRendererDSL.font(this)
+        return UIRendererDSL.ascender()
     }
 
     /**
      * Returns the position of the descender line in the current font
      */
     fun getDescend(): Float {
-        UIRendererDSL.instance.font(this)
-        return UIRendererDSL.instance.descender()
+        UIRendererDSL.font(this)
+        return UIRendererDSL.descender()
     }
 
     /**
