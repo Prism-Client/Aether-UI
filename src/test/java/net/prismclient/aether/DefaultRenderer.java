@@ -63,18 +63,16 @@ public class DefaultRenderer extends UIRenderer {
     @NotNull
     @Override
     public UIContentFBO createContentFBO(float width, float height) {
-        if (width <= 0 || height <= 0) {
+        if (width <= 0 || height <= 0)
             throw new RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0");
-        }
         NVGLUFramebuffer framebuffer = nvgluCreateFramebuffer(
                 ctx,
                 (int) width, //(int) (width * UICore.Companion.getContentScaleX()),
                 (int) height, //(int) (height * UICore.Companion.getContentScaleY()),
                 NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY
         );
-        if (framebuffer == null) {
-            throw new RuntimeException("Failed to create the framebuffer");
-        }
+        if (framebuffer == null)
+            throw new RuntimeException("Failed to create the framebuffer. w: " + width + ", h: " + height);
         UIContentFBO fbo = new UIContentFBO(
                 framebuffer.fbo(),
                 width,
@@ -89,6 +87,7 @@ public class DefaultRenderer extends UIRenderer {
         NVGLUFramebuffer framebuffer = fbos.get(fbo);
         if (framebuffer != null) {
             nvgluDeleteFramebuffer(ctx, framebuffer);
+            fbos.remove(fbo);
             return;
         }
         System.out.println("Failed to delete the framebuffer because it was not found.");
