@@ -16,6 +16,12 @@ open class UIContainerSheet : UIFrameSheet() {
     var verticalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
     var horizontalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Horizontal)
 
+    fun verticalScrollbar(block: UIScrollbar.() -> Unit) =
+        verticalScrollbar.block()
+
+    fun horizontalScrollbar(block: UIScrollbar.() -> Unit) =
+        horizontalScrollbar.block()
+
     /**
      * [Overflow] defines what the vertical, and horizontal scrollbars
      * are supposed to do when content leaves the screen. Check the enum

@@ -64,16 +64,19 @@ class ExampleScreen : UIScreen() {
                 }
             }
 
-            verticalScrollbar.x = px(10)
-            verticalScrollbar.y = percent(10)
-            verticalScrollbar.width = px(5)
-            verticalScrollbar.height = percent(80)
+            verticalScrollbar {
+                x = px(10)
+                y = percent(10)
+                width = px(5)
+                height = percent(80)
+                radius = radius(2.5f)
 
-            verticalScrollbar.radius = radius(2.5f)
-
-            verticalScrollbar.background = UIBackground()
-            verticalScrollbar.background!!.color = asRGBA(255, 0, 0)
-
+                verticalScrollbar {
+                    background {
+                        color = asRGBA(255, 0, 0)
+                    }
+                }
+            }
 
             clipContent = true
         }
