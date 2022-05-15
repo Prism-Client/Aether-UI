@@ -2,6 +2,7 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
+import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.color.UIColorSwatch
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
@@ -50,7 +51,7 @@ class ExampleScreen : UIScreen() {
             x = percent(50)
             y = percent(50)
             width = px(700)
-            height = px(700)
+            height = px(500)
 
             contentRadius = radius(10f)
 
@@ -127,6 +128,19 @@ class ExampleScreen : UIScreen() {
             }
         }
 
+        style("h1") {
+            font {
+                align(UIAlignment.TOPLEFT)
+                fontFamily = "Poppins"
+                fontType = UIFont.FontType.Bold
+                textAlignment = ALIGNTOP or ALIGNLEFT
+                fontSize = 64f
+                fontColor = -1
+            }
+
+            clipContent = false
+        }
+
         animation(UIDefaultAnimation("animation")) {
             keyframe {
                 x = unit(-1f, WIDTHANIM)
@@ -137,6 +151,7 @@ class ExampleScreen : UIScreen() {
         }
 
         val frame = UIContainer<UIContainerSheet>("frame")
+        val label = UILabel("Text", "h1")
 //        val swatch = UIColorSwatch("swatch")
 
         frames.add(frame)
@@ -146,6 +161,7 @@ class ExampleScreen : UIScreen() {
         slider = UISlider(1000f, 0f, "The quick brown fox jumps over the lazy dog".width(), 1f, "slider")
 
         frame.addComponent(slider)
+//        frame.addComponent(label)
 
         UIProvider.dispatchAnimation("animation", slider)
 
@@ -153,12 +169,12 @@ class ExampleScreen : UIScreen() {
     }
 
     override fun render() {
-        renderer {
-            color(-1)
-            renderImage("background", 0f, 0f, UICore.width, UICore.height)
-            font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
-            "The quick brown fox jumps over the lazy dog".render(50f, 30f, slider.value, "..", true)
-        }
+//        renderer {
+//            color(-1)
+//            renderImage("background", 0f, 0f, UICore.width, UICore.height)
+//            font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
+//            "The quick brown fox jumps over the lazy dog".render(50f, 30f, slider.value, "..", true)
+//        }
         super.render()
     }
 }
