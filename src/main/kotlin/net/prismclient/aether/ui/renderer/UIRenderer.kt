@@ -39,6 +39,9 @@ abstract class UIRenderer {
     protected var fontSpacing: Float = 0f
 
     @JvmField
+    protected var stroke = false
+
+    @JvmField
     protected var strokeWidth: Float = 0f
 
     @JvmField
@@ -178,6 +181,13 @@ abstract class UIRenderer {
     open fun stroke(strokeWidth: Float, strokeColor: Int) {
         this.strokeWidth = strokeWidth
         this.strokeColor = strokeColor
+        stroke = true
+    }
+
+    open fun finishStroke() {
+        strokeWidth = 0f
+        strokeColor = 0
+        stroke = false
     }
 
     /**
@@ -221,27 +231,6 @@ abstract class UIRenderer {
     abstract fun scissor(x: Float, y: Float, width: Float, height: Float)
 
     /**
-     * Renders a rectangle
-     *
-     * @param x The x position of the rectangle
-     * @param y The y position of the rectangle
-     * @param width The width of the rectangle
-     * @param height The height of the rectangle
-     */
-    abstract fun rect(x: Float, y: Float, width: Float, height: Float)
-
-    /**
-     * Renders a rounded rectangle
-     *
-     * @param x The x position of the rectangle
-     * @param y The y position of the rectangle
-     * @param width The width of the rectangle
-     * @param height The height of the rectangle
-     * @param radius The corner radius of the rectangle
-     */
-    abstract fun rect(x: Float, y: Float, width: Float, height: Float, radius: Float)
-
-    /**
      * Renders a rounded rectangle with varying corner radii
      *
      * @param x The x position of the rectangle
@@ -263,6 +252,23 @@ abstract class UIRenderer {
         bottomRight: Float,
         bottomLeft: Float
     )
+
+    abstract fun circle(x: Float, y: Float, radius: Float)
+
+    /**
+     * Renders an ellipse
+     *
+     * @param x The x position of the ellipse
+     * @param y The y position of the ellipse
+     * @param width The width of the ellipse
+     * @param height The height of the ellipse
+     */
+    abstract fun ellipse(x: Float, y: Float, width: Float, height: Float)
+
+    /**
+     * Renders a triangle
+     */
+    abstract fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float)
 
     /**
      * Renders a rounded rectangle linear gradient
@@ -329,53 +335,6 @@ abstract class UIRenderer {
     )
 
     /**
-     * Renders an ellipse
-     *
-     * @param x The x position of the ellipse
-     * @param y The y position of the ellipse
-     * @param width The width of the ellipse
-     * @param height The height of the ellipse
-     */
-    abstract fun ellipse(x: Float, y: Float, width: Float, height: Float)
-
-    /**
-     * Renders the stroke for a rectangle
-     *
-     * @see rect
-     */
-    abstract fun srect(x: Float, y: Float, width: Float, height: Float)
-
-    /**
-     * Renders the stroke for a rounded rectangle
-     *
-     * @see rect
-     */
-    abstract fun srect(x: Float, y: Float, width: Float, height: Float, radius: Float)
-
-    /**
-     * Renders the stroke for a varying corner radius rectangle
-     *
-     * @see rect
-     */
-    abstract fun srect(
-        x: Float,
-        y: Float,
-        width: Float,
-        height: Float,
-        topLeft: Float,
-        topRight: Float,
-        bottomRight: Float,
-        bottomLeft: Float
-    )
-
-    /**
-     * Renders the stroke for a ellipse
-     *
-     * @see ellipse
-     */
-    abstract fun sellipse(x: Float, y: Float, width: Float, height: Float)
-
-    /**
      * Loads an image based on the given file location into [imageName] with the given [imageFlags]
      *
      * @param imageName The unique name of the image
@@ -401,7 +360,7 @@ abstract class UIRenderer {
      * @param height
      * @param radius
      */
-    abstract fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, radius: Float)
+    abstract fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float)
 
     /**
      * Loads a font from the provided file location into the provided [fontName]
@@ -451,6 +410,12 @@ abstract class UIRenderer {
      * Returns the Descender of the provided string
      */
     abstract fun stringDescender(): Float
+
+    /**
+     * Accepts a svg from a [ByteBuffer] and rasterizes it as an image and places
+     * the rasterized image into the image list with the given [svgName]
+     */
+    abstract fun loadSVG(svgName: String, buffer: ByteBuffer, scale: Float)
 
     /**
      * Returns the red of the active color

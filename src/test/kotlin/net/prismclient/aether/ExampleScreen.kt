@@ -1,13 +1,7 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.animation.ease.impl.UIQuart
-import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
-import net.prismclient.aether.ui.component.type.color.UIColorSwatch
-import net.prismclient.aether.ui.component.type.color.UIColorSwatchSheet
-import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
@@ -19,11 +13,9 @@ import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.util.EM
-import net.prismclient.aether.ui.unit.util.HEIGHTANIM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
-
     override fun initialize() {
         UIFontFamily(
                 "Poppins",
@@ -37,6 +29,7 @@ class ExampleScreen : UIScreen() {
 
         renderer {
             loadImage("background", "/images/background.png")
+            loadSvg("svg", "/aether/svg/message-text.svg", 4f)
         }
 
         style(UIContainerSheet(), "frame") {
@@ -58,8 +51,6 @@ class ExampleScreen : UIScreen() {
                     borderWidth = 2f
                 }
             }
-
-//            overflowX = UIContainerSheet.Overflow.Scroll
 
             verticalScrollbar.x = px(10)
             verticalScrollbar.y = percent(10)
@@ -140,10 +131,9 @@ class ExampleScreen : UIScreen() {
     }
 
     override fun render() {
-//        renderer {
-//            renderImage("background", 0f, 0f, UICore.width, UICore.height)
-//        }
+        renderer {
+            renderImage("background", 0f, 0f, UICore.width, UICore.height)
+        }
         super.render()
-        //renderGradient(50f, 50f, 500f, 500f)
     }
 }

@@ -9,10 +9,13 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.nanovg.*;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBTruetype;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
+import static org.lwjgl.nanovg.NanoSVG.*;
 import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -158,18 +161,6 @@ public class DefaultRenderer extends UIRenderer {
     }
 
     @Override
-    public void rect(float x, float y, float width, float height) {
-        nvgBeginPath(ctx);
-        nvgRect(ctx, x, y, width, height);
-        fill();
-    }
-
-    @Override
-    public void rect(float x, float y, float width, float height, float radius) {
-        rect(x, y, width, height, radius, radius, radius, radius);
-    }
-
-    @Override
     public void rect(float x, float y, float width, float height, float topLeft, float topRight, float bottomRight, float bottomLeft) {
         nvgBeginPath(ctx);
         if (width <= 1f || height <= 1f) {
@@ -178,7 +169,7 @@ public class DefaultRenderer extends UIRenderer {
             nvgShapeAntiAlias(ctx, false);
         }
         nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft);
-        fill();
+        check();
     }
 
     @Override
@@ -207,38 +198,27 @@ public class DefaultRenderer extends UIRenderer {
     }
 
     @Override
+    public void circle(float x, float y, float radius) {
+        nvgBeginPath(ctx);
+        nvgCircle(ctx, x, y, radius);
+        check();
+    }
+
+    @Override
     public void ellipse(float x, float y, float width, float height) {
         nvgBeginPath(ctx);
         nvgEllipse(ctx, x, y, width, height);
-        fill();
+        check();
     }
 
     @Override
-    public void srect(float x, float y, float width, float height) {
+    public void triangle(float x, float y, float x1, float y1, float x2, float y2) {
         nvgBeginPath(ctx);
-        nvgRect(ctx, x, y, width, height);
-        stroke();
-    }
-
-    @Override
-    public void srect(float x, float y, float width, float height, float radius) {
-        nvgBeginPath(ctx);
-        nvgRoundedRect(ctx, x, y, width, height, radius);
-        stroke();
-    }
-
-    @Override
-    public void srect(float x, float y, float width, float height, float topLeft, float topRight, float bottomRight, float bottomLeft) {
-        nvgBeginPath(ctx);
-        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft);
-        stroke();
-    }
-
-    @Override
-    public void sellipse(float x, float y, float width, float height) {
-        nvgBeginPath(ctx);
-        nvgEllipse(ctx, x, y, width, height);
-        stroke();
+        nvgMoveTo(ctx, x, y);
+        nvgLineTo(ctx, x1, y1);
+        nvgLineTo(ctx, x2, y2);
+        nvgLineTo(ctx, x, y);
+        check();
     }
 
     @Override
@@ -267,14 +247,14 @@ public class DefaultRenderer extends UIRenderer {
     }
 
     @Override
-    public void renderImage(@NotNull String imageName, float x, float y, float width, float height, float radius) {
+    public void renderImage(@NotNull String imageName, float x, float y, float width, float height, float topLeft, float topRight, float bottomRight, float bottomLeft) {
         UIImageData img = images.get(imageName); int handle = 0;
         if (img != null) handle = img.getHandle();
         nvgImagePattern(ctx, x, y, width, height, 0, handle, 1f, paint);
         paint.innerColor(color);
         paint.outerColor(color);
         nvgBeginPath(ctx);
-        nvgRoundedRect(ctx, x, y, width, height, radius);
+        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft);
         nvgFillPaint(ctx, paint);
         nvgFill(ctx);
     }
@@ -368,6 +348,39 @@ public class DefaultRenderer extends UIRenderer {
         return Math.abs(decender[0]);
     }
 
+    @Override
+    public void loadSVG(@NotNull String svgName, @NotNull ByteBuffer buffer, float scale) {
+        NSVGImage image;
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            image = nsvgParse(buffer, stack.ASCII("px"), 96f);
+            if (image == null) {
+                throw new RuntimeException("Failed to parse SVG. name: " + svgName + ", scale:" + scale);
+            }
+        }
+
+        long rasterizer = nsvgCreateRasterizer();
+
+        int w = (int) (image.width() * scale);
+        int h = (int) (image.height() * scale);
+
+        ByteBuffer rast = MemoryUtil.memAlloc(w * h * 4);
+
+        nsvgRasterize(
+                rasterizer,
+                image,
+                0, 0,
+                scale,
+                rast, w, h,
+                w * 4
+        );
+
+        nsvgDeleteRasterizer(rasterizer);
+
+        images.put(svgName,
+                new UIImageData(
+                        nvgCreateImageRGBA(ctx, w, h, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_GENERATE_MIPMAPS, rast), w, h, rast));
+    }
+
     private void fill() {
         nvgFillColor(ctx, color);
         nvgFill(ctx);
@@ -377,5 +390,13 @@ public class DefaultRenderer extends UIRenderer {
         nvgStrokeWidth(ctx, strokeWidth);
         nvgStrokeColor(ctx, outlineColor);
         nvgStroke(ctx);
+    }
+
+    private void check() {
+        if (stroke) {
+            stroke();
+        } else {
+            fill();
+        }
     }
 }
