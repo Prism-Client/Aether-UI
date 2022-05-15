@@ -1,10 +1,7 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.animation.ease.impl.UIQuart
-import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.component.type.color.UIColorSwatch
 import net.prismclient.aether.ui.component.type.color.UIColorSwatchSheet
-import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
@@ -17,11 +14,9 @@ import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.util.EM
-import net.prismclient.aether.ui.unit.util.HEIGHTANIM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
-
     override fun initialize() {
         UIFontFamily(
                 "Poppins",
@@ -35,7 +30,7 @@ class ExampleScreen : UIScreen() {
 
         renderer {
             loadImage("background", "/images/background.png")
-            render.loadSVG("svg", 2f, "/aether/svg/message-text.svg".toTerminatingByteBuffer())
+            loadSvg("svg", "/aether/svg/message-text.svg", 4f)
         }
 
         style(UIContainerSheet(), "frame") {
@@ -57,8 +52,6 @@ class ExampleScreen : UIScreen() {
                     borderWidth = 2f
                 }
             }
-
-//            overflowX = UIContainerSheet.Overflow.Scroll
 
             verticalScrollbar.x = px(10)
             verticalScrollbar.y = percent(10)
@@ -117,7 +110,7 @@ class ExampleScreen : UIScreen() {
 
             background {
                 border {
-                    borderColor = asRGBA(255, 255,  255, 0.5f)
+                    borderColor = asRGBA(255, 255, 255, 0.5f)
                     borderWidth = 1f
                 }
             }

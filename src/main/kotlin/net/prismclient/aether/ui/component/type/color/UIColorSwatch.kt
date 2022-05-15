@@ -40,8 +40,8 @@ class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style){
         renderer {
             color(style.swatchColor)
             rect(relX, relY, relWidth, relHeight)
-            render.linearGradient(x, y, relWidth, relHeight, 0f, x, y, x + relWidth, y, -1, asRGBA(0, 0, 0, 0))
-            render.linearGradient(x, y, relWidth, relHeight, 0f, x, y, x, y + relHeight, asRGBA(0, 0, 0, 0), asRGBA(0, 0, 0))
+            renderer.linearGradient(x, y, relWidth, relHeight, 0f, x, y, x + relWidth, y, -1, asRGBA(0, 0, 0, 0))
+            renderer.linearGradient(x, y, relWidth, relHeight, 0f, x, y, x, y + relHeight, asRGBA(0, 0, 0, 0), asRGBA(0, 0, 0))
         }
     }
 

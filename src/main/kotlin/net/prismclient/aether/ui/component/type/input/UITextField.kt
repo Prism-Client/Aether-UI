@@ -24,7 +24,7 @@ import java.lang.Integer.min
  * @param maxLength The maximum length the text box can render
  * @param style The style sheet for the component
  */
-open class UITextField @JvmOverloads constructor(
+open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/components/form/input
     var text: String,
     var placeholder: String,
     var inputFlavor: TextFlavor = any,

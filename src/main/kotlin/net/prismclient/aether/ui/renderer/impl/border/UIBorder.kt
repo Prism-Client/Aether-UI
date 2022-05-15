@@ -17,7 +17,7 @@ open class UIBorder : UICopy<UIBorder> {
 
     open fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
         renderer {
-            outline(borderWidth, borderColor) {
+            stroke(borderColor, borderWidth) {
                 rect(x, y, width,height, radius)
             }
         }
