@@ -28,13 +28,13 @@ fun operation(unit1: UIUnit, unit2: UIUnit, operation: UIOperation) = UIOperatio
 
 /** Operator functions **/
 
-operator fun UIUnit.plus(unit: UIUnit) = UIOperationUnit(this, unit, ADD)
+operator fun UIUnit?.plus(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, ADD)
 
-operator fun UIUnit.minus(unit: UIUnit) = UIOperationUnit(this, unit, SUBTRACT)
+operator fun UIUnit?.minus(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, SUBTRACT)
 
-operator fun UIUnit.times(unit: UIUnit) = UIOperationUnit(this, unit, MULTIPLY)
+operator fun UIUnit?.times(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, MULTIPLY)
 
-operator fun UIUnit.div(unit: UIUnit) = UIOperationUnit(this, unit, DIVIDE)
+operator fun UIUnit?.div(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, DIVIDE)
 
 /** Calculation functions **/
 
