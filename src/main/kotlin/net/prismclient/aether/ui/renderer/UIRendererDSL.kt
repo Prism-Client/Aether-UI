@@ -97,23 +97,24 @@ object UIRendererDSL {
         renderer.wrapString(this, x, y, width, splitHeight)
 
     /**
-     * Renders a string until the given width, where appended string is
-     * added to that point and the string is truncated to that point. For
-     * example, if the text is "Hello", the appended string is ".." and "Hel.."
-     * width is greater than width, then the string rendered is "Hel..". If
-     * appended string is blank, the string is cut off at the given width point.
+     * Renders a string until the given width, where then the string is
+     * truncated to the point, and the appended string is added. For example,
+     * if the text is "Hello", the appended string is ".." and "Hel.." width
+     * is greater than width, then the string rendered is "Hel..". If the appended
+     * string is blank, or null, the string is cut off at the given width point,
+     * like normal clipped text.
      *
      * @param ignoreLastSpace If true, the last space (if applicable) is omitted.
      */
     @JvmOverloads
-    fun String.render(x: Float, y: Float, width: Float, appendedString: String = "", ignoreLastSpace: Boolean = true) {
+    fun String.render(x: Float, y: Float, width: Float, appendedString: String? = null, ignoreLastSpace: Boolean = true) {
         if (width >= this.width()) {
             this.render(x, y)
             return
         }
         var new = ""
         var w = 0f
-        var aw = appendedString.width()
+        val aw = appendedString?.width() ?: 0f
         for (c in 0 until this.length) {
             val char = this[c]
             w += char.toString().width()
@@ -123,7 +124,7 @@ object UIRendererDSL {
                 val flag = (this.length != new.length)
                 if (ignoreLastSpace && new[new.length - 1] == ' ') // Omit the space if applicable
                     new = new.substring(0, new.length - 1)
-                if (flag) // Append the appendedString if the length is less than the inital
+                if (flag && appendedString != null) // Append the appendedString if the length is less than the inital
                     new += appendedString
                 break
             }
