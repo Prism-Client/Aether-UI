@@ -11,11 +11,11 @@ import net.prismclient.aether.ui.component.UIComponent
 open class UISlider(value: Float, var min: Float, var max: Float, var step: Float, style: String) : UIComponent<UISliderSheet>(style) {
     var value: Float = value
         set(value) {
-            field = value //.coerceAtLeast(min).coerceAtMost(max)
-            normalizedValue = value / (max - min)
+            field = value.coerceAtLeast(min).coerceAtMost(max)
+            //normalizedValue = value / (max - min)
         }
 
-    private var normalizedValue = 0f
+    private var normalizedValue = value / (max - min)
 
     private var offsetX = 0f
     private var selected = false
@@ -34,6 +34,8 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
         super.mouseMoved(mouseX, mouseY)
         if (selected) {
             normalizedValue = (((mouseX - offsetX - style.sliderControl.cachedX)) / (relWidth - style.sliderControl.cachedWidth)).coerceAtLeast(0f).coerceAtMost(1f)
+            value = (max - min) * normalizedValue + min
+            println(value)
         }
     }
 
