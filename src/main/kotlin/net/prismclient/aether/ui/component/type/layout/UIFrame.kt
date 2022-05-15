@@ -69,7 +69,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         frameWidth = style.frameWidth.getX()
         frameHeight = style.frameHeight.getY()
         if (style.clipContent) {
-            if (!this::framebuffer.isInitialized || frameWidth != framebuffer.width || frameWidth != framebuffer.height) {
+            if (!this::framebuffer.isInitialized || frameWidth != framebuffer.width || frameHeight != framebuffer.height) {
                 createFramebuffer()
             }
         }
