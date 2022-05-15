@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.style
 
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
@@ -24,6 +25,11 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
     open var margin: UIMargin? = null
     open var anchor: UIAnchorPoint = UIAnchorPoint()
 
+    /**
+     * When true, any content within the component will be clipped
+     */
+    var clipContent = true
+
     override fun copy(): UIStyleSheet = UIStyleSheet().apply(this)
 
     /**
@@ -43,6 +49,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         this.padding = sheet.padding?.copy()
         this.margin = sheet.margin?.copy()
         this.anchor = sheet.anchor.copy()
+        this.clipContent = sheet.clipContent
 
         return this
     }

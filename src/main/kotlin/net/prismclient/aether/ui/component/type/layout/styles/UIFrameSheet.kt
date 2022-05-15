@@ -23,11 +23,6 @@ open class UIFrameSheet : UIStyleSheet() {
     var frameHeight: UIUnit? = height
 
     /**
-     * When true, any content within the [UIFrame] will be clipped
-     */
-    var clipContent = true
-
-    /**
      * The corner radius of the content
      */
     var contentRadius: UIRadius? = null
@@ -40,7 +35,6 @@ open class UIFrameSheet : UIStyleSheet() {
         it.frameWidth = frameWidth?.copy()
         it.frameHeight = frameHeight?.copy()
 
-        it.clipContent = clipContent
         it.contentRadius = contentRadius
 
         return it

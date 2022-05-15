@@ -67,7 +67,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     open fun updateStyle() {
         // Update font if not null
-        style.font?.update(x + style.font!!.x.getX(width, false), y + style.font!!.y.getY(height, false))
+        style.font?.update(this)
     }
 
     open fun updateAnimation() {
@@ -78,9 +78,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         updateAnimation()
         style.background?.render(relX, relY, relWidth, relHeight)
         renderer {
-            scissor(relX, relY, relWidth, relHeight) {
-                renderComponent()
-            }
+            if (style.clipContent) {
+                scissor(relX, relY, relWidth, relHeight) {
+                    renderComponent()
+                }
+            } else renderComponent()
         }
     }
 
