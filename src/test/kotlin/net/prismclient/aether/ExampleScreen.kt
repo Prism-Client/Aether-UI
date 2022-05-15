@@ -139,9 +139,5 @@ class ExampleScreen : UIScreen() {
             renderImage("background", 0f, 0f, UICore.width, UICore.height)
         }
         super.render()
-        renderer {
-            color(-1)
-            renderImage("svg", 0f, 0f, 18f, 18f)
-        }
     }
 }
