@@ -7,7 +7,6 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
-import net.prismclient.aether.ui.renderer.UIRendererDSL
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
@@ -18,7 +17,6 @@ import net.prismclient.aether.ui.unit.util.EM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
-
     override fun initialize() {
         UIFontFamily(
                 "Poppins",
@@ -112,7 +110,7 @@ class ExampleScreen : UIScreen() {
 
             background {
                 border {
-                    borderColor = asRGBA(255, 255,  255, 0.5f)
+                    borderColor = asRGBA(255, 255, 255, 0.5f)
                     borderWidth = 1f
                 }
             }
@@ -130,7 +128,6 @@ class ExampleScreen : UIScreen() {
     }
 
     override fun render() {
-
 //        renderer {
 //            renderImage("background", 0f, 0f, UICore.width, UICore.height)
 //        }

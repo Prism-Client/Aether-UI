@@ -61,6 +61,7 @@ object UIRendererDSL {
         this.fontSize = fontSize
         this.fontAlignment = fontAlignment
         this.fontSpacing = fontSpacing
+        renderer.font(fontFace, fontSize, fontAlignment, fontSpacing)
     }
 
     /**
@@ -101,16 +102,26 @@ object UIRendererDSL {
      * example, if the text is "Hello", the appended string is ".." and "Hel.."
      * width is greater than width, then the string rendered is "Hel..". If
      * appended string is blank, the string is cut off at the given width point.
+     *
+     * @param ignoreLastSpace If true, the last space (if applicable) is omitted.
      */
-    fun String.render(x: Float, y: Float, width: Float, appendedString: String) {
+    @JvmOverloads
+    fun String.render(x: Float, y: Float, width: Float, appendedString: String, ignoreLastSpace: Boolean = true) {
+        var new = ""
         var w = 0f
         var aw = appendedString.width()
         for (c in 0 until this.length) {
-            w += this[c].toString().width()
+            val char = this[c]
+            w += char.toString().width()
+            new += char
             if (w > width - aw) {
-                this.substring(0, c) + appendedString.render(x, y)
+                if (ignoreLastSpace && new[new.length - 1] == ' ')
+                    new = new.substring(0, new.length - 2)
+                new += appendedString
+                break
             }
         }
+        new.render(x, y)
     }
 
     fun String.width(): Float = renderer.stringWidth(this)
