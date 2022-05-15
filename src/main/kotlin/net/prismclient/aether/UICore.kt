@@ -6,7 +6,8 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
+import net.prismclient.aether.ui.renderer.UIRendererDSL
+
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.util.UIKey
@@ -55,11 +56,11 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     }
 
     open fun beginFrame(screenWidth: Float, screenHeight: Float, devicePxRatio: Float) {
-        UIRendererDSL.instance.beginFrame(screenWidth, screenHeight, devicePxRatio)
+        UIRendererDSL.beginFrame(screenWidth, screenHeight, devicePxRatio)
     }
 
     open fun endFrame() {
-        UIRendererDSL.instance.endFrame()
+        UIRendererDSL.endFrame()
     }
 
     open fun renderContent() {

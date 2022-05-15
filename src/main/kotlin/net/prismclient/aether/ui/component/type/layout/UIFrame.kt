@@ -2,7 +2,7 @@ package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
-import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
+import net.prismclient.aether.ui.renderer.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.util.UIKey
@@ -29,8 +29,6 @@ import net.prismclient.aether.ui.util.extensions.renderer
  */
 abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style), UILayout {
     protected val components = ArrayList<UIComponent<*>>()
-
-    protected val renderer = UIRendererDSL.instance.render
     protected lateinit var framebuffer: UIContentFBO
 
     var frameWidth: Float = 0f
@@ -62,9 +60,9 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
 
     open fun createFramebuffer() {
         if (this::framebuffer.isInitialized)
-            renderer.deleteContentFBO(framebuffer)
+            UIRendererDSL.renderer.deleteContentFBO(framebuffer)
         if (relWidth >= 1f && relHeight >= 1f)
-            framebuffer = renderer.createContentFBO(frameWidth, frameHeight)
+            framebuffer = UIRendererDSL.renderer.createContentFBO(frameWidth, frameHeight)
     }
 
     open fun updateFramebuffer() {
@@ -117,7 +115,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         renderer {
             // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
             if (relWidth >= 1f || relHeight >= 1f) {
-                renderFbo(
+                renderer.renderFBO(
                         framebuffer,
                         relX,
                         relY,

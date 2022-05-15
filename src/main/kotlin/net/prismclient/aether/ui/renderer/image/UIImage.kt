@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.renderer.image
 
-import net.prismclient.aether.ui.renderer.builder.UIRendererDSL
+import net.prismclient.aether.ui.renderer.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import java.nio.ByteBuffer
 
@@ -18,6 +18,6 @@ class UIImage(val imageName: String, val imageData: ByteBuffer, flags: Int = 0) 
         private set
 
     init {
-        UIRendererDSL.instance.loadImage(imageName, imageData, flags)
+        UIRendererDSL.loadImage(imageName, imageData, flags)
     }
 }
