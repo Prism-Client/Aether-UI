@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.type.input.slider
 
 import net.prismclient.aether.ui.component.UIComponent
+import kotlin.math.roundToInt
 
 /**
  * [UISlider]
@@ -8,17 +9,11 @@ import net.prismclient.aether.ui.component.UIComponent
  * @author sen
  * @since 5/13/2022
  */
-open class UISlider(value: Float, var min: Float, var max: Float, var step: Float, style: String) : UIComponent<UISliderSheet>(style) {
-    var value: Float = value
-        set(value) {
-            field = value.coerceAtLeast(min).coerceAtMost(max)
-            //normalizedValue = value / (max - min)
-        }
+open class UISlider(var value: Float, var min: Float, var max: Float, var step: Float, style: String) : UIComponent<UISliderSheet>(style) {
+    protected var normalizedValue = value / (max - min)
 
-    private var normalizedValue = value / (max - min)
-
-    private var offsetX = 0f
-    private var selected = false
+    protected var offsetX = 0f
+    protected var selected = false
 
     override fun update() {
         super.update()
@@ -32,10 +27,13 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
 
     override fun mouseMoved(mouseX: Float, mouseY: Float) {
         super.mouseMoved(mouseX, mouseY)
-        if (selected) {
-            normalizedValue = (((mouseX - offsetX - style.sliderControl.cachedX)) / (relWidth - style.sliderControl.cachedWidth)).coerceAtLeast(0f).coerceAtMost(1f)
+        if (selected) { // I got lazy
+            normalizedValue = (((mouseX - offsetX - style.sliderControl.cachedX)) / (relWidth - style.sliderControl.cachedWidth))
+                    .coerceAtLeast(0f)
+                    .coerceAtMost(1f)
             value = (max - min) * normalizedValue + min
-            println(value)
+            value = (value / step).roundToInt() * step
+            normalizedValue = value / (max - min)
         }
     }
 
