@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.animation
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.animation.util.UIIEase
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.util.*
@@ -25,6 +26,7 @@ abstract class UIAnimation<T>(
         val name: String,
         var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
 ) : UICopy<UIAnimation<T>> where T : UIStyleSheet, T : UIIEase {
+    val lifetime = System.currentTimeMillis()
     val timeline: ArrayList<T> = ArrayList()
 
     protected lateinit var component: UIComponent<*>
@@ -118,12 +120,19 @@ abstract class UIAnimation<T>(
         }
     }
 
+    fun forceComplete() {
+        println("Forced animation completion.")
+        completeAnimation()
+    }
+
     fun completeAnimation() {
         println("Completed animation: $name, Component: $component")
         completed = true
         animating = false
 
         saveState(timeline[timeline.size - 1])
+
+        UIProvider.completeAnimation(this)
     }
 
     /**

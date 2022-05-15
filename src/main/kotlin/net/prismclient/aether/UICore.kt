@@ -41,8 +41,11 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     val animationThread = Thread {
         while (true) {
             animationLock.acquire()
-            UIProvider.activeAnimations.forEach(UIAnimation<*>::update)
+            UIProvider.updateAnimations()
         }
+    }.also {
+        it.name = "Animation-Thread"
+        //it.start()
     }
 
     var focusedComponent: UIComponent<*>? = null

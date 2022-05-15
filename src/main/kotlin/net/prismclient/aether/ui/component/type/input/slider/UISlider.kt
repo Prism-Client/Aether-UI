@@ -17,12 +17,8 @@ open class UISlider(var value: Float, var min: Float, var max: Float, var step: 
     protected var offsetX = 0f
     protected var selected = false
 
-    override fun update() {
-        super.update()
-        style.sliderControl.update(this)
-    }
-
     override fun renderComponent() {
+        style.sliderControl.update(this)
         style.sliderControl.offsetX = normalizedValue * (relWidth - style.sliderControl.cachedWidth)
         style.sliderControl.render()
     }

@@ -7,6 +7,11 @@ import net.prismclient.aether.ui.renderer.UIRendererDSL
 import net.prismclient.aether.ui.style.util.UIFontFamily
 
 object UIProvider {
+    /**
+     * The maximum time in milliseconds that an animation can live.
+     */
+    const val MAX_ANIMATION_DURATION = 25000L
+
     lateinit var renderer: UIRenderer
 
     val styles = HashMap<String, UIStyleSheet>()
@@ -43,7 +48,8 @@ object UIProvider {
 
     @JvmOverloads
     fun getStyle(styleName: String, original: Boolean = false): UIStyleSheet {
-        val style = styles[styleName] ?: throw NullPointerException("Not found")
+        val style = styles[styleName]
+                ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
         return if (original) style else style.copy()
     }
 
@@ -56,5 +62,24 @@ object UIProvider {
         component.animation = animations[animationName]!!.copy()
         component.animation!!.start(component)
         activeAnimations.add(component.animation!!)
+    }
+
+    fun completeAnimation(animation: UIAnimation<*>) {
+        activeAnimations.remove(animation)
+    }
+
+    fun updateAnimations() {
+        try {
+            for (i in 0 until activeAnimations.size) {
+                val animation = activeAnimations[i]
+                if (animation.lifetime > System.currentTimeMillis() + MAX_ANIMATION_DURATION) {
+                    animation.forceComplete()
+                }
+                activeAnimations[i].update()
+            }
+        } catch (_: Exception) {
+            // An animation might be removed while updating
+            updateAnimations()
+        }
     }
 }
