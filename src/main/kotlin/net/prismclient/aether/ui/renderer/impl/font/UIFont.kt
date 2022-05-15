@@ -138,6 +138,24 @@ class UIFont : UICopy<UIFont> {
         Thin
     }
 
+    enum class FontRenderType {
+        /**
+         * Renders the string normally, as a one line string.
+         */
+        NORMAL,
+
+        /**
+         * Like normal, but when the text exits the bounds, it is clipped.
+         */
+        CLIP,
+        WRAP,
+
+        /**
+         *
+         */
+        APPEND
+    }
+
     override fun copy(): UIFont = UIFont().also {
         it.textAlignment = textAlignment
         it.fontStyle = fontStyle

@@ -1,3 +1,10 @@
 package net.prismclient.aether.ui.component.type
 
-class UILabel
+import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.style.UIStyleSheet
+
+class UILabel(style: String) : UIComponent<UIStyleSheet>(style) {
+    override fun renderComponent() {
+
+    }
+}

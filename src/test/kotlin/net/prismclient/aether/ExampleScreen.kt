@@ -1,5 +1,7 @@
 package net.prismclient.aether
 
+import net.prismclient.aether.ui.animation.ease.impl.UIQuart
+import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.component.type.color.UIColorSwatch
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
@@ -15,10 +17,12 @@ import net.prismclient.aether.ui.renderer.UIRendererDSL.width
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
+import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.util.EM
+import net.prismclient.aether.ui.unit.util.WIDTHANIM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
@@ -123,8 +127,17 @@ class ExampleScreen : UIScreen() {
             }
         }
 
+        animation(UIDefaultAnimation("animation")) {
+            keyframe {
+                x = unit(-1f, WIDTHANIM)
+            }
+            keyframe(UIQuart(1000L)) {
+                x = px(50)
+            }
+        }
+
         val frame = UIContainer<UIContainerSheet>("frame")
-        val swatch = UIColorSwatch("swatch")
+//        val swatch = UIColorSwatch("swatch")
 
         frames.add(frame)
         components.add(frame)
@@ -133,6 +146,8 @@ class ExampleScreen : UIScreen() {
         slider = UISlider(1000f, 0f, "The quick brown fox jumps over the lazy dog".width(), 1f, "slider")
 
         frame.addComponent(slider)
+
+        UIProvider.dispatchAnimation("animation", slider)
 
         update()
     }
