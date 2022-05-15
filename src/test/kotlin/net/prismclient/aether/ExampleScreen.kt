@@ -1,11 +1,17 @@
 package net.prismclient.aether
 
+import net.prismclient.aether.ui.component.type.color.UIColorSwatch
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
+import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
+import net.prismclient.aether.ui.renderer.UIRendererDSL
+import net.prismclient.aether.ui.renderer.UIRendererDSL.render
+import net.prismclient.aether.ui.renderer.UIRendererDSL.width
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
@@ -16,6 +22,8 @@ import net.prismclient.aether.ui.unit.util.EM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
+    lateinit var slider: UISlider
+
     override fun initialize() {
         UIFontFamily(
                 "Poppins",
@@ -115,24 +123,26 @@ class ExampleScreen : UIScreen() {
             }
         }
 
-//        val frame = UIContainer<UIContainerSheet>("frame")
-//        val swatch = UIColorSwatch("swatch")
-//
-//        frame.addComponent(swatch)
-//
-//        frames.add(frame)
-//        components.add(frame)
+        val frame = UIContainer<UIContainerSheet>("frame")
+        val swatch = UIColorSwatch("swatch")
 
-        val slider = UISlider(5f, 0f, 10f, 1f, "slider")
+        frames.add(frame)
+        components.add(frame)
 
-        components.add(slider)
+        UIRendererDSL.font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
+        slider = UISlider(1000f, 0f, "The quick brown fox jumps over the lazy dog".width(), 1f, "slider")
+
+        frame.addComponent(slider)
 
         update()
     }
 
     override fun render() {
         renderer {
+            color(-1)
             renderImage("background", 0f, 0f, UICore.width, UICore.height)
+            font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
+            "The quick brown fox jumps over the lazy dog".render(50f, 30f, slider.value, "..", true)
         }
         super.render()
     }
