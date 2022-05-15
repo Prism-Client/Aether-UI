@@ -4,18 +4,30 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.UIRendererDSL
+import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.extensions.align
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
  * [UIFont] is a renderer which renders a component's font.
  *
+ * Note: Width, and height are ignored.
+ *
  * @author sen
  * @since 4/26/2022
  */
-class UIFont : UICopy<UIFont> {
+open class UIFont : UIShape() {
+    /**
+     * Instructs [UIFont] how to render text.
+     *
+     * @see FontRenderType
+     * @see appendedString
+     */
+    var fontRenderType: FontRenderType = FontRenderType.NORMAL
+
     /**
      * The alignment of the text
      *
@@ -57,20 +69,8 @@ class UIFont : UICopy<UIFont> {
         }
     var fontSize = UIDefaults.instance.fontSize
     var fontSpacing = UIDefaults.instance.fontSpacing
-
-    var x: UIUnit = px(0)
-    var y: UIUnit = px(0)
-
-    /**
-     * The calculated X position of the component, which is updated when [update] is called
-     */
-    var calculatedX = 0f
-        private set
-    /**
-     * The calculated Y position of the component, which is updated when [update] is called
-     */
-    var calculatedY = 0f
-        private set
+    var lineHeight = 0f
+    var appendedString: String? = null
 
     /**
      * If true, fontName will not update automatically. It will only update when [overwriteFontName] is called
@@ -78,18 +78,26 @@ class UIFont : UICopy<UIFont> {
     var isOverridden = false
         private set
 
-    fun align(alignment: UIAlignment) =
-        net.prismclient.aether.ui.util.extensions.align(alignment, x, y)
+    fun align(alignment: UIAlignment) {
+        x ?: run { x = px(0) }
+        y ?: run { y = px(0) }
+        align(alignment, x!!, y!!)
+    }
 
-    fun update(x: Float, y: Float) {
-        calculatedX = x
-        calculatedY = y
+    @Deprecated("Use render(text: String) instead", ReplaceWith("render(text: String)"))
+    override fun render() {
+        throw IllegalStateException("Use render(text: String) instead")
     }
 
     fun render(text: String) {
         renderer {
             font(this@UIFont)
-            text.render(calculatedX, calculatedY)
+            when (fontRenderType) {
+                FontRenderType.NORMAL -> text.render(cachedX, cachedY)
+                FontRenderType.WRAP -> text.render(cachedX, cachedY, (component.relX + component.relWidth) - cachedWidth, lineHeight)
+                FontRenderType.CLIP, FontRenderType.APPEND ->
+                    text.render(cachedX, cachedY, (component.relX + component.relWidth) - cachedWidth, null, false)
+            }
         }
     }
 
@@ -138,6 +146,12 @@ class UIFont : UICopy<UIFont> {
         Thin
     }
 
+    /**
+     * Instructs [UIFont] on how to render the text. See the enums for details.
+     *
+     * @author sen
+     * @since 5/15/2022
+     */
     enum class FontRenderType {
         /**
          * Renders the string normally, as a one line string.
@@ -145,18 +159,28 @@ class UIFont : UICopy<UIFont> {
         NORMAL,
 
         /**
-         * Like normal, but when the text exits the bounds, it is clipped.
+         * Omits any text that exceeds the bounds.
          */
         CLIP,
+
+        /**
+         * If the string exceeds the bounds, the text will be wrapped
+         */
         WRAP,
 
         /**
-         *
+         * Renders a string until the given width, where then the string is
+         * truncated to the point, and the appended string is added. For example,
+         * if the text is "Hello", the appended string is ".." and "Hel.." width
+         * is greater than width, then the string rendered is "Hel..". If appended
+         * string is blank, the string is cut off at the given width point, like normal
+         * clipped text.
          */
         APPEND
     }
 
     override fun copy(): UIFont = UIFont().also {
+        it.fontRenderType = fontRenderType
         it.textAlignment = textAlignment
         it.fontStyle = fontStyle
         it.fontColor = fontColor
@@ -164,6 +188,7 @@ class UIFont : UICopy<UIFont> {
         it.fontFamily = fontFamily
         it.fontSize = fontSize
         it.fontSpacing = fontSpacing
+        it.lineHeight = lineHeight
         it.x = x
         it.y = y
 

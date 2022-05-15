@@ -8,6 +8,7 @@ import net.prismclient.aether.ui.util.extensions.calculateX
 import net.prismclient.aether.ui.util.extensions.calculateY
 
 abstract class UIShape : UIRenderable, UICopy<UIShape> {
+    protected lateinit var component: UIComponent<*>
     var color = 0
     var x: UIUnit? = null
     var y: UIUnit? = null
@@ -27,6 +28,7 @@ abstract class UIShape : UIRenderable, UICopy<UIShape> {
         protected set
 
     override fun update(component: UIComponent<*>) {
+        this.component = component
         cachedX = calculateX(x, component, component.relWidth) + component.relX
         cachedY = calculateY(y, component, component.relHeight) + component.relY
         cachedWidth = calculateX(width, component, component.relWidth)

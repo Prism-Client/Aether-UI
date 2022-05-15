@@ -106,8 +106,8 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
     }
 
     open fun updateCaret() {
-        val x = style.font!!.calculatedX
-        val y = style.font!!.calculatedY
+        val x = style.font!!.cachedX
+        val y = style.font!!.cachedX
         caretX = x + +style.caretX
         caretY = y + -style.caretY
         caretWidth = +style.caretWidth
@@ -136,7 +136,7 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
         // the caret position, set the selection position.
         renderer {
             font(style.font!!) // Apply the font (in case its properties have been lost)
-            var x = style.font!!.calculatedX
+            var x = style.font!!.cachedX
             var previous = 0f
             var flag = false // flag = found position
             for (i in text.indices) {
@@ -158,7 +158,7 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
             }
 
             // Update the variables
-            selectionX = style.font!!.calculatedX + text.substring(0, caretPosition).width()
+            selectionX = style.font!!.cachedX + text.substring(0, caretPosition).width()
             selectionWidth = text.substring(0, selectionPosition).width() - text.substring(0, caretPosition).width()
             hasSelection = true
         }
@@ -175,7 +175,7 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
         selectionPosition = endArea
         hasSelection = true
         renderer {
-            selectionX = style.font!!.calculatedX + text.substring(0, caretPosition).width()
+            selectionX = style.font!!.cachedX + text.substring(0, caretPosition).width()
             selectionWidth = text.substring(0, selectionPosition).width() - text.substring(0, caretPosition).width()
         }
         hasSelection = true
@@ -281,7 +281,7 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
 
         /* Calculate what spot did the user click in */
         renderer {
-            var x = style.font!!.calculatedX
+            var x = style.font!!.cachedX
             val y = this@UITextField.y
             var previous = 0f
             val h = this@UITextField.height

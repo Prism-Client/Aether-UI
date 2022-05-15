@@ -5,7 +5,7 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 
-inline fun style(block: UIStyleSheet.() -> Unit) = UIStyleSheet().also(block).also(block)
+inline fun style(name: String, block: UIStyleSheet.() -> Unit) = UIStyleSheet().also { it.name = name; it.block(); UIProvider.addStyle(it) }
 
 inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) = sheet.also {
     it.name = name
