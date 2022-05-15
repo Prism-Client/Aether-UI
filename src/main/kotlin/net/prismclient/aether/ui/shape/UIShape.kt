@@ -26,7 +26,6 @@ abstract class UIShape : UIRenderable, UICopy<UIShape> {
     var cachedHeight = 0f
         protected set
 
-
     override fun update(component: UIComponent<*>) {
         cachedX = calculateX(x, component, component.relWidth) + component.relX
         cachedY = calculateY(y, component, component.relHeight) + component.relY

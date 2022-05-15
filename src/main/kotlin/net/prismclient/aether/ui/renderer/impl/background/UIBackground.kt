@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui.renderer.impl.background
 
-import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius

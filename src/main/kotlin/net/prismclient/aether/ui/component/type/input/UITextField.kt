@@ -5,7 +5,6 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.input.UITextField.TextFlavor
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
-import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer

@@ -1,7 +1,7 @@
 package net.prismclient.aether.ui.unit.type
 
-import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.unit.UIUnit
 
 /**
  * [UIRelativeUnit] represents a [UIUnit]. By default, it is exactly like

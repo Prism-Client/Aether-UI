@@ -2,11 +2,8 @@ package net.prismclient.aether.ui.util.extensions
 
 import net.prismclient.aether.UICore
 import org.apache.commons.io.IOUtils
-import org.lwjgl.system.MemoryUtil
-import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.channels.Channels
 
 /**
  * Returns a ByteBuffer from a file location using a resource stream

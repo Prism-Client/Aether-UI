@@ -9,7 +9,6 @@ import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.limit
 import net.prismclient.aether.ui.util.extensions.renderer
-import java.lang.Float.max
 
 class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
     private lateinit var component: UIContainer<*>

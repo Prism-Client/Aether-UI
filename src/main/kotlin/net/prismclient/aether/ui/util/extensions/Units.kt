@@ -4,8 +4,8 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
-import net.prismclient.aether.ui.unit.util.UIOperation.*
 import net.prismclient.aether.ui.unit.util.*
+import net.prismclient.aether.ui.unit.util.UIOperation.*
 
 /** General Units **/
 
