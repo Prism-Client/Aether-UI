@@ -12,12 +12,14 @@ import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.calculateX
 import net.prismclient.aether.ui.util.extensions.calculateY
 import net.prismclient.aether.ui.util.extensions.renderer
+import java.util.function.Consumer
 
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var style: T = UIProvider.getStyle(style, false) as T
     var parent: UIComponent<*>? = null
     var animation: UIAnimation<*>? = null
 
+    /** Component plot properties **/
     var x = 0f
     var y = 0f
     var width = 0f
@@ -28,6 +30,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var relHeight = 0f
 
     var wasInside = false
+
+    /** Listeners **/
+    protected var mousePressedListeners: MutableList<Consumer<UIComponent<*>>>? = null
+    protected var mouseReleasedListeners: MutableList<Consumer<UIComponent<*>>>? = null
+    protected var mouseEnteredListeners: MutableList<Consumer<UIComponent<*>>>? = null
+    protected var mouseLeaveListeners: MutableList<Consumer<UIComponent<*>>>? = null
 
     /**
      * Invoked on creation, and screen resize
@@ -40,8 +48,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         // Update the relative values
         updateBounds()
 
-        // Update the style
+        // Update the style and update the bounds again if something
+        // within the style modified the plot of the component
         updateStyle()
+        updateBounds()
     }
 
     open fun updatePosition() {
@@ -88,12 +98,14 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     abstract fun renderComponent()
 
+    /** Input **/
+
     open fun mouseMoved(mouseX: Float, mouseY: Float) {
         if (isMouseInsideBoundingBox() && !wasInside) {
             wasInside = true
-            onMouseEnter()
+            mouseEntered()
         } else if (wasInside) {
-            onMouseLeave()
+            mouseLeft()
             wasInside = false
         }
     }
@@ -102,10 +114,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         if (this is UIFocusable<*> && !isFocused() && isMouseInsideBoundingBox()) {
             UICore.instance.focus(this)
         }
+        mousePressedListeners?.forEach { it.accept(this) }
     }
 
     open fun mouseReleased(mouseX: Float, mouseY: Float) {
-
+        mouseReleasedListeners?.forEach { it.accept(this) }
     }
 
     open fun keyPressed(key: UIKey, character: Char) {
@@ -116,13 +129,41 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     }
 
-    open fun onMouseEnter() {
-
+    protected open fun mouseEntered() {
+        mouseEnteredListeners?.forEach { it.accept(this) }
     }
 
-    open fun onMouseLeave() {
-
+    protected open fun mouseLeft() {
+        mouseLeaveListeners?.forEach { it.accept(this) }
     }
+
+    /** Event **/
+
+    open fun onMousePressed(event: Consumer<UIComponent<*>>) {
+        if (mousePressedListeners == null)
+            mousePressedListeners = mutableListOf()
+        mousePressedListeners!!.add(event)
+    }
+
+    open fun onMouseReleased(event: Consumer<UIComponent<*>>) {
+        if (mouseReleasedListeners == null)
+            mouseReleasedListeners = mutableListOf()
+        mouseReleasedListeners!!.add(event)
+    }
+
+    open fun onMouseEnter(event: Consumer<UIComponent<*>>) {
+        if (mouseEnteredListeners == null)
+            mouseEnteredListeners = mutableListOf()
+        mouseEnteredListeners!!.add(event)
+    }
+
+    open fun onMouseLeave(event: Consumer<UIComponent<*>>) {
+        if (mouseLeaveListeners == null)
+            mouseLeaveListeners = mutableListOf()
+        mouseLeaveListeners!!.add(event)
+    }
+
+    /** Position Calculation **/
 
     operator fun UIUnit?.unaryPlus() = this.getX()
 

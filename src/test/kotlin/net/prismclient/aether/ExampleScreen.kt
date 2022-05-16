@@ -151,17 +151,30 @@ class ExampleScreen : UIScreen() {
         }
 
         val frame = UIContainer<UIContainerSheet>("frame")
-        val label = UILabel("Text", "h1")
+        val label = UILabel("The quick brown fox jumps over the lazy dog", "h1")
+
+        label.style.font!!.fontRenderType = UIFont.FontRenderType.WRAP
+        label.style.font!!.appendedString = ".."
 //        val swatch = UIColorSwatch("swatch")
+
+        frame.onMousePressed {
+            println("Frame was clicked!")
+        }
 
         frames.add(frame)
         components.add(frame)
 
-        UIRendererDSL.font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
-        slider = UISlider(1000f, 0f, "The quick brown fox jumps over the lazy dog".width(), 1f, "slider")
+        UIRendererDSL.font(label.style.font!!)
+        slider = UISlider(1000f, 0f, 1000f, 1f, "slider")
+
+        label.style.font!!.lineBreakWidth = slider.value
+
+        slider.onValueChanged {
+            label.style.font!!.lineBreakWidth = it.value
+        }
 
         frame.addComponent(slider)
-//        frame.addComponent(label)
+        frame.addComponent(label)
 
         UIProvider.dispatchAnimation("animation", slider)
 

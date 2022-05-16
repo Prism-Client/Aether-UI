@@ -53,11 +53,6 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         updateLayout()
     }
 
-    override fun updateBounds() {
-        super.updateBounds()
-        updateFramebuffer()
-    }
-
     open fun createFramebuffer() {
         if (this::framebuffer.isInitialized)
             UIRendererDSL.renderer.deleteContentFBO(framebuffer)
