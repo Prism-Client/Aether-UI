@@ -6,8 +6,6 @@ import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.UIRendererDSL
 import net.prismclient.aether.ui.shape.UIShape
-import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.align
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -22,6 +20,12 @@ import kotlin.math.max
  * @since 4/26/2022
  */
 open class UIFont : UIShape() {
+    /**
+     * When true, the component will be ensured to be at
+     * least the size of the font width and height
+     */
+    var overrideParent: Boolean = true
+
     /**
      * Instructs [UIFont] how to render text.
      *
@@ -73,6 +77,7 @@ open class UIFont : UIShape() {
     var fontSpacing = UIDefaults.instance.fontSpacing
     var lineBreakWidth = 0f
     var lineHeight = 0f
+    var lineCount = 0
     var appendedString: String? = null
     var stringWidth = 0f
     var stringHeight = 0f
@@ -100,31 +105,33 @@ open class UIFont : UIShape() {
 
     fun render(text: String) {
         renderer {
-            var w = 0f
-            var h = 0f
             font(this@UIFont)
             when (fontRenderType) {
                 FontRenderType.NORMAL -> {
                     text.render(cachedX, cachedY)
-                    w = text.width()
-                    h = text.height()
+                    stringWidth = text.width()
+                    stringHeight = text.height()
                 }
                 FontRenderType.WRAP -> {
-                    text.render(cachedX, cachedY, lineBreakWidth, lineHeight)
-                    w = getWrappedWidth()
-                    h = getWrappedHeight()
+                    val c: Int = text.render(cachedX, cachedY, lineBreakWidth, lineHeight)
+                    if (lineCount != c) {
+                        component.update()
+                        lineCount = c
+                    }
+                    stringWidth = getWrappedWidth()
+                    stringHeight = getWrappedHeight()
                 }
                 FontRenderType.CLIP, FontRenderType.APPEND -> {
-                    w = text.render(cachedX, cachedY, component.relX + lineBreakWidth, null, false)
-                    h = text.height()
+                    stringWidth = text.render(cachedX, cachedY, component.relX + lineBreakWidth, null, false)
+                    stringHeight = text.height()
                 }
             }
 
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
-            if (w >= component.width || h >= component.height) {
-                component.width = max(w, component.width)
-                component.height = max(h, component.height)
+            if (overrideParent && (stringWidth > component.width || stringHeight > component.height)) {
+                component.width = max(stringWidth, component.width)
+                component.height = max(stringHeight, component.height)
                 component.updateBounds()
             }
         }
@@ -211,6 +218,7 @@ open class UIFont : UIShape() {
     override fun copy(): UIFont = UIFont().also {
         it.apply(this)
 
+        it.overrideParent = overrideParent
         it.fontRenderType = fontRenderType
         it.textAlignment = textAlignment
         it.fontStyle = fontStyle
