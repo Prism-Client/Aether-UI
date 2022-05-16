@@ -19,13 +19,9 @@ abstract class UIShape : UIRenderable, UICopy<UIShape> {
     var offsetY = 0f
 
     var cachedX = 0f
-        protected set
     var cachedY = 0f
-        protected set
     var cachedWidth = 0f
-        protected set
     var cachedHeight = 0f
-        protected set
 
     override fun update(component: UIComponent<*>) {
         this.component = component
