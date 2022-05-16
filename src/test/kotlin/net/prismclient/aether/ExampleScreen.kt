@@ -132,9 +132,9 @@ class ExampleScreen : UIScreen() {
             font {
                 align(UIAlignment.TOPLEFT)
                 fontFamily = "Poppins"
-                fontType = UIFont.FontType.Bold
+                fontType = UIFont.FontType.Regular
                 textAlignment = ALIGNTOP or ALIGNLEFT
-                fontSize = 64f
+                fontSize = 16f
                 fontColor = -1
             }
 
@@ -151,7 +151,7 @@ class ExampleScreen : UIScreen() {
         }
 
         val frame = UIContainer<UIContainerSheet>("frame")
-        val label = UILabel("The quick brown fox jumps over the lazy dog", "h1")
+        val label = UILabel("Here is some text have fun or something", "h1")
 
         label.style.font!!.fontRenderType = UIFont.FontRenderType.WRAP
         label.style.font!!.appendedString = ".."
@@ -182,12 +182,6 @@ class ExampleScreen : UIScreen() {
     }
 
     override fun render() {
-//        renderer {
-//            color(-1)
-//            renderImage("background", 0f, 0f, UICore.width, UICore.height)
-//            font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
-//            "The quick brown fox jumps over the lazy dog".render(50f, 30f, slider.value, "..", true)
-//        }
         super.render()
     }
 }

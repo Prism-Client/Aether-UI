@@ -302,22 +302,22 @@ public class DefaultRenderer extends UIRenderer {
 
         wrapWidth = 0f;
 
-        // Calculate the rows
-        int nrows = nvgTextBreakLines(ctx, "Insert some tex there xd asjdhaksjdhka.", width, rows);
-
         // Set the font state
         nvgFontBlur(ctx, 0);
-        nvgFontFace(ctx, fontName);
+        nvgFontFace(ctx, "Poppins-black");
         nvgFontSize(ctx, fontSize);
         nvgTextAlign(ctx, fontAlignment);
         nvgFillColor(ctx, color);
         nvgTextLetterSpacing(ctx, fontSpacing);
 
+        // Calculate the rows
+        int nrows = nvgTextBreakLines(ctx, text, width, rows);
+
         // Get the metrics of the line
         nvgTextMetrics(ctx, ascender, decender, lineHeight);
 
         // Iterate through the rows
-        for (int i = 0; i < nrows; i++) {
+        for (int i = 0; i < nrows ; i++) {
             NVGTextRow row = rows.get(i);
 
             float w = nnvgText(ctx, x, y, row.start(), row.end()); // Render the text
