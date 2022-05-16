@@ -152,12 +152,12 @@ object UIRendererDSL {
     /**
      * Returns thw width of the most recent call to a wrapped string
      */
-    fun getWrappedWidth(): Float = 0f
+    fun getWrappedWidth(): Float = renderer.wrapWidth()
 
     /**
      * Returns the height of the most recent call to a wrapped string
      */
-    fun getWrappedHeight(): Float = 0f
+    fun getWrappedHeight(): Float = renderer.wrapHeight()
 
     fun loadFont(name: String, fileLocation: String) =
         loadFont(name, fileLocation.toByteBuffer())

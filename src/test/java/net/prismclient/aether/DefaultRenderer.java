@@ -297,7 +297,7 @@ public class DefaultRenderer extends UIRenderer {
     private float wrapHeight = 0f;
 
     @Override
-    public void wrapString(@NotNull String text, float x, float y, float width, float splitHeight) {
+    public int wrapString(@NotNull String text, float x, float y, float width, float splitHeight) {
         NVGTextRow.Buffer rows = NVGTextRow.create(100);
 
         wrapWidth = 0f;
@@ -327,6 +327,7 @@ public class DefaultRenderer extends UIRenderer {
             y += lineHeight[0] + splitHeight; // Increase by the font height plus the split height
         }
         wrapHeight = y;
+        return nrows;
     }
 
     @Override

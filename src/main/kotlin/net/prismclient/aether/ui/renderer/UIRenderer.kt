@@ -389,7 +389,7 @@ abstract class UIRenderer {
      * @param width The width to wrap the text at
      * @param splitHeight The spacing between the individual lines
      */
-    abstract fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float)
+    abstract fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int
 
     /**
      * Returns the width of the provided string
