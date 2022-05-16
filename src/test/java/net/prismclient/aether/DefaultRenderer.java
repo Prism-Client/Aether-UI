@@ -15,6 +15,7 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
+import static java.lang.Math.max;
 import static org.lwjgl.nanovg.NanoSVG.*;
 import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
@@ -292,10 +293,17 @@ public class DefaultRenderer extends UIRenderer {
         nvgText(ctx, x, y, text);
     }
 
+    private float wrapWidth = 0f;
+    private float wrapHeight = 0f;
+
     @Override
     public void wrapString(@NotNull String text, float x, float y, float width, float splitHeight) {
+        NVGTextRow.Buffer rows = NVGTextRow.create(100);
+
+        wrapWidth = 0f;
+
         // Calculate the rows
-        int nrows = nvgTextBreakLines(ctx, text, width, rows);
+        int nrows = nvgTextBreakLines(ctx, "Insert some tex there xd asjdhaksjdhka.", width, rows);
 
         // Set the font state
         nvgFontBlur(ctx, 0);
@@ -312,10 +320,13 @@ public class DefaultRenderer extends UIRenderer {
         for (int i = 0; i < nrows; i++) {
             NVGTextRow row = rows.get(i);
 
-            nnvgText(ctx, x, y, row.start(), row.end()); // Render the text
+            float w = nnvgText(ctx, x, y, row.start(), row.end()); // Render the text
+
+            wrapWidth = max(wrapWidth, w);
 
             y += lineHeight[0] + splitHeight; // Increase by the font height plus the split height
         }
+        wrapHeight = y;
     }
 
     @Override
@@ -345,6 +356,16 @@ public class DefaultRenderer extends UIRenderer {
     public float stringDescender() {
         nvgTextMetrics(ctx, null, decender, null);
         return Math.abs(decender[0]);
+    }
+
+    @Override
+    public float wrapWidth() {
+        return wrapWidth;
+    }
+
+    @Override
+    public float wrapHeight() {
+        return wrapHeight;
     }
 
     @Override

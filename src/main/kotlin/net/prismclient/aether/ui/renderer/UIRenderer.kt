@@ -412,6 +412,16 @@ abstract class UIRenderer {
     abstract fun stringDescender(): Float
 
     /**
+     * Returns the width of the latest call to [wrapString]
+     */
+    abstract fun wrapWidth(): Float
+
+    /**
+     * Returns the height of the latest call to [wrapString]
+     */
+    abstract fun wrapHeight(): Float
+
+    /**
      * Accepts a svg from a [ByteBuffer] and rasterizes it as an image and places
      * the rasterized image into the image list with the given [svgName]
      */

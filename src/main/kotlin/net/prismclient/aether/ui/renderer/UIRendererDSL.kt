@@ -105,12 +105,19 @@ object UIRendererDSL {
      * like normal clipped text.
      *
      * @param ignoreLastSpace If true, the last space (if applicable) is omitted.
+     * @return The width of the rendered string
      */
     @JvmOverloads
-    fun String.render(x: Float, y: Float, width: Float, appendedString: String? = null, ignoreLastSpace: Boolean = true) {
+    fun String.render(
+            x: Float,
+            y: Float,
+            width: Float,
+            appendedString: String? = null,
+            ignoreLastSpace: Boolean = true
+    ): Float {
         if (width >= this.width()) {
             this.render(x, y)
-            return
+            return this.width()
         }
         var new = ""
         var w = 0f
@@ -131,6 +138,7 @@ object UIRendererDSL {
             new += char
         }
         new.render(x, y)
+        return new.width()
     }
 
     fun String.width(): Float = renderer.stringWidth(this)
@@ -140,6 +148,16 @@ object UIRendererDSL {
     fun ascender() = renderer.stringAscender()
 
     fun descender() = renderer.stringDescender()
+
+    /**
+     * Returns thw width of the most recent call to a wrapped string
+     */
+    fun getWrappedWidth(): Float = 0f
+
+    /**
+     * Returns the height of the most recent call to a wrapped string
+     */
+    fun getWrappedHeight(): Float = 0f
 
     fun loadFont(name: String, fileLocation: String) =
         loadFont(name, fileLocation.toByteBuffer())
