@@ -84,7 +84,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         margin!!.block()
     }
 
-    fun animation(block: UIAnimation<*>.() -> Unit) {
+    inline fun animation(block: UIAnimation<*>.() -> Unit) {
         TODO("Animation block missing")
     }
 }

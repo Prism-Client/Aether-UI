@@ -151,30 +151,30 @@ class ExampleScreen : UIScreen() {
         }
 
         val frame = UIContainer<UIContainerSheet>("frame")
-        val label = UILabel("Here is some text have fun or something", "h1")
+        val label = UILabel("The quick brown fox jumps over the lazy dog! Or something like that. Anyway, this is a multiline label which allows for multiple lines, as the name suggests!", "h1")
 
         label.style.font!!.fontRenderType = UIFont.FontRenderType.WRAP
         label.style.font!!.appendedString = ".."
-//        val swatch = UIColorSwatch("swatch")
 
-        frame.onMousePressed {
-            println("Frame was clicked!")
+        label.style.background {
+            color = asRGBA(255, 0, 0)
         }
 
         frames.add(frame)
         components.add(frame)
 
         UIRendererDSL.font(label.style.font!!)
-        slider = UISlider(1000f, 0f, 1000f, 1f, "slider")
+        slider = UISlider(1000f, 0f, 1000f, 100f, "slider")
 
         label.style.font!!.lineBreakWidth = slider.value
+        label.style.font!!.lineHeight = 10f
 
         slider.onValueChanged {
             label.style.font!!.lineBreakWidth = it.value
         }
 
-        frame.addComponent(slider)
         frame.addComponent(label)
+        frame.addComponent(slider)
 
         UIProvider.dispatchAnimation("animation", slider)
 

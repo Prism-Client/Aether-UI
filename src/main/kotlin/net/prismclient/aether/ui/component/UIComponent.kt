@@ -240,4 +240,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     protected fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) =
             (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
+
+    /** Other **/
+    inline fun style(block: T.() -> Unit) =
+        block.invoke(style)
 }
