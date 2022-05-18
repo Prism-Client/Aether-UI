@@ -29,6 +29,18 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var relWidth = 0f
     var relHeight = 0f
 
+    /** Padding and Margin **/
+    var paddingTop = 0f
+    var paddingRight = 0f
+    var paddingBottom = 0f
+    var paddingLeft = 0f
+
+    var marginTop = 0f
+    var marginRight = 0f
+    var marginBottom = 0f
+    var marginLeft = 0f
+
+
     var wasInside = false
 
     /** Listeners **/
@@ -49,14 +61,17 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         updateBounds()
 
         // Update the style and update the bounds again if something
-        // within the style modified the plot of the component
+        // within the style modified the plot of the component. Update
+        // the style again if necessary because the bounds might change
+        // the positioning of the component
         updateStyle()
         updateBounds()
+        //updateStyle() // TODO: Refactor padding and margins to a new function
     }
 
     open fun updatePosition() {
-        x = +style.x + getParentX() - getAnchorX()
-        y = -style.y + getParentY() - getAnchorY()
+        x = +style.x + getParentX() - getAnchorX() + +style.padding?.paddingLeft
+        y = -style.y + getParentY() - getAnchorY() + -style.padding?.paddingTop
     }
 
     open fun updateSize() {
@@ -68,10 +83,25 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Updates the relative values based on the absolute values
      */
     open fun updateBounds() {
-        relX = x - +style.padding?.paddingLeft
-        relY = y - -style.padding?.paddingTop
-        relWidth = width + +style.padding?.paddingRight
-        relHeight = height + -style.padding?.paddingBottom
+        // Update padding
+        paddingTop = -style.padding?.paddingTop
+        paddingRight = +style.padding?.paddingRight
+        paddingBottom = -style.padding?.paddingBottom
+        paddingLeft = +style.padding?.paddingLeft
+        // Update margin
+        marginTop = -style.margin?.marginTop
+        marginRight = +style.margin?.marginRight
+        marginBottom = -style.margin?.marginBottom
+        marginLeft = +style.margin?.marginLeft
+
+        relX = x
+        relY = y
+
+        x += paddingLeft
+        y += paddingTop
+
+        relWidth = width + paddingRight
+        relHeight = height + paddingBottom
     }
 
 

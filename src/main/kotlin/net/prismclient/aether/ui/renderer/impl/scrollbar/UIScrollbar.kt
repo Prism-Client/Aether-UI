@@ -146,8 +146,13 @@ class UIScrollbar(val type: Scrollbar) : UICopy<UIScrollbar> {
         }
     }
 
+    inline fun background(block: UIBackground.() -> Unit) {
+        background = background ?: UIBackground()
+        background!!.block()
+    }
+
     inline fun border(block: UIBorder.() -> Unit) {
-        border = UIBorder()
+        border = border ?: UIBorder()
         border!!.block()
     }
 
