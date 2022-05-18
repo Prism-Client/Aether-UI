@@ -4,7 +4,7 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.UIRendererDSL
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.util.extensions.align
 import net.prismclient.aether.ui.util.extensions.px

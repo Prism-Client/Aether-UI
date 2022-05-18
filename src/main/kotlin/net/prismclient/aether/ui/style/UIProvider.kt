@@ -3,7 +3,7 @@ package net.prismclient.aether.ui.style
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.UIRendererDSL
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.style.util.UIFontFamily
 
 object UIProvider {

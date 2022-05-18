@@ -2,7 +2,7 @@ package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
-import net.prismclient.aether.ui.renderer.UIRendererDSL
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.util.UIKey

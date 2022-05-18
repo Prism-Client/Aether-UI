@@ -1,6 +1,7 @@
-package net.prismclient.aether.ui.renderer
+package net.prismclient.aether.ui.renderer.dsl
 
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.MIPMAP
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATX
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATY
@@ -57,10 +58,10 @@ object UIRendererDSL {
     }
 
     fun font(fontFace: String, fontSize: Float, fontAlignment: Int, fontSpacing: Float) {
-        this.fontFace = fontFace
-        this.fontSize = fontSize
-        this.fontAlignment = fontAlignment
-        this.fontSpacing = fontSpacing
+        UIRendererDSL.fontFace = fontFace
+        UIRendererDSL.fontSize = fontSize
+        UIRendererDSL.fontAlignment = fontAlignment
+        UIRendererDSL.fontSpacing = fontSpacing
         renderer.font(fontFace, fontSize, fontAlignment, fontSpacing)
     }
 
@@ -238,11 +239,11 @@ object UIRendererDSL {
     fun scissor(x: Float, y: Float, width: Float, height: Float) = renderer.scissor(x, y, width, height)
 
     fun stroke(strokeWidth: Float, strokeDirection: StrokeDirection) {
-        this.stroke = true
-        this.strokeWidth = strokeWidth
-        this.strokeDirection = strokeDirection
-        this.halfsw = strokeWidth / 2f
-        this.halfsw = if (this.halfsw < 0.1f) 0f else this.halfsw
+        stroke = true
+        UIRendererDSL.strokeWidth = strokeWidth
+        UIRendererDSL.strokeDirection = strokeDirection
+        halfsw = strokeWidth / 2f
+        halfsw = if (halfsw < 0.1f) 0f else halfsw
         // Calculate the stroke direction
         pos = when (UIRendererDSL.strokeDirection) {
             StrokeDirection.INSIDE -> UIRendererDSL.strokeWidth / 2f
@@ -257,7 +258,7 @@ object UIRendererDSL {
     }
 
     fun finishStroke() {
-        this.stroke = false
+        stroke = false
         pos = 0f
         siz = 0f
         strokeWidth = 0f

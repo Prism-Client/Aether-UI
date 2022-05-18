@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.renderer.image
 
-import net.prismclient.aether.ui.renderer.UIRendererDSL
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import java.nio.ByteBuffer
 

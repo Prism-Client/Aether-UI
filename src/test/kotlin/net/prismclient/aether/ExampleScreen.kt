@@ -3,7 +3,6 @@ package net.prismclient.aether
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.component.type.UILabel
-import net.prismclient.aether.ui.component.type.color.UIColorSwatch
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
@@ -12,9 +11,7 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
-import net.prismclient.aether.ui.renderer.UIRendererDSL
-import net.prismclient.aether.ui.renderer.UIRendererDSL.render
-import net.prismclient.aether.ui.renderer.UIRendererDSL.width
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen

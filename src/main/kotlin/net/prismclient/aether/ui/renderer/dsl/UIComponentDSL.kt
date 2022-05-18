@@ -1,21 +1,27 @@
-package net.prismclient.aether.ui.renderer.builder
+package net.prismclient.aether.ui.renderer.dsl
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.type.UILabel
+import net.prismclient.aether.ui.component.type.input.button.UIButton
+import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.*
 
 /**
- * [UIBuilder]
+ * [UIComponentDSL] is a DSL builder for defining components on the screen.
  *
  * @author sen
  * @since 12/5/2022
+ *
+ * @see net.prismclient.aether.ui.util.extensions.create
  */
-object UIBuilder {
+object UIComponentDSL {
     private var components: ArrayList<UIComponent<*>>? = null
     private val frameStack = Stack<UIFrame<*>>()
     private val styleStack = Stack<String>()
     var activeComponent: UIComponent<*>? = null
-    var activeStyle: String = ""
+    var activeStyle: String? = null
 
     fun create() {
         components = ArrayList()
@@ -32,9 +38,45 @@ object UIBuilder {
 
     }
 
-    /** Layout components **/
+    /** Style **/
+    fun style(name: String) {
+        activeStyle = name
+    }
 
-    /** General components **/
+    /**
+     * Creates a new style from the given style sheet.
+     *
+     * @param sheet An instance of whatever style sheet is intended to be created
+     * @param name The name of the style sheet
+     * @param block The DSL block to configure [T]
+     */
+    inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) =
+        net.prismclient.aether.ui.util.extensions.style(sheet, name, block)
+
+    /** Components **/
+    inline fun <T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
+        if (component is UIFrame<*>) {
+
+        }
+        // TODO add to list
+        return component.also(block)
+    }
+
+    /* Label Components */
+    inline fun h1(text: String, block: UILabel.() -> Unit) =
+        component(UILabel(text, "h1"), block)
+
+    inline fun h2(text: String, block: UILabel.() -> Unit) =
+        component(UILabel(text, "h2"), block)
+
+    inline fun h3(text: String, block: UILabel.() -> Unit) =
+        component(UILabel(text, "h3"), block)
+
+    inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit) =
+        component(UIButton<UIStyleSheet>(text, style!!), block)
+
+    inline fun slider(value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit) =
+        component(UISlider(value, min, max, step, style!!), block)
 
     /**
      * Returns an ArrayList of components created

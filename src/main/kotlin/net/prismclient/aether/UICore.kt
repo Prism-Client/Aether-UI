@@ -1,12 +1,11 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.callback.UICoreCallback
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.UIRendererDSL
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider

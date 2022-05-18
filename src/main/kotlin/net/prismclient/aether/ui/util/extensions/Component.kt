@@ -1,9 +1,14 @@
 package net.prismclient.aether.ui.util.extensions
 
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
+
+inline fun create(block: UIComponentDSL.() -> Unit) {
+    UIComponentDSL.block()
+}
 
 inline fun style(name: String, block: UIStyleSheet.() -> Unit) = UIStyleSheet().also { it.name = name; it.block(); UIProvider.addStyle(it) }
 
