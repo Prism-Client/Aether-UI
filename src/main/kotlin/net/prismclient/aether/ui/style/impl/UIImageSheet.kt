@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.style.impl
 
-import net.prismclient.aether.ui.renderer.image.UIImage
+import net.prismclient.aether.ui.renderer.image.UIImageType
 import net.prismclient.aether.ui.style.UIStyleSheet
 
 /**
@@ -10,5 +10,5 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @since 12/5/2022
  */
 class UIImageSheet : UIStyleSheet() {
-    lateinit var image: UIImage
+    lateinit var image: UIImageType
 }

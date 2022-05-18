@@ -25,10 +25,10 @@ abstract class UIShape : UIRenderable, UICopy<UIShape> {
 
     override fun update(component: UIComponent<*>) {
         this.component = component
-        cachedX = calculateX(x, component, component.relWidth) + component.relX
-        cachedY = calculateY(y, component, component.relHeight) + component.relY
-        cachedWidth = calculateX(width, component, component.relWidth)
-        cachedHeight = calculateY(height, component, component.relHeight)
+        cachedX = calculateX(x, component, component.width) + component.x
+        cachedY = calculateY(y, component, component.height) + component.y
+        cachedWidth = calculateX(width, component, component.width)
+        cachedHeight = calculateY(height, component, component.height)
     }
 
     open fun apply(shape: UIShape): UIShape {

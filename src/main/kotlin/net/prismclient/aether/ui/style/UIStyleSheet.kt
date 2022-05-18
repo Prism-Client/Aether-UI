@@ -9,6 +9,7 @@ import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.extensions.px
 
 open class UIStyleSheet : UICopy<UIStyleSheet> {
     var name: String = ""
@@ -90,9 +91,51 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         padding!!.block()
     }
 
+    @JvmOverloads
+    fun padding(paddingTop: Float = 0f, paddingRight: Float = 0f, paddingBottom: Float = 0f, paddingLeft: Float = 0f) =
+        padding {
+            this.paddingTop = px(paddingTop)
+            this.paddingRight = px(paddingRight)
+            this.paddingBottom = px(paddingBottom)
+            this.paddingLeft = px(paddingLeft)
+        }
+    
+    fun padding(
+        paddingTop: UIUnit? = padding?.paddingTop,
+        paddingRight: UIUnit? = padding?.paddingRight,
+        paddingBottom: UIUnit? = padding?.paddingBottom,
+        paddingLeft: UIUnit? = padding?.paddingLeft
+    ) = padding { 
+        this.paddingTop = paddingTop
+        this.paddingRight = paddingRight
+        this.paddingBottom = paddingBottom
+        this.paddingLeft = paddingLeft
+    }
+
     inline fun margin(block: UIMargin.() -> Unit) {
         margin = margin ?: UIMargin()
         margin!!.block()
+    }
+
+    @JvmOverloads
+    fun margin(marginTop: Float = 0f, marginRight: Float = 0f, marginBottom: Float = 0f, marginLeft: Float = 0f) =
+        margin {
+            this.marginTop = px(marginTop)
+            this.marginRight = px(marginRight)
+            this.marginBottom = px(marginBottom)
+            this.marginLeft = px(marginLeft)
+        }
+
+    fun margin(
+        marginTop: UIUnit? = margin?.marginTop,
+        marginRight: UIUnit? = margin?.marginRight,
+        marginBottom: UIUnit? = margin?.marginBottom,
+        marginLeft: UIUnit? = margin?.marginLeft
+    ) = margin {
+        this.marginTop = marginTop
+        this.marginRight = marginRight
+        this.marginBottom = marginBottom
+        this.marginLeft = marginLeft
     }
 
     inline fun animation(block: UIAnimation<*>.() -> Unit) {

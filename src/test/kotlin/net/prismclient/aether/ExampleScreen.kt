@@ -11,6 +11,7 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
+import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.font
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
@@ -42,6 +43,73 @@ class ExampleScreen : UIScreen() {
             loadSvg("svg", "/aether/svg/message-text.svg", 4f)
         }
 
+
+        style(UIContainerSheet(), "frame") {
+            anchor.align(UIAlignment.CENTER)
+
+            x = percent(50)
+            y = percent(50)
+            width = px(700)
+            height = px(500)
+
+            contentRadius = radius(10f)
+
+            background {
+                color = asRGBA(24, 202, 255, 0.16f)
+                radius = radius(10f)
+
+                border {
+                    borderColor = asRGBA(34, 202, 255, 0.85f)
+                    borderWidth = 2f
+                }
+            }
+
+            verticalScrollbar {
+                x = px(10)
+                y = percent(10)
+                width = px(5)
+                height = percent(80)
+                radius = radius(2.5f)
+
+                background {
+                    color = asRGBA(255, 255, 0)
+                }
+            }
+        }
+
+        style(UIContainerSheet(), "frame") {
+            anchor.align(UIAlignment.CENTER)
+
+            x = percent(50)
+            y = percent(50)
+            width = px(700)
+            height = px(500)
+
+            contentRadius = radius(10f)
+
+            background {
+                color = asRGBA(24, 202, 255, 0.16f)
+                radius = radius(10f)
+
+                border {
+                    borderColor = asRGBA(34, 202, 255, 0.85f)
+                    borderWidth = 2f
+                }
+            }
+
+            verticalScrollbar {
+                x = px(10)
+                y = percent(10)
+                width = px(5)
+                height = percent(80)
+                radius = radius(2.5f)
+
+                background {
+                    color = asRGBA(255, 255, 0)
+                }
+            }
+        }
+
         build {
             style("h1") {
                 font {
@@ -54,41 +122,6 @@ class ExampleScreen : UIScreen() {
                 }
 
                 clipContent = false
-            }
-            
-            style(UIContainerSheet(), "frame") {
-                anchor.align(UIAlignment.CENTER)
-
-                x = percent(50)
-                y = percent(50)
-                width = px(700)
-                height = px(500)
-
-                contentRadius = radius(10f)
-
-                background {
-                    color = asRGBA(24, 202, 255, 0.16f)
-                    radius = radius(10f)
-
-                    border {
-                        borderColor = asRGBA(34, 202, 255, 0.85f)
-                        borderWidth = 2f
-                    }
-                }
-
-                // TODO: Fix color?
-
-//                verticalScrollbar {
-//                    x = px(10)
-//                    y = percent(10)
-//                    width = px(5)
-//                    height = percent(80)
-//                    radius = radius(2.5f)
-//
-//                    background {
-//                        color = asRGBA(255, 255, 0)
-//                    }
-//                }
             }
 
             style(UITextFieldSheet(), "textfield") {
@@ -154,14 +187,17 @@ class ExampleScreen : UIScreen() {
                         "The quick brown fox jumps over the lazy dog! Or something" +
                         " like that. Anyway, this is a multiline label which allows" +
                         " for multiple lines, as the name suggests!"
-                ){
+                ) {
                     style {
                         font {
                             fontRenderType = UIFont.FontRenderType.WRAP
                             appendedString = ".."
                         }
 
-                        background(asRGBA(255, 0, 0))
+                        background(asRGBA(255, 255, 255, 0.3f))
+                        padding {
+                            paddingLeft = px(10)
+                        }
                     }
                 }
 
