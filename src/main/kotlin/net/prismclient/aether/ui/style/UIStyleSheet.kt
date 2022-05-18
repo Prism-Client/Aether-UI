@@ -64,23 +64,34 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         this.height = height
     }
 
+    /** Background **/
+
     inline fun background(block: UIBackground.() -> Unit) {
-        background = UIBackground()
+        background = background ?: UIBackground()
         background!!.block()
     }
 
+    /**
+     * Sets the color of the background
+     */
+    fun background(color: Int) = background { this.color = color }
+
+    /** Font **/
+
     inline fun font(block: UIFont.() -> Unit) {
-        font = UIFont()
+        font = font ?: UIFont()
         font!!.block()
     }
 
+    /** Plotting **/
+
     inline fun padding(block: UIPadding.() -> Unit) {
-        padding = UIPadding()
+        padding = padding ?: UIPadding()
         padding!!.block()
     }
 
     inline fun margin(block: UIMargin.() -> Unit) {
-        margin = UIMargin()
+        margin = margin ?: UIMargin()
         margin!!.block()
     }
 

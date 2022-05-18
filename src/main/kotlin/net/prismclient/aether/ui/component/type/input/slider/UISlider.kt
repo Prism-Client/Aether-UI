@@ -67,9 +67,18 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
         normalizedValue = value / (max - min)
     }
 
-    fun onValueChanged(event: Consumer<UISlider>) {
+    /**
+     * Adds a slider value change listener. When the values of the slider
+     * changes, the event is invoked.
+     *
+     * @param acceptImmediately If true, the event is invoked on add.
+     */
+    @JvmOverloads
+    fun onValueChanged(acceptImmediately: Boolean = false, event: Consumer<UISlider>) {
         if (valueListeners == null)
             valueListeners = mutableListOf()
         valueListeners!!.add(event)
+        if (acceptImmediately)
+            event.accept(this)
     }
 }

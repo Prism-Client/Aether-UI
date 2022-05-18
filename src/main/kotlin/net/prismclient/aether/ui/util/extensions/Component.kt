@@ -6,7 +6,11 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 
+/**
+ * Initializes the component builder, and creates a [UIComponentDSL] block.
+ */
 inline fun create(block: UIComponentDSL.() -> Unit) {
+    UIComponentDSL.create()
     UIComponentDSL.block()
 }
 

@@ -2,32 +2,45 @@ package net.prismclient.aether.ui.screen
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-//import net.prismclient.aether.ui.renderer.builder.UIBuilder
+import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.util.UIKey
+import net.prismclient.aether.ui.util.extensions.create
 
 abstract class UIScreen {
     var components: ArrayList<UIComponent<*>> = ArrayList()
     var frames: ArrayList<UIFrame<*>> = ArrayList()
 
     init {
-//        UIBuilder.start()
         initialize()
-//        components = UIBuilder.create()
-//        UIBuilder.reset()
-//        components.forEach(UIComponent::initialize)
+
+        components = UIComponentDSL.get()
+        frames = UIComponentDSL.getFrames()
+        UIComponentDSL.finalize()
+        update()
     }
 
-    // protected inline fun style(block: UIStyle.() -> Unit) = UIStyle.block()
+    protected inline fun build(block: UIComponentDSL.() -> Unit) = create(block)
 
-//    protected inline fun build(block: UIBuilder.() -> Unit) = UIBuilder.block()
-
+    /**
+     * Invoked when the screen is first created. A build block should be invoked
+     * to create components, else unexpected, and unwanted actions might occur.
+     *
+     * @see UIComponentDSL
+     * @see build
+     */
     abstract fun initialize()
 
+    /**
+     * Invoked on screen creation, and when the display is changed.
+     */
     open fun update() {
         components.forEach(UIComponent<*>::update)
         frames.forEach(UIFrame<*>::update)
     }
 
+    /**
+     * Rendered before everything else. (Including the actual game)
+     */
     open fun renderContent() {
         for (i in 0 until frames.size) frames[i].renderContent()
     }
@@ -55,5 +68,4 @@ abstract class UIScreen {
     open fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         components.forEach { it.mouseScrolled(it.getMouseX(), it.getMouseY(), scrollAmount) }
     }
-
 }

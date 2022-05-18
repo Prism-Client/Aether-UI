@@ -12,7 +12,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
-import net.prismclient.aether.ui.renderer.impl.background.UIBackground
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.font
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
@@ -42,143 +42,140 @@ class ExampleScreen : UIScreen() {
             loadSvg("svg", "/aether/svg/message-text.svg", 4f)
         }
 
-        style(UIContainerSheet(), "frame") {
-            anchor.align(UIAlignment.CENTER)
+        build {
+            style("h1") {
+                font {
+                    align(UIAlignment.TOPLEFT)
+                    fontFamily = "Poppins"
+                    fontType = UIFont.FontType.Regular
+                    textAlignment = ALIGNTOP or ALIGNLEFT
+                    fontSize = 16f
+                    fontColor = -1
+                }
 
-            x = percent(50)
-            y = percent(50)
-            width = px(700)
-            height = px(500)
+                clipContent = false
+            }
+            
+            style(UIContainerSheet(), "frame") {
+                anchor.align(UIAlignment.CENTER)
 
-            contentRadius = radius(10f)
+                x = percent(50)
+                y = percent(50)
+                width = px(700)
+                height = px(500)
 
-            background {
-                color = asRGBA(24, 202, 255, 0.16f)
-                radius = radius(10f)
+                contentRadius = radius(10f)
 
-                border {
-                    borderColor = asRGBA(34, 202, 255, 0.85f)
-                    borderWidth = 2f
+                background {
+                    color = asRGBA(24, 202, 255, 0.16f)
+                    radius = radius(10f)
+
+                    border {
+                        borderColor = asRGBA(34, 202, 255, 0.85f)
+                        borderWidth = 2f
+                    }
+                }
+
+                // TODO: Fix color?
+
+//                verticalScrollbar {
+//                    x = px(10)
+//                    y = percent(10)
+//                    width = px(5)
+//                    height = percent(80)
+//                    radius = radius(2.5f)
+//
+//                    background {
+//                        color = asRGBA(255, 255, 0)
+//                    }
+//                }
+            }
+
+            style(UITextFieldSheet(), "textfield") {
+                x = px(10) + px(10)
+                y = percent(100) - px(10)
+                width = rel(1) - px(10) - px(10)
+                height = px(1000)
+
+                caretY = UIUnit(-0.5f, EM)
+                caretWidth = px(1)
+                caretColor = asRGBA(255, 255, 255, 0.6f)
+                selectionColor = asRGBA(137, 207, 240, 0.3f)
+
+                background {
+                    color = asRGBA(1f, 1f, 1f, 0.15f)
+                    radius = radius(10f)
+                }
+
+                font {
+                    align(UIAlignment.MIDDLELEFT)
+                    fontFamily = "Poppins"
+                    fontSize = 16f
+                    fontColor = -1
+                    fontType = UIFont.FontType.Regular
+                    textAlignment = ALIGNLEFT or ALIGNMIDDLE
+
+                    // Adjust the font to be the center of the text
+                    y += descender(0.5)
+                }
+
+                padding {
+                    paddingLeft = px(10)
                 }
             }
 
-            verticalScrollbar.x = px(10)
-            verticalScrollbar.y = percent(10)
-            verticalScrollbar.width = px(5)
-            verticalScrollbar.height = percent(80)
+            style(UISliderSheet(), "slider") {
+                position(px(50), px(50))
+                size(px(400), px(5))
 
-            verticalScrollbar.radius = radius(2.5f)
+                sliderControl.color = -1
 
-            verticalScrollbar.background = UIBackground()
-            verticalScrollbar.background!!.color = asRGBA(255, 0, 0)
-
-
-            clipContent = true
-        }
-
-        style(UITextFieldSheet(), "textfield") {
-            x = px(10) + px(10)
-            y = percent(100) - px(10)
-            width = rel(1) - px(10) - px(10)
-            height = px(1000)
-
-            caretY = UIUnit(-0.5f, EM)
-            caretWidth = px(1)
-            caretColor = asRGBA(255, 255, 255, 0.6f)
-            selectionColor = asRGBA(137, 207, 240, 0.3f)
-
-            background {
-                color = asRGBA(1f, 1f, 1f, 0.15f)
-                radius = radius(10f)
+                background {
+                    radius = radius(2.5f)
+                    color = asRGBA(255, 255, 255, 0.3f)
+                    border {
+                        borderWidth = 1f
+                        borderColor = asRGBA(255, 255, 255, 0.75f)
+                    }
+                }
             }
 
-            font {
-                align(UIAlignment.MIDDLELEFT)
-                fontFamily = "Poppins"
-                fontSize = 16f
-                fontColor = -1
-                fontType = UIFont.FontType.Regular
-                textAlignment = ALIGNLEFT or ALIGNMIDDLE
-
-                // Adjust the font to be the center of the text
-                y += descender(0.5)
+            animation(UIDefaultAnimation("animation")) {
+                keyframe {
+                    x = unit(-1f, WIDTHANIM)
+                }
+                keyframe(UIQuart(1000L)) {
+                    x = px(50)
+                }
             }
 
-            padding {
-                paddingLeft = px(10)
-            }
-        }
+            container("frame") {
+                val label = h1(
+                        "The quick brown fox jumps over the lazy dog! Or something" +
+                        " like that. Anyway, this is a multiline label which allows" +
+                        " for multiple lines, as the name suggests!"
+                ){
+                    style {
+                        font {
+                            fontRenderType = UIFont.FontRenderType.WRAP
+                            appendedString = ".."
+                        }
 
-        style(UISliderSheet(), "slider") {
-            position(px(50), px(50))
-            size(px(400), px(5))
+                        background(asRGBA(255, 0, 0))
+                    }
+                }
 
-            sliderControl.color = -1
-
-            background {
-                radius = radius(2.5f)
-                color = asRGBA(255, 255, 255, 0.3f)
-                border {
-                    borderWidth = 1f
-                    borderColor = asRGBA(255, 255, 255, 0.75f)
+                slider = slider(1000f, 0f, 1000f, 100f, "slider")
+                slider.onValueChanged(true) {
+                    label.style.font!!.lineBreakWidth = it.value
                 }
             }
         }
-
-        style("h1") {
-            font {
-                align(UIAlignment.TOPLEFT)
-                fontFamily = "Poppins"
-                fontType = UIFont.FontType.Regular
-                textAlignment = ALIGNTOP or ALIGNLEFT
-                fontSize = 16f
-                fontColor = -1
-            }
-
-            clipContent = false
-        }
-
-        animation(UIDefaultAnimation("animation")) {
-            keyframe {
-                x = unit(-1f, WIDTHANIM)
-            }
-            keyframe(UIQuart(1000L)) {
-                x = px(50)
-            }
-        }
-
-        val frame = UIContainer<UIContainerSheet>("frame")
-        val label = UILabel("The quick brown fox jumps over the lazy dog! Or something like that. Anyway, this is a multiline label which allows for multiple lines, as the name suggests!", "h1")
-
-        label.style.font!!.fontRenderType = UIFont.FontRenderType.WRAP
-        label.style.font!!.appendedString = ".."
-
-        label.style.background {
-            color = asRGBA(255, 0, 0)
-        }
-
-        frames.add(frame)
-        components.add(frame)
-
-        UIRendererDSL.font(label.style.font!!)
-        slider = UISlider(1000f, 0f, 1000f, 100f, "slider")
-
-        label.style.font!!.lineBreakWidth = slider.value
-        label.style.font!!.lineHeight = 10f
-
-        slider.onValueChanged {
-            label.style.font!!.lineBreakWidth = it.value
-        }
-
-        frame.addComponent(label)
-        frame.addComponent(slider)
 
         UIProvider.dispatchAnimation("animation", slider)
-
-        update()
     }
 
     override fun render() {
-        super.render()
+        super.render() // Breakpoint debugging
     }
 }
