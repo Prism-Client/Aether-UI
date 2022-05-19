@@ -2,8 +2,10 @@ package net.prismclient.aether.ui.animation.impl
 
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.animation.ease.UIEase
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.impl.animation.UIAnimationSheet
 import net.prismclient.aether.ui.util.UIAnimationPriority
+import net.prismclient.aether.ui.util.extensions.transition
 
 /**
  * [UIDefaultAnimation] is the default implementation of [UIAnimation]. It supports a generic
@@ -12,7 +14,7 @@ import net.prismclient.aether.ui.util.UIAnimationPriority
  * @author sen
  * @since 9/5/2022
  */
-class UIDefaultAnimation(
+open class UIDefaultAnimation(
     name: String,
     priority: UIAnimationPriority = UIAnimationPriority.NORMAL
 ) : UIAnimation<UIAnimationSheet>(name, priority) {
@@ -20,11 +22,35 @@ class UIDefaultAnimation(
         val c = this.component
         val p = nextKeyframe!!
         val ap = activeKeyframe!!
-        val prog = p.ease.getValue().toFloat()
+        val prog = nextKeyframe!!.ease.getValue().toFloat()
+        updatePosition(prog, c, p, ap)
+        updateSize(prog, c, p, ap)
+        updateBackground(prog, c, p, ap)
+        updateFont(prog, c, p, ap)
+    }
+
+    open fun updatePosition(prog: Float, c: UIComponent<*>, p: UIAnimationSheet, ap: UIAnimationSheet) {
         c.x = ap.x.updateX(c.x) + ((p.x.updateX(c.x) - ap.x.updateX(c.x)) * prog) + c.getParentX()
         c.y = ap.y.updateY(c.y) + ((p.y.updateY(c.y) - ap.y.updateY(c.y)) * prog) + c.getParentY()
+    }
+
+    open fun updateSize(prog: Float, c: UIComponent<*>, p: UIAnimationSheet, ap: UIAnimationSheet) {
         c.width = ap.width.updateX(c.width) + ((p.width.updateX(c.width) - ap.width.updateX(c.width)) * prog)
         c.height = ap.height.updateY(c.height) + ((p.height.updateY(c.height) - ap.height.updateY(c.height)) * prog)
+    }
+
+    open fun updateBackground(prog: Float, c: UIComponent<*>, p: UIAnimationSheet, ap: UIAnimationSheet) {
+        if (c.style.background != null) { // TODO: Need to cache the intial color(s)
+            c.style.background!!.color = transition(
+                (p.background?.color ?: c.style.background!!.color),
+                (ap.background?.color ?: c.style.background!!.color),
+                prog
+            )
+        }
+    }
+
+    open fun updateFont(prog: Float, c: UIComponent<*>, p: UIAnimationSheet, ap: UIAnimationSheet) {
+
     }
 
     inline fun keyframe(block: UIAnimationSheet.() -> Unit = {}): UIAnimationSheet =

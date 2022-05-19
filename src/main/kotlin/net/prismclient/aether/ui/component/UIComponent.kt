@@ -53,17 +53,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked on creation, and screen resize
      */
     open fun update() {
-        // Update the position and size
-        updatePosition()
+        // Update the size, then the position
         updateSize()
+        updatePosition()
 
         // Update the relative values
         updateBounds()
-
-        // Update the style and update the bounds again if something
-        // within the style modified the plot of the component. Update
-        // the style again if necessary because the bounds might change
-        // the positioning of the component
         updateStyle()
     }
 
@@ -77,10 +72,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         height = -style.height
     }
 
-    /**
-     * Updates the relative values based on the absolute values
-     */
-    open fun updateBounds() {
+    open fun calculateBounds() {
         // Update padding
         paddingTop = -style.padding?.paddingTop
         paddingRight = +style.padding?.paddingRight
@@ -92,6 +84,13 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         marginRight = +style.margin?.marginRight
         marginBottom = -style.margin?.marginBottom
         marginLeft = +style.margin?.marginLeft
+    }
+
+    /**
+     * Updates the relative values based on the absolute values
+     */
+    open fun updateBounds() {
+        calculateBounds()
 
         relX = x - paddingLeft
         relY = y - paddingTop

@@ -12,6 +12,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.impl.UITextFieldSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.unit.UIUnit
@@ -168,12 +169,22 @@ class ExampleScreen : UIScreen() {
                 }
             }
 
+            style(UIStyleSheet(), "btn") {
+                background(asRGBA(0, 0, 0, 0.3f))
+                width = px(50)
+                height = px(50)
+            }
+
             animation(UIDefaultAnimation("animation")) {
                 keyframe {
-                    x = unit(-1f, WIDTHANIM)
+                    background {
+                        color = asRGBA(255, 0, 0)
+                    }
                 }
                 keyframe(UIQuart(1000L)) {
-                    x = px(50)
+                    background {
+                        color = -1
+                    }
                 }
             }
 
@@ -189,7 +200,7 @@ class ExampleScreen : UIScreen() {
 
                     width = px(100)
                     height = px(100)
-//                    padding(10f)
+                    padding(10f)
 
                     font {
                         fontRenderType = UIFont.FontRenderType.WRAP
@@ -201,6 +212,10 @@ class ExampleScreen : UIScreen() {
             slider = slider(1000f, 0f, 1000f, 100f, "slider")
             slider.onValueChanged(true) {
                 label.style.font!!.lineBreakWidth = it.value
+            }
+
+            button("A text button", "btn") {
+
             }
         }
 
