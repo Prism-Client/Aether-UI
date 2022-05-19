@@ -83,14 +83,14 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
             TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
             MIDDLELEFT, CENTER, MIDDLERIGHT -> 0.5f
             BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> 1f
-            else -> throw UnsupportedOperationException("Unkown alignment type: $alignment")
+            else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
         }
 
         anchor.y!!.value = when (alignment) {
             TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
             MIDDLELEFT, CENTER, MIDDLERIGHT -> 0.5f
             BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> 1f
-            else -> throw UnsupportedOperationException("Unkown alignment type: $alignment")
+            else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
         }
     }
 
