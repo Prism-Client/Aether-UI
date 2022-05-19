@@ -33,16 +33,16 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'commons-io:commons-io:2.11.0'
 
-    testImplementation "org.lwjgl:lwjgl::$lwjglVersion"
-    testImplementation "org.lwjgl:lwjgl-glfw::$lwjglVersion"
-    testImplementation "org.lwjgl:lwjgl-nanovg::$lwjglVersion"
-    testImplementation "org.lwjgl:lwjgl-opengl::$lwjglVersion"
-    testImplementation "org.lwjgl:lwjgl-stb::$lwjglVersion"
-    testRuntimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-    testRuntimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-    testRuntimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
-    testRuntimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
-    testRuntimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+    testImplementation "org.lwjgl:lwjgl:$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-nanovg:$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
+    testRuntimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
+    testRuntimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
+    testRuntimeOnly "org.lwjgl:lwjgl-nanovg:$lwjglVersion:$lwjglNatives"
+    testRuntimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
+    testRuntimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
