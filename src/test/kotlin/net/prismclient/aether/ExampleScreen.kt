@@ -2,18 +2,13 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
-import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.font
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
@@ -182,36 +177,33 @@ class ExampleScreen : UIScreen() {
                 }
             }
 
-            container("frame") {
-                val label = h1(
-                        "The quick brown fox jumps over the lazy dog! Or something" +
-                        " like that. Anyway, this is a multiline label which allows" +
-                        " for multiple lines, as the name suggests!"
-                ) {
-                    style {
-                        align(UIAlignment.CENTER)
-                        anchor(UIAlignment.CENTER)
-                        background(asRGBA(255, 255, 255, 0.3f))
-                        padding(10f)
+            val label = h1(
+                    "The quick brown fox jumps over the lazy dog! Or something" +
+                            " like that. Anyway, this is a multiline label which allows" +
+                            " for multiple lines, as the name suggests!"
+            ) {
+                style {
+                    align(UIAlignment.CENTER)
+                    anchor(UIAlignment.CENTER)
+                    background(asRGBA(20, 124, 160))
 
-                        font {
-                            fontRenderType = UIFont.FontRenderType.WRAP
-                            appendedString = ".."
-                        }
+                    width = px(100)
+                    height = px(100)
+//                    padding(10f)
+
+                    font {
+                        fontRenderType = UIFont.FontRenderType.WRAP
+                        appendedString = ".."
                     }
                 }
+            }
 
-                slider = slider(1000f, 0f, 1000f, 100f, "slider")
-                slider.onValueChanged(true) {
-                    label.style.font!!.lineBreakWidth = it.value
-                }
+            slider = slider(1000f, 0f, 1000f, 100f, "slider")
+            slider.onValueChanged(true) {
+                label.style.font!!.lineBreakWidth = it.value
             }
         }
 
         UIProvider.dispatchAnimation("animation", slider)
-    }
-
-    override fun render() {
-        super.render() // Breakpoint debugging
     }
 }
