@@ -18,7 +18,6 @@ open class UIBackground : UICopy<UIBackground> {
     var border: UIBorder? = null
     var radius: UIRadius? = null
 
-
     open fun render(x: Float, y: Float, width: Float, height: Float) {
         renderer {
             color(color)

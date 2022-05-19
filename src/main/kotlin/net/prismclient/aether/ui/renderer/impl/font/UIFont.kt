@@ -76,6 +76,11 @@ open class UIFont : UIShape() {
     var fontSize = UIDefaults.instance.fontSize
     var fontSpacing = UIDefaults.instance.fontSpacing
     var lineBreakWidth = 0f
+        set(value) {
+            field = value
+            if (component != null && component!!.animation?.animating != true)
+                component!!.update()
+        }
     var lineHeight = 0f
     var lineCount = 0
     var appendedString: String? = null
@@ -92,10 +97,6 @@ open class UIFont : UIShape() {
         x ?: run { x = px(0) }
         y ?: run { y = px(0) }
         align(alignment, x!!, y!!)
-    }
-
-    override fun update(component: UIComponent<*>) {
-        super.update(component)
     }
 
     @Deprecated("Use render(text: String) instead", ReplaceWith("render(text: String)"))
@@ -115,24 +116,26 @@ open class UIFont : UIShape() {
                 FontRenderType.WRAP -> {
                     val c: Int = text.render(cachedX, cachedY, lineBreakWidth, lineHeight)
                     if (lineCount != c) {
-                        component.update()
+                        component!!.update()
                         lineCount = c
                     }
                     stringWidth = getWrappedWidth()
                     stringHeight = getWrappedHeight()
                 }
                 FontRenderType.CLIP, FontRenderType.APPEND -> {
-                    stringWidth = text.render(cachedX, cachedY, component.relX + lineBreakWidth, null, false)
+                    stringWidth = text.render(cachedX, cachedY, component!!.relX + lineBreakWidth, null, false)
                     stringHeight = text.height()
                 }
             }
 
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
-            if (overrideParent && (stringWidth > component.width || stringHeight > component.height)) {
-                component.width = max(stringWidth, component.width)
-                component.height = max(stringHeight, component.height)
-                component.updateBounds()
+            if (overrideParent && (stringWidth > component!!.width || stringHeight > component!!.height)) {
+                component!!.width = max(stringWidth, component!!.width)
+                component!!.height = max(stringHeight, component!!.height)
+                component!!.updatePosition()
+                component!!.updateBounds()
+                component!!.updateStyle()
             }
         }
     }

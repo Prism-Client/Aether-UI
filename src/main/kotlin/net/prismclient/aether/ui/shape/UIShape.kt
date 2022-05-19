@@ -8,7 +8,7 @@ import net.prismclient.aether.ui.util.extensions.calculateX
 import net.prismclient.aether.ui.util.extensions.calculateY
 
 abstract class UIShape : UIRenderable, UICopy<UIShape> {
-    protected lateinit var component: UIComponent<*>
+    protected var component: UIComponent<*>? = null
     var color = 0
     var x: UIUnit? = null
     var y: UIUnit? = null

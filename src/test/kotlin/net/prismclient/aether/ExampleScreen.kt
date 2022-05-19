@@ -189,14 +189,14 @@ class ExampleScreen : UIScreen() {
                         " for multiple lines, as the name suggests!"
                 ) {
                     style {
+                        align(UIAlignment.CENTER)
+                        anchor(UIAlignment.CENTER)
+                        background(asRGBA(255, 255, 255, 0.3f))
+                        padding(10f)
+
                         font {
                             fontRenderType = UIFont.FontRenderType.WRAP
                             appendedString = ".."
-                        }
-
-                        background(asRGBA(255, 255, 255, 0.3f))
-                        padding {
-                            paddingLeft = px(10)
                         }
                     }
                 }

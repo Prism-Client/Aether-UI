@@ -65,13 +65,13 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         // the style again if necessary because the bounds might change
         // the positioning of the component
         updateStyle()
-        updateBounds()
-        //updateStyle() // TODO: Refactor padding and margins to a new function
+//        updateBounds()
+//        updateStyle() // TODO: Refactor padding and margins to a new function
     }
 
     open fun updatePosition() {
-        x = +style.x + getParentX() - getAnchorX() + +style.padding?.paddingLeft
-        y = -style.y + getParentY() - getAnchorY() + -style.padding?.paddingTop
+        x = +style.x + getParentX() - getAnchorX()
+        y = -style.y + getParentY() - getAnchorY()
     }
 
     open fun updateSize() {
@@ -88,20 +88,18 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         paddingRight = +style.padding?.paddingRight
         paddingBottom = -style.padding?.paddingBottom
         paddingLeft = +style.padding?.paddingLeft
+
         // Update margin
         marginTop = -style.margin?.marginTop
         marginRight = +style.margin?.marginRight
         marginBottom = -style.margin?.marginBottom
         marginLeft = +style.margin?.marginLeft
 
-        relX = x
-        relY = y
+        relX = x - paddingLeft
+        relY = y - paddingTop
 
-        x += paddingLeft
-        y += paddingTop
-
-        relWidth = width + paddingRight
-        relHeight = height + paddingBottom
+        relWidth = width + paddingLeft + paddingRight
+        relHeight = height + paddingTop + paddingBottom
     }
 
 

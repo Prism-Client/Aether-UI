@@ -1,7 +1,7 @@
 package net.prismclient.aether.ui.style
 
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
@@ -10,6 +10,8 @@ import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.px
+import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
+import net.prismclient.aether.ui.unit.util.RELATIVE
 
 open class UIStyleSheet : UICopy<UIStyleSheet> {
     var name: String = ""
@@ -65,6 +67,33 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         this.height = height
     }
 
+    fun align(alignment: UIAlignment) {
+        x = x ?: px(0)
+        y = y ?: px(0)
+        net.prismclient.aether.ui.util.extensions.align(alignment, x!!, y!!)
+    }
+
+    fun anchor(alignment: UIAlignment) {
+        anchor.x = anchor.x ?: px(0)
+        anchor.y = anchor.y ?: px(0)
+        anchor.x!!.type = RELATIVE
+        anchor.y!!.type = RELATIVE
+
+        anchor.x!!.value = when (alignment) {
+            TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
+            MIDDLELEFT, CENTER, MIDDLERIGHT -> 0.5f
+            BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> 1f
+            else -> throw UnsupportedOperationException("Unkown alignment type: $alignment")
+        }
+
+        anchor.y!!.value = when (alignment) {
+            TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
+            MIDDLELEFT, CENTER, MIDDLERIGHT -> 0.5f
+            BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> 1f
+            else -> throw UnsupportedOperationException("Unkown alignment type: $alignment")
+        }
+    }
+
     /** Background **/
 
     inline fun background(block: UIBackground.() -> Unit) {
@@ -90,8 +119,11 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         padding = padding ?: UIPadding()
         padding!!.block()
     }
+    
+    fun padding(value: Float) = padding(value, value, value, value)
+    
+    fun padding(unit: UIUnit) = padding(unit, unit, unit, unit)
 
-    @JvmOverloads
     fun padding(paddingTop: Float = 0f, paddingRight: Float = 0f, paddingBottom: Float = 0f, paddingLeft: Float = 0f) =
         padding {
             this.paddingTop = px(paddingTop)
@@ -117,7 +149,10 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         margin!!.block()
     }
 
-    @JvmOverloads
+    fun margin(value: Float) = margin(value, value, value, value)
+
+    fun margin(unit: UIUnit) = margin(unit, unit, unit, unit)
+
     fun margin(marginTop: Float = 0f, marginRight: Float = 0f, marginBottom: Float = 0f, marginLeft: Float = 0f) =
         margin {
             this.marginTop = px(marginTop)
