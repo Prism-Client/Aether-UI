@@ -316,17 +316,19 @@ public class DefaultRenderer extends UIRenderer {
         // Get the metrics of the line
         nvgTextMetrics(ctx, ascender, decender, lineHeight);
 
+        float h = y;
+
         // Iterate through the rows
         for (int i = 0; i < nrows ; i++) {
             NVGTextRow row = rows.get(i);
 
-            float w = nnvgText(ctx, x, y, row.start(), row.end()); // Render the text
+            float w = nnvgText(ctx, x, h, row.start(), row.end()) - x; // Render the text
 
             wrapWidth = max(wrapWidth, w);
 
-            y += lineHeight[0] + splitHeight; // Increase by the font height plus the split height
+            h += lineHeight[0] + splitHeight; // Increase by the font height plus the split height
         }
-        wrapHeight = y;
+        wrapHeight = h - y;
         return nrows;
     }
 
