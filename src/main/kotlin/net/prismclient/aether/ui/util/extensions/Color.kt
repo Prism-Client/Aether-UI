@@ -36,10 +36,10 @@ fun Float.limit(): Float = this.coerceAtMost(1f).coerceAtLeast(0f)
 fun transition(c1: Int, c2: Int, progress: Float): Int {
     val prog = progress.limit()
 
-    val red = c2.getRed() + ((c1.getRed() - c2.getRed() * prog))
-    val green = c2.getGreen() + ((c1.getGreen() - c2.getGreen() * prog))
-    val blue = c2.getBlue() + ((c1.getBlue() - c2.getBlue() * prog))
-    val alpha = c2.getAlpha() + ((c1.getAlpha() - c2.getAlpha() * prog))
+    val red = c1.getRed() + ((c2.getRed() - c1.getRed()) * prog).toInt()
+    val green = c1.getGreen() + ((c2.getGreen() - c1.getGreen()) * prog).toInt()
+    val blue = c1.getBlue() + ((c2.getBlue() - c1.getBlue()) * prog).toInt()
+    val alpha = c1.getAlpha() + ((c2.getAlpha() - c1.getAlpha()) * prog).toInt()
 
     return asRGBA(red.limit(), green.limit(), blue.limit(), alpha.limit())
 }
