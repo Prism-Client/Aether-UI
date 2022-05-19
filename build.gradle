@@ -33,11 +33,11 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'commons-io:commons-io:2.11.0'
 
-    testImplementation "org.lwjgl:lwjgl"
-    testImplementation "org.lwjgl:lwjgl-glfw"
-    testImplementation "org.lwjgl:lwjgl-nanovg"
-    testImplementation "org.lwjgl:lwjgl-opengl"
-    testImplementation "org.lwjgl:lwjgl-stb"
+    testImplementation "org.lwjgl:lwjgl::$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-glfw::$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-nanovg::$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-opengl::$lwjglVersion"
+    testImplementation "org.lwjgl:lwjgl-stb::$lwjglVersion"
     testRuntimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
     testRuntimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
     testRuntimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
