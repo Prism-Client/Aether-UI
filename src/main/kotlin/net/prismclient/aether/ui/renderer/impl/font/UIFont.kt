@@ -115,10 +115,10 @@ open class UIFont : UIShape() {
                 }
                 FontRenderType.WRAP -> {
                     val c: Int = text.render(cachedX, cachedY, lineBreakWidth, lineHeight)
-                    if (lineCount != c) {
-                        component!!.update()
-                        lineCount = c
-                    }
+//                    if (lineCount != c) {
+//                        //component!!.update()
+//                        lineCount = c
+//                    }
                     stringWidth = getWrappedWidth()
                     stringHeight = getWrappedHeight()
                 }
@@ -130,13 +130,14 @@ open class UIFont : UIShape() {
 
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
-            if (overrideParent && (stringWidth > component!!.width || stringHeight > component!!.height)) {
-                component!!.width = max(stringWidth, component!!.width)
-                component!!.height = max(stringHeight, component!!.height)
-                component!!.updatePosition()
-                component!!.updateBounds()
-                component!!.updateStyle()
-            }
+//            if (overrideParent && (stringWidth > component!!.width || stringHeight > component!!.height)) {
+//                component!!.width = max(stringWidth, component!!.width)
+//                component!!.height = max(stringHeight, component!!.height)
+//                component!!.updatePosition()
+////                component!!.updateBounds()
+////                component!!.updateStyle()
+//                println("Updated parent!")
+//            }
         }
     }
 

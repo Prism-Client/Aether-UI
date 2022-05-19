@@ -10,6 +10,17 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @since 5/15/2022
  */
 class UILabel(var text: String, style: String) : UIComponent<UIStyleSheet>(style) {
+    override fun updateSize() {
+        super.updateSize()
+        // Render the font after updating the size to ensure that the
+        // text width and height are calculated before the frame render
+//        style.font?.update(this)
+//        style.font?.render(text)
+//        style.font?.update(this)
+    }
+
+    override fun updateStyle() {}
+
     override fun renderComponent() {
         style.font?.render(text)
     }

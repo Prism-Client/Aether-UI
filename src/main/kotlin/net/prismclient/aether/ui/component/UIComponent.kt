@@ -65,8 +65,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         // the style again if necessary because the bounds might change
         // the positioning of the component
         updateStyle()
-//        updateBounds()
-//        updateStyle() // TODO: Refactor padding and margins to a new function
     }
 
     open fun updatePosition() {
