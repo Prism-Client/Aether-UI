@@ -304,7 +304,7 @@ public class DefaultRenderer extends UIRenderer {
 
         // Set the font state
         nvgFontBlur(ctx, 0);
-        nvgFontFace(ctx, "Poppins-black");
+        nvgFontFace(ctx, fontName);
         nvgFontSize(ctx, fontSize);
         nvgTextAlign(ctx, fontAlignment);
         nvgFillColor(ctx, color);
