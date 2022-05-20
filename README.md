@@ -36,4 +36,4 @@ Image using maven
 
 ---
 
-Check out the docs, or the test packages for more information on how to use the library!
+Once completed, take a look at the [docs](https://github.com/Prism-Client/Aether-UI/tree/master/docs) or the [example screen!](https://github.com/Prism-Client/Aether-UI/blob/master/src/test/kotlin/net/prismclient/aether/ExampleScreen.kt) Please note, as mentioned above there might be a lot of lacking information as it is in the early stage of development.
