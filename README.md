@@ -1,7 +1,7 @@
 # Aether UI
 
 
-<img src="/docs/images/client-logo.png" align="right" width="230" height="230">
+<img src="/docs/assets/client-logo-rounded.png" align="right" width="230" height="230">
  
 **Aether is a anti-aliased UI engine for Minecraft**, and LWJGL projects (or anything really). You can create your own renderer implementation, or use the default implementation with *[NanoVG](https://github.com/memononen/nanovg "An anti-aliased vector graphics library")*. It is desgined to be concise and very flexible. 
 
