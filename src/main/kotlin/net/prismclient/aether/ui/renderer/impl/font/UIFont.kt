@@ -76,11 +76,6 @@ open class UIFont : UIShape() {
     var fontSize = UIDefaults.instance.fontSize
     var fontSpacing = UIDefaults.instance.fontSpacing
     var lineBreakWidth = 0f
-        set(value) {
-            field = value
-            if (component != null && component!!.animation?.animating != true)
-                component!!.update()
-        }
     var lineHeight = 0f
     var lineCount = 0
     var appendedString: String? = null
@@ -112,6 +107,9 @@ open class UIFont : UIShape() {
                     text.render(cachedX, cachedY)
                     stringWidth = text.width()
                     stringHeight = text.height()
+                }
+                FontRenderType.NEWLINE -> {
+
                 }
                 FontRenderType.WRAP -> {
                     val c: Int = text.render(cachedX, cachedY, lineBreakWidth, lineHeight)
@@ -197,6 +195,11 @@ open class UIFont : UIShape() {
          * Renders the string normally, as a one line string.
          */
         NORMAL,
+
+        /**
+         * Creates a new line when \n is appended to a string
+         */
+        NEWLINE,
 
         /**
          * Omits any text that exceeds the bounds.

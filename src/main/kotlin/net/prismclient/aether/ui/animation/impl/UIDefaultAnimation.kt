@@ -4,6 +4,7 @@ import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.style.impl.animation.UIAnimationSheet
 import net.prismclient.aether.ui.util.UIAnimationPriority
 import net.prismclient.aether.ui.util.extensions.transition
@@ -40,20 +41,28 @@ open class UIDefaultAnimation(
         c.height = ap.height.updateY(c.height) + ((p.height.updateY(c.height) - ap.height.updateY(c.height)) * prog)
     }
 
-    private var cachedBackground = false
-    private var cachedBackgroundColor: Int = 0
+    protected var background: UIBackground? = null
 
     open fun updateBackground(prog: Float, c: UIComponent<*>, p: UIAnimationSheet, ap: UIAnimationSheet) {
-        if (c.style.background != null) { // TODO: Need to cache the initial color(s)
-            if (!cachedBackground) {
-                cachedBackgroundColor = c.style.background!!.color
-                cachedBackground = true
-            }
+        if (c.style.background != null) {
+            if (background == null)
+                background = c.style.background!!.copy()
+
             c.style.background!!.color = transition(
-                (ap.background?.color ?: cachedBackgroundColor),
-                (p.background?.color ?: cachedBackgroundColor),
+                (ap.background?.color ?: background!!.color),
+                (p.background?.color ?: background!!.color),
                 prog
             )
+
+            if (c.style.background!!.border != null) {
+                c.style.background!!.border!!.borderColor = transition(
+                    (ap.background?.border?.borderColor ?: background!!.border!!.borderColor),
+                    (p.background?.border?.borderColor ?: background!!.border!!.borderColor),
+                    prog
+                )
+                c.style.background!!.border!!.borderWidth =
+                    (ap.background?.border?.borderWidth ?: background!!.border!!.borderWidth) + (((p.background?.border?.borderWidth ?: background!!.border!!.borderWidth) - (ap.background?.border?.borderWidth ?: background!!.border!!.borderWidth)) * prog)
+            }
         }
     }
 
@@ -65,9 +74,8 @@ open class UIDefaultAnimation(
         if (k.animationResult == UIAnimationResult.Reset) {
             component.update()
 
-            if (cachedBackground) {
-                component.style.background!!.color = cachedBackgroundColor
-            }
+            if (background != null)
+                component.style.background = background
         } else {
             val s = component.style
             s.x = +k.x ?: s.x

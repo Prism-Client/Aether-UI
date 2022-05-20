@@ -156,6 +156,9 @@ object UIComponentDSL {
     inline fun h3(text: String, block: UILabel.() -> Unit = {}) =
         component(UILabel(text, "h3"), block)
 
+    inline fun p(text: String, block: UILabel.() -> Unit) =
+        component(UILabel(text, "p"), block)
+
     /** Button **/
 
     inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) =

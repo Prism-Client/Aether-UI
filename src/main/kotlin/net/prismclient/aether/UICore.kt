@@ -78,7 +78,7 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     }
 
     open fun mousePressed(mouseX: Float, mouseY: Float) {
-        if ((focusedComponent?.isMouseInsideBoundingBox()) == false) {
+        if (focusedComponent?.isMouseInsideBoundingBox() == false) {
             (focusedComponent!! as UIFocusable<*>).removeFocus()
             focusedComponent = null
         }

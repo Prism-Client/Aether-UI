@@ -43,16 +43,46 @@ class ExampleScreen : UIScreen() {
             dependsOn(::AnimationStyles)
 
             // Create a h2 label
-            h2("Example Screen") {
+            h1("Header 1") {
                 style {
                     control(UIAlignment.TOPLEFT, UIAlignment.TOPLEFT)
                     position(10f, 10f)
                 }
             }
 
-            slider(1000f, 0f, 1000f, 100f, "slider")
-            button("Hover over me!", "btn")
-                .hover("fadeIn", "fadeOut")
+            h2("Header 2") {
+                style {
+                    control(UIAlignment.TOPLEFT, UIAlignment.TOPLEFT)
+                    position(10f, 58f)
+                }
+            }
+
+            h3("Header 3") {
+                style {
+                    control(UIAlignment.TOPLEFT, UIAlignment.TOPLEFT)
+                    position(10f, 90f)
+                }
+            }
+
+            p("This is a paragraph! Write some paragraphical text here which will convey a message of some sort!") {
+                style {
+                    control(UIAlignment.TOPLEFT, UIAlignment.TOPLEFT)
+                    position(10f, 114f)
+                    font {
+                        fontRenderType = UIFont.FontRenderType.WRAP
+                        lineBreakWidth = 300f
+                    }
+                }
+            }
+
+            //slider(1000f, 0f, 1000f, 100f, "slider")
+            button("Hover over me!", "btn") {
+                style {
+                    background {
+                        border {}
+                    }
+                }
+            }.hover("fadeIn", "fadeOut")
         }
     }
 }

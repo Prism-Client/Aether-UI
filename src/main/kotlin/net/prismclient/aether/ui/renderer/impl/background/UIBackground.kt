@@ -27,7 +27,7 @@ open class UIBackground : UICopy<UIBackground> {
     }
 
     inline fun border(block: UIBorder.() -> Unit) {
-        border = UIBorder()
+        border = border ?: UIBorder()
         border!!.block()
     }
 

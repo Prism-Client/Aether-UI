@@ -54,7 +54,7 @@ class TextStyles : UIDependable() {
             font {
                 align(UIAlignment.TOPLEFT)
                 fontFamily = "Poppins"
-                fontType = UIFont.FontType.Regular
+                fontType = UIFont.FontType.Light
                 textAlignment = UIRenderer.ALIGNTOP or UIRenderer.ALIGNLEFT
                 fontSize = 16f
                 fontColor = -1

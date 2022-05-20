@@ -16,6 +16,10 @@ class AnimationStyles : UIDependable() {
             keyframe(UIQuart(250L), true) {
                 background {
                     color = asRGBA(0f, 0f, 0f, 0.5f)
+                    border {
+                        borderColor = asRGBA(80, 130,220, 0.8f)
+                        borderWidth = 4f
+                    }
                 }
                 animationResult = UIAnimationResult.Retain
                 keep() // Same thing as above, and in the method params of the block function
@@ -26,6 +30,7 @@ class AnimationStyles : UIDependable() {
             keyframe(UIQuart(1000L), true) {
                 background {
                     color = asRGBA(0f, 0f, 0f, 0.3f)
+                    border {}
                 }
             }
         }
