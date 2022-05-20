@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.screen
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
+import net.prismclient.aether.ui.util.UIDependable
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.create
 
@@ -20,6 +21,18 @@ abstract class UIScreen {
     }
 
     protected inline fun build(block: UIComponentDSL.() -> Unit) = create(block)
+
+    /**
+     * Adds a dependable class. To create a dependable class, make a class
+     * which extends [UIDependable]. See [UIDependable] doc for more information.
+     *
+     * Use this class as: `dependsOn(::ClassName)`
+     *
+     * @see UIDependable
+     */
+    fun <T : UIDependable> dependsOn(clazz: () -> T) {
+        clazz().load()
+    }
 
     /**
      * Invoked when the screen is first created. A build block should be invoked

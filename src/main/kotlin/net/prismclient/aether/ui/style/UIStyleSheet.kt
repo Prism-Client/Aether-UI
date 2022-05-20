@@ -75,6 +75,19 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         net.prismclient.aether.ui.util.extensions.align(alignment, x!!, y!!)
     }
 
+    /**
+     * Shortnand for [align] and anchor. Both values are set to the [alignment]
+     */
+    fun control(alignment: UIAlignment) = control(alignment, alignment)
+
+    /**
+     * Shorthand for [align] and [anchor]
+     */
+    fun control(alignment: UIAlignment, anchorAlignment: UIAlignment) {
+        align(alignment)
+        anchor(anchorAlignment)
+    }
+
     fun anchor(alignment: UIAlignment) {
         anchor.x = anchor.x ?: px(0)
         anchor.y = anchor.y ?: px(0)
