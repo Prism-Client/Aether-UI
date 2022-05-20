@@ -126,9 +126,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /** Input **/
 
     open fun mouseMoved(mouseX: Float, mouseY: Float) {
-        if (isMouseInsideBoundingBox() && !wasInside) {
-            wasInside = true
-            mouseEntered()
+        if (isMouseInsideBoundingBox()) {
+            if (!wasInside) {
+                mouseEntered()
+                wasInside = true
+            }
         } else if (wasInside) {
             mouseLeft()
             wasInside = false
