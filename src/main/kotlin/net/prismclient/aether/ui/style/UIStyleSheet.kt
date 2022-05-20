@@ -57,6 +57,8 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         return this
     }
 
+    fun position(x: Float, y: Float) = position(px(x), px(y))
+
     fun position(x: UIUnit, y: UIUnit) {
         this.x = x
         this.y = y
@@ -104,7 +106,8 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
     /**
      * Sets the color of the background
      */
-    fun background(color: Int) = background { this.color = color }
+    @JvmOverloads
+    inline fun background(color: Int, block: UIBackground.() -> Unit = {}) = background { this.color = color; this.block() }
 
     /** Font **/
 

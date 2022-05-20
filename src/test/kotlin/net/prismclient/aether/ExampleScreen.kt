@@ -7,6 +7,7 @@ import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
@@ -22,9 +23,8 @@ import net.prismclient.aether.ui.unit.util.WIDTHANIM
 import net.prismclient.aether.ui.util.extensions.*
 
 class ExampleScreen : UIScreen() {
-    lateinit var slider: UISlider
-
     override fun initialize() {
+        // TODO: dependsOn(StyleClass.class)
         UIFontFamily(
                 "Poppins",
                 "/fonts/",
@@ -112,9 +112,22 @@ class ExampleScreen : UIScreen() {
                 font {
                     align(UIAlignment.TOPLEFT)
                     fontFamily = "Poppins"
-                    fontType = UIFont.FontType.Regular
+                    fontType = UIFont.FontType.Bold
                     textAlignment = ALIGNTOP or ALIGNLEFT
-                    fontSize = 16f
+                    fontSize = 48f
+                    fontColor = -1
+                }
+
+                clipContent = false
+            }
+
+            style("h2") {
+                font {
+                    align(UIAlignment.TOPLEFT)
+                    fontFamily = "Poppins"
+                    fontType = UIFont.FontType.Bold
+                    textAlignment = ALIGNTOP or ALIGNLEFT
+                    fontSize = 32f
                     fontColor = -1
                 }
 
@@ -171,41 +184,30 @@ class ExampleScreen : UIScreen() {
             }
 
             style(UIStyleSheet(), "btn") {
-                background(asRGBA(0, 0, 0, 0.3f))
+                background(asRGBA(0, 0, 0, 0.3f)) {
+                    radius = radius(15f)
+                }
                 x = px(200)
                 y = px(200)
-                width = px(50)
+                width = px(150)
                 height = px(50)
 
                 font {
+                    align(UIAlignment.CENTER)
+                    textAlignment = ALIGNMIDDLE or ALIGNCENTER
                     fontFamily = "Poppins"
-                    fontSize = 32f
-                }
-            }
-
-            animation(UIDefaultAnimation("animation")) {
-                keyframe {}
-                keyframe(UIQuart(1000L)) {
-                    background {
-                        color = asRGBA(255, 0, 255)
-                    }
-                    animationResult = UIAnimationResult.Reset
+                    fontSize = 16f
+                    fontType = UIFont.FontType.Light
                 }
             }
 
             animation(UIDefaultAnimation("fadeIn")) {
-                first {
-                    println("Starting")
-                }
-                keyframe(UIQuart(1000L), true) {
+                keyframe(UIQuart(250L), true) {
                     background {
-                        color = asRGBA(1f, 0f, 0f, 0.3f)
+                        color = asRGBA(0f, 0f, 0f, 0.5f)
                     }
                     animationResult = UIAnimationResult.Retain
-                    keep() // Same thing as above
-                }
-                then {
-                    println("Completed")
+                    keep() // Same thing as above, and in the method params of the block function
                 }
             }
 
@@ -217,33 +219,17 @@ class ExampleScreen : UIScreen() {
                 }
             }
 
-            val label = h1(
-                    "The quick brown fox jumps over the lazy dog! Or something" +
-                            " like that. Anyway, this is a multiline label which allows" +
-                            " for multiple lines, as the name suggests!"
-            ) {
+            val label = h2("Example Screen") {
                 style {
-                    align(UIAlignment.CENTER)
-                    anchor(UIAlignment.CENTER)
-                    background(asRGBA(20, 124, 160))
-
-                    width = px(100)
-                    height = px(100)
-                    padding(10f)
-
-                    font {
-                        fontRenderType = UIFont.FontRenderType.WRAP
-                        appendedString = ".."
-                    }
+                    align(UIAlignment.TOPLEFT)
+                    anchor(UIAlignment.TOPLEFT)
+                    position(10f, 10f)
                 }
             }
 
-            slider = slider(1000f, 0f, 1000f, 100f, "slider")
-            slider.onValueChanged(true) {
-                label.style.font!!.lineBreakWidth = it.value
-            }
+            slider(1000f, 0f, 1000f, 100f, "slider")
 
-            button("A text button", "btn") {
+            button("Hover over me!", "btn") {
 
             }.onMouseEnter {
                 UIProvider.dispatchAnimation("fadeIn", it)

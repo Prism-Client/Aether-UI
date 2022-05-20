@@ -66,7 +66,7 @@ open class UIDefaultAnimation(
             component.update()
 
             if (cachedBackground) {
-                component.style.background!!.color = cachedBackgroundColor!!
+                component.style.background!!.color = cachedBackgroundColor
             }
         } else {
             val s = component.style
@@ -91,7 +91,7 @@ open class UIDefaultAnimation(
             keyframe(ease, keep, 0L, block)
 
     inline fun keyframe(ease: UIEase, keep: Boolean, delay: Long, block: UIAnimationSheet.() -> Unit = {}) =
-            keyframe(block).also { it.ease = ease; it.ease.delay = delay; it.keep() }
+            keyframe(block).also { it.ease = ease; it.ease.delay = delay; it.animationResult = if (keep) UIAnimationResult.Retain else UIAnimationResult.Reset }
 
     override fun copy(): UIAnimation<UIAnimationSheet> = UIDefaultAnimation(name, priority).also {
         it.apply(this)
