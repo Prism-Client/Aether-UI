@@ -40,7 +40,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var marginBottom = 0f
     var marginLeft = 0f
 
-
     var wasInside = false
 
     /** Listeners **/
@@ -275,4 +274,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /** Other **/
     inline fun style(block: T.() -> Unit) =
         block.invoke(style)
+
+    /**
+     * Shorthand for loading animations for when the mouse hovers over the component
+     */
+    fun hover(hoverAnimation: String, leaveAnimation: String) {
+        onMouseEnter() {
+            UIProvider.dispatchAnimation(hoverAnimation, this)
+        }
+        onMouseLeave {
+            UIProvider.dispatchAnimation(leaveAnimation, this)
+        }
+    }
 }

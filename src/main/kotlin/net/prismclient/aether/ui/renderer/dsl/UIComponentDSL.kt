@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.renderer.dsl
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
+import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.layout.UIFrame
@@ -164,6 +165,9 @@ object UIComponentDSL {
 
     inline fun slider(value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}) =
         component(UISlider(value, min, max, step, style!!), block)
+
+    inline fun textField(text: String, placeholder: String, inputFlavor: UITextField.TextFlavor, maxLength: Int = -1, style: String? = activeStyle, block: UITextField.() -> Unit) =
+        component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
 
     /** Layout **/
 

@@ -19,15 +19,15 @@ import java.lang.Integer.min
  * @since 4/27/2022
  * @param text The active input value. If empty and not focused, [placeholder] text will render instead.
  * @param placeholder The text to render if the text field is not active and empty
- * @param inputFlavor The charset to limit the input text. See [TextFlavor] for more info.
- * @param maxLength The maximum length the text box can render
+ * @param inputFlavor The charset to which the text field is limited to. See [TextFlavor] for more info.
+ * @param maxLength The maximum length the text box can render. If -1, the length is infinite
  * @param style The style sheet for the component
  */
 open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/components/form/input
     var text: String,
     var placeholder: String,
     var inputFlavor: TextFlavor = any,
-    var maxLength: Int = 0,
+    var maxLength: Int = -1,
     style: String
 ) : UIComponent<UITextFieldSheet>(style), UIFocusable<UITextField> {
     var focused = false
@@ -257,7 +257,7 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
      */
     open fun String.pasteText() {
         for (c in this.indices) {
-            if (this[c].has() && (text.length <= maxLength || maxLength == 0)) {
+            if (this[c].has() && (text.length <= maxLength || maxLength == -1)) {
                 insert(c.toString())
             }
         }
@@ -369,7 +369,7 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
             else -> {
                 val ch = if (UICore.instance.shiftHeld) Character.toUpperCase(character) else character
 
-                if (ch.has() && (text.length <= maxLength || maxLength == 0)) {
+                if (ch.has() && (text.length <= maxLength || maxLength == -1)) {
                     insert(ch.toString())
                 }
             }

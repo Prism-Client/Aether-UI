@@ -9,11 +9,9 @@ import net.prismclient.aether.ui.util.extensions.getRed
 import java.nio.ByteBuffer
 
 /**
- * [UIRenderer] is an abstract class which must be defined to render anything to
- * the screen. Components reference [UIRendererBuilder] to render things on screen,
- * which calls to the active instance of this class.
- *
- * Any functions that start with the prefix "s" denote a stroke.
+ * [UIRenderer] handles all calls for rendering graphics on screen. An
+ * instance of this class must be created on initialization. You can
+ * find the default NanoVG implementation in the test package.
  *
  * @author sen
  * @since 4/23/2022

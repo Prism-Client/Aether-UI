@@ -49,6 +49,7 @@ object UIRendererDSL {
     @JvmOverloads
     fun color(r: Int, g: Int, b: Int, a: Int = 255) = color(asRGBA(r, g, b, a))
 
+    @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
     operator fun Int.unaryPlus() = color(this)
 
     /** Font **/
@@ -175,6 +176,9 @@ object UIRendererDSL {
 
     fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) =
         renderer.renderImage(imageName, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+
+    // TODO: Maybe something like loadAll(type: String, fileLocation: String)
+    // loadAll("svg", "/aether/svgs/")
 
     fun loadImage(name: String, fileLocation: String, flags: Int = MIPMAP or REPEATX or REPEATY) =
         loadImage(name, fileLocation.toByteBuffer(), flags)
