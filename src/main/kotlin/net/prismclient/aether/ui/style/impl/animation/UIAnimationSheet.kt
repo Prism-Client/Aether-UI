@@ -12,4 +12,14 @@ import net.prismclient.aether.ui.style.UIStyleSheet
 class UIAnimationSheet : UIStyleSheet(), UIIEase {
     override var ease: UIEase = UILinear()
     override var animationResult: UIAnimationResult = UIAnimationResult.Reset
+
+    override fun copy(): UIAnimationSheet {
+        val sheet = UIAnimationSheet()
+
+        sheet.apply(this)
+        sheet.ease = ease.copy()
+        sheet.animationResult = animationResult
+
+        return sheet
+    }
 }
