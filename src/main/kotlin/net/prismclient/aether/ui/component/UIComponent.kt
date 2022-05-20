@@ -166,28 +166,32 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     /** Event **/
 
-    open fun onMousePressed(event: Consumer<UIComponent<*>>) {
+    open fun onMousePressed(event: Consumer<UIComponent<*>>): UIComponent<*> {
         if (mousePressedListeners == null)
             mousePressedListeners = mutableListOf()
         mousePressedListeners!!.add(event)
+        return this
     }
 
-    open fun onMouseReleased(event: Consumer<UIComponent<*>>) {
+    open fun onMouseReleased(event: Consumer<UIComponent<*>>): UIComponent<*> {
         if (mouseReleasedListeners == null)
             mouseReleasedListeners = mutableListOf()
         mouseReleasedListeners!!.add(event)
+        return this
     }
 
-    open fun onMouseEnter(event: Consumer<UIComponent<*>>) {
+    open fun onMouseEnter(event: Consumer<UIComponent<*>>): UIComponent<*> {
         if (mouseEnteredListeners == null)
             mouseEnteredListeners = mutableListOf()
         mouseEnteredListeners!!.add(event)
+        return this
     }
 
-    open fun onMouseLeave(event: Consumer<UIComponent<*>>) {
+    open fun onMouseLeave(event: Consumer<UIComponent<*>>): UIComponent<*> {
         if (mouseLeaveListeners == null)
             mouseLeaveListeners = mutableListOf()
         mouseLeaveListeners!!.add(event)
+        return this
     }
 
     /** Position Calculation **/
