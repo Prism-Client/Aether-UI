@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.animation.impl
 
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.animation.ease.UIEase
+import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.impl.animation.UIAnimationSheet
 import net.prismclient.aether.ui.util.UIAnimationPriority
@@ -39,11 +40,19 @@ open class UIDefaultAnimation(
         c.height = ap.height.updateY(c.height) + ((p.height.updateY(c.height) - ap.height.updateY(c.height)) * prog)
     }
 
+    private var cachedBackground = false
+    private var cachedBackgroundColor: Int = 0
+
     open fun updateBackground(prog: Float, c: UIComponent<*>, p: UIAnimationSheet, ap: UIAnimationSheet) {
-        if (c.style.background != null) { // TODO: Need to cache the intial color(s)
+        if (c.style.background != null) { // TODO: Need to cache the initial color(s)
+            if (!cachedBackground) {
+                cachedBackgroundColor = c.style.background!!.color
+                println(cachedBackgroundColor)
+                cachedBackground = true
+            }
             c.style.background!!.color = transition(
-                (p.background?.color ?: c.style.background!!.color),
-                (ap.background?.color ?: c.style.background!!.color),
+                (p.background?.color ?: cachedBackgroundColor!!),
+                (ap.background?.color ?: cachedBackgroundColor!!),
                 prog
             )
         }
@@ -51,6 +60,25 @@ open class UIDefaultAnimation(
 
     open fun updateFont(prog: Float, c: UIComponent<*>, p: UIAnimationSheet, ap: UIAnimationSheet) {
 
+    }
+
+    override fun saveState(k: UIAnimationSheet) {
+        if (k.animationResult == UIAnimationResult.Reset) {
+            component.update()
+
+            if (cachedBackground) {
+                println(component.style.background!!.color)
+                println(cachedBackgroundColor!!)
+//                component.style.background!!.color = cachedBackgroundColor!!
+            }
+        } else {
+            val s = component.style
+            s.x = +k.x ?: s.x
+            s.y = +k.y ?: s.y
+            s.width = +k.width ?: s.width
+            s.height = +k.height ?: s.height
+            component.update()
+        }
     }
 
     inline fun keyframe(block: UIAnimationSheet.() -> Unit = {}): UIAnimationSheet =
@@ -63,7 +91,8 @@ open class UIDefaultAnimation(
             keyframe(block).also { it.ease = ease }.also { it.ease.delay = delay }
 
     override fun copy(): UIAnimation<UIAnimationSheet> = UIDefaultAnimation(name, priority).also {
+        it.apply(this)
         for (animation in timeline)
-            it.timeline.add(animation)
+            it.timeline.add(animation.copy())
     }
 }
