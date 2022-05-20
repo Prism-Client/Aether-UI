@@ -10,6 +10,7 @@ import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIAnimationPriority
 import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.isNormal
+import java.util.function.Consumer
 
 /**
  * [UIAnimation] has a sequence of [UIStyleSheet] and other data pertaining to the Animation
@@ -33,6 +34,7 @@ abstract class UIAnimation<T>(
     protected var activeKeyframe: T? = null
     protected var nextKeyframe: T? = null
     protected var nextKeyframeIndex: Int = 0
+    var onCompletionListeners: MutableList<Consumer<UIAnimation<T>>>? = null
 
     var animationLength: Long = 0L
         protected set
@@ -107,18 +109,7 @@ abstract class UIAnimation<T>(
         saveState(activeKeyframe!!)
     }
 
-    fun saveState(k: T) {
-        if (k.animationResult == UIAnimationResult.Reset) {
-            component.update()
-        } else {
-            val s = component.style
-            s.x = +k.x ?: s.x
-            s.y = +k.y ?: s.y
-            s.width = +k.width ?: s.width
-            s.height = +k.height ?: s.height
-            component.update()
-        }
-    }
+    abstract fun saveState(k: T)
 
     fun forceComplete() {
         println("Forced animation completion.")
@@ -126,13 +117,15 @@ abstract class UIAnimation<T>(
     }
 
     fun completeAnimation() {
-        println("Completed animation: $name, Component: $component")
         completed = true
         animating = false
 
         saveState(timeline[timeline.size - 1])
 
         UIProvider.completeAnimation(this)
+
+        // Invoke the listeners that the animation has been completed
+        onCompletionListeners?.forEach { it.accept(this) }
     }
 
     /**
@@ -190,4 +183,17 @@ abstract class UIAnimation<T>(
      */
     protected operator fun UIUnit?.unaryPlus(): UIUnit? =
             if (this?.type == INITIAL) null else this
+
+    /**
+     * Adds an action which is invoked when the animation is completed
+     */
+    fun then(event: Consumer<UIAnimation<T>>) {
+        if (onCompletionListeners == null)
+            onCompletionListeners = mutableListOf()
+        onCompletionListeners!!.add(event)
+    }
+
+    protected fun apply(animation: UIAnimation<T>) {
+        this.onCompletionListeners = animation.onCompletionListeners
+    }
 }
