@@ -2,6 +2,7 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
+import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
@@ -171,19 +172,47 @@ class ExampleScreen : UIScreen() {
 
             style(UIStyleSheet(), "btn") {
                 background(asRGBA(0, 0, 0, 0.3f))
+                x = px(200)
+                y = px(200)
                 width = px(50)
                 height = px(50)
+
+                font {
+                    fontFamily = "Poppins"
+                    fontSize = 32f
+                }
             }
 
             animation(UIDefaultAnimation("animation")) {
-                keyframe {
-                    background {
-                        color = asRGBA(255, 0, 0)
-                    }
-                }
+                keyframe {}
                 keyframe(UIQuart(1000L)) {
                     background {
-                        color = -1
+                        color = asRGBA(255, 0, 255)
+                    }
+                    animationResult = UIAnimationResult.Reset
+                }
+            }
+
+            animation(UIDefaultAnimation("fadeIn")) {
+                first {
+                    println("Starting")
+                }
+                keyframe(UIQuart(1000L), true) {
+                    background {
+                        color = asRGBA(1f, 0f, 0f, 0.3f)
+                    }
+                    animationResult = UIAnimationResult.Retain
+                    keep() // Same thing as above
+                }
+                then {
+                    println("Completed")
+                }
+            }
+
+            animation(UIDefaultAnimation("fadeOut")) {
+                keyframe(UIQuart(1000L), true) {
+                    background {
+                        color = asRGBA(0f, 0f, 0f, 0.3f)
                     }
                 }
             }
@@ -216,9 +245,13 @@ class ExampleScreen : UIScreen() {
 
             button("A text button", "btn") {
 
+            }.onMouseEnter {
+                UIProvider.dispatchAnimation("fadeIn", it)
+            }.onMouseLeave {
+                UIProvider.dispatchAnimation("fadeOut", it)
             }
         }
 
-        UIProvider.dispatchAnimation("animation", slider)
+//        UIProvider.dispatchAnimation("animation", slider)
     }
 }

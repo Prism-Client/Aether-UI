@@ -20,6 +20,8 @@ import java.util.function.Consumer
  * the component will animate with a quadratic ease from the property difference.
  * In essence, the following keyframe defines the ease properties.
  *
+ * If there is only one keyframe, then a blank keyframe will be inserted into the first index
+ *
  * @author sen
  * @since 3/5/2022
  */
@@ -34,6 +36,7 @@ abstract class UIAnimation<T>(
     protected var activeKeyframe: T? = null
     protected var nextKeyframe: T? = null
     protected var nextKeyframeIndex: Int = 0
+    var onCreationListeners: MutableList<Consumer<UIAnimation<T>>>? = null
     var onCompletionListeners: MutableList<Consumer<UIAnimation<T>>>? = null
 
     var animationLength: Long = 0L
@@ -49,6 +52,9 @@ abstract class UIAnimation<T>(
         if (timeline.size < 1) {
             println("Timeline must have at least 1 keyframe to start an animation")
             return
+        } else if (timeline.size == 1) {
+            timeline.add(timeline[0])
+            timeline[0] = getStyle()
         }
 
         animationLength = 0L
@@ -57,6 +63,8 @@ abstract class UIAnimation<T>(
 
         for (keyframe in timeline)
             animationLength += keyframe.ease.duration
+
+        onCreationListeners?.forEach { it.accept(this) }
     }
 
     open fun pause() {
@@ -184,8 +192,14 @@ abstract class UIAnimation<T>(
     protected operator fun UIUnit?.unaryPlus(): UIUnit? =
             if (this?.type == INITIAL) null else this
 
+    fun first(event: Consumer<UIAnimation<T>>) {
+        if (onCreationListeners == null)
+            onCreationListeners = mutableListOf()
+        onCreationListeners!!.add(event)
+    }
+
     /**
-     * Adds an action which is invoked when the animation is completed
+     * Adds an event which is invoked when the animation is completed
      */
     fun then(event: Consumer<UIAnimation<T>>) {
         if (onCompletionListeners == null)
@@ -196,4 +210,6 @@ abstract class UIAnimation<T>(
     protected fun apply(animation: UIAnimation<T>) {
         this.onCompletionListeners = animation.onCompletionListeners
     }
+
+    protected abstract fun getStyle(): T
 }

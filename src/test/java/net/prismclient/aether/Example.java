@@ -175,7 +175,7 @@ public class Example {
             core.renderContent();
 
             glViewport(0, 0, framebufferWidth, framebufferHeight);
-            glClearColor(0f, 0f, 0f, 0f);
+            glClearColor(0.3f, 0.3f, 0.3f, 0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             core.beginFrame(width, height, Math.max(contentScaleX, contentScaleY));

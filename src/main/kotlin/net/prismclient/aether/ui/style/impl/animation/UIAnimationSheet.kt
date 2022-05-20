@@ -13,6 +13,13 @@ class UIAnimationSheet : UIStyleSheet(), UIIEase {
     override var ease: UIEase = UILinear()
     override var animationResult: UIAnimationResult = UIAnimationResult.Reset
 
+    /**
+     * Shorthand for setting the [animationResult] to Retain
+     */
+    fun keep() {
+        animationResult = UIAnimationResult.Retain
+    }
+
     override fun copy(): UIAnimationSheet {
         val sheet = UIAnimationSheet()
 

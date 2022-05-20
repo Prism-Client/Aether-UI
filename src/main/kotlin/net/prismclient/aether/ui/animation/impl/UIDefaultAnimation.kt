@@ -47,12 +47,11 @@ open class UIDefaultAnimation(
         if (c.style.background != null) { // TODO: Need to cache the initial color(s)
             if (!cachedBackground) {
                 cachedBackgroundColor = c.style.background!!.color
-                println(cachedBackgroundColor)
                 cachedBackground = true
             }
             c.style.background!!.color = transition(
-                (p.background?.color ?: cachedBackgroundColor!!),
-                (ap.background?.color ?: cachedBackgroundColor!!),
+                (ap.background?.color ?: cachedBackgroundColor),
+                (p.background?.color ?: cachedBackgroundColor),
                 prog
             )
         }
@@ -67,9 +66,7 @@ open class UIDefaultAnimation(
             component.update()
 
             if (cachedBackground) {
-                println(component.style.background!!.color)
-                println(cachedBackgroundColor!!)
-//                component.style.background!!.color = cachedBackgroundColor!!
+                component.style.background!!.color = cachedBackgroundColor!!
             }
         } else {
             val s = component.style
@@ -88,11 +85,19 @@ open class UIDefaultAnimation(
             keyframe(block).also { it.ease = ease }
 
     inline fun keyframe(ease: UIEase, delay: Long, block: UIAnimationSheet.() -> Unit = {}) =
-            keyframe(block).also { it.ease = ease }.also { it.ease.delay = delay }
+            keyframe(block).also { it.ease = ease; it.ease.delay = delay }
+
+    inline fun keyframe(ease: UIEase, keep: Boolean, block: UIAnimationSheet.() -> Unit = {}) =
+            keyframe(ease, keep, 0L, block)
+
+    inline fun keyframe(ease: UIEase, keep: Boolean, delay: Long, block: UIAnimationSheet.() -> Unit = {}) =
+            keyframe(block).also { it.ease = ease; it.ease.delay = delay; it.keep() }
 
     override fun copy(): UIAnimation<UIAnimationSheet> = UIDefaultAnimation(name, priority).also {
         it.apply(this)
         for (animation in timeline)
             it.timeline.add(animation.copy())
     }
+
+    override fun getStyle(): UIAnimationSheet = UIAnimationSheet()
 }
