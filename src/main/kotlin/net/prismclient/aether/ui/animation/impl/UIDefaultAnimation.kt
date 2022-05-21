@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
+import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.style.impl.animation.UIAnimationSheet
 import net.prismclient.aether.ui.util.UIAnimationPriority
 import net.prismclient.aether.ui.util.extensions.transition
@@ -54,7 +55,15 @@ open class UIDefaultAnimation(
                 prog
             )
 
-            if (c.style.background!!.border != null) {
+            if (ap.background?.border != null || p.background?.border != null) {
+                if (background == null) {
+                    c.style.background = UIBackground()
+                    background = c.style.background
+                }
+                if (background!!.border == null) {
+                    background!!.border = UIBorder()
+                    c.style.background!!.border = background!!.border
+                }
                 c.style.background!!.border!!.borderColor = transition(
                     (ap.background?.border?.borderColor ?: background!!.border!!.borderColor),
                     (p.background?.border?.borderColor ?: background!!.border!!.borderColor),
