@@ -11,6 +11,7 @@ import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
+import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.unit.util.RELATIVE
 
 open class UIStyleSheet : UICopy<UIStyleSheet> {
@@ -63,6 +64,8 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         this.x = x
         this.y = y
     }
+
+    fun size(width: Float, height: Float) = size(px(width), px(height))
 
     fun size(width: UIUnit, height: UIUnit) {
         this.width = width
@@ -120,7 +123,8 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
      * Sets the color of the background
      */
     @JvmOverloads
-    inline fun background(color: Int, block: UIBackground.() -> Unit = {}) = background { this.color = color; this.block() }
+    inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
+            background { this.color = color; this.radius; this.block() }
 
     /** Font **/
 
