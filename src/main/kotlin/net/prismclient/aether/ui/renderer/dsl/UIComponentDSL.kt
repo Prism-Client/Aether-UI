@@ -80,7 +80,7 @@ object UIComponentDSL {
      * Removes the component as the active component / frame.
      */
     fun popComponent() {
-        if (activeComponent is UIFrame<*>) {
+        if (activeFrame is UIFrame<*>) {
             frameStack.pop()
             activeFrame = if (frameStack.size > 0) {
                 frameStack.peek()
