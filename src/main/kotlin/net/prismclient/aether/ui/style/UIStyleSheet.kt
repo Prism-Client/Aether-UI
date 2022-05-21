@@ -124,7 +124,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
      */
     @JvmOverloads
     inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
-            background { this.color = color; this.radius; this.block() }
+            background { this.color = color; this.radius = radius; this.block() }
 
     /** Font **/
 

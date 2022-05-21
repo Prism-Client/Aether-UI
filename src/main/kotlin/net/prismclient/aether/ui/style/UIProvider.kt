@@ -4,6 +4,7 @@ import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
+import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.style.util.UIFontFamily
 
 object UIProvider {
@@ -15,9 +16,10 @@ object UIProvider {
     lateinit var renderer: UIRenderer
 
     val styles = HashMap<String, UIStyleSheet>()
-    val fonts = HashMap<String, UIFontFamily>()
-    val animations = HashMap<String, UIAnimation<*>>()
-    val activeAnimations = ArrayList<UIAnimation<*>>()
+    private val images = HashMap<String, UIImageData>()
+    private val fonts = HashMap<String, UIFontFamily>()
+    private val animations = HashMap<String, UIAnimation<*>>()
+    private val activeAnimations = ArrayList<UIAnimation<*>>()
 
     /**
      * Initializes the UIProvider
@@ -29,6 +31,12 @@ object UIProvider {
         UIRendererDSL.renderer = renderer
     }
 
+    fun registerImage(name: String, image: UIImageData) {
+        images[name] = image
+    }
+
+    fun getImage(name: String) = images[name]
+
     /**
      * Adds a [UIFontFamily] into the fonts arraylist. If fonts are loaded by a
      * string instead of a UIFontType, it will automatically be loaded into memory.
@@ -36,13 +44,13 @@ object UIProvider {
      *
      * @see UIFontFamily
      */
-    fun addFont(fontFamily: UIFontFamily) {
+    fun registerFont(fontFamily: UIFontFamily) {
         if (fonts[fontFamily.familyName] == null) {
             fonts[fontFamily.familyName] = fontFamily
         }
     }
 
-    fun addStyle(style: UIStyleSheet) {
+    fun registerStyle(style: UIStyleSheet) {
         styles[style.name] = style
     }
 

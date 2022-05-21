@@ -85,6 +85,8 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
     }
 
     fun mousePressed(mouseX: Float, mouseY: Float) {
+        if (!shouldRender || (((component!! as UIContainer<*>).expandedWidth <= 0f && type == Scrollbar.Horizontal) || ((component!! as UIContainer<*>).expandedHeight <= 0f && type == Scrollbar.Vertical))) return
+
         var x = cachedX
         var y = cachedY
         var w = cachedWidth

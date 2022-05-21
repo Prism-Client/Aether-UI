@@ -14,12 +14,12 @@ inline fun create(block: UIComponentDSL.() -> Unit) {
     UIComponentDSL.block()
 }
 
-inline fun style(name: String, block: UIStyleSheet.() -> Unit) = UIStyleSheet().also { it.name = name; it.block(); UIProvider.addStyle(it) }
+inline fun style(name: String, block: UIStyleSheet.() -> Unit) = UIStyleSheet().also { it.name = name; it.block(); UIProvider.registerStyle(it) }
 
 inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) = sheet.also {
     it.name = name
     it.block()
-    UIProvider.addStyle(it)
+    UIProvider.registerStyle(it)
 }
 
 fun radius(radius: Float): UIRadius =

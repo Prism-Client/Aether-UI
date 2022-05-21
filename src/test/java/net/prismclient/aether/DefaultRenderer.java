@@ -3,12 +3,12 @@ package net.prismclient.aether;
 import net.prismclient.aether.ui.renderer.UIRenderer;
 import net.prismclient.aether.ui.renderer.image.UIImageData;
 import net.prismclient.aether.ui.renderer.other.UIContentFBO;
+import net.prismclient.aether.ui.style.UIProvider;
 import net.prismclient.aether.ui.util.extensions.ColorKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.nanovg.*;
 import org.lwjgl.stb.STBImage;
-import org.lwjgl.stb.STBTruetype;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
@@ -222,28 +222,76 @@ public class DefaultRenderer extends UIRenderer {
     }
 
     @Override
-    public boolean loadImage(@NotNull String imageName, @Nullable ByteBuffer imageData, int imageFlags) {
-        if (imageData == null) {
+    public UIImageData loadImage(@NotNull String imageName, @NotNull UIImageData image, int imageFlags) {
+        image.setImageType(UIImageData.ImageType.Image);
+        if (image.getBuffer() == null) {
             System.out.println("Failed to load image with name: " + imageName + " as it was null");
-            return false;
+            return image;
         }
 
         int[] width = new int[]{0};
         int[] height = new int[]{0};
-        int[] channels = new int[]{0};
 
-        imageData = STBImage.stbi_load_from_memory(imageData, width, height, channels, 4);
+        image.setBuffer(STBImage.stbi_load_from_memory(image.getBuffer(), width, height, new int[]{0}, 4));
 
-        if (imageData == null) {
+        if (image.getBuffer() == null) {
             System.out.println("Failed to parse file. Is it corrupted?");
-            return false;
+            return image;
         }
 
-        images.put(imageName,
-                new UIImageData(
-                        nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, imageData), width[0], height[0], imageData));
+        nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.getBuffer());
 
-        return true;
+        image.setWidth(width[0]);
+        image.setHeight(height[0]);
+        image.setLoaded(true);
+
+        UIProvider.INSTANCE.registerImage(imageName, image);
+
+        return image;
+    }
+
+    @NotNull
+    @Override
+    public UIImageData loadSVG(@NotNull String svgName, @NotNull UIImageData image, float scale) {
+        image.setImageType(UIImageData.ImageType.Svg);
+        NSVGImage img;
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            if (image.getBuffer() == null) {
+                System.out.println("Failed to load the svg: " + svgName);
+                return image;
+            }
+            img = nsvgParse(image.getBuffer(), stack.ASCII("px"), 96f);
+            if (img == null) {
+                throw new RuntimeException("Failed to parse SVG. name: " + svgName + ", scale:" + scale);
+            }
+        }
+
+        long rasterizer = nsvgCreateRasterizer();
+
+        int w = (int) (img.width() * scale);
+        int h = (int) (img.height() * scale);
+
+        ByteBuffer rast = MemoryUtil.memAlloc(w * h * 4);
+
+        nsvgRasterize(
+                rasterizer,
+                img,
+                0, 0,
+                scale,
+                rast, w, h,
+                w * 4
+        );
+
+        nsvgDeleteRasterizer(rasterizer);
+        nvgCreateImageRGBA(ctx, w, h, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_GENERATE_MIPMAPS, rast);
+
+        image.setWidth(w);
+        image.setHeight(h);
+        image.setLoaded(true);
+
+        UIProvider.INSTANCE.registerImage(svgName, image);
+
+        return image;
     }
 
     @Override
@@ -266,7 +314,6 @@ public class DefaultRenderer extends UIRenderer {
 
     @Override
     public boolean loadFont(@NotNull String fontName, @Nullable ByteBuffer fontData) {
-        System.out.println("Loading font: " + fontName);
         if (fontData == null) {
             System.out.println("Failed to load font " + fontName + " as it was not found.");
             return false;
@@ -369,39 +416,6 @@ public class DefaultRenderer extends UIRenderer {
     @Override
     public float wrapHeight() {
         return wrapHeight;
-    }
-
-    @Override
-    public void loadSVG(@NotNull String svgName, @NotNull ByteBuffer buffer, float scale) {
-        NSVGImage image;
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            image = nsvgParse(buffer, stack.ASCII("px"), 96f);
-            if (image == null) {
-                throw new RuntimeException("Failed to parse SVG. name: " + svgName + ", scale:" + scale);
-            }
-        }
-
-        long rasterizer = nsvgCreateRasterizer();
-
-        int w = (int) (image.width() * scale);
-        int h = (int) (image.height() * scale);
-
-        ByteBuffer rast = MemoryUtil.memAlloc(w * h * 4);
-
-        nsvgRasterize(
-                rasterizer,
-                image,
-                0, 0,
-                scale,
-                rast, w, h,
-                w * 4
-        );
-
-        nsvgDeleteRasterizer(rasterizer);
-
-        images.put(svgName,
-                new UIImageData(
-                        nvgCreateImageRGBA(ctx, w, h, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_GENERATE_MIPMAPS, rast), w, h, rast));
     }
 
     private void fill() {

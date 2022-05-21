@@ -35,8 +35,8 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
 
         for (i in 0 until components.size) {
             val c = components[i]
-            w = (c.relX + c.relWidth).coerceAtLeast(w)
-            h = (c.relY + c.relHeight).coerceAtLeast(h)
+            w = (c.relX + c.relWidth + c.marginRight).coerceAtLeast(w)
+            h = (c.relY + c.relHeight + c.marginBottom).coerceAtLeast(h)
         }
 
         val x = if (style.clipContent) 0f else relX

@@ -48,7 +48,7 @@ class UIFontFamily(
     }
 
     init {
-        UIProvider.addFont(this)
+        UIProvider.registerFont(this)
     }
 
     /**

@@ -1,16 +1,15 @@
 package net.prismclient.aether.dependencies
 
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.UIDependable
-import net.prismclient.aether.ui.util.extensions.asRGBA
-import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.radius
-import net.prismclient.aether.ui.util.extensions.style
+import net.prismclient.aether.ui.util.extensions.*
 
 /**
  * An example of [UIDependable] which has component styles setup
@@ -18,10 +17,21 @@ import net.prismclient.aether.ui.util.extensions.style
  */
 class ComponentStyles : UIDependable() {
     override fun load() {
-        style(UISliderSheet(), "slider") {
-            position(px(50), px(50))
-            size(px(400), px(5))
+        /** Button **/
+        style(UIStyleSheet(), "btn") {
+            background(asRGBA(0, 0, 0, 0.3f), radius(15f))
 
+            font {
+                align(UIAlignment.CENTER)
+                textAlignment = UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER
+                fontFamily = "Poppins"
+                fontSize = 16f
+                fontType = UIFont.FontType.Light
+            }
+        }
+
+        /** Slider **/
+        style(UISliderSheet(), "slider") {
             sliderControl.color = -1
 
             background {
@@ -34,21 +44,46 @@ class ComponentStyles : UIDependable() {
             }
         }
 
-        style(UIStyleSheet(), "btn") {
+        /** Container w Scrollbar **/
+        style(UIContainerSheet(), "container") {
+            control(UIAlignment.CENTER)
             background(asRGBA(0, 0, 0, 0.3f)) {
-                radius = radius(15f)
+                radius = radius(40f)
             }
-            x = px(200)
-            y = px(200)
-            width = px(150)
-            height = px(50)
+            contentRadius = radius(40f)
 
-            font {
-                align(UIAlignment.CENTER)
-                textAlignment = UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER
-                fontFamily = "Poppins"
-                fontSize = 16f
-                fontType = UIFont.FontType.Light
+            width = px(400)
+            height = px(400)
+
+            overflowX = UIContainerSheet.Overflow.Scroll
+            overflowY = UIContainerSheet.Overflow.Scroll
+
+            verticalScrollbar {
+                x = rel(1f) - px(10) - px(5)
+                y = percent(10)
+                width = px(5)
+                height = percent(80)
+                radius = radius(2.5f)
+
+                color = -1
+
+                background(asRGBA(0, 0, 0, 0.3f)) {
+                    radius = radius(2.5f)
+                }
+            }
+
+            horizontalScrollbar {
+                x = percent(10)
+                y = rel(1f) - px(10) - px(5)
+                width = percent(80)
+                height = px(5)
+                radius = radius(2.5f)
+
+                color = -1
+
+                background(asRGBA(0, 0, 0, 0.3f)) {
+                    radius = radius(2.5f)
+                }
             }
         }
     }

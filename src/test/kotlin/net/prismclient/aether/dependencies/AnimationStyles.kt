@@ -3,6 +3,7 @@ package net.prismclient.aether.dependencies
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
+import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIDependable
 import net.prismclient.aether.ui.util.extensions.animation
 import net.prismclient.aether.ui.util.extensions.asRGBA
@@ -13,7 +14,7 @@ import net.prismclient.aether.ui.util.extensions.asRGBA
 class AnimationStyles : UIDependable() {
     override fun load() {
         animation(UIDefaultAnimation("fadeIn")) {
-            keyframe(UIQuart(250L), true) {
+            keyframe(UIQuart(500L), true) {
                 background {
                     color = asRGBA(0f, 0f, 0f, 0.5f)
                     border {
@@ -27,7 +28,7 @@ class AnimationStyles : UIDependable() {
         }
 
         animation(UIDefaultAnimation("fadeOut")) {
-            keyframe(UIQuart(1000L), true) {
+            keyframe(UIQuart(500L), true) {
                 background {
                     color = asRGBA(0f, 0f, 0f, 0.3f)
                     border {}

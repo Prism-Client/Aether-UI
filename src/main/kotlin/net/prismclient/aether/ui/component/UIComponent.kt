@@ -52,6 +52,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked on creation, and screen resize
      */
     open fun update() {
+        calculateBounds()
         // Update the size, then the position
         updateSize()
         updatePosition()
@@ -62,8 +63,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun updatePosition() {
-        x = +style.x + getParentX() - getAnchorX()
-        y = -style.y + getParentY() - getAnchorY()
+        x = +style.x + getParentX() - getAnchorX() + marginLeft
+        y = -style.y + getParentY() - getAnchorY() + marginTop
     }
 
     open fun updateSize() {
@@ -89,8 +90,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Updates the relative values based on the absolute values
      */
     open fun updateBounds() {
-        calculateBounds()
-
         relX = x - paddingLeft
         relY = y - paddingTop
 
@@ -278,12 +277,13 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Shorthand for loading animations for when the mouse hovers over the component
      */
-    fun hover(hoverAnimation: String, leaveAnimation: String) {
-        onMouseEnter() {
+    fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<*> {
+        onMouseEnter {
             UIProvider.dispatchAnimation(hoverAnimation, this)
         }
         onMouseLeave {
             UIProvider.dispatchAnimation(leaveAnimation, this)
         }
+        return this
     }
 }

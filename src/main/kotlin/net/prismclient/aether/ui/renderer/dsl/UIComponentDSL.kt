@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.renderer.dsl
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
+import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
@@ -171,6 +172,10 @@ object UIComponentDSL {
 
     inline fun textField(text: String, placeholder: String, inputFlavor: UITextField.TextFlavor, maxLength: Int = -1, style: String? = activeStyle, block: UITextField.() -> Unit) =
         component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
+
+    /** Other **/
+    inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit) =
+        component(UIImage(imageName, imageLocation, style!!), block)
 
     /** Layout **/
 

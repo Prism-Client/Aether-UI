@@ -332,16 +332,32 @@ abstract class UIRenderer {
         color2: Int
     )
 
+//    /**
+//     * Loads an image based on the given file location into [imageName] with the given [imageFlags]
+//     *
+//     * @param imageName The unique name of the image
+//     * @param imageData A ByteBuffer containing the data of the image
+//     * @param imageFlags The flags provided to load the image
+//     * @see Properties Image section
+//     * @return Returns if the image was sucessfully loaded or not
+//     */
+//    abstract fun loadImage(imageName: String, imageData: ByteBuffer?, imageFlags: Int): Boolean
+
     /**
-     * Loads an image based on the given file location into [imageName] with the given [imageFlags]
+     * Loads an image from an existing UILoadableImage
      *
-     * @param imageName The unique name of the image
-     * @param imageData A ByteBuffer containing the data of the image
-     * @param imageFlags The flags provided to load the image
-     * @see Properties Image section
+     * @param imageName The unique name of the imageLocation
      * @return Returns if the image was sucessfully loaded or not
      */
-    abstract fun loadImage(imageName: String, imageData: ByteBuffer?, imageFlags: Int): Boolean
+    abstract fun loadImage(imageName: String, image: UIImageData, flags: Int): UIImageData
+
+    /**
+     * Accepts a svg from a [ByteBuffer] and rasterizes it as an image and places
+     * the rasterized image into the image list with the given [svgName]
+     *
+     * @param scale The size to rasterize the svg to
+     */
+    abstract fun loadSVG(svgName: String, image: UIImageData, scale: Float): UIImageData
 
     /**
      * Deletes the image associated with [imageName] from memory
@@ -418,12 +434,6 @@ abstract class UIRenderer {
      * Returns the height of the latest call to [wrapString]
      */
     abstract fun wrapHeight(): Float
-
-    /**
-     * Accepts a svg from a [ByteBuffer] and rasterizes it as an image and places
-     * the rasterized image into the image list with the given [svgName]
-     */
-    abstract fun loadSVG(svgName: String, buffer: ByteBuffer, scale: Float)
 
     /**
      * Returns the red of the active color
