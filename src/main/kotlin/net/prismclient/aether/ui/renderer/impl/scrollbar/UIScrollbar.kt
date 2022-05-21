@@ -39,13 +39,13 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
                 UIContainerSheet.Overflow.Auto -> container.expandedWidth > 0f
             }
         } else {
-            when (container.style.overflowX) {
+            when (container.style.overflowY) {
                 UIContainerSheet.Overflow.None -> false
                 UIContainerSheet.Overflow.Scroll -> true
                 UIContainerSheet.Overflow.Auto -> container.expandedHeight > 0f
             }
         }
-
+        
         // Update the values
         cachedX = container.relX + container.calculateUnitX(x, container.relWidth, false)
         cachedY = container.relY + container.calculateUnitY(y, container.relHeight, false)
