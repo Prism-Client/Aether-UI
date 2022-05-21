@@ -262,13 +262,13 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun getMouseY(): Float =
             UICore.mouseY - getParentYOffset()
 
-    protected fun getParentXOffset(): Float =
+    fun getParentXOffset(): Float =
             if (parent != null && parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) parent!!.relX else 0f
 
-    protected fun getParentYOffset(): Float =
+    fun getParentYOffset(): Float =
             if (parent != null && parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) parent!!.relY else 0f
 
-    protected fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) =
+    fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) =
             (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
 
     /** Other **/

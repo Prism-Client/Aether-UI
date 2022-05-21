@@ -8,6 +8,7 @@ import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
@@ -25,13 +26,13 @@ import net.prismclient.aether.ui.util.extensions.*
 class ExampleScreen : UIScreen() {
     override fun initialize() {
         UIFontFamily(
-                "Poppins",
-                "/fonts/",
-                "regular",
-                "black",
-                "bold",
-                "light",
-                "thin"
+            "Poppins",
+            "/fonts/",
+            "regular",
+            "black",
+            "bold",
+            "light",
+            "thin"
         )
 
         build {
@@ -42,7 +43,60 @@ class ExampleScreen : UIScreen() {
             dependsOn(::ComponentStyles)
             dependsOn(::AnimationStyles)
 
-            // Create a h2 label
+            style(UIContainerSheet(), "container") {
+                control(UIAlignment.CENTER)
+                background(asRGBA(0, 255, 0, 0.3f))
+
+                width = px(400)
+                height = px(400)
+
+                overflowX = UIContainerSheet.Overflow.Scroll
+                overflowY = UIContainerSheet.Overflow.Scroll
+
+                verticalScrollbar {
+                    x = px(10)
+                    y = percent(10)
+                    width = px(5)
+                    height = percent(80)
+                    radius = radius(2.5f)
+
+                    color = -1
+
+                    background(asRGBA(0, 0, 0, 0.3f)) {
+                        radius = radius(2.5f)
+                    }
+                }
+
+                horizontalScrollbar {
+                    x = percent(10)
+                    y = px(10)
+                    width = percent(80)
+                    height = px(5)
+                    radius = radius(2.5f)
+
+                    color = -1
+
+                    background(asRGBA(0, 0, 0, 0.3f)) {
+                        radius = radius(2.5f)
+                    }
+                }
+            }
+
+            style(UIStyleSheet(), "tall-btn") {
+                background(asRGBA(255, 0, 0, 1f))
+
+                x = px(50)
+                y = px(50)
+                width = px(1000)
+                height = px(1000)
+            }
+
+            container("container") {
+                button("Really tall button", "tall-btn")
+            }
+
+            return
+
             h1("Header 1") {
                 style {
                     control(UIAlignment.TOPLEFT, UIAlignment.TOPLEFT)
@@ -84,5 +138,9 @@ class ExampleScreen : UIScreen() {
                 }
             }.hover("fadeIn", "fadeOut")
         }
+    }
+
+    override fun render() {
+        super.render()
     }
 }

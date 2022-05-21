@@ -68,7 +68,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
             return
         renderer {
             renderContent(framebuffer) {
-                translate(0f, -(style.verticalScrollbar.value * expandedHeight)) {
+                translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
                     components.forEach(UIComponent<*>::render)
                 }
             }
@@ -83,7 +83,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
         style.background?.render(relX, relY, relWidth, relHeight)
         renderer {
             if (!style.clipContent) {
-                translate(0f, -(style.verticalScrollbar.value * expandedHeight)) {
+                translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
                     renderComponent()
                 }
             } else {

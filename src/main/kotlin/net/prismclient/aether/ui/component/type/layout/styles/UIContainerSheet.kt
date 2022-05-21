@@ -10,7 +10,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @since 5/12/2022
  */
 open class UIContainerSheet : UIFrameSheet() {
-    var overflowX: Overflow = Overflow.Auto
+    var overflowX: Overflow = Overflow.Scroll
     var overflowY: Overflow = Overflow.None
 
     var verticalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
