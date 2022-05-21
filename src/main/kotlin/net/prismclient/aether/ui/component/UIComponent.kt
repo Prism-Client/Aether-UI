@@ -23,6 +23,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var style: T = UIProvider.getStyle(style, false) as T
     var parent: UIComponent<*>? = null
     var animation: UIAnimation<*>? = null
+    var overrided = false
 
     /** Component plot properties **/
     var x = 0f
@@ -68,8 +69,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun updatePosition() {
-        x = +style.x + getParentX() - getAnchorX() + marginLeft
-        y = -style.y + getParentY() - getAnchorY() + marginTop
+        if (!overrided) {
+            x = +style.x + getParentX() - getAnchorX() + marginLeft
+            y = -style.y + getParentY() - getAnchorY() + marginTop
+        }
     }
 
     open fun updateSize() {

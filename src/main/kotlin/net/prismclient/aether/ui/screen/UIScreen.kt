@@ -68,7 +68,7 @@ abstract class UIScreen {
 
     open fun mousePressed(mouseX: Float, mouseY: Float) {
         for (i in 0 until components.size) {
-            if (i < components.size - 1) {
+            if (i < components.size) {
                 components[i].mouseClicked(mouseX, mouseY)
             }
         }

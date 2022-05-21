@@ -14,12 +14,12 @@ import net.prismclient.aether.ui.util.extensions.asRGBA
 class AnimationStyles : UIDependable() {
     override fun load() {
         animation(UIDefaultAnimation("fadeIn")) {
-            keyframe(UIQuart(500L), true) {
+            keyframe(UIQuart(250L), true) {
                 background {
                     color = asRGBA(0f, 0f, 0f, 0.5f)
                     border {
-                        borderColor = asRGBA(80, 130,220, 0.8f)
-                        borderWidth = 4f
+                        borderColor = asRGBA(255, 255, 255, 0.5f)
+                        borderWidth = 1f
                     }
                 }
                 animationResult = UIAnimationResult.Retain
@@ -28,7 +28,7 @@ class AnimationStyles : UIDependable() {
         }
 
         animation(UIDefaultAnimation("fadeOut")) {
-            keyframe(UIQuart(500L), true) {
+            keyframe(UIQuart(250L), true) {
                 background {
                     color = asRGBA(0f, 0f, 0f, 0.3f)
                     border {}

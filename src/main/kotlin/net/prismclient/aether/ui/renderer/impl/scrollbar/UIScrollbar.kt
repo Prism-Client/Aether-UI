@@ -7,8 +7,6 @@ import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
-import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.limit
 import net.prismclient.aether.ui.util.extensions.renderer
 
@@ -31,21 +29,8 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
         this.component = component
         val container = component as UIContainer<*>
 
-        // Check based on the overflow if the scrollbar should be rendered or not
-        shouldRender = if (type == Scrollbar.Vertical) {
-            when (container.style.overflowX) {
-                UIContainerSheet.Overflow.None -> false
-                UIContainerSheet.Overflow.Scroll -> true
-                UIContainerSheet.Overflow.Auto -> container.expandedWidth > 0f
-            }
-        } else {
-            when (container.style.overflowY) {
-                UIContainerSheet.Overflow.None -> false
-                UIContainerSheet.Overflow.Scroll -> true
-                UIContainerSheet.Overflow.Auto -> container.expandedHeight > 0f
-            }
-        }
-        
+        shouldRender()
+
         // Update the values
         cachedX = container.relX + container.calculateUnitX(x, container.relWidth, false)
         cachedY = container.relY + container.calculateUnitY(y, container.relHeight, false)
@@ -56,6 +41,25 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
             sliderSize = cachedHeight * (cachedHeight / (container.expandedHeight + cachedHeight))
         } else if (type == Scrollbar.Horizontal) {
             sliderSize = cachedWidth * (cachedWidth / (container.expandedWidth + cachedWidth))
+        }
+    }
+
+    fun shouldRender() {
+        val container = component as UIContainer<*>
+
+        // Check based on the overflow if the scrollbar should be rendered or not
+        shouldRender = if (type == Scrollbar.Vertical) {
+            when (container.style.overflowY) {
+                UIContainerSheet.Overflow.None -> false
+                UIContainerSheet.Overflow.Always -> true
+                UIContainerSheet.Overflow.Auto -> container.expandedHeight > 0f
+            }
+        } else {
+            when (container.style.overflowX) {
+                UIContainerSheet.Overflow.None -> false
+                UIContainerSheet.Overflow.Always -> true
+                UIContainerSheet.Overflow.Auto -> container.expandedWidth > 0f
+            }
         }
     }
 

@@ -109,8 +109,13 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
 
     override fun mouseMoved(mouseX: Float, mouseY: Float) {
         super.mouseMoved(mouseX - (style.horizontalScrollbar.value * expandedWidth), mouseY - (style.verticalScrollbar.value * expandedHeight))
-        //-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)
         style.verticalScrollbar.mouseMoved(mouseX, mouseY)
         style.horizontalScrollbar.mouseMoved(mouseX, mouseY)
+    }
+
+    override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
+        super.mouseScrolled(mouseX, mouseY, scrollAmount)
+        style.verticalScrollbar.value += ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
+        mouseMoved(mouseX, mouseY) // Update for animations n stuff
     }
 }
