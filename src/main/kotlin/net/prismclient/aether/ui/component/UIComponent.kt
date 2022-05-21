@@ -133,7 +133,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             if (!wasInside) {
                 mouseEntered()
                 wasInside = true
-                println("Entered: $this")
             }
         } else if (wasInside) {
             mouseLeft()
