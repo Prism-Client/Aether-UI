@@ -1,5 +1,7 @@
 package net.prismclient.aether.ui.unit.util
 
+import net.prismclient.aether.ui.component.type.image.UIImage
+
 /**
  *  A value represented in pixels
  */
@@ -71,3 +73,12 @@ const val WIDTHANIM: Byte = 13
  * The height of the component, for animations
  */
 const val HEIGHTANIM: Byte = 14
+
+/**
+ * Unique to [UIImage] components. Represents the width of the loaded image
+ */
+const val IMAGEWIDTH: Byte = 15
+/**
+ * Unique to [UIImage] components. Represents the height of the loaded image
+ */
+const val IMAGEHEIGHT: Byte = 16

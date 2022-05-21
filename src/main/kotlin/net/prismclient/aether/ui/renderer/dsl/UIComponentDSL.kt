@@ -11,7 +11,6 @@ import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * [UIComponentDSL] is a DSL builder for defining components on the screen.
@@ -81,11 +80,14 @@ object UIComponentDSL {
      * Removes the component as the active component / frame.
      */
     fun popComponent(component: UIComponent<*>) {
+        if (components == null || frames == null || frameStack == null) return
         if (component is UIFrame<*>) {
-            frameStack.pop()
-            activeFrame = if (frameStack.size > 0) {
-                frameStack.peek()
-            } else null
+            if (frameStack.size != 0) {
+                frameStack.pop()
+                activeFrame = if (frameStack.size > 0) {
+                    frameStack.peek()
+                } else null
+            }
         }
         activeComponent = null
     }
@@ -94,6 +96,7 @@ object UIComponentDSL {
      * Inserts the component into the active frame or the components array.
      */
     private fun insertComponent(component: UIComponent<*>) {
+        if (components == null || frames == null) return
         if (component is UIFrame<*>)
             frames!!.add(component)
         if (activeFrame != null) {
@@ -131,7 +134,7 @@ object UIComponentDSL {
      * @param block The DSL block to configure [T]
      */
     inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) =
-        net.prismclient.aether.ui.util.extensions.style(sheet, name, block)
+            net.prismclient.aether.ui.util.extensions.style(sheet, name, block)
 
     /** Components **/
 
@@ -149,33 +152,33 @@ object UIComponentDSL {
     /** Label Components **/
 
     inline fun h1(text: String, block: UILabel.() -> Unit = {}) =
-        component(UILabel(text, "h1"), block)
+            component(UILabel(text, "h1"), block)
 
     inline fun h2(text: String, block: UILabel.() -> Unit = {}) =
-        component(UILabel(text, "h2"), block)
+            component(UILabel(text, "h2"), block)
 
     inline fun h3(text: String, block: UILabel.() -> Unit = {}) =
-        component(UILabel(text, "h3"), block)
+            component(UILabel(text, "h3"), block)
 
     inline fun p(text: String, block: UILabel.() -> Unit) =
-        component(UILabel(text, "p"), block)
+            component(UILabel(text, "p"), block)
 
     /** Button **/
 
     inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) =
-        component(UIButton<UIStyleSheet>(text, style!!), block)
+            component(UIButton<UIStyleSheet>(text, style!!), block)
 
     /** Input **/
 
     inline fun slider(value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}) =
-        component(UISlider(value, min, max, step, style!!), block)
+            component(UISlider(value, min, max, step, style!!), block)
 
     inline fun textField(text: String, placeholder: String, inputFlavor: UITextField.TextFlavor, maxLength: Int = -1, style: String? = activeStyle, block: UITextField.() -> Unit) =
-        component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
+            component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
 
     /** Other **/
     inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) =
-        component(UIImage(imageName, imageLocation, style!!), block)
+            component(UIImage(imageName, imageLocation, style!!), block)
 
     /** Layout **/
 

@@ -19,9 +19,6 @@ import java.nio.ByteBuffer
 @Suppress("SpellCheckingInspection")
 abstract class UIRenderer {
     @JvmField
-    protected val images = HashMap<String, UIImageData>()
-
-    @JvmField
     protected var activeColor: Int = 0
 
     @JvmField

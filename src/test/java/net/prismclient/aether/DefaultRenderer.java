@@ -239,7 +239,7 @@ public class DefaultRenderer extends UIRenderer {
             return image;
         }
 
-        nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.getBuffer());
+        image.setHandle(nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.getBuffer()));
 
         image.setWidth(width[0]);
         image.setHeight(height[0]);
@@ -283,7 +283,7 @@ public class DefaultRenderer extends UIRenderer {
         );
 
         nsvgDeleteRasterizer(rasterizer);
-        nvgCreateImageRGBA(ctx, w, h, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_GENERATE_MIPMAPS, rast);
+        image.setHandle(nvgCreateImageRGBA(ctx, w, h, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_GENERATE_MIPMAPS, rast));
 
         image.setWidth(w);
         image.setHeight(h);
@@ -296,7 +296,7 @@ public class DefaultRenderer extends UIRenderer {
 
     @Override
     public void renderImage(@NotNull String imageName, float x, float y, float width, float height, float topLeft, float topRight, float bottomRight, float bottomLeft) {
-        UIImageData img = images.get(imageName); int handle = 0;
+        UIImageData img = UIProvider.INSTANCE.getImage(imageName); int handle = 0;
         if (img != null) handle = img.getHandle();
         nvgImagePattern(ctx, x, y, width, height, 0, handle, 1f, paint);
         paint.innerColor(color);

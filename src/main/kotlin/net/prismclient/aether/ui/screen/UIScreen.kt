@@ -67,7 +67,11 @@ abstract class UIScreen {
     }
 
     open fun mousePressed(mouseX: Float, mouseY: Float) {
-        components.forEach { it.mouseClicked(it.getMouseX(), it.getMouseY()) }
+        for (i in 0 until components.size) {
+            if (i < components.size - 1) {
+                components[i].mouseClicked(mouseX, mouseY)
+            }
+        }
     }
 
     open fun mouseReleased(mouseX: Float, mouseY: Float) {

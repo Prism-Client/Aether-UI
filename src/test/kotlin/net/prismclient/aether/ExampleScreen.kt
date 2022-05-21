@@ -9,19 +9,15 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.util.UIFontFamily
+import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.unit.util.IMAGEHEIGHT
+import net.prismclient.aether.ui.unit.util.IMAGEWIDTH
+import net.prismclient.aether.ui.util.extensions.div
 import net.prismclient.aether.ui.util.extensions.px
 
 class ExampleScreen : UIScreen() {
     override fun initialize() {
-        UIFontFamily(
-                "Poppins",
-                "/fonts/",
-                "regular",
-                "black",
-                "bold",
-                "light",
-                "thin"
-        )
+        UIFontFamily("Poppins", "/fonts/", "regular", "black", "bold", "light", "thin")
 
         build {
             // Using the dependsOn feature, we can load styles
@@ -47,6 +43,15 @@ class ExampleScreen : UIScreen() {
                 }.hover("fadeIn", "fadeOut").onMousePressed {
                     if (it.isMouseInsideBoundingBox()) {
                         (it as UIButton).text = "Yay! I've been clicked!"
+                        this.addComponent(image("kazuha", "/images/kazuha.jpeg", "imag") {
+                            style {
+                                control(UIAlignment.CENTER, UIAlignment.CENTER)
+                                y = px(300)
+                                width = UIUnit(1f, IMAGEWIDTH) / px(6)
+                                height = UIUnit(1f, IMAGEHEIGHT) / px(6)
+                            }
+                        })
+                        this.update()
                     }
                 }.onMouseLeave {
                     (it as UIButton).text = "Click me!"
@@ -58,7 +63,6 @@ class ExampleScreen : UIScreen() {
                         margin(10f)
                     }
                 }
-                image("kazuha", "/images/kazuha.jpeg", "imag")
             }
 
             h1("Header 1") {
@@ -95,4 +99,7 @@ class ExampleScreen : UIScreen() {
         }
     }
 
+    override fun render() {
+        super.render()
+    }
 }

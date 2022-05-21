@@ -7,7 +7,7 @@
 
 In a future release, the ability to import designs directly from figma, and to load actual css will be added.
 
-Todo add screenshots here!!!
+![Simple Demo](/docs/assets/Demo.gif)
 
 
 # Getting started

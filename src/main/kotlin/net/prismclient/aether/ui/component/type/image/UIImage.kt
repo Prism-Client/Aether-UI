@@ -11,7 +11,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 5/20/2022
  */
-class UIImage(var name: String, image: UIImageData, style: String) : UIComponent<UIImageSheet>(style) {
+class UIImage(var name: String, val image: UIImageData, style: String) : UIComponent<UIImageSheet>(style) {
     /**
      * Loads an image from the specified file location
      */
@@ -32,4 +32,6 @@ class UIImage(var name: String, image: UIImageData, style: String) : UIComponent
             )
         }
     }
+
+
 }

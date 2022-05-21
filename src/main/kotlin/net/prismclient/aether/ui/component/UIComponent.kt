@@ -2,12 +2,17 @@ package net.prismclient.aether.ui.component
 
 import net.prismclient.aether.UICore
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.component.type.layout.container.UIContainer
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.unit.type.UIOperationUnit
+import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.calculateX
 import net.prismclient.aether.ui.util.extensions.calculateY
@@ -128,6 +133,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             if (!wasInside) {
                 mouseEntered()
                 wasInside = true
+                println("Entered: $this")
             }
         } else if (wasInside) {
             mouseLeft()
@@ -210,6 +216,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     @JvmOverloads
+    fun calculateX(unit: UIUnit?, component: UIComponent<*>, width: Float = component.getParentWidth(), ignoreOperation: Boolean = false): Float {
+        return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) net.prismclient.aether.ui.util.extensions.calculateX(unit, component, width)
+        else when (unit.type) {
+            PIXELS, PXANIMRELATIVE -> unit.value
+            RELATIVE, RELANIMRELATIVE -> unit.value * width
+            EM -> unit.value * (component.style.font?.fontSize ?: 0f)
+            ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
+            DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
+            else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
+        }
+    }
+
+
+    @JvmOverloads
     fun UIUnit?.getY(ignore: Boolean = false): Float = this.getY(getParentHeight(), ignore)
 
     @JvmOverloads
@@ -238,6 +258,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun getAnchorY() =
             calculateUnitY(style.anchor.y, height, false)
 
+    // TODO: Cleanup this mess with mouse bubbling and stuff
+
     fun isMouseInside() =
             (getMouseX() > x) &&
             (getMouseY() > y) &&
@@ -247,11 +269,15 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Returns true if the mouse is inside the rel x, y, width and height
      */
-    fun isMouseInsideBoundingBox() =
-            (getMouseX() > relX) &&
-            (getMouseY() > relY) &&
-            (getMouseX() < relX + relWidth) &&
-            (getMouseY() < relY + relHeight)
+    fun isMouseInsideBoundingBox() = ((getMouseX() >= relX) &&
+            (getMouseY() >= relY) &&
+            (getMouseX() <= relX + relWidth) &&
+            (getMouseY() <= relY + relHeight)) &&
+            (parent == null ||
+            (UICore.mouseX >= parent!!.relX) &&
+            (UICore.mouseY >= parent!!.relY) &&
+            (UICore.mouseX <= parent!!.relX + parent!!.relWidth) &&
+            (UICore.mouseY <= parent!!.relY + parent!!.relHeight))
 
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 
@@ -261,14 +287,25 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun getMouseY(): Float =
             UICore.mouseY - getParentYOffset()
 
-    fun getParentXOffset(): Float =
-            if (parent != null && parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) parent!!.relX else 0f
+    fun getParentXOffset(): Float {
+        return (if (parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) {
+            parent!!.relX
+        } else 0f) - if (parent != null && parent is UIContainer) {
+            ((parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth)
+        } else 0f
+    }
 
-    fun getParentYOffset(): Float =
-            if (parent != null && parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) parent!!.relY else 0f
+    fun getParentYOffset(): Float {
+        return (if (parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) {
+            parent!!.relY
+        } else 0f) - if (parent != null && parent is UIContainer) {
+            ((parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight)
+        } else 0f
+    }
 
     fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) =
-            (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
+        (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
+
 
     /** Other **/
     inline fun style(block: T.() -> Unit) =
