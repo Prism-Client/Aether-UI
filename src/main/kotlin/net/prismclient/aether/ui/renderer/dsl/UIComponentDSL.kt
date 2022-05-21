@@ -79,8 +79,8 @@ object UIComponentDSL {
     /**
      * Removes the component as the active component / frame.
      */
-    fun popComponent() {
-        if (activeFrame is UIFrame<*>) {
+    fun popComponent(component: UIComponent<*>) {
+        if (component is UIFrame<*>) {
             frameStack.pop()
             activeFrame = if (frameStack.size > 0) {
                 frameStack.peek()
@@ -141,7 +141,7 @@ object UIComponentDSL {
     inline fun <T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
         pushComponent(component)
         component.also(block)
-        popComponent()
+        popComponent(component)
         return component
     }
 
