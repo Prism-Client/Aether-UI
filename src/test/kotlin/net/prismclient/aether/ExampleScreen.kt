@@ -58,7 +58,7 @@ class ExampleScreen : UIScreen() {
                         margin(10f)
                     }
                 }
-//                image("kazuha", "")
+                image("kazuha", "/images/kazuha.jpeg", "imag")
             }
 
             h1("Header 1") {

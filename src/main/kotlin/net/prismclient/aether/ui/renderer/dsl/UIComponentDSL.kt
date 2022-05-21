@@ -174,7 +174,7 @@ object UIComponentDSL {
         component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
 
     /** Other **/
-    inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit) =
+    inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) =
         component(UIImage(imageName, imageLocation, style!!), block)
 
     /** Layout **/

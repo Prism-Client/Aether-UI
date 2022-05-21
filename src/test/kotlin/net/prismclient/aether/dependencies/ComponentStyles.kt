@@ -1,5 +1,6 @@
 package net.prismclient.aether.dependencies
 
+import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.input.slider.UISliderSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
@@ -76,6 +77,7 @@ class ComponentStyles : UIDependable() {
                 x = percent(10)
                 y = rel(1f) - px(10) - px(5)
                 width = percent(80)
+                width = percent(80)
                 height = px(5)
                 radius = radius(2.5f)
 
@@ -85,6 +87,13 @@ class ComponentStyles : UIDependable() {
                     radius = radius(2.5f)
                 }
             }
+        }
+
+        /** Image **/
+        style(UIImageSheet(), "imag") {
+            width = px(200f)
+            height = px(200f)
+            imageRadius = radius(25f)
         }
     }
 }
