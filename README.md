@@ -1,17 +1,10 @@
 # Aether UI
 
-
 <img src="/docs/assets/client-logo-rounded.png" align="right" width="230" height="230">
  
-**Aether is a UI component library engine for Minecraft** and LWJGL projects (or anything really). You can create your own renderer implementation or use the default implementation with *[NanoVG](https://github.com/memononen/nanovg "An anti-aliased vector graphics library")*, which is an **Anti-Aliased vector graphics library**. **Please note the project is in the early stages of development.** Bugs may arise, and there might be incomplete/missing features. I have not chosen a license for the project. The discord server for the parent project can be found [here](https://discord.gg/jg3aWfASPp).
+**Aether is a UI component library engine for Minecraft** and LWJGL projects (or anything really). You can create your renderer implementation or use the default implementation with *[NanoVG](https://github.com/memononen/nanovg "An anti-aliased vector graphics library")*, which is an **Anti-Aliased vector graphics library**. **Please note the project is in the early stages of development.** Bugs may arise, and there might be incomplete/missing features. The libary is licensed under the GNU General Public License (GPL v2).
 
-In a future release, the ability to import designs directly from figma, and to load actual css will be added.
-
-<br></br>
-<br></br>
-
-![Simple Demo](/docs/assets/Demo.gif)
-
+Aether is [declarative](https://en.wikipedia.org/wiki/Declarative_programming), so you describe what you want, not how to do what you want. The engine should be used with Kotlin; however, it can be used with Java. Ready to get started? Check out the [getting started](#getting-started), to y'know, get started.
 
 # Getting started
 
@@ -39,9 +32,9 @@ Image using maven
 
 </details>
 
----
-
 Once completed, take a look at the [docs](https://github.com/Prism-Client/Aether-UI/tree/master/docs) or the [example screen!](https://github.com/Prism-Client/Aether-UI/blob/master/src/test/kotlin/net/prismclient/aether/ExampleScreen.kt) Please note, as mentioned above there might be a lot of lacking information as it is in the early stage of development.
+
+---
 
 # Development
 
