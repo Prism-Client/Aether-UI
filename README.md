@@ -4,7 +4,9 @@
  
 **Aether is a UI component library engine for Minecraft** and LWJGL projects (or anything really). You can create your renderer implementation or use the default implementation with *[NanoVG](https://github.com/memononen/nanovg "An anti-aliased vector graphics library")*, which is an **Anti-Aliased vector graphics library**. **Please note the project is in the early stages of development.** Bugs may arise, and there might be incomplete/missing features. The libary is licensed under the GNU General Public License (GPL v2).
 
-Aether is [declarative](https://en.wikipedia.org/wiki/Declarative_programming), so you describe what you want, not how to do what you want. The engine should be used with Kotlin; however, it can be used with Java. Ready to get started? Check out the [getting started](#getting-started), to y'know, get started.
+Aether is [declarative](https://en.wikipedia.org/wiki/Declarative_programming), so you describe what you want, not how to do what you want. The engine should be used with Kotlin; however, it can be used with Java.
+
+Ready to get started? Check out the [getting started](#getting-started), to y'know, get started.
 
 # Getting started
 
