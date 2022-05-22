@@ -21,13 +21,13 @@ class ExampleScreen : UIScreen() {
 
             component(
                 UIListLayout(
-                    UIListLayout.ListDirection.Vertical,
+                    UIListLayout.ListDirection.Horizontal,
                     UIListLayout.ListOrientation.Forward,
                     "container"
                 )
             ) {
                 applyStyle("btn") {
-                    for (i in 0 .. 100) {
+                    for (i in 0 .. 25) {
                         button("button: $i")
                             .hover("fadeIn", "fadeOut")
                     }

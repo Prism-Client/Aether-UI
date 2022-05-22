@@ -8,6 +8,8 @@ Aether is [declarative](https://en.wikipedia.org/wiki/Declarative_programming), 
 
 Ready to get started? Check out the [getting started](#getting-started), to y'know, get started.
 
+---
+
 # Getting started
 
 Import the project into your IDE using the following buildscript: 
@@ -15,7 +17,7 @@ Import the project into your IDE using the following buildscript:
 <details>
 <summary>Gradle</summary>
  
-```java
+```groovy
 repositories {
   maven { url 'https://jitpack.io' }
 }
