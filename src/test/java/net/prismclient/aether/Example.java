@@ -47,7 +47,7 @@ public class Example {
         }
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
-        long window = glfwCreateWindow(1000, 600, "i want to shoot my foot", NULL, NULL);
+        long window = glfwCreateWindow(1000, 600, "Demo", NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new RuntimeException();

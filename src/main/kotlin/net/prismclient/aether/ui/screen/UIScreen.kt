@@ -35,6 +35,15 @@ abstract class UIScreen {
     }
 
     /**
+     * Java alternative to [dependsOn]. An instance of [UIDependable] must be passed.
+     *
+     * @see dependsOn
+     */
+    fun dependsOn(clazz: UIDependable) {
+        clazz.load()
+    }
+
+    /**
      * Invoked when the screen is first created. A build block should be invoked
      * to create components, else unexpected, and unwanted actions might occur.
      *
