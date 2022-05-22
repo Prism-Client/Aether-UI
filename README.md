@@ -11,6 +11,7 @@ In a future release, the ability to import designs directly from figma, and to l
 <br></br>
 
 ![Simple Demo](/docs/assets/Demo.gif)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FPrism-Client%2FAether-UI.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FPrism-Client%2FAether-UI?ref=badge_shield)
 
 
 # Getting started
@@ -46,3 +47,7 @@ Once completed, take a look at the [docs](https://github.com/Prism-Client/Aether
 # Development
 
 The project board can be found [here](https://trello.com/b/g4Nvdykx/aether)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FPrism-Client%2FAether-UI.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FPrism-Client%2FAether-UI?ref=badge_large)
