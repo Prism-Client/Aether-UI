@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.component.type.layout.list
 
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrientation.Backwards
+import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrientation.Forward
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 
 /**
@@ -16,6 +17,43 @@ open class UIListLayout @JvmOverloads constructor(
         var listOrientation: ListOrientation = ListOrientation.Forward,
         style: String
 ) : UIContainer<UIContainerSheet>(style) {
+
+    override fun updateLayout() {
+        var x = 0f
+        var y = 0f
+
+        if (listOrientation == Forward) {
+            for (i in 0 until components.size) {
+                val component = components[i]
+
+                component.overrided = true
+
+                if (listDirection == ListDirection.Vertical) {
+                    component.y = y + component.marginTop
+                    y += component.relHeight + component.marginTop + component.marginBottom
+                } else if (listDirection == ListDirection.Horizontal) {
+                    component.x = x + component.marginLeft
+                    x += component.relWidth + component.marginLeft + component.marginRight
+                }
+                component.update()
+            }
+        } else {
+            for (i in components.size - 1 downTo 0) {
+                val component = components[i]
+
+                component.overrided = true
+
+                if (listDirection == ListDirection.Vertical) {
+                    component.y = y + component.marginTop
+                    y += component.relHeight + component.marginTop + component.marginBottom
+                } else if (listDirection == ListDirection.Horizontal) {
+                    component.x = x + component.marginLeft
+                    x += component.relWidth + component.marginLeft + component.marginRight
+                }
+                component.update()
+            }
+        }
+    }
 
     /**
      * Defines which direction the list is rendered in

@@ -10,8 +10,8 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @since 5/12/2022
  */
 open class UIContainerSheet : UIFrameSheet() {
-    var overflowX: Overflow = Overflow.Scroll
-    var overflowY: Overflow = Overflow.None
+    var overflowX: Overflow = Overflow.Auto
+    var overflowY: Overflow = Overflow.Auto
 
     var verticalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
     var horizontalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Horizontal)
@@ -36,7 +36,7 @@ open class UIContainerSheet : UIFrameSheet() {
         /**
          * Creates a scrollbar on the given axis regardless if content leaves the window
          */
-        Scroll,
+        Always,
         /**
          * Like scroll, but only adds the scrollbar on the given axis if content leaves the window
          */

@@ -20,7 +20,10 @@ class ComponentStyles : UIDependable() {
     override fun load() {
         /** Button **/
         style(UIStyleSheet(), "btn") {
+            size(380f, 100f)
             background(asRGBA(0, 0, 0, 0.3f), radius(15f))
+
+            margin(10f)
 
             font {
                 align(UIAlignment.CENTER)
@@ -49,15 +52,12 @@ class ComponentStyles : UIDependable() {
         style(UIContainerSheet(), "container") {
             control(UIAlignment.CENTER)
             background(asRGBA(0, 0, 0, 0.3f)) {
-                radius = radius(40f)
+                radius = radius(15f)
             }
-            contentRadius = radius(40f)
+            contentRadius = radius(15f)
 
             width = px(400)
             height = px(400)
-
-            overflowX = UIContainerSheet.Overflow.Scroll
-            overflowY = UIContainerSheet.Overflow.Scroll
 
             verticalScrollbar {
                 x = rel(1f) - px(10) - px(5)
