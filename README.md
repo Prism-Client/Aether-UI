@@ -11,7 +11,6 @@ Ready to get started? Check out the [getting started](#getting-started), to y'kn
 ---
 
 # Getting started
-
 Import the project into your IDE using the following buildscript: 
 
 <details>
@@ -23,7 +22,7 @@ repositories {
 }
  
 dependencies {
-  implementation 'com.github.Prism-Client:Aether-UI:VERSION' 
+  implementation 'com.github.Prism-Client:Aether-UI:production-SNAPSHOT' 
 }
 ```
  
@@ -32,7 +31,20 @@ dependencies {
 <details>
 <summary>Maven</summary>
 
-Image using maven
+```xml
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <dependency>
+        <groupId>com.github.Prism-Client</groupId>
+        <artifactId>Aether-UI</artifactId>
+        <version>production-SNAPSHOT</version>
+    </dependency>
+```
 
 </details>
 
