@@ -19,9 +19,11 @@ class ExampleScreen : UIScreen() {
             dependsOn(::ComponentStyles)
             dependsOn(::AnimationStyles)
 
+            button("Some button", "btn")
+
             component(
                 UIListLayout(
-                    UIListLayout.ListDirection.Horizontal,
+                    UIListLayout.ListDirection.Vertical,
                     UIListLayout.ListOrientation.Forward,
                     "container"
                 )

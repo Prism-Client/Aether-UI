@@ -66,18 +66,20 @@ public class DefaultRenderer extends UIRenderer {
     public UIContentFBO createContentFBO(float width, float height) {
         if (width <= 0 || height <= 0)
             throw new RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0");
+        float contentScale = max(UICore.Companion.getContentScaleX(), UICore.Companion.getContentScaleY());
         NVGLUFramebuffer framebuffer = nvgluCreateFramebuffer(
                 ctx,
-                (int) width, //(int) (width * UICore.Companion.getContentScaleX()),
-                (int) height, //(int) (height * UICore.Companion.getContentScaleY()),
+                (int) (width * contentScale),
+                (int) (height * contentScale),
                 NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY
         );
         if (framebuffer == null)
             throw new RuntimeException("Failed to create the framebuffer. w: " + width + ", h: " + height);
         UIContentFBO fbo = new UIContentFBO(
                 framebuffer.fbo(),
-                width,
-                height
+                width * contentScale,
+                height * contentScale,
+                contentScale
         );
         fbos.put(fbo, framebuffer);
         return fbo;

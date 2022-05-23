@@ -80,7 +80,7 @@ public class Example {
 
             if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                 String keyName = glfwGetKeyName(keyCode, scancode);
-                var key = keyMap.get(keyCode);
+                UIKey key = keyMap.get(keyCode);
 
                 if (key != null && key == UIKey.SPACE) {
                     return;

@@ -10,5 +10,6 @@ package net.prismclient.aether.ui.renderer.other
 class UIContentFBO(
     val id: Int,
     val width: Float,
-    val height: Float
+    val height: Float,
+    val contentScale: Float
 )
