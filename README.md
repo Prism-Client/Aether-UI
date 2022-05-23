@@ -39,11 +39,13 @@ dependencies {
         </repository>
     </repositories>
 
-    <dependency>
-        <groupId>com.github.Prism-Client</groupId>
-        <artifactId>Aether-UI</artifactId>
-        <version>production-SNAPSHOT</version>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.Prism-Client</groupId>
+            <artifactId>Aether-UI</artifactId>
+            <version>production-SNAPSHOT</version>
+        </dependency>
+    <dependencies>
 ```
 
 </details>
