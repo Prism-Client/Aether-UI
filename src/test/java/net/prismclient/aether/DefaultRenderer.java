@@ -77,8 +77,8 @@ public class DefaultRenderer extends UIRenderer {
             throw new RuntimeException("Failed to create the framebuffer. w: " + width + ", h: " + height);
         UIContentFBO fbo = new UIContentFBO(
                 framebuffer.fbo(),
-                width * contentScale,
-                height * contentScale,
+                width,
+                height,
                 contentScale
         );
         fbos.put(fbo, framebuffer);
@@ -111,6 +111,8 @@ public class DefaultRenderer extends UIRenderer {
 
     @Override
     public void renderFBO(@NotNull UIContentFBO fbo, float x, float y, float width, float height, float topLeft, float topRight, float bottomRight, float bottomLeft) {
+        float cs = fbo.getContentScale();
+
         nvgImagePattern(ctx, x, y, width, height, 0, fbos.get(fbo).image(), 1f, paint);
         nvgBeginPath(ctx);
         color(-1);
