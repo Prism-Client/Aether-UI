@@ -306,7 +306,7 @@ object UIRendererDSL {
 
     inline fun renderContent(fbo: UIContentFBO, block: UIRendererDSL.() -> Unit) {
         renderer.bindContentFBO(fbo)
-        renderer.beginFrame(fbo.width, fbo.height, fbo.contentScale)
+        renderer.beginFrame(fbo.width / fbo.contentScale, fbo.height / fbo.contentScale, fbo.contentScale)
         this.block()
         renderer.endFrame()
         renderer.unbindContentFBO()
