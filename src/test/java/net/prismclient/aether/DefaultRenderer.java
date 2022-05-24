@@ -77,8 +77,8 @@ public class DefaultRenderer extends UIRenderer {
             throw new RuntimeException("Failed to create the framebuffer. w: " + width + ", h: " + height);
         UIContentFBO fbo = new UIContentFBO(
                 framebuffer.fbo(),
-                width,
-                height,
+                width * contentScale,
+                height * contentScale,
                 contentScale
         );
         fbos.put(fbo, framebuffer);
