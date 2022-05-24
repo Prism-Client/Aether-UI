@@ -1,4 +1,4 @@
-package net.prismclient.aether
+package net.prismclient.aether.ui
 
 import net.prismclient.aether.ui.callback.UICoreCallback
 import net.prismclient.aether.ui.component.UIComponent
@@ -17,6 +17,7 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     companion object {
         @JvmStatic
         lateinit var instance: UICore
+
         @JvmStatic
         var activeScreen: UIScreen? = null
             set(value) {
