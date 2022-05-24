@@ -272,6 +272,8 @@ object UIRendererDSL {
      */
     fun line(x: Float, y: Float) = renderer.line(x, y)
 
+    fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) = renderer.bezier(x, y, x1, y1, x2, y2)
+
     fun ellipse(x: Float, y: Float, width: Float, height: Float) = renderer.ellipse(x, y, width - pos, height - pos)
 
     fun circle(x: Float, y: Float, radius: Float) = renderer.circle(x, y, radius - pos)

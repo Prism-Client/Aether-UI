@@ -21,6 +21,7 @@ import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import java.lang.Float.max
 import java.nio.ByteBuffer
+import kotlin.math.abs
 
 /**
  * [NanoVGRenderer] is the default renderer implementation for Aether
@@ -32,7 +33,7 @@ class NanoVGRenderer : UIRenderer() {
     private val ctx = NanoVGGL3.nnvgCreate(NanoVGGL3.NVG_ANTIALIAS)
     private val fbos = HashMap<UIContentFBO, NVGLUFramebuffer>()
     private val color = NVGColor.create()
-    private val none = NVGColor.create()
+    private val none = NVGColor.create().also { nvgRGBAf(0f, 0f, 0f, 0f, it) }
     private val outlineColor = NVGColor.create()
     private val paint = NVGPaint.create()
     override fun beginFrame(width: Float, height: Float, devicePixelRatio: Float) {
@@ -179,6 +180,9 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun line(x: Float, y: Float) =
         nvgLineTo(ctx, x, y)
+
+    override fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) =
+        nvgBezierTo(ctx, x, y, x1, y1, x2, y2)
 
     override fun finishLine() {
         nvgStrokeColor(ctx, color)
@@ -394,10 +398,6 @@ class NanoVGRenderer : UIRenderer() {
     private var wrapWidth = 0f
     private var wrapHeight = 0f
 
-    init {
-        nvgRGBAf(0f, 0f, 0f, 0f, none)
-    }
-
     override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int {
         val rows = NVGTextRow.create(100)
         wrapWidth = 0f
@@ -450,7 +450,7 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun stringDescender(): Float {
         nvgTextMetrics(ctx, null, decender, null)
-        return Math.abs(decender[0])
+        return abs(decender[0])
     }
 
     override fun wrapWidth(): Float {

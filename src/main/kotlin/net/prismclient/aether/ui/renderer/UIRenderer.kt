@@ -42,9 +42,6 @@ abstract class UIRenderer {
     @JvmField
     protected var strokeColor: Int = 0
 
-    @JvmField
-    protected var line = false
-
     @JvmField var lineX = 0f
     @JvmField var lineY = 0f
 
@@ -78,7 +75,6 @@ abstract class UIRenderer {
         const val SQUARE = 2
         const val BEVEL = 3
         const val MITER = 4
-
     }
 
     /**
@@ -278,10 +274,12 @@ abstract class UIRenderer {
 
     abstract fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float)
 
-    /** Line  **/
+    /** Line **/
     abstract fun startLine(x: Float, y: Float, lineCap: Int, lineJoin: Int, lineWidth: Float)
 
     abstract fun line(x: Float, y: Float)
+
+    abstract fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float)
 
     abstract fun finishLine()
 
