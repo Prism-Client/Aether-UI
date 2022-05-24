@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.component.type.input
 
-import net.prismclient.aether.UICore
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.input.UITextField.TextFlavor
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
@@ -339,7 +339,7 @@ open class UITextField @JvmOverloads constructor( // https://chakra-ui.com/docs/
 
         when (key) {
             UIKey.BACKSPACE -> if (selected || hasSelection) {
-                    insert("")
+                insert("")
             } else {
                 if (caretPosition > 0) {
                     text = text.substring(0, caretPosition - 1) + text.substring(caretPosition)

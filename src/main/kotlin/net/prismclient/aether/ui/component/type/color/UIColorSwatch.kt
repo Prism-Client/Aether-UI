@@ -1,11 +1,11 @@
 package net.prismclient.aether.ui.component.type.color
 
-import net.prismclient.aether.UICore
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.util.extensions.*
 import java.awt.Color
 
-class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style){
+class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style) {
     var focused = false
     var color = 0
         private set
@@ -13,13 +13,15 @@ class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style){
     var hsb = floatArrayOf(0f, 0f, 0f)
 
     fun updateHSB() =
-            Color.RGBtoHSB(style.swatchColor.getRed(), style.swatchColor.getGreen(), style.swatchColor.getBlue(), hsb)
+        Color.RGBtoHSB(style.swatchColor.getRed(), style.swatchColor.getGreen(), style.swatchColor.getBlue(), hsb)
 
     fun getActiveColor() =
-            UICore.instance.coreCallback.getPixelColor(
-                    UICore.mouseX.coerceAtLeast(relX + getParentXOffset()).coerceAtMost(relX + relWidth + getParentXOffset() - 1f),
-                    UICore.mouseY.coerceAtLeast(relY + getParentYOffset() + 2f).coerceAtMost(relY + relWidth + getParentYOffset())
-            )
+        UICore.instance.coreCallback.getPixelColor(
+            UICore.mouseX.coerceAtLeast(relX + getParentXOffset())
+                .coerceAtMost(relX + relWidth + getParentXOffset() - 1f),
+            UICore.mouseY.coerceAtLeast(relY + getParentYOffset() + 2f)
+                .coerceAtMost(relY + relWidth + getParentYOffset())
+        )
 
     fun adjustHue(hue: Float) {
         updateHSB()
@@ -41,7 +43,19 @@ class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style){
             color(style.swatchColor)
             rect(relX, relY, relWidth, relHeight)
             renderer.linearGradient(x, y, relWidth, relHeight, 0f, x, y, x + relWidth, y, -1, asRGBA(0, 0, 0, 0))
-            renderer.linearGradient(x, y, relWidth, relHeight, 0f, x, y, x, y + relHeight, asRGBA(0, 0, 0, 0), asRGBA(0, 0, 0))
+            renderer.linearGradient(
+                x,
+                y,
+                relWidth,
+                relHeight,
+                0f,
+                x,
+                y,
+                x,
+                y + relHeight,
+                asRGBA(0, 0, 0, 0),
+                asRGBA(0, 0, 0)
+            )
         }
     }
 

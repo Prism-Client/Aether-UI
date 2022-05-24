@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui.renderer.impl.font
 
-import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
@@ -9,7 +8,6 @@ import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.util.extensions.align
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
-import kotlin.math.max
 
 /**
  * [UIFont] is a renderer which renders a component's font.

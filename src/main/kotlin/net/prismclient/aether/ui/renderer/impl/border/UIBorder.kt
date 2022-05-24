@@ -19,7 +19,7 @@ open class UIBorder : UICopy<UIBorder> {
     open fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
         renderer {
             stroke(borderColor, borderWidth, borderDirection) {
-                rect(x, y, width,height, radius)
+                rect(x, y, width, height, radius)
             }
         }
     }

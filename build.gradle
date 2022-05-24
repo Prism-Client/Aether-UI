@@ -1,8 +1,9 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.0-Beta'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.0-RC'
     id 'java'
+    id 'maven-publish'
 }
 
 group 'net.prismclient'
@@ -29,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.0-RC'
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.21"
     implementation 'commons-io:commons-io:2.11.0'
 
@@ -58,5 +59,16 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 compileKotlin {
     kotlinOptions {
         languageVersion = "1.7"
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.Prism-Client'
+            artifactId = 'Aether-UI'
+            version = '0.1-release'
+            from components.kotlin
+        }
     }
 }

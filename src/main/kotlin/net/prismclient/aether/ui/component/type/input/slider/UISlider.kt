@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.component.type.input.slider
 
-import net.prismclient.aether.UICore
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.component.UIComponent
 import java.util.function.Consumer
 import kotlin.math.roundToInt
@@ -19,7 +19,8 @@ import kotlin.math.roundToInt
  * @param max The maximum value that the slider should be
  * @param step The value which the slider should step by
  */
-open class UISlider(value: Float, var min: Float, var max: Float, var step: Float, style: String) : UIComponent<UISliderSheet>(style) {
+open class UISlider(value: Float, var min: Float, var max: Float, var step: Float, style: String) :
+    UIComponent<UISliderSheet>(style) {
     var value: Float = value
         set(value) {
             val prev = this.value
@@ -29,8 +30,8 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
         }
 
     protected var normalizedValue = (value / (max - min))
-            .coerceAtLeast(0f)
-            .coerceAtMost(1f)
+        .coerceAtLeast(0f)
+        .coerceAtMost(1f)
     protected var offsetX = 0f
     protected var selected = false
 
@@ -45,7 +46,8 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
     override fun mouseMoved(mouseX: Float, mouseY: Float) {
         super.mouseMoved(mouseX, mouseY)
         if (selected) { // I got lazy
-            normalizedValue = (((UICore.mouseX - offsetX - style.sliderControl.cachedX)) / (relWidth - style.sliderControl.cachedWidth))
+            normalizedValue =
+                (((UICore.mouseX - offsetX - style.sliderControl.cachedX)) / (relWidth - style.sliderControl.cachedWidth))
                     .coerceAtLeast(0f)
                     .coerceAtMost(1f)
             updateSlider()
@@ -56,11 +58,12 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
         super.mouseClicked(mouseX, mouseY)
 
         if (isWithinBounds(
-                        style.sliderControl.cachedX + style.sliderControl.offsetX,
-                        style.sliderControl.cachedY + style.sliderControl.offsetY,
-                        style.sliderControl.cachedWidth,
-                        style.sliderControl.cachedHeight
-        )) {
+                style.sliderControl.cachedX + style.sliderControl.offsetX,
+                style.sliderControl.cachedY + style.sliderControl.offsetY,
+                style.sliderControl.cachedWidth,
+                style.sliderControl.cachedHeight
+            )
+        ) {
             offsetX = UICore.mouseX - (style.sliderControl.cachedX + style.sliderControl.offsetX)
             selected = true
         }

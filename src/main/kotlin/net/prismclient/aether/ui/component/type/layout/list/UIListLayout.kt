@@ -13,9 +13,9 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
  * @since 5/20/2022
  */
 open class UIListLayout @JvmOverloads constructor(
-        var listDirection: ListDirection = ListDirection.Vertical,
-        var listOrientation: ListOrientation = ListOrientation.Forward,
-        style: String
+    var listDirection: ListDirection = ListDirection.Vertical,
+    var listOrientation: ListOrientation = Forward,
+    style: String
 ) : UIContainer<UIContainerSheet>(style) {
 
     override fun updateLayout() {

@@ -21,7 +21,7 @@ class UIRectangle : UIShape() {
     }
 
     override fun copy(): UIShape =
-            UIRectangle().also {
-                it.radius = radius?.copy()
-            }.apply(this)
+        UIRectangle().also {
+            it.radius = radius?.copy()
+        }.apply(this)
 }

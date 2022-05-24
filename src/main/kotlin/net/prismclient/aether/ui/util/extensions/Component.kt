@@ -14,7 +14,8 @@ inline fun create(block: UIComponentDSL.() -> Unit) {
     UIComponentDSL.block()
 }
 
-inline fun style(name: String, block: UIStyleSheet.() -> Unit) = UIStyleSheet().also { it.name = name; it.block(); UIProvider.registerStyle(it) }
+inline fun style(name: String, block: UIStyleSheet.() -> Unit) =
+    UIStyleSheet().also { it.name = name; it.block(); UIProvider.registerStyle(it) }
 
 inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) = sheet.also {
     it.name = name
@@ -23,7 +24,7 @@ inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit)
 }
 
 fun radius(radius: Float): UIRadius =
-        UIRadius().also { it.set(radius) }
+    UIRadius().also { it.set(radius) }
 
 inline fun <T : UIAnimation<*>> animation(animation: T, block: T.() -> Unit) =
-        animation.also(block).also { UIProvider.registerAnimation(it) }
+    animation.also(block).also { UIProvider.registerAnimation(it) }

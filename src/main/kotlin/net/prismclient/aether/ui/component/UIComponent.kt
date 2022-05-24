@@ -1,8 +1,7 @@
 package net.prismclient.aether.ui.component
 
-import net.prismclient.aether.UICore
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
@@ -14,7 +13,6 @@ import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
 import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIKey
-import net.prismclient.aether.ui.util.extensions.calculateX
 import net.prismclient.aether.ui.util.extensions.calculateY
 import net.prismclient.aether.ui.util.extensions.renderer
 import java.util.function.Consumer

@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui.component.type.layout.styles
 
-import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit

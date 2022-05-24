@@ -1,4 +1,4 @@
-package net.prismclient.aether
+package net.prismclient.aether.ui
 
 import net.prismclient.aether.ui.callback.UICoreCallback
 import net.prismclient.aether.ui.component.UIComponent
@@ -37,15 +37,6 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
 
     val updateThreads = Executors.newFixedThreadPool(1)
     val animationLock = Semaphore(0)
-//    val animationThread = Thread {
-//        while (true) {
-//            animationLock.acquire()
-//            UIProvider.updateAnimations()
-//        }
-//    }.also {
-//        it.name = "Animation-Thread"
-//        //it.start()
-//    }
 
     var focusedComponent: UIComponent<*>? = null
 

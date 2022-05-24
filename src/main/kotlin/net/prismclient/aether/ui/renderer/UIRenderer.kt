@@ -42,11 +42,20 @@ abstract class UIRenderer {
     @JvmField
     protected var strokeColor: Int = 0
 
+    @JvmField
+    protected var line = false
+
+    @JvmField var lineX = 0f
+    @JvmField var lineY = 0f
+
+    @JvmField
+    protected var lineCap: Int = BUTT
+
+    @JvmField
+    protected var lineJoin: Int = MITER
+
     companion object Properties {
         /* Font */
-        /**
-         * A font can be aligned using the Kotlin: "or" Java: "|" function
-         */
         const val ALIGNLEFT = 1
         const val ALIGNCENTER = 2
         const val ALIGNRIGHT = 4
@@ -62,6 +71,14 @@ abstract class UIRenderer {
         const val FLIPY = 4
         const val PREMULTIPLIED = 8
         const val NEAREST = 16
+
+        /* Line Cap/Join */
+        const val BUTT = 0
+        const val ROUND = 1
+        const val SQUARE = 2
+        const val BEVEL = 3
+        const val MITER = 4
+
     }
 
     /**
@@ -138,7 +155,6 @@ abstract class UIRenderer {
      */
     abstract fun unbindContentFBO()
 
-    // TODO: Document + UIRendererDSL
     /**
      * TODO
      */
@@ -260,10 +276,14 @@ abstract class UIRenderer {
      */
     abstract fun ellipse(x: Float, y: Float, width: Float, height: Float)
 
-    /**
-     * Renders a triangle
-     */
     abstract fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float)
+
+    /** Line  **/
+    abstract fun startLine(x: Float, y: Float, lineCap: Int, lineJoin: Int, lineWidth: Float)
+
+    abstract fun line(x: Float, y: Float)
+
+    abstract fun finishLine()
 
     /**
      * Renders a rounded rectangle linear gradient
@@ -329,17 +349,6 @@ abstract class UIRenderer {
         color2: Int
     )
 
-//    /**
-//     * Loads an image based on the given file location into [imageName] with the given [imageFlags]
-//     *
-//     * @param imageName The unique name of the image
-//     * @param imageData A ByteBuffer containing the data of the image
-//     * @param imageFlags The flags provided to load the image
-//     * @see Properties Image section
-//     * @return Returns if the image was sucessfully loaded or not
-//     */
-//    abstract fun loadImage(imageName: String, imageData: ByteBuffer?, imageFlags: Int): Boolean
-
     /**
      * Loads an image from an existing UILoadableImage
      *
@@ -371,7 +380,17 @@ abstract class UIRenderer {
      * @param height
      * @param radius
      */
-    abstract fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float)
+    abstract fun renderImage(
+        imageName: String,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    )
 
     /**
      * Loads a font from the provided file location into the provided [fontName]
