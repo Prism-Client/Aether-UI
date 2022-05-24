@@ -11,4 +11,4 @@ import net.prismclient.aether.ui.unit.UIUnit
  * @author sen
  * @since 4/5/2022
  */
-class UIRelativeUnit(value: Float, type: Byte): UIUnit(value, type)
+class UIRelativeUnit(value: Float, type: Byte) : UIUnit(value, type)

@@ -33,10 +33,12 @@ open class UIContainerSheet : UIFrameSheet() {
          * Does not introduce a scrollbar on the given axis
          */
         None,
+
         /**
          * Creates a scrollbar on the given axis regardless if content leaves the window
          */
         Always,
+
         /**
          * Like scroll, but only adds the scrollbar on the given axis if content leaves the window
          */

@@ -1,7 +1,8 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.UICore.Companion.activeScreen
-import net.prismclient.aether.UICore.Companion.instance
+import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.UICore.Companion.activeScreen
+import net.prismclient.aether.ui.UICore.Companion.instance
 import net.prismclient.aether.ui.callback.UICoreCallback
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.asRGBA

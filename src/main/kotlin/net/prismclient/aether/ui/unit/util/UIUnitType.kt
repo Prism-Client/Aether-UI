@@ -78,6 +78,7 @@ const val HEIGHTANIM: Byte = 14
  * Unique to [UIImage] components. Represents the width of the loaded image
  */
 const val IMAGEWIDTH: Byte = 15
+
 /**
  * Unique to [UIImage] components. Represents the height of the loaded image
  */

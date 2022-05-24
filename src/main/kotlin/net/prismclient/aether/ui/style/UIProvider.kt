@@ -57,7 +57,7 @@ object UIProvider {
     @JvmOverloads
     fun getStyle(styleName: String, original: Boolean = false): UIStyleSheet {
         val style = styles[styleName]
-                ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
+            ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
         return if (original) style else style.copy()
     }
 

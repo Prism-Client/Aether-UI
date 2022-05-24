@@ -125,7 +125,8 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
     }
 
     @JvmOverloads
-    inline fun background(color: Int, block: UIBackground.() -> Unit = {}) = background { this.color = color; this.block() }
+    inline fun background(color: Int, block: UIBackground.() -> Unit = {}) =
+        background { this.color = color; this.block() }
 
     inline fun background(block: UIBackground.() -> Unit) {
         background = background ?: UIBackground()

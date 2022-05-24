@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui.animation
 
-import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.animation.util.UIIEase
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIProvider
@@ -26,8 +25,8 @@ import java.util.function.Consumer
  * @since 3/5/2022
  */
 abstract class UIAnimation<T>(
-        val name: String,
-        var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
+    val name: String,
+    var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
 ) : UICopy<UIAnimation<T>> where T : UIStyleSheet, T : UIIEase {
     val lifetime = System.currentTimeMillis()
     val timeline: ArrayList<T> = ArrayList()
@@ -190,7 +189,7 @@ abstract class UIAnimation<T>(
      * Returns null if type is INITIAL, as a component cannot have it set to that type
      */
     protected operator fun UIUnit?.unaryPlus(): UIUnit? =
-            if (this?.type == INITIAL) null else this
+        if (this?.type == INITIAL) null else this
 
     fun first(event: Consumer<UIAnimation<T>>) {
         if (onCreationListeners == null)

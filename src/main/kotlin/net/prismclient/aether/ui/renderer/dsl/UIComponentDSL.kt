@@ -135,7 +135,7 @@ object UIComponentDSL {
      * @param block The DSL block to configure [T]
      */
     inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) =
-            net.prismclient.aether.ui.util.extensions.style(sheet, name, block)
+        net.prismclient.aether.ui.util.extensions.style(sheet, name, block)
 
     /** Components **/
 
@@ -153,46 +153,71 @@ object UIComponentDSL {
     /** Label Components **/
     @JvmOverloads
     inline fun h1(text: String, block: UILabel.() -> Unit = {}) =
-            component(UILabel(text, "h1"), block)
+        component(UILabel(text, "h1"), block)
 
     @JvmOverloads
     inline fun h2(text: String, block: UILabel.() -> Unit = {}) =
-            component(UILabel(text, "h2"), block)
+        component(UILabel(text, "h2"), block)
 
     @JvmOverloads
     inline fun h3(text: String, block: UILabel.() -> Unit = {}) =
-            component(UILabel(text, "h3"), block)
+        component(UILabel(text, "h3"), block)
 
     @JvmOverloads
     inline fun p(text: String, block: UILabel.() -> Unit) =
-            component(UILabel(text, "p"), block)
+        component(UILabel(text, "p"), block)
 
     /** Button **/
     @JvmOverloads
     inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) =
-            component(UIButton<UIStyleSheet>(text, style!!), block)
+        component(UIButton<UIStyleSheet>(text, style!!), block)
 
     /** Input **/
     @JvmOverloads
-    inline fun slider(value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}) =
-            component(UISlider(value, min, max, step, style!!), block)
+    inline fun slider(
+        value: Float,
+        min: Float,
+        max: Float,
+        step: Float,
+        style: String? = activeStyle,
+        block: UISlider.() -> Unit = {}
+    ) =
+        component(UISlider(value, min, max, step, style!!), block)
+
     @JvmOverloads
-    inline fun textField(text: String, placeholder: String, inputFlavor: UITextField.TextFlavor, maxLength: Int = -1, style: String? = activeStyle, block: UITextField.() -> Unit) =
-            component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
+    inline fun textField(
+        text: String,
+        placeholder: String,
+        inputFlavor: UITextField.TextFlavor,
+        maxLength: Int = -1,
+        style: String? = activeStyle,
+        block: UITextField.() -> Unit
+    ) =
+        component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
 
     /** Other **/
     @JvmOverloads
-    inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) =
-            component(UIImage(imageName, imageLocation, style!!), block)
+    inline fun image(
+        imageName: String,
+        imageLocation: String,
+        style: String? = activeStyle,
+        block: UIImage.() -> Unit = {}
+    ) =
+        component(UIImage(imageName, imageLocation, style!!), block)
 
     /** Layout **/
     @JvmOverloads
     inline fun container(style: String? = activeStyle, block: UIContainer<UIContainerSheet>.() -> Unit) =
-            component(UIContainer(style!!), block)
+        component(UIContainer(style!!), block)
 
     @JvmOverloads
-    inline fun list(listDirection: UIListLayout.ListDirection, listOrientation: UIListLayout.ListOrientation, style: String? = activeStyle, block: UIListLayout.() -> Unit) =
-            component(UIListLayout(listDirection, listOrientation, style!!), block)
+    inline fun list(
+        listDirection: UIListLayout.ListDirection,
+        listOrientation: UIListLayout.ListOrientation,
+        style: String? = activeStyle,
+        block: UIListLayout.() -> Unit
+    ) =
+        component(UIListLayout(listDirection, listOrientation, style!!), block)
 
     /**
      * Returns an ArrayList of components created

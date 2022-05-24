@@ -6,7 +6,8 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class UISine(duration: Long = 1000L, animationDirection: UIEaseDirection = UIEaseDirection.INOUT) : UIEase(duration, animationDirection) {
+class UISine(duration: Long = 1000L, animationDirection: UIEaseDirection = UIEaseDirection.INOUT) :
+    UIEase(duration, animationDirection) {
     override fun getValue(): Double {
         val x = this.get().toDouble()
 

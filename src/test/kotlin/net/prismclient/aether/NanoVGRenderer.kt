@@ -1,7 +1,7 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.UICore.Companion.contentScaleX
-import net.prismclient.aether.UICore.Companion.contentScaleY
+import net.prismclient.aether.ui.UICore.Companion.contentScaleX
+import net.prismclient.aether.ui.UICore.Companion.contentScaleY
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
@@ -16,11 +16,11 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
+import java.lang.Float.max
 import java.nio.ByteBuffer
 
 /**
- * [DefaultRenderer] is an example implementation for the renderer
- * of Aether UI which uses NanoVG.
+ * [NanoVGRenderer] is the default renderer implementation for Aether
  *
  * @author sen
  * @since 4/23/2022
@@ -47,16 +47,18 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
-        val contentScale = Math.max(contentScaleX, contentScaleY)
+        val contentScale = max(contentScaleX, contentScaleY)
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
-                ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
-                NanoVG.NVG_IMAGE_REPEATX or NanoVG.NVG_IMAGE_REPEATY
+            ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
+            NanoVG.NVG_IMAGE_REPEATX or NanoVG.NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
-                framebuffer.fbo(),
-                width * contentScale,
-                height * contentScale,
-                contentScale
+            framebuffer.fbo(),
+            width * contentScale,
+            height * contentScale,
+            width,
+            height,
+            contentScale
         )
         fbos[fbo] = framebuffer
         return fbo
@@ -83,7 +85,17 @@ class NanoVGRenderer : UIRenderer() {
         NanoVGGL3.nvgluBindFramebuffer(ctx, null)
     }
 
-    override fun renderFBO(fbo: UIContentFBO, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) {
+    override fun renderFBO(
+        fbo: UIContentFBO,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) {
         val cs = fbo.contentScale
         NanoVG.nvgImagePattern(ctx, x, y, width, height, 0f, fbos[fbo]!!.image(), 1f, paint)
         NanoVG.nvgBeginPath(ctx)
@@ -97,7 +109,13 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun stroke(strokeWidth: Float, strokeColor: Int) {
         super.stroke(strokeWidth, strokeColor)
-        NanoVG.nvgRGBA(strokeColor.getRed().toByte(), strokeColor.getGreen().toByte(), strokeColor.getBlue().toByte(), strokeColor.getAlpha().toByte(), outlineColor)
+        NanoVG.nvgRGBA(
+            strokeColor.getRed().toByte(),
+            strokeColor.getGreen().toByte(),
+            strokeColor.getBlue().toByte(),
+            strokeColor.getAlpha().toByte(),
+            outlineColor
+        )
     }
 
     override fun save() {
@@ -128,7 +146,16 @@ class NanoVGRenderer : UIRenderer() {
         NanoVG.nvgScissor(ctx, x, y, width, height)
     }
 
-    override fun rect(x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) {
+    override fun rect(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) {
         NanoVG.nvgBeginPath(ctx)
         if (width <= 1f || height <= 1f) {
             // Rendering 1px and below causes half transparent draws
@@ -139,16 +166,70 @@ class NanoVGRenderer : UIRenderer() {
         check()
     }
 
-    override fun linearGradient(x: Float, y: Float, width: Float, height: Float, radius: Float, gradientX: Float, gradientY: Float, gradientWidth: Float, gradientHeight: Float, color1: Int, color2: Int) {
-        linearGradient(x, y, width, height, radius, radius, radius, radius, gradientX, gradientY, gradientWidth, gradientHeight, color1, color2)
+    override fun linearGradient(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        radius: Float,
+        gradientX: Float,
+        gradientY: Float,
+        gradientWidth: Float,
+        gradientHeight: Float,
+        color1: Int,
+        color2: Int
+    ) {
+        linearGradient(
+            x,
+            y,
+            width,
+            height,
+            radius,
+            radius,
+            radius,
+            radius,
+            gradientX,
+            gradientY,
+            gradientWidth,
+            gradientHeight,
+            color1,
+            color2
+        )
     }
 
-    override fun linearGradient(x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float, gradientX: Float, gradientY: Float, gradientWidth: Float, gradientHeight: Float, color1: Int, color2: Int) {
+    override fun linearGradient(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float,
+        gradientX: Float,
+        gradientY: Float,
+        gradientWidth: Float,
+        gradientHeight: Float,
+        color1: Int,
+        color2: Int
+    ) {
         val c1 = NVGColor.calloc()
         val c2 = NVGColor.calloc()
         val p = NVGPaint.calloc()
-        NanoVG.nvgRGBA(color1.getRed().toByte(), color1.getGreen().toByte(), color1.getBlue().toByte(), color1.getAlpha().toByte(), c1)
-        NanoVG.nvgRGBA(color2.getRed().toByte(), color2.getGreen().toByte(), color2.getBlue().toByte(), color2.getAlpha().toByte(), c2)
+        NanoVG.nvgRGBA(
+            color1.getRed().toByte(),
+            color1.getGreen().toByte(),
+            color1.getBlue().toByte(),
+            color1.getAlpha().toByte(),
+            c1
+        )
+        NanoVG.nvgRGBA(
+            color2.getRed().toByte(),
+            color2.getGreen().toByte(),
+            color2.getBlue().toByte(),
+            color2.getAlpha().toByte(),
+            c2
+        )
         NanoVG.nvgLinearGradient(ctx, gradientX, gradientY, gradientWidth, gradientHeight, c1, c2, p)
         NanoVG.nvgBeginPath(ctx)
         NanoVG.nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
@@ -220,14 +301,20 @@ class NanoVGRenderer : UIRenderer() {
         val h = (img.height() * scale).toInt()
         val rast = MemoryUtil.memAlloc(w * h * 4)
         NanoSVG.nsvgRasterize(
-                rasterizer,
-                img, 0f, 0f,
-                scale,
-                rast, w, h,
-                w * 4
+            rasterizer,
+            img, 0f, 0f,
+            scale,
+            rast, w, h,
+            w * 4
         )
         NanoSVG.nsvgDeleteRasterizer(rasterizer)
-        image.handle = NanoVG.nvgCreateImageRGBA(ctx, w, h, NanoVG.NVG_IMAGE_REPEATX or NanoVG.NVG_IMAGE_REPEATY or NanoVG.NVG_IMAGE_GENERATE_MIPMAPS, rast)
+        image.handle = NanoVG.nvgCreateImageRGBA(
+            ctx,
+            w,
+            h,
+            NanoVG.NVG_IMAGE_REPEATX or NanoVG.NVG_IMAGE_REPEATY or NanoVG.NVG_IMAGE_GENERATE_MIPMAPS,
+            rast
+        )
         image.width = w.toFloat()
         image.height = h.toFloat()
         image.loaded = true
@@ -235,7 +322,17 @@ class NanoVGRenderer : UIRenderer() {
         return image
     }
 
-    override fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) {
+    override fun renderImage(
+        imageName: String,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) {
         val img = getImage(imageName)
         var handle = 0
         if (img != null) handle = img.handle

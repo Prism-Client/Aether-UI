@@ -371,7 +371,17 @@ abstract class UIRenderer {
      * @param height
      * @param radius
      */
-    abstract fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float)
+    abstract fun renderImage(
+        imageName: String,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    )
 
     /**
      * Loads a font from the provided file location into the provided [fontName]

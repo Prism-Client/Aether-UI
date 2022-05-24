@@ -20,15 +20,20 @@ class UIImage(var name: String, val image: UIImageData, style: String) : UICompo
     /**
      * Loads am image or svg from the specified location with a given name
      */
-    constructor(name: String, location: String, style: String) : this(name, UIRendererDSL.assumeLoadImage(name, location), style)
+    constructor(name: String, location: String, style: String) : this(
+        name,
+        UIRendererDSL.assumeLoadImage(name, location),
+        style
+    )
 
     override fun renderComponent() {
         renderer {
-            renderImage(name, x, y, width, height,
-                    style.imageRadius?.topLeft ?: 0f,
-                    style.imageRadius?.topRight ?: 0f,
-                    style.imageRadius?.bottomRight ?: 0f,
-                    style.imageRadius?.bottomLeft ?: 0f,
+            renderImage(
+                name, x, y, width, height,
+                style.imageRadius?.topLeft ?: 0f,
+                style.imageRadius?.topRight ?: 0f,
+                style.imageRadius?.bottomRight ?: 0f,
+                style.imageRadius?.bottomLeft ?: 0f,
             )
         }
     }

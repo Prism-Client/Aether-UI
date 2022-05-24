@@ -70,7 +70,10 @@ open class UIDefaultAnimation(
                     prog
                 )
                 c.style.background!!.border!!.borderWidth =
-                    (ap.background?.border?.borderWidth ?: background!!.border!!.borderWidth) + (((p.background?.border?.borderWidth ?: background!!.border!!.borderWidth) - (ap.background?.border?.borderWidth ?: background!!.border!!.borderWidth)) * prog)
+                    (ap.background?.border?.borderWidth
+                        ?: background!!.border!!.borderWidth) + (((p.background?.border?.borderWidth
+                        ?: background!!.border!!.borderWidth) - (ap.background?.border?.borderWidth
+                        ?: background!!.border!!.borderWidth)) * prog)
             }
         }
     }
@@ -96,19 +99,22 @@ open class UIDefaultAnimation(
     }
 
     inline fun keyframe(block: UIAnimationSheet.() -> Unit = {}): UIAnimationSheet =
-            keyframe(UIAnimationSheet(), block)
+        keyframe(UIAnimationSheet(), block)
 
     inline fun keyframe(ease: UIEase, block: UIAnimationSheet.() -> Unit = {}) =
-            keyframe(block).also { it.ease = ease }
+        keyframe(block).also { it.ease = ease }
 
     inline fun keyframe(ease: UIEase, delay: Long, block: UIAnimationSheet.() -> Unit = {}) =
-            keyframe(block).also { it.ease = ease; it.ease.delay = delay }
+        keyframe(block).also { it.ease = ease; it.ease.delay = delay }
 
     inline fun keyframe(ease: UIEase, keep: Boolean, block: UIAnimationSheet.() -> Unit = {}) =
-            keyframe(ease, keep, 0L, block)
+        keyframe(ease, keep, 0L, block)
 
     inline fun keyframe(ease: UIEase, keep: Boolean, delay: Long, block: UIAnimationSheet.() -> Unit = {}) =
-            keyframe(block).also { it.ease = ease; it.ease.delay = delay; it.animationResult = if (keep) UIAnimationResult.Retain else UIAnimationResult.Reset }
+        keyframe(block).also {
+            it.ease = ease; it.ease.delay = delay; it.animationResult =
+            if (keep) UIAnimationResult.Retain else UIAnimationResult.Reset
+        }
 
     override fun copy(): UIAnimation<UIAnimationSheet> = UIDefaultAnimation(name, priority).also {
         it.apply(this)

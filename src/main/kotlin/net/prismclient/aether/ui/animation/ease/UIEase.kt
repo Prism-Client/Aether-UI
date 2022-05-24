@@ -41,7 +41,9 @@ abstract class UIEase(var duration: Long = 1000L, var animationDirection: UIEase
             .coerceAtMost(1f)
             .coerceAtLeast(0f)
             .also {
-                if (it >= 1f) { finish() }
+                if (it >= 1f) {
+                    finish()
+                }
             }
     }
 
