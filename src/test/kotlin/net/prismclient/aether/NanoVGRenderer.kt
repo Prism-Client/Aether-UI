@@ -11,7 +11,10 @@ import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.extensions.getBlue
 import net.prismclient.aether.ui.util.extensions.getGreen
 import net.prismclient.aether.ui.util.extensions.getRed
+import org.lwjgl.*
 import org.lwjgl.nanovg.*
+import org.lwjgl.nanovg.NanoVG.nvgLinearGradient
+import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.opengl.GL11
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
@@ -33,16 +36,16 @@ class NanoVGRenderer : UIRenderer() {
     private val outlineColor = NVGColor.create()
     private val paint = NVGPaint.create()
     override fun beginFrame(width: Float, height: Float, devicePixelRatio: Float) {
-        NanoVG.nvgBeginFrame(ctx, width, height, devicePixelRatio)
+        nvgBeginFrame(ctx, width, height, devicePixelRatio)
     }
 
     override fun endFrame() {
-        NanoVG.nvgEndFrame(ctx)
+        nvgEndFrame(ctx)
     }
 
     override fun color(color: Int) {
         super.color(color)
-        NanoVG.nvgRGBA(r().toByte(), g().toByte(), b().toByte(), a().toByte(), this.color)
+        nvgRGBA(r().toByte(), g().toByte(), b().toByte(), a().toByte(), this.color)
     }
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
@@ -50,7 +53,7 @@ class NanoVGRenderer : UIRenderer() {
         val contentScale = max(contentScaleX, contentScaleY)
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
-            NanoVG.NVG_IMAGE_REPEATX or NanoVG.NVG_IMAGE_REPEATY
+            NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
             framebuffer.fbo(),
@@ -97,19 +100,19 @@ class NanoVGRenderer : UIRenderer() {
         bottomLeft: Float
     ) {
         val cs = fbo.contentScale
-        NanoVG.nvgImagePattern(ctx, x, y, width, height, 0f, fbos[fbo]!!.image(), 1f, paint)
-        NanoVG.nvgBeginPath(ctx)
+        nvgImagePattern(ctx, x, y, width, height, 0f, fbos[fbo]!!.image(), 1f, paint)
+        nvgBeginPath(ctx)
         color(-1)
         paint.innerColor(color)
         paint.outerColor(color)
-        NanoVG.nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-        NanoVG.nvgFillPaint(ctx, paint)
-        NanoVG.nvgFill(ctx)
+        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+        nvgFillPaint(ctx, paint)
+        nvgFill(ctx)
     }
 
     override fun stroke(strokeWidth: Float, strokeColor: Int) {
         super.stroke(strokeWidth, strokeColor)
-        NanoVG.nvgRGBA(
+        nvgRGBA(
             strokeColor.getRed().toByte(),
             strokeColor.getGreen().toByte(),
             strokeColor.getBlue().toByte(),
@@ -119,31 +122,31 @@ class NanoVGRenderer : UIRenderer() {
     }
 
     override fun save() {
-        NanoVG.nvgSave(ctx)
+        nvgSave(ctx)
     }
 
     override fun restore() {
-        NanoVG.nvgRestore(ctx)
+        nvgRestore(ctx)
     }
 
     override fun translate(x: Float, y: Float) {
-        NanoVG.nvgTranslate(ctx, x, y)
+        nvgTranslate(ctx, x, y)
     }
 
     override fun rotate(angle: Float) {
-        NanoVG.nvgRotate(ctx, angle)
+        nvgRotate(ctx, angle)
     }
 
     override fun rotate(angle: Double) {
-        NanoVG.nvgRotate(ctx, Math.toRadians(angle).toFloat())
+        nvgRotate(ctx, Math.toRadians(angle).toFloat())
     }
 
     override fun scale(x: Float, y: Float) {
-        NanoVG.nvgScale(ctx, x, y)
+        nvgScale(ctx, x, y)
     }
 
     override fun scissor(x: Float, y: Float, width: Float, height: Float) {
-        NanoVG.nvgScissor(ctx, x, y, width, height)
+        nvgScissor(ctx, x, y, width, height)
     }
 
     override fun rect(
@@ -156,14 +159,30 @@ class NanoVGRenderer : UIRenderer() {
         bottomRight: Float,
         bottomLeft: Float
     ) {
-        NanoVG.nvgBeginPath(ctx)
+        nvgBeginPath(ctx)
         if (width <= 1f || height <= 1f) {
             // Rendering 1px and below causes half transparent draws
             // because of how NanoVG renders antialiasing
-            NanoVG.nvgShapeAntiAlias(ctx, false)
+            nvgShapeAntiAlias(ctx, false)
         }
-        NanoVG.nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
         check()
+    }
+
+    override fun startLine(x: Float, y: Float, lineCap: Int, lineJoin: Int, lineWidth: Float) {
+        nvgBeginPath(ctx)
+        nvgLineCap(ctx, lineCap)
+        nvgLineJoin(ctx, lineJoin)
+        nvgStrokeWidth(ctx, lineWidth)
+        nvgMoveTo(ctx, x, y)
+    }
+
+    override fun line(x: Float, y: Float) =
+        nvgLineTo(ctx, x, y)
+
+    override fun finishLine() {
+        nvgStrokeColor(ctx, color)
+        nvgStroke(ctx)
     }
 
     override fun linearGradient(
@@ -216,48 +235,48 @@ class NanoVGRenderer : UIRenderer() {
         val c1 = NVGColor.calloc()
         val c2 = NVGColor.calloc()
         val p = NVGPaint.calloc()
-        NanoVG.nvgRGBA(
+        nvgRGBA(
             color1.getRed().toByte(),
             color1.getGreen().toByte(),
             color1.getBlue().toByte(),
             color1.getAlpha().toByte(),
             c1
         )
-        NanoVG.nvgRGBA(
+        nvgRGBA(
             color2.getRed().toByte(),
             color2.getGreen().toByte(),
             color2.getBlue().toByte(),
             color2.getAlpha().toByte(),
             c2
         )
-        NanoVG.nvgLinearGradient(ctx, gradientX, gradientY, gradientWidth, gradientHeight, c1, c2, p)
-        NanoVG.nvgBeginPath(ctx)
-        NanoVG.nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-        NanoVG.nvgFillPaint(ctx, p)
-        NanoVG.nvgFill(ctx)
+        nvgLinearGradient(ctx, gradientX, gradientY, gradientWidth, gradientHeight, c1, c2, p)
+        nvgBeginPath(ctx)
+        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+        nvgFillPaint(ctx, p)
+        nvgFill(ctx)
         c1.free()
         c2.free()
         p.free()
     }
 
     override fun circle(x: Float, y: Float, radius: Float) {
-        NanoVG.nvgBeginPath(ctx)
-        NanoVG.nvgCircle(ctx, x, y, radius)
+        nvgBeginPath(ctx)
+        nvgCircle(ctx, x, y, radius)
         check()
     }
 
     override fun ellipse(x: Float, y: Float, width: Float, height: Float) {
-        NanoVG.nvgBeginPath(ctx)
-        NanoVG.nvgEllipse(ctx, x, y, width, height)
+        nvgBeginPath(ctx)
+        nvgEllipse(ctx, x, y, width, height)
         check()
     }
 
     override fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) {
-        NanoVG.nvgBeginPath(ctx)
-        NanoVG.nvgMoveTo(ctx, x, y)
-        NanoVG.nvgLineTo(ctx, x1, y1)
-        NanoVG.nvgLineTo(ctx, x2, y2)
-        NanoVG.nvgLineTo(ctx, x, y)
+        nvgBeginPath(ctx)
+        nvgMoveTo(ctx, x, y)
+        nvgLineTo(ctx, x1, y1)
+        nvgLineTo(ctx, x2, y2)
+        nvgLineTo(ctx, x, y)
         check()
     }
 
@@ -274,7 +293,7 @@ class NanoVGRenderer : UIRenderer() {
             println("Failed to parse file. Is it corrupted?")
             return image
         }
-        image.handle = NanoVG.nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.buffer)
+        image.handle = nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.buffer)
         image.width = width[0].toFloat()
         image.height = height[0].toFloat()
         image.loaded = true
@@ -308,11 +327,11 @@ class NanoVGRenderer : UIRenderer() {
             w * 4
         )
         NanoSVG.nsvgDeleteRasterizer(rasterizer)
-        image.handle = NanoVG.nvgCreateImageRGBA(
+        image.handle = nvgCreateImageRGBA(
             ctx,
             w,
             h,
-            NanoVG.NVG_IMAGE_REPEATX or NanoVG.NVG_IMAGE_REPEATY or NanoVG.NVG_IMAGE_GENERATE_MIPMAPS,
+            NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY or NVG_IMAGE_GENERATE_MIPMAPS,
             rast
         )
         image.width = w.toFloat()
@@ -336,13 +355,13 @@ class NanoVGRenderer : UIRenderer() {
         val img = getImage(imageName)
         var handle = 0
         if (img != null) handle = img.handle
-        NanoVG.nvgImagePattern(ctx, x, y, width, height, 0f, handle, 1f, paint)
+        nvgImagePattern(ctx, x, y, width, height, 0f, handle, 1f, paint)
         paint.innerColor(color)
         paint.outerColor(color)
-        NanoVG.nvgBeginPath(ctx)
-        NanoVG.nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-        NanoVG.nvgFillPaint(ctx, paint)
-        NanoVG.nvgFill(ctx)
+        nvgBeginPath(ctx)
+        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+        nvgFillPaint(ctx, paint)
+        nvgFill(ctx)
     }
 
     override fun deleteImage(imageName: String) {
@@ -354,7 +373,7 @@ class NanoVGRenderer : UIRenderer() {
             println("Failed to load font $fontName as it was not found.")
             return false
         }
-        NanoVG.nvgCreateFontMem(ctx, fontName, fontData, 0)
+        nvgCreateFontMem(ctx, fontName, fontData, 0)
         return true
     }
 
@@ -363,20 +382,20 @@ class NanoVGRenderer : UIRenderer() {
     private val decender = floatArrayOf(0f)
     private val lineHeight = floatArrayOf(0f)
     override fun renderString(text: String, x: Float, y: Float) {
-        NanoVG.nvgFontBlur(ctx, 0f)
-        NanoVG.nvgFontFace(ctx, fontName)
-        NanoVG.nvgFontSize(ctx, fontSize)
-        NanoVG.nvgTextAlign(ctx, fontAlignment)
-        NanoVG.nvgFillColor(ctx, color)
-        NanoVG.nvgTextLetterSpacing(ctx, fontSpacing)
-        NanoVG.nvgText(ctx, x, y, text)
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgFillColor(ctx, color)
+        nvgTextLetterSpacing(ctx, fontSpacing)
+        nvgText(ctx, x, y, text)
     }
 
     private var wrapWidth = 0f
     private var wrapHeight = 0f
 
     init {
-        NanoVG.nvgRGBAf(0f, 0f, 0f, 0f, none)
+        nvgRGBAf(0f, 0f, 0f, 0f, none)
     }
 
     override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int {
@@ -384,24 +403,24 @@ class NanoVGRenderer : UIRenderer() {
         wrapWidth = 0f
 
         // Set the font state
-        NanoVG.nvgFontBlur(ctx, 0f)
-        NanoVG.nvgFontFace(ctx, fontName)
-        NanoVG.nvgFontSize(ctx, fontSize)
-        NanoVG.nvgTextAlign(ctx, fontAlignment)
-        NanoVG.nvgFillColor(ctx, color)
-        NanoVG.nvgTextLetterSpacing(ctx, fontSpacing)
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgFillColor(ctx, color)
+        nvgTextLetterSpacing(ctx, fontSpacing)
 
         // Calculate the rows
-        val nrows = NanoVG.nvgTextBreakLines(ctx, text, width, rows)
+        val nrows = nvgTextBreakLines(ctx, text, width, rows)
 
         // Get the metrics of the line
-        NanoVG.nvgTextMetrics(ctx, ascender, decender, lineHeight)
+        nvgTextMetrics(ctx, ascender, decender, lineHeight)
         var h = y
 
         // Iterate through the rows
         for (i in 0 until nrows) {
             val row = rows[i]
-            val w = NanoVG.nnvgText(ctx, x, h, row.start(), row.end()) - x // Render the text
+            val w = nnvgText(ctx, x, h, row.start(), row.end()) - x // Render the text
             wrapWidth = Math.max(wrapWidth, w)
             h += lineHeight[0] + splitHeight // Increase by the font height plus the split height
         }
@@ -410,27 +429,27 @@ class NanoVGRenderer : UIRenderer() {
     }
 
     override fun stringWidth(text: String): Float {
-        NanoVG.nvgFontBlur(ctx, 0f)
-        NanoVG.nvgFontFace(ctx, fontName)
-        NanoVG.nvgFontSize(ctx, fontSize)
-        NanoVG.nvgTextAlign(ctx, fontAlignment)
-        NanoVG.nvgFillColor(ctx, none)
-        NanoVG.nvgTextLetterSpacing(ctx, fontSpacing)
-        return NanoVG.nvgText(ctx, 0f, 0f, text)
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgFillColor(ctx, none)
+        nvgTextLetterSpacing(ctx, fontSpacing)
+        return nvgText(ctx, 0f, 0f, text)
     }
 
     override fun stringHeight(text: String): Float {
-        NanoVG.nvgTextMetrics(ctx, null, null, lineHeight)
+        nvgTextMetrics(ctx, null, null, lineHeight)
         return lineHeight[0]
     }
 
     override fun stringAscender(): Float {
-        NanoVG.nvgTextMetrics(ctx, ascender, null, null)
+        nvgTextMetrics(ctx, ascender, null, null)
         return ascender[0]
     }
 
     override fun stringDescender(): Float {
-        NanoVG.nvgTextMetrics(ctx, null, decender, null)
+        nvgTextMetrics(ctx, null, decender, null)
         return Math.abs(decender[0])
     }
 
@@ -443,14 +462,14 @@ class NanoVGRenderer : UIRenderer() {
     }
 
     private fun fill() {
-        NanoVG.nvgFillColor(ctx, color)
-        NanoVG.nvgFill(ctx)
+        nvgFillColor(ctx, color)
+        nvgFill(ctx)
     }
 
     private fun stroke() {
-        NanoVG.nvgStrokeWidth(ctx, strokeWidth)
-        NanoVG.nvgStrokeColor(ctx, outlineColor)
-        NanoVG.nvgStroke(ctx)
+        nvgStrokeWidth(ctx, strokeWidth)
+        nvgStrokeColor(ctx, outlineColor)
+        nvgStroke(ctx)
     }
 
     private fun check() {

@@ -6,8 +6,10 @@ import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ROUND
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.util.UIFontFamily
+import net.prismclient.aether.ui.util.extensions.renderer
 
 class ExampleScreen : UIScreen() {
     override fun initialize() {
@@ -40,5 +42,12 @@ class ExampleScreen : UIScreen() {
 
     override fun render() {
         super.render()
+        renderer {
+            color(-1)
+            line(50f, 50f, ROUND, ROUND, 4f) {
+                line(100f, 150f)
+                line(200f, 200f)
+            }
+        }
     }
 }

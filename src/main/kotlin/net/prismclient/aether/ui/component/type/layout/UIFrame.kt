@@ -1,10 +1,10 @@
 package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer
 
@@ -111,15 +111,15 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
             // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
             if (relWidth >= 1f || relHeight >= 1f) {
                 renderer.renderFBO(
-                    framebuffer,
-                    relX,
-                    relY,
-                    frameWidth,
-                    frameHeight,
-                    style.contentRadius?.topLeft ?: 0f,
-                    style.contentRadius?.topRight ?: 0f,
-                    style.contentRadius?.bottomRight ?: 0f,
-                    style.contentRadius?.bottomLeft ?: 0f
+                        framebuffer,
+                        relX,
+                        relY,
+                        frameWidth,
+                        frameHeight,
+                        style.contentRadius?.topLeft ?: 0f,
+                        style.contentRadius?.topRight ?: 0f,
+                        style.contentRadius?.bottomRight ?: 0f,
+                        style.contentRadius?.bottomLeft ?: 0f
                 )
             }
         }

@@ -209,24 +209,15 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     @JvmOverloads
     fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float =
-        calculateUnitX(this, width, ignore)
+            calculateUnitX(this, width, ignore)
 
     fun calculateUnitX(unit: UIUnit?, width: Float, ignore: Boolean): Float = if (unit == null) 0f else {
         calculateX(unit, this, width, ignore)
     }
 
     @JvmOverloads
-    fun calculateX(
-        unit: UIUnit?,
-        component: UIComponent<*>,
-        width: Float = component.getParentWidth(),
-        ignoreOperation: Boolean = false
-    ): Float {
-        return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) net.prismclient.aether.ui.util.extensions.calculateX(
-            unit,
-            component,
-            width
-        )
+    fun calculateX(unit: UIUnit?, component: UIComponent<*>, width: Float = component.getParentWidth(), ignoreOperation: Boolean = false): Float {
+        return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) net.prismclient.aether.ui.util.extensions.calculateX(unit, component, width)
         else when (unit.type) {
             PIXELS, PXANIMRELATIVE -> unit.value
             RELATIVE, RELANIMRELATIVE -> unit.value * width
@@ -243,37 +234,37 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     @JvmOverloads
     fun UIUnit?.getY(height: Float, ignore: Boolean = false) =
-        calculateUnitY(this, height, ignore)
+            calculateUnitY(this, height, ignore)
 
     fun calculateUnitY(unit: UIUnit?, height: Float, ignore: Boolean): Float = if (unit == null) 0f else {
         calculateY(unit, this, height, ignore)
     }
 
     fun getParentX() = if (parent != null)
-        if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
+            if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
 
     fun getParentY() = if (parent != null)
-        if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
+            if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
 
     fun getParentWidth() =
-        if (parent != null) parent!!.width else UICore.width
+            if (parent != null) parent!!.width else UICore.width
 
     fun getParentHeight() =
-        if (parent != null) parent!!.height else UICore.height
+            if (parent != null) parent!!.height else UICore.height
 
     fun getAnchorX() =
-        calculateUnitX(style.anchor.x, width, false)
+            calculateUnitX(style.anchor.x, width, false)
 
     fun getAnchorY() =
-        calculateUnitY(style.anchor.y, height, false)
+            calculateUnitY(style.anchor.y, height, false)
 
     // TODO: Cleanup this mess with mouse bubbling and stuff
 
     fun isMouseInside() =
-        (getMouseX() > x) &&
-                (getMouseY() > y) &&
-                (getMouseX() < x + width) &&
-                (getMouseY() < y + height)
+            (getMouseX() > x) &&
+            (getMouseY() > y) &&
+            (getMouseX() < x + width) &&
+            (getMouseY() < y + height)
 
     /**
      * Returns true if the mouse is inside the rel x, y, width and height
@@ -283,18 +274,18 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             (getMouseX() <= relX + relWidth) &&
             (getMouseY() <= relY + relHeight)) &&
             (parent == null ||
-                    (UICore.mouseX >= parent!!.relX) &&
-                    (UICore.mouseY >= parent!!.relY) &&
-                    (UICore.mouseX <= parent!!.relX + parent!!.relWidth) &&
-                    (UICore.mouseY <= parent!!.relY + parent!!.relHeight))
+            (UICore.mouseX >= parent!!.relX) &&
+            (UICore.mouseY >= parent!!.relY) &&
+            (UICore.mouseX <= parent!!.relX + parent!!.relWidth) &&
+            (UICore.mouseY <= parent!!.relY + parent!!.relHeight))
 
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 
     fun getMouseX(): Float =
-        UICore.mouseX - getParentXOffset()
+            UICore.mouseX - getParentXOffset()
 
     fun getMouseY(): Float =
-        UICore.mouseY - getParentYOffset()
+            UICore.mouseY - getParentYOffset()
 
     fun getParentXOffset(): Float {
         return (if (parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) {

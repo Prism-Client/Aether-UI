@@ -2,7 +2,9 @@ package net.prismclient.aether.ui.renderer.dsl
 
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.BUTT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.MIPMAP
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.MITER
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATX
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATY
 import net.prismclient.aether.ui.renderer.image.UIImageData
@@ -265,6 +267,11 @@ object UIRendererDSL {
         bottomLeft + halfsw
     )
 
+    /**
+     * Must be placed inside a [line] block
+     */
+    fun line(x: Float, y: Float) = renderer.line(x, y)
+
     fun ellipse(x: Float, y: Float, width: Float, height: Float) = renderer.ellipse(x, y, width - pos, height - pos)
 
     fun circle(x: Float, y: Float, radius: Float) = renderer.circle(x, y, radius - pos)
@@ -368,6 +375,18 @@ object UIRendererDSL {
         this.block()
         renderer.endFrame()
         renderer.unbindContentFBO()
+    }
+
+    /**
+     * Used to start a line path
+     *
+     * @param lineCap Accepts BUTT, ROUND, SQUARE
+     * @param lineJoin Accepts MITER, ROUND, BEVEL
+     */
+    inline fun line(x: Float, y: Float, lineCap: Int = BUTT, lineJoin: Int = MITER, lineWidth: Float = 1f, block: UIRendererDSL.() -> Unit) {
+        renderer.startLine(x, y, lineCap, lineJoin, lineWidth)
+        this.block()
+        renderer.finishLine()
     }
 
     /**
