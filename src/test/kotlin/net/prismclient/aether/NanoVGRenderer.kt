@@ -204,19 +204,15 @@ class NanoVGRenderer : UIRenderer() {
     override fun loadSVG(svgName: String, image: UIImageData, scale: Float): UIImageData {
         image.imageType = UIImageData.ImageType.Svg
         val img: NSVGImage?
-        val stack = MemoryStack.stackPush()
-
-        try {
+        val stack = MemoryStack.stackPush().use {
             if (image.buffer == null) {
                 println("Failed to load the svg: $svgName")
                 return image
             }
-            img = NanoSVG.nsvgParse(image.buffer, stack.ASCII("px"), 96f)
+            img = NanoSVG.nsvgParse(image.buffer, it.ASCII("px"), 96f)
             if (img == null) {
                 throw RuntimeException("Failed to parse SVG. name: $svgName, scale:$scale")
             }
-        } finally {
-            stack.pop()
         }
 
         val rasterizer = NanoSVG.nsvgCreateRasterizer()
