@@ -58,8 +58,8 @@ fun calculateX(
         EM -> unit.value * (component.style.font?.fontSize ?: 0f)
         ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
         DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
-        IMAGEWIDTH -> (component as UIImage).image.width * unit.value
-        IMAGEHEIGHT -> (component as UIImage).image.height * unit.value
+        IMAGEWIDTH -> ((component as UIImage).activeImage?.width ?: 0f) * unit.value
+        IMAGEHEIGHT -> ((component as UIImage).activeImage?.height ?: 0f) * unit.value
         else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
     }
 }
@@ -113,8 +113,8 @@ fun calculateY(unit: UIUnit?, component: UIComponent<*>, height: Float, ignoreOp
         EM -> unit.value * (component.style.font?.fontSize ?: 0f)
         ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
         DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
-        IMAGEWIDTH -> (component as UIImage).image.width * unit.value
-        IMAGEHEIGHT -> (component as UIImage).image.height * unit.value
+        IMAGEWIDTH -> ((component as UIImage).activeImage?.width ?: 0f) * unit.value
+        IMAGEHEIGHT -> ((component as UIImage).activeImage?.height ?: 0f) * unit.value
         else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
     }
 }

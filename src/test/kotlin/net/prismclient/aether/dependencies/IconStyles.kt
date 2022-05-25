@@ -9,8 +9,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
 class IconStyles : UIDependable() {
     override fun load() {
         renderer {
-            loadImage("background", "/images/background.png")
-            loadSvg("svg", "/aether/svg/message-text.svg", 4f)
+
         }
     }
 }

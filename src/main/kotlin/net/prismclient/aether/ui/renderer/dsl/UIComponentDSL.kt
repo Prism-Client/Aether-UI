@@ -24,8 +24,8 @@ import java.util.*
 object UIComponentDSL {
     private var components: ArrayList<UIComponent<*>>? = null
     private var frames: ArrayList<UIFrame<*>>? = null
-    private val frameStack = Stack<UIFrame<*>>()
-    private val styleStack = Stack<String>()
+    private var frameStack: Stack<UIFrame<*>>? = null
+    private var styleStack: Stack<String>? = null
     private var activeComponent: UIComponent<*>? = null
     private var activeFrame: UIFrame<*>? = null
     var activeStyle: String? = null
@@ -37,18 +37,20 @@ object UIComponentDSL {
     fun create() {
         components = ArrayList()
         frames = ArrayList()
+        frameStack = Stack()
+        styleStack = Stack()
     }
 
     /**
      * Frees any resources after creating the components.
      */
     fun finalize() {
-        frameStack.clear()
-        styleStack.clear()
-        activeComponent = null
-        activeFrame = null
         components = null
         frames = null
+        frameStack = null
+        styleStack = null
+        activeComponent = null
+        activeFrame = null
         activeStyle = null
     }
 
@@ -59,11 +61,11 @@ object UIComponentDSL {
     fun pushComponent(component: UIComponent<*>) {
         // If the active component is not null, then this
         // component's parent should be the active component
-        if (activeComponent != null) {
-            component.parent = activeComponent
-            insertComponent(component)
-            return
-        }
+//        if (activeComponent != null) {
+//            component.parent = activeComponent
+//            insertComponent(component)
+//            return
+//        }
 
         insertComponent(component)
 
@@ -71,7 +73,7 @@ object UIComponentDSL {
         // it as the active frame, and to the frame stack
         if (component is UIFrame<*>) {
             activeFrame = component
-            frameStack.add(component)
+            frameStack!!.add(component)
         } else {
             activeComponent = component
         }
@@ -81,12 +83,12 @@ object UIComponentDSL {
      * Removes the component as the active component / frame.
      */
     fun popComponent(component: UIComponent<*>) {
-        if (components == null || frames == null || frameStack == null) return
+        if (components == null || frames == null) return
         if (component is UIFrame<*>) {
-            if (frameStack.size != 0) {
-                frameStack.pop()
-                activeFrame = if (frameStack.size > 0) {
-                    frameStack.peek()
+            if (frameStack!!.size != 0) {
+                frameStack!!.pop()
+                activeFrame = if (frameStack!!.size > 0) {
+                    frameStack!!.peek()
                 } else null
             }
         }
@@ -97,6 +99,8 @@ object UIComponentDSL {
      * Inserts the component into the active frame or the components array.
      */
     private fun insertComponent(component: UIComponent<*>) {
+//        if (activeComponent != null)
+//            component.parent = activeComponent
         if (components == null || frames == null) return
         if (component is UIFrame<*>)
             frames!!.add(component)
@@ -164,7 +168,7 @@ object UIComponentDSL {
         component(UILabel(text, "h3"), block)
 
     @JvmOverloads
-    inline fun p(text: String, block: UILabel.() -> Unit) =
+    inline fun p(text: String, block: UILabel.() -> Unit = {}) =
         component(UILabel(text, "p"), block)
 
     /** Button **/
@@ -225,4 +229,9 @@ object UIComponentDSL {
     fun get(): ArrayList<UIComponent<*>> = components!!
 
     fun getFrames(): ArrayList<UIFrame<*>> = frames!!
+
+    /**
+     * Returns true if the Component DSL builder is active
+     */
+    fun isActive() = components != null
 }
