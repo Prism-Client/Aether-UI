@@ -33,9 +33,6 @@ open class UICheckbox(
             deselectedImage.style.imageColor = 0
         UIComponentDSL.pushComponent(selectedImage)
         UIComponentDSL.pushComponent(deselectedImage)
-
-        // Update the images
-        checkListeners?.forEach { it.accept(this, checked) }
     }
 
     override fun renderComponent() {}

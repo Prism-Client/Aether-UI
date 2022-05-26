@@ -12,14 +12,18 @@ import java.util.function.BiConsumer
  * @author sen
  * @since 5/24/2022
  */
-open class UISelectableButton<T : UIStyleSheet>(var checked: Boolean = false, text: String, style: String) : UIButton<T>(text, style) {
+open class UISelectableButton<T : UIStyleSheet>(checked: Boolean = false, text: String, style: String) : UIButton<T>(text, style) {
+    var checked = checked
+        set(value) {
+            field = value
+            checkListeners?.forEach { it.accept(this, checked) }
+        }
     var checkListeners: MutableList<BiConsumer<UISelectableButton<T>, Boolean>>? = null
 
     init {
         onMousePressed { _ ->
             if (isMouseInsideBoundingBox()) {
-                checked = !checked
-                checkListeners?.forEach { it.accept(this, checked) }
+                this.checked = !this.checked
             }
         }
     }
