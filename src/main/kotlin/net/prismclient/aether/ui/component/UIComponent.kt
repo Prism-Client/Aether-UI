@@ -43,7 +43,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var parent: UIComponent<*>? = null
     var animation: UIAnimation<*>? = null
     var overridden = false
-    var visible = false
+    var visible = true
 
     /** Component plot properties **/
     var x = 0f
@@ -170,6 +170,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun render() {
+        if (!visible) return
         updateAnimation()
         style.background?.render(relX, relY, relWidth, relHeight)
         renderer {

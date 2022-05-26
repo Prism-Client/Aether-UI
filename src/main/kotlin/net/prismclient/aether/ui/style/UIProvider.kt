@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.style
 
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.UIRenderer
@@ -90,4 +91,10 @@ object UIProvider {
             updateAnimations()
         }
     }
+
+    /**
+     * Returns a list of [UIComponent] with the parent of the provided [self]
+     */
+    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> =
+        UICore.activeScreen?.components?.filter { it.parent == self }?.toList() ?: mutableListOf()
 }

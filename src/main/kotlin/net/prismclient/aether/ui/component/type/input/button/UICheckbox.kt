@@ -4,19 +4,38 @@ import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.style.UIStyleSheet
 
-open class UICheckbox(checked: Boolean = false, var imageStyle: String, style: String) : UISelectableButton<UIStyleSheet>(checked, "", style) {
+open class UICheckbox(
+    checked: Boolean = false,
+    var selectedImageName: String = "checkbox",
+    var deselectedImageName: String = "",
+    var imageStyle: String,
+    style: String
+) : UISelectableButton<UIStyleSheet>(checked, "", style) {
     lateinit var selectedImage: UIImage
     lateinit var deselectedImage: UIImage
 
     init {
         onCheckChange { _, isSelected ->
-            //checkbox.image = if (isSelected) selectedImage else deselectedImage
+            if (isSelected) {
+                selectedImage.visible = true
+                deselectedImage.visible = false
+            } else {
+                selectedImage.visible = false
+                deselectedImage.visible = true
+            }
         }
     }
 
     override fun initialize() {
-        //checkbox = UIImage(selectedImage, imageStyle)
-        //UIComponentDSL.pushComponent(checkbox)
+        selectedImage = UIImage(selectedImageName, imageStyle)
+        deselectedImage = UIImage(deselectedImageName, imageStyle)
+        if (deselectedImageName.isEmpty()) // Make the deselected image invisible
+            deselectedImage.style.imageColor = 0
+        UIComponentDSL.pushComponent(selectedImage)
+        UIComponentDSL.pushComponent(deselectedImage)
+
+        // Update the images
+        checkListeners?.forEach { it.accept(this, checked) }
     }
 
     override fun renderComponent() {}

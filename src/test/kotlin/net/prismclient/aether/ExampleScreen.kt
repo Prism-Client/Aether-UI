@@ -29,14 +29,10 @@ class ExampleScreen : UIScreen() {
             style(UIImageSheet(), "image") {
                 control(UIAlignment.CENTER)
                 size(24f, 24f)
-                width = px(24)
-                height = px(24)
             }
 
-            component(UICheckbox(true, "image", "btn")) {
-                style {
-                    size(48f, 48f)
-                }
+            checkbox(true, imageStyle = "image", style = "btn") {
+                style { size(48f, 48f) }
 
                 onCheckChange { _, isSelected ->
                     println("Selected: $isSelected")

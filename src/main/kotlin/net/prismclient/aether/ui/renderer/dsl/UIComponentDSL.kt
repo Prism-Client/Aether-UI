@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.input.button.UIButton
+import net.prismclient.aether.ui.component.type.input.button.UICheckbox
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
@@ -149,8 +150,8 @@ object UIComponentDSL {
      */
     inline fun <T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
         pushComponent(component)
-        component.initialize()
         component.also(block)
+        component.initialize()
         popComponent(component)
         return component
     }
@@ -176,6 +177,25 @@ object UIComponentDSL {
     @JvmOverloads
     inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) =
         component(UIButton<UIStyleSheet>(text, style!!), block)
+
+    inline fun checkbox(
+        checked: Boolean = false,
+        selectedImageName: String = "checkbox",
+        imageStyle: String,
+        style: String? = null,
+        block: UICheckbox.() -> Unit
+    ) =
+        UIComponentDSL.checkbox(checked, selectedImageName, "", imageStyle, style, block)
+
+    inline fun checkbox(
+        checked: Boolean = false,
+        selectedImageName: String = "checkbox",
+        deselectedImageName: String = "",
+        imageStyle: String,
+        style: String? = activeStyle,
+        block: UICheckbox.() -> Unit
+    ) =
+        component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style!!), block)
 
     /** Input **/
     @JvmOverloads
