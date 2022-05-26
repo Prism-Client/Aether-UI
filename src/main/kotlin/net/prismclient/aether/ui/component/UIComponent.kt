@@ -52,6 +52,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     protected var mouseEnteredListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseLeaveListeners: MutableList<Consumer<UIComponent<*>>>? = null
 
+    open fun initialize() {
+
+    }
+
     /**
      * Invoked on creation, and screen resize
      */

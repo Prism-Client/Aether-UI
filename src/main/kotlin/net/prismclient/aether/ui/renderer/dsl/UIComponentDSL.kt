@@ -66,8 +66,7 @@ object UIComponentDSL {
 //            insertComponent(component)
 //            return
 //        }
-
-        insertComponent(component)
+        println("Pushing $component")
 
         // If the component is an instance of UIFrame<*>, add
         // it as the active frame, and to the frame stack
@@ -77,6 +76,10 @@ object UIComponentDSL {
         } else {
             activeComponent = component
         }
+
+        println("Active Component: $activeComponent, ActiveFrame: $activeFrame")
+
+        insertComponent(component)
     }
 
     /**
@@ -99,6 +102,8 @@ object UIComponentDSL {
      * Inserts the component into the active frame or the components array.
      */
     private fun insertComponent(component: UIComponent<*>) {
+        println("Added component: $component, Parent: ${component.parent}")
+
 //        if (activeComponent != null)
 //            component.parent = activeComponent
         if (components == null || frames == null) return
@@ -149,6 +154,7 @@ object UIComponentDSL {
      */
     inline fun <T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
         pushComponent(component)
+        component.initialize()
         component.also(block)
         popComponent(component)
         return component

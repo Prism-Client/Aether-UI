@@ -28,8 +28,6 @@ class ExampleScreen : UIScreen() {
             }
 
             style(UIImageSheet(), "image") {
-                control(UIAlignment.CENTER)
-                x = px(100)
                 width = px(50)
                 height = px(50)
             }
