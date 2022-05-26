@@ -7,6 +7,8 @@ import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
+import net.prismclient.aether.ui.renderer.impl.background.UIBackground
+import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
@@ -17,11 +19,31 @@ import net.prismclient.aether.ui.util.extensions.calculateY
 import net.prismclient.aether.ui.util.extensions.renderer
 import java.util.function.Consumer
 
+/**
+ * [UIComponent] is the superclass of all components. It accepts a [style], a
+ * string linked to an instance of [UIStyleSheet] specific to the component. A
+ * [UIStyleSheet] holds properties such as the desired x and y positions, background,
+ * and other properties depending on the type of [UIStyleSheet]. It is an inheritable
+ * class, and certain components may require a specific type of it to work correctly.
+ *
+ * [UIComponent] also has [x], [y], [width] and [height] properties, known as the
+ * absolute values. The [relX], [relY], [relWidth] and [relHeight], are known as relative
+ * values. The relative values are the normal property, except with the bounds of the
+ * component calculated and applied to it via the [calculateBounds] function. Bounds
+ * include the padding and margin properties of the component. Classes such as [UIBackground]
+ * render the background to the relative properties, while other classes such as [UIFont]
+ * render to the absolute properties.
+ *
+ * @author sen
+ * @since 1.0
+ */
+@Suppress("UNCHECKED_CAST")
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
-    var style: T = UIProvider.getStyle(style, false) as T
+    var style: T
     var parent: UIComponent<*>? = null
     var animation: UIAnimation<*>? = null
-    var overrided = false
+    var overridden = false
+    var visible = false
 
     /** Component plot properties **/
     var x = 0f
@@ -52,9 +74,21 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     protected var mouseEnteredListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseLeaveListeners: MutableList<Consumer<UIComponent<*>>>? = null
 
-    open fun initialize() {
-
+    init {
+        try {
+            this.style = UIProvider.getStyle(style, false) as T
+        } catch (exception: ClassCastException) {
+            throw InvalidStyleSheetException(style, this)
+        }
     }
+
+    /**
+     * Invoked one time, at initialization. This is when the component
+     * is actively being added to the UIComponentDSL. This can be useful
+     * for adding components to this one because the init method will place
+     * the component before this one in the render list.
+     */
+    open fun initialize() {}
 
     /**
      * Invoked on creation, and screen resize
@@ -70,18 +104,29 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         updateStyle()
     }
 
+    /**
+     * Invoked from the update method. If not [overridden], the component
+     * will update its position relative to its parent
+     */
     open fun updatePosition() {
-        if (!overrided) {
+        if (!overridden) {
             x = +style.x + getParentX() - getAnchorX() + marginLeft
             y = -style.y + getParentY() - getAnchorY() + marginTop
         }
     }
 
+    /**
+     * Updates the width and height of the component
+     */
     open fun updateSize() {
         width = +style.width
         height = -style.height
     }
 
+    /**
+     * Calculates the padding and margin properties of the component. Should
+     * be invoked after the component's position and size have been calculated.
+     */
     open fun calculateBounds() {
         // Update padding
         paddingTop = -style.padding?.paddingTop
@@ -97,7 +142,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
-     * Updates the relative values based on the absolute values
+     * Updates the relative position and size of the component based on the
+     * padding and margins of the component. This should be invoked after the
+     * position, size, and bounds are calculated.
      */
     open fun updateBounds() {
         relX = x - paddingLeft
@@ -107,12 +154,17 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         relHeight = height + paddingTop + paddingBottom
     }
 
-
+    /**
+     * Updates the stylesheet
+     */
     open fun updateStyle() {
         // Update font if not null
         style.font?.update(this)
     }
 
+    /**
+     * Updates the active animation (if applicable)
+     */
     open fun updateAnimation() {
         animation?.update()
     }
@@ -129,6 +181,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         }
     }
 
+    /**
+     * Invoked every time the component needs to be rendered. Any code to
+     * render the component should be placed within this function.
+     */
     abstract fun renderComponent()
 
     /** Input **/
@@ -327,4 +383,17 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         }
         return this
     }
+
+    /**
+     * [InvalidStyleSheetException] is thrown when an invalid cast from
+     * [UIStyleSheet] to [T] failed.
+     *
+     * The most common cause is that the provided style sheet is not an
+     * instance of [T]. If the [UIComponent] is a custom implementation it
+     * is possible that the copy function is not override in the class.
+     *
+     * @author sen
+     * @since 5/25/2022
+     */
+    class InvalidStyleSheetException(styleName: String, component: UIComponent<*>) : Exception("Style of name \"$styleName\" is not a valid instance of $component. Is the style sheet passed an instance of the required style sheeet for the component? If the style sheet is a custom implementation, please check if you have added the copy method which returns an instance of that style sheeet.")
 }

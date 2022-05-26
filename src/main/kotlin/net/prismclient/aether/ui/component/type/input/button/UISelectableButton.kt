@@ -16,11 +16,11 @@ open class UISelectableButton<T : UIStyleSheet>(var checked: Boolean = false, te
     var checkListeners: MutableList<BiConsumer<UISelectableButton<T>, Boolean>>? = null
 
     init {
-        onMousePressed { component ->
-            val wasSelected = checked
-            checked = component.isMouseInsideBoundingBox()
-            if (wasSelected != checked)
+        onMousePressed { _ ->
+            if (isMouseInsideBoundingBox()) {
+                checked = !checked
                 checkListeners?.forEach { it.accept(this, checked) }
+            }
         }
     }
 

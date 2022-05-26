@@ -79,7 +79,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
     }
 
     /**
-     * Shortnand for [align] and anchor. Both values are set to the [alignment]
+     * Shorthand for [align] and anchor. Both values are set to the [alignment]
      */
     fun control(alignment: UIAlignment) = control(alignment, alignment)
 

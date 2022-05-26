@@ -5,20 +5,18 @@ import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.style.UIStyleSheet
 
 open class UICheckbox(checked: Boolean = false, var imageStyle: String, style: String) : UISelectableButton<UIStyleSheet>(checked, "", style) {
-    var selectedImage: String = "checkbox"
-    lateinit var checkbox: UIImage
+    lateinit var selectedImage: UIImage
+    lateinit var deselectedImage: UIImage
 
     init {
-        onCheckChange { _, selected ->
-            checkbox.image = if (selected) {
-                selectedImage
-            } else ""
+        onCheckChange { _, isSelected ->
+            //checkbox.image = if (isSelected) selectedImage else deselectedImage
         }
     }
 
     override fun initialize() {
-        checkbox = UIImage(selectedImage, imageStyle)
-        UIComponentDSL.pushComponent(checkbox)
+        //checkbox = UIImage(selectedImage, imageStyle)
+        //UIComponentDSL.pushComponent(checkbox)
     }
 
     override fun renderComponent() {}

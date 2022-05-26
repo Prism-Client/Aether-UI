@@ -26,7 +26,7 @@ open class UIListLayout @JvmOverloads constructor(
             for (i in 0 until components.size) {
                 val component = components[i]
 
-                component.overrided = true
+                component.overridden = true
 
                 if (listDirection == ListDirection.Vertical) {
                     component.y = y + component.marginTop
@@ -41,7 +41,7 @@ open class UIListLayout @JvmOverloads constructor(
             for (i in components.size - 1 downTo 0) {
                 val component = components[i]
 
-                component.overrided = true
+                component.overridden = true
 
                 if (listDirection == ListDirection.Vertical) {
                     component.y = y + component.marginTop

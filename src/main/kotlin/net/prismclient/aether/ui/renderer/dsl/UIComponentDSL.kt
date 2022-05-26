@@ -55,6 +55,22 @@ object UIComponentDSL {
     }
 
     /**
+     * Inserts the component into the active frame or the components array.
+     */
+    private fun insertComponent(component: UIComponent<*>) {
+        if (activeComponent != null)
+            component.parent = activeComponent
+        if (components == null || frames == null) return
+        if (component is UIFrame<*>)
+            frames!!.add(component)
+        if (activeFrame != null) {
+            activeFrame!!.addComponent(component)
+        } else {
+            components!!.add(component)
+        }
+    }
+
+    /**
      * Adds the component to the stack and / or array. Called
      * by the inner methods of this class.
      */
@@ -66,7 +82,8 @@ object UIComponentDSL {
 //            insertComponent(component)
 //            return
 //        }
-        println("Pushing $component")
+
+        insertComponent(component)
 
         // If the component is an instance of UIFrame<*>, add
         // it as the active frame, and to the frame stack
@@ -76,10 +93,6 @@ object UIComponentDSL {
         } else {
             activeComponent = component
         }
-
-        println("Active Component: $activeComponent, ActiveFrame: $activeFrame")
-
-        insertComponent(component)
     }
 
     /**
@@ -96,24 +109,6 @@ object UIComponentDSL {
             }
         }
         activeComponent = null
-    }
-
-    /**
-     * Inserts the component into the active frame or the components array.
-     */
-    private fun insertComponent(component: UIComponent<*>) {
-        println("Added component: $component, Parent: ${component.parent}")
-
-//        if (activeComponent != null)
-//            component.parent = activeComponent
-        if (components == null || frames == null) return
-        if (component is UIFrame<*>)
-            frames!!.add(component)
-        if (activeFrame != null) {
-            activeFrame!!.addComponent(component)
-        } else {
-            components!!.add(component)
-        }
     }
 
     /** Style **/

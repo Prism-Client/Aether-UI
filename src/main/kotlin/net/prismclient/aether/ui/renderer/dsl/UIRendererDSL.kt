@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.renderer.dsl
 
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.BUTT
@@ -15,6 +16,7 @@ import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
 import org.apache.commons.io.FilenameUtils
+import java.lang.Float.max
 import java.nio.ByteBuffer
 
 object UIRendererDSL {
@@ -197,10 +199,10 @@ object UIRendererDSL {
     }
 
     @JvmOverloads
-    fun loadSvg(name: String, fileLocation: String, scale: Float = 2f) =
+    fun loadSvg(name: String, fileLocation: String, scale: Float = max(UICore.contentScaleX, UICore.contentScaleY)) =
         loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale)
 
-    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float): UIImageData {
+    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = max(UICore.contentScaleX, UICore.contentScaleY)): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
         return renderer.loadSVG(name, image, scale)

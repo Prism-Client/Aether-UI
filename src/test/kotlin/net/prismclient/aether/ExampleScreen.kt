@@ -6,7 +6,6 @@ import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.input.button.UICheckbox
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.util.UIFontFamily
@@ -24,16 +23,24 @@ class ExampleScreen : UIScreen() {
             dependsOn(::AnimationStyles)
 
             renderer{
-                loadAsset("checkbox", "/demo/star.svg")
+                loadSvg("checkbox", "/demo/thumbs-up.svg")
             }
 
             style(UIImageSheet(), "image") {
-                width = px(50)
-                height = px(50)
+                control(UIAlignment.CENTER)
+                size(24f, 24f)
+                width = px(24)
+                height = px(24)
             }
 
             component(UICheckbox(true, "image", "btn")) {
+                style {
+                    size(48f, 48f)
+                }
 
+                onCheckChange { _, isSelected ->
+                    println("Selected: $isSelected")
+                }
             }
         }
     }
