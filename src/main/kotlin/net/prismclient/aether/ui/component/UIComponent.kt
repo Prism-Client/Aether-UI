@@ -386,7 +386,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
-     * [InvalidStyleSheetException] is thrown when an invalid cast from
+     * [InvalidStyleSheetException] is thrown when a cast from
      * [UIStyleSheet] to [T] failed.
      *
      * The most common cause is that the provided style sheet is not an
