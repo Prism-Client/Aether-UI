@@ -30,7 +30,7 @@ abstract class UIScreen {
      *
      * @see UIDependable
      */
-    fun <T : UIDependable> dependsOn(clazz: () -> T) {
+    inline fun <T : UIDependable> dependsOn(clazz: () -> T) {
         clazz().load()
     }
 

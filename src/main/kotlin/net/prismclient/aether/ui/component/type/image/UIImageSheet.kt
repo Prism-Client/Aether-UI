@@ -3,13 +3,26 @@ package net.prismclient.aether.ui.component.type.image
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIStyleSheet
 
+/**
+ * [UIImageSheet] is the sheet implementation for [UIImage].
+ *
+ * @author sen
+ * @since 5/25/2022
+ */
 class UIImageSheet : UIStyleSheet() {
+    /**
+     * The color of the image. Use -1 (WHITE) for the normal color.
+     */
+    var imageColor = -1
+
+    /**
+     * The radius of the image.
+     */
     var imageRadius: UIRadius? = null
 
-    override fun copy(): UIImageSheet {
-        val sheet = UIImageSheet()
-        sheet.apply(this)
-        sheet.imageRadius = imageRadius?.copy()
-        return sheet
+    override fun copy() = UIImageSheet().also {
+        it.apply(this)
+        it.imageColor = imageColor
+        it.imageRadius = imageRadius?.copy()
     }
 }

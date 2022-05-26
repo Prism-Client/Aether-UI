@@ -4,7 +4,8 @@ import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.ease.UIEaseDirection
 import kotlin.math.pow
 
-class UICubic(duration: Long = 1000L, animationDirection: UIEaseDirection = UIEaseDirection.INOUT) : UIEase(duration, animationDirection) {
+class UICubic(duration: Long = 1000L, animationDirection: UIEaseDirection = UIEaseDirection.INOUT) :
+    UIEase(duration, animationDirection) {
     override fun getValue(): Double {
         val x = this.get().toDouble()
 

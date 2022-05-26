@@ -2,17 +2,17 @@ package net.prismclient.aether.ui.style
 
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
+import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.unit.util.RELATIVE
 import net.prismclient.aether.ui.util.UICopy
 import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
-import net.prismclient.aether.ui.renderer.impl.property.UIRadius
-import net.prismclient.aether.ui.unit.util.RELATIVE
 
 open class UIStyleSheet : UICopy<UIStyleSheet> {
     var name: String = ""
@@ -79,7 +79,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
     }
 
     /**
-     * Shortnand for [align] and anchor. Both values are set to the [alignment]
+     * Shorthand for [align] and anchor. Both values are set to the [alignment]
      */
     fun control(alignment: UIAlignment) = control(alignment, alignment)
 
@@ -124,7 +124,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
      */
     @JvmOverloads
     inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
-            background { this.color = color; this.radius = radius; this.block() }
+        background { this.color = color; this.radius = radius; this.block() }
 
     /** Font **/
 
@@ -139,9 +139,9 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
         padding = padding ?: UIPadding()
         padding!!.block()
     }
-    
+
     fun padding(value: Float) = padding(value, value, value, value)
-    
+
     fun padding(unit: UIUnit) = padding(unit, unit, unit, unit)
 
     fun padding(paddingTop: Float = 0f, paddingRight: Float = 0f, paddingBottom: Float = 0f, paddingLeft: Float = 0f) =
@@ -151,13 +151,13 @@ open class UIStyleSheet : UICopy<UIStyleSheet> {
             this.paddingBottom = px(paddingBottom)
             this.paddingLeft = px(paddingLeft)
         }
-    
+
     fun padding(
         paddingTop: UIUnit? = padding?.paddingTop,
         paddingRight: UIUnit? = padding?.paddingRight,
         paddingBottom: UIUnit? = padding?.paddingBottom,
         paddingLeft: UIUnit? = padding?.paddingLeft
-    ) = padding { 
+    ) = padding {
         this.paddingTop = paddingTop
         this.paddingRight = paddingRight
         this.paddingBottom = paddingBottom

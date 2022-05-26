@@ -1,13 +1,13 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.0-Beta'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.0-RC'
     id 'java'
     id 'maven-publish'
 }
 
 group 'net.prismclient'
-version '0.1-release'
+version '1.0-Production'
 
 project.ext.lwjglVersion = "3.3.1"
 switch (OperatingSystem.current()) {
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.0-RC'
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.21"
     implementation 'commons-io:commons-io:2.11.0'
 

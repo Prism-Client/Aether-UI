@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.util.extensions
 
-import net.prismclient.aether.UICore
+import net.prismclient.aether.ui.UICore
 import org.apache.commons.io.IOUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -20,7 +20,8 @@ fun String.toByteBuffer(): ByteBuffer {
 fun String.nullableByteBuffer(): ByteBuffer? {
     try {
         return this.toByteBuffer()
-    } catch (ignored: Exception) {}
+    } catch (ignored: Exception) {
+    }
     return null
 }
 

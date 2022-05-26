@@ -1,7 +1,8 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.UICore.Companion.activeScreen
-import net.prismclient.aether.UICore.Companion.instance
+import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.UICore.Companion.activeScreen
+import net.prismclient.aether.ui.UICore.Companion.instance
 import net.prismclient.aether.ui.callback.UICoreCallback
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.asRGBA
@@ -109,7 +110,7 @@ object Runner {
         }
         val stack = MemoryStack.stackPush()
 
-        try {
+        MemoryStack.stackPush().use {
             val fw = stack.mallocInt(1)
             val fh = stack.mallocInt(1)
             val sx = stack.mallocFloat(1)
@@ -122,8 +123,6 @@ object Runner {
             contentScaleY = sy[0]
             UICore.contentScaleX = contentScaleX
             UICore.contentScaleY = contentScaleY
-        } finally {
-            stack.pop()
         }
 
         GLFW.glfwMakeContextCurrent(window)
@@ -138,6 +137,7 @@ object Runner {
 
         // Set the active screen (set width, and height first)
         activeScreen = ExampleScreen()
+
         while (!GLFW.glfwWindowShouldClose(window)) {
             val t = GLFW.glfwGetTime()
             val n = System.nanoTime()
