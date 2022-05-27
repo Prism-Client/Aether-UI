@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.renderer.impl.property
 
-import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.interfaces.UICopy
 
 /**
  * [UIRadius] represents a shape with 4 customizable corner radii
@@ -15,6 +15,10 @@ class UIRadius(
     var bottomLeft: Float = 0f
 ) : UICopy<UIRadius> {
     constructor(radius: Float) : this(radius, radius, radius, radius)
+
+    fun animate(previousRadius: UIRadius?, activeRadius: UIRadius?, progress: Float) {
+        
+    }
 
     fun set(radius: Float) {
         topLeft = radius

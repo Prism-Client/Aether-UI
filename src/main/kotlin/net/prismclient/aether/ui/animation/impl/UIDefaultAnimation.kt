@@ -1,13 +1,15 @@
 package net.prismclient.aether.ui.animation.impl
 
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.animation.UIAnimationPriority
 import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.style.impl.animation.UIAnimationSheet
-import net.prismclient.aether.ui.util.UIAnimationPriority
+import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.unit.type.UIRelativeUnit
 import net.prismclient.aether.ui.util.extensions.transition
 
 /**
@@ -90,8 +92,6 @@ open class UIDefaultAnimation(
                 component.style.background = background
         } else {
             val s = component.style
-
-            // Check for irregular types
 
             s.x = +k.x ?: s.x
             s.y = +k.y ?: s.y

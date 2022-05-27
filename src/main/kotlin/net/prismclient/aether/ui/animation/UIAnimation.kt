@@ -6,8 +6,7 @@ import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.util.*
-import net.prismclient.aether.ui.util.UIAnimationPriority
-import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.extensions.isNormal
 import java.util.function.Consumer
 
@@ -158,12 +157,6 @@ abstract class UIAnimation<T>(
             return component.calculateUnitX(this, component.getParentWidth(), false)
         return when (this.type) {
             INITIAL -> x
-            PXANIMRELATIVE -> x + this.value
-            RELANIMRELATIVE -> x + component.getParentWidth() * this.value
-            XANIM -> component.x * this.value
-            YANIM -> component.y * this.value
-            WIDTHANIM -> component.width * this.value
-            HEIGHTANIM -> component.height * this.value
             else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
         }
     }

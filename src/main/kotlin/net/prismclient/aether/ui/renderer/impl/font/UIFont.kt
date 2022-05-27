@@ -10,7 +10,8 @@ import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
- * [UIFont] is a renderer which renders a component's font.
+ * [UIFont] is a [UIShape] which renders a string based on a set of requirements
+ * (the properties of this).
  *
  * Note: Width, and height are ignored.
  *

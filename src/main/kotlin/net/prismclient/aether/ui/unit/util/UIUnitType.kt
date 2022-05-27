@@ -3,19 +3,21 @@ package net.prismclient.aether.ui.unit.util
 import net.prismclient.aether.ui.component.type.image.UIImage
 
 /**
- *  A value represented in pixels
+ * The default unit type. Represents the value in pixels.
  */
 const val PIXELS: Byte = 0
 
 /**
- *  Decimal value representing the parent's width/height
+ * Represents the screen width or height, depending on the unit times the value.
  */
 const val RELATIVE: Byte = 1
 
 /**
- * The height of the active component
+ * The font size of the active component
  */
 const val EM: Byte = 2
+
+// TODO: Add REM as a unit. Add border as a supported unit
 
 /**
  * The border width of the active component
@@ -43,36 +45,6 @@ const val ASCENDER: Byte = 7
  * The descender portion of the current stylesheet's font
  */
 const val DESCENDER: Byte = 8
-
-/**
- * A relative pixel position for a unit in an animation
- */
-const val PXANIMRELATIVE: Byte = 9
-
-/**
- * A relative percentage position for a unit in an animation
- */
-const val RELANIMRELATIVE: Byte = 10
-
-/**
- * The x of the component, for animations
- */
-const val XANIM: Byte = 11
-
-/**
- * The y of the component, for animations
- */
-const val YANIM: Byte = 12
-
-/**
- * The width of the component, for animations
- */
-const val WIDTHANIM: Byte = 13
-
-/**
- * The height of the component, for animations
- */
-const val HEIGHTANIM: Byte = 14
 
 /**
  * Unique to [UIImage] components. Represents the width of the loaded image

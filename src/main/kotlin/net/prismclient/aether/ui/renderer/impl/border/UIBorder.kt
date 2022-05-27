@@ -2,7 +2,7 @@ package net.prismclient.aether.ui.renderer.impl.border
 
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
-import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**

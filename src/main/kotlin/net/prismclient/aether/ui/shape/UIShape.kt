@@ -3,7 +3,7 @@ package net.prismclient.aether.ui.shape
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.other.UIRenderable
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.extensions.calculateX
 import net.prismclient.aether.ui.util.extensions.calculateY
 

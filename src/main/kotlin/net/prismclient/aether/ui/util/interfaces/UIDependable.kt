@@ -1,4 +1,4 @@
-package net.prismclient.aether.ui.util
+package net.prismclient.aether.ui.util.interfaces
 
 import net.prismclient.aether.ui.screen.UIScreen
 

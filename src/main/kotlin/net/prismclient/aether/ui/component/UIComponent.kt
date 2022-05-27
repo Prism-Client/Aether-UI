@@ -261,12 +261,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     /** Position Calculation **/
 
-    operator fun UIUnit?.unaryPlus() = this.getX()
+    operator fun UIUnit?.unaryPlus() = getX(this)
 
-    operator fun UIUnit?.unaryMinus() = this.getY()
+    operator fun UIUnit?.unaryMinus() = getY(this)
 
     @JvmOverloads
-    fun UIUnit?.getX(ignore: Boolean = false): Float = this.getX(getParentWidth(), ignore)
+    fun getX(unit: UIUnit?, ignore: Boolean = false): Float = unit.getX(getParentWidth(), ignore)
 
     @JvmOverloads
     fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float =
@@ -280,8 +280,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun calculateX(unit: UIUnit?, component: UIComponent<*>, width: Float = component.getParentWidth(), ignoreOperation: Boolean = false): Float {
         return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) net.prismclient.aether.ui.util.extensions.calculateX(unit, component, width)
         else when (unit.type) {
-            PIXELS, PXANIMRELATIVE -> unit.value
-            RELATIVE, RELANIMRELATIVE -> unit.value * width
+            PIXELS -> unit.value
+            RELATIVE -> unit.value * width
             EM -> unit.value * (component.style.font?.fontSize ?: 0f)
             ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
             DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
@@ -289,9 +289,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         }
     }
 
-
     @JvmOverloads
-    fun UIUnit?.getY(ignore: Boolean = false): Float = this.getY(getParentHeight(), ignore)
+    fun getY(unit: UIUnit?, ignore: Boolean = false): Float = unit.getY(getParentHeight(), ignore)
 
     @JvmOverloads
     fun UIUnit?.getY(height: Float, ignore: Boolean = false) =
@@ -314,10 +313,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             if (parent != null) parent!!.height else UICore.height
 
     fun getAnchorX() =
-            calculateUnitX(style.anchor.x, width, false)
+            calculateUnitX(style.anchor?.x, width, false)
 
     fun getAnchorY() =
-            calculateUnitY(style.anchor.y, height, false)
+            calculateUnitY(style.anchor?.y, height, false)
 
     // TODO: Cleanup this mess with mouse bubbling and stuff
 
