@@ -90,6 +90,9 @@ open class UIDefaultAnimation(
                 component.style.background = background
         } else {
             val s = component.style
+
+            // Check for irregular types
+
             s.x = +k.x ?: s.x
             s.y = +k.y ?: s.y
             s.width = +k.width ?: s.width

@@ -4,6 +4,8 @@ import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.impl.UIDefaultAnimation
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.unit.util.WIDTHANIM
+import net.prismclient.aether.ui.unit.util.XANIM
 import net.prismclient.aether.ui.util.UIDependable
 import net.prismclient.aether.ui.util.extensions.animation
 import net.prismclient.aether.ui.util.extensions.asRGBA
@@ -33,6 +35,15 @@ class AnimationStyles : UIDependable() {
                     color = asRGBA(0f, 0f, 0f, 0.3f)
                     border {}
                 }
+            }
+        }
+
+        animation(UIDefaultAnimation("easeInLeft")) {
+            keyframe(UIQuart(1000L), true) {
+                x = UIUnit(-1f, WIDTHANIM)
+            }
+            keyframe(UIQuart(1000L), true) {
+                x = UIUnit(1f, XANIM)
             }
         }
     }

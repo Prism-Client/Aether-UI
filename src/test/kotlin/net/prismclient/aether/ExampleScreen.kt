@@ -7,6 +7,7 @@ import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
+import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.util.extensions.renderer
 
@@ -29,13 +30,15 @@ class ExampleScreen : UIScreen() {
                 size(24f, 24f)
             }
 
-            checkbox(true, imageStyle = "image", style = "btn") {
+            val checkbox = checkbox(true, imageStyle = "image", style = "btn") {
                 style { size(48f, 48f) }
 
                 onCheckChange { _, isSelected ->
                     println("Selected: $isSelected")
                 }
-            }
+            }.hover("fadeIn", "fadeOut")
+
+            UIProvider.dispatchAnimation("easeInLeft", checkbox)
         }
     }
 
