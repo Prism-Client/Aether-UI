@@ -36,7 +36,18 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
 
     protected var cachedColor: Int? = null
 
-    override fun animate(previous: UIBackground?, current: UIBackground?, progress: Float, component: UIComponent<*>?) {
+    override fun updateAnimationCache(component: UIComponent<*>) {
+        border?.updateAnimationCache(component)
+        radius?.updateAnimationCache(component)
+    }
+
+    override fun clearAnimationCache() {
+        cachedColor = null
+        radius?.clearAnimationCache()
+        border?.clearAnimationCache()
+    }
+
+    override fun animate(previous: UIBackground?, current: UIBackground?, progress: Float, component: UIComponent<*>) {
         cachedColor = cachedColor ?: color
 
         color = transition(
@@ -44,8 +55,8 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
             current?.color ?: cachedColor!!,
             progress
         )
-        radius?.animate(previous?.radius, current?.radius, progress, null)
-        border?.animate(previous?.border, current?.border, progress, null)
+        radius?.animate(previous?.radius, current?.radius, progress, component)
+        border?.animate(previous?.border, current?.border, progress, component)
     }
 
     override fun copy(): UIBackground = UIBackground().also {

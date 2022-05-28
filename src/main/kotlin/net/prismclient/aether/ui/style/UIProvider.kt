@@ -58,7 +58,7 @@ object UIProvider {
     @JvmOverloads
     fun getStyle(styleName: String, original: Boolean = false): UIStyleSheet {
         val style = styles[styleName]
-            ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
+                ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
         return if (original) style else style.copy()
     }
 
@@ -77,24 +77,25 @@ object UIProvider {
         activeAnimations.remove(animation)
     }
 
+    fun updateAnimationCache() {
+        for (i in 0 until activeAnimations.size)
+            activeAnimations[i].updateCache()
+    }
+
     fun updateAnimations() {
-        try {
-            for (i in 0 until activeAnimations.size) {
-                val animation = activeAnimations[i]
-                if (animation.lifetime > System.currentTimeMillis() + MAX_ANIMATION_DURATION) {
-                    animation.forceComplete()
-                }
-                activeAnimations[i].update()
+        for (i in 0 until activeAnimations.size) {
+            if (i >= activeAnimations.size) break
+            val animation = activeAnimations[i]
+            if (animation.lifetime > System.currentTimeMillis() + MAX_ANIMATION_DURATION) {
+                animation.forceComplete()
             }
-        } catch (_: Exception) {
-            // An animation might be removed while updating
-            updateAnimations()
+            activeAnimations[i].update()
         }
     }
 
     /**
      * Returns a list of [UIComponent] with the parent of the provided [self]
      */
-    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> =
-        UICore.activeScreen?.components?.filter { it.parent == self }?.toList() ?: mutableListOf()
+    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> = UICore.activeScreen?.components?.filter { it.parent == self }?.toList()
+            ?: mutableListOf()
 }

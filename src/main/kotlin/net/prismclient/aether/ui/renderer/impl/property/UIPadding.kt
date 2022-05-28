@@ -22,8 +22,15 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
 
     private var cachedPadding: CachedValues? = null
 
-    override fun animate(previous: UIPadding?, current: UIPadding?, progress: Float, component: UIComponent<*>?) {
-        component!!
+    override fun updateAnimationCache(component: UIComponent<*>) {
+        cachedPadding = CachedValues(component.paddingTop, component.paddingRight, component.paddingBottom, component.paddingLeft)
+    }
+
+    override fun clearAnimationCache() {
+        cachedPadding = null
+    }
+
+    override fun animate(previous: UIPadding?, current: UIPadding?, progress: Float, component: UIComponent<*>) {
         cachedPadding = cachedPadding ?: CachedValues(component.paddingTop, component.paddingRight, component.paddingBottom, component.paddingLeft)
 
         component.paddingTop = fromProgress(

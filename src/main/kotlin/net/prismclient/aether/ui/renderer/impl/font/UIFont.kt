@@ -205,7 +205,15 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             it.overwriteFontName(fontName)
     }
 
-    override fun animate(previous: UIFont?, current: UIFont?, progress: Float, component: UIComponent<*>?) {
+    override fun updateAnimationCache(component: UIComponent<*>) {
+
+    }
+
+    override fun clearAnimationCache() {
+
+    }
+
+    override fun animate(previous: UIFont?, current: UIFont?, progress: Float, component: UIComponent<*>) {
         // TODO: Animate fonts
     }
 

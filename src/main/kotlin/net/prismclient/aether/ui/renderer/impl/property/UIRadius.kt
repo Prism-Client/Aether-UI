@@ -30,7 +30,13 @@ class UIRadius(
 
     private var cachedRadius: UIRadius? = null
 
-    override fun animate(previous: UIRadius?, current: UIRadius?, progress: Float, component: UIComponent<*>?) {
+    override fun updateAnimationCache(component: UIComponent<*>) {}
+
+    override fun clearAnimationCache() {
+        cachedRadius = null
+    }
+
+    override fun animate(previous: UIRadius?, current: UIRadius?, progress: Float, component: UIComponent<*>) {
         cachedRadius = cachedRadius ?: this.copy()
         
         topLeft = fromProgress(previous?.topLeft ?: cachedRadius!!.topLeft, current?.topLeft ?: cachedRadius!!.topLeft, progress)

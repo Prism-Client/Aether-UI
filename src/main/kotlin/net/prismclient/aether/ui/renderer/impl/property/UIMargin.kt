@@ -20,8 +20,15 @@ class UIMargin : UICopy<UIMargin>, UIAnimatable<UIMargin> {
 
     private var cachedMargin: CachedValues? = null
 
-    override fun animate(previous: UIMargin?, current: UIMargin?, progress: Float, component: UIComponent<*>?) {
-        component!!
+    override fun updateAnimationCache(component: UIComponent<*>) {
+        cachedMargin = CachedValues(component.marginTop, component.marginRight, component.marginBottom, component.marginLeft)
+    }
+
+    override fun clearAnimationCache() {
+        cachedMargin = null
+    }
+
+    override fun animate(previous: UIMargin?, current: UIMargin?, progress: Float, component: UIComponent<*>) {
         cachedMargin = cachedMargin ?: CachedValues(component.paddingTop, component.paddingRight, component.paddingBottom, component.paddingLeft)
 
         component.marginTop = fromProgress(

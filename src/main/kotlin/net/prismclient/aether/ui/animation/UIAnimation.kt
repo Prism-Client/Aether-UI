@@ -82,6 +82,24 @@ class UIAnimation<T : UIStyleSheet>(
         TODO("Stopping of animations have not yet been implemented")
     }
 
+    /**
+     * Updates the animation cache on the offhand chance that the window is resized during
+     * the animation
+     */
+    fun updateCache() {
+        component.style.updateAnimationCache(component)
+    }
+
+    /**
+     * Clears the animation cache. It is automatically invoked when the animation is completed.
+     */
+    fun clearCache() {
+        component.style.clearAnimationCache()
+    }
+
+    /**
+     * Invoked on the screen render. The animation is updated here.
+     */
     fun update() {
         if (completed || !animating)
             return
@@ -138,6 +156,9 @@ class UIAnimation<T : UIStyleSheet>(
         animating = false
 
         saveState(timeline[timeline.size - 1])
+
+        // Clear the cache after the state has been saved (if it needs to be saved)
+        clearCache()
 
         UIProvider.completeAnimation(this)
 

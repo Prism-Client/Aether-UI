@@ -229,6 +229,9 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         this.background = sheet.background?.copy()
         this.font = sheet.font?.copy()
 
+        this.ease = sheet.ease?.copy()
+        this.animationResult = sheet.animationResult
+
         this.x = sheet.x?.copy()
         this.y = sheet.y?.copy()
         this.width = sheet.width?.copy()
@@ -244,8 +247,31 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
 
     protected var initialValue: UIStyleSheet.InitialValues? = null
 
-    override fun animate(previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float, component: UIComponent<*>?) {
-        component!!
+    override fun updateAnimationCache(component: UIComponent<*>) {
+        if (initialValue != null) {
+            initialValue!!.x = component.x
+            initialValue!!.y = component.y
+            initialValue!!.width = component.width
+            initialValue!!.height = component.height
+        }
+
+        anchor?.updateAnimationCache(component)
+        padding?.updateAnimationCache(component)
+        margin?.updateAnimationCache(component)
+        background?.updateAnimationCache(component)
+        font?.updateAnimationCache(component)
+    }
+
+    override fun clearAnimationCache() {
+        initialValue = null
+        anchor?.clearAnimationCache()
+        padding?.clearAnimationCache()
+        margin?.clearAnimationCache()
+        background?.clearAnimationCache()
+        font?.clearAnimationCache()
+    }
+
+    override fun animate(previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float, component: UIComponent<*>) {
         if (initialValue == null)
             initialValue = InitialValues(
                 component.x,
@@ -256,13 +282,11 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
                 component.style.font?.copy()
             )
 
-        val style = component.style
-
-        style.anchor?.animate(previous?.anchor, current?.anchor, progress, component)
+        anchor?.animate(previous?.anchor, current?.anchor, progress, component)
 
         // Calculate Bounds
-        style.padding?.animate(previous?.padding, padding, progress, component)
-        style.margin?.animate(previous?.margin, margin, progress, component)
+        padding?.animate(previous?.padding, padding, progress, component)
+        margin?.animate(previous?.margin, margin, progress, component)
 
         // Update Size
         component.width = fromProgress(component.width(previous?.width), component.width(current?.width), progress)
@@ -276,8 +300,8 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         component.updateBounds()
 
         // Update background and font
-        style.background?.animate(previous?.background, current?.background, progress, component)
-        style.font?.animate(previous?.font, current?.font, progress, component)
+        background?.animate(previous?.background, current?.background, progress, component)
+        font?.animate(previous?.font, current?.font, progress, component)
     }
 
     fun UIComponent<*>.x(unit: UIUnit?): Float =
@@ -312,10 +336,10 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      * Used to store the initial values of an animation
      */
     protected inner class InitialValues(
-        val x: Float,
-        val y: Float,
-        val width: Float,
-        val height: Float,
+        var x: Float,
+        var y: Float,
+        var width: Float,
+        var height: Float,
         val background: UIBackground?,
         val font: UIFont?
     )

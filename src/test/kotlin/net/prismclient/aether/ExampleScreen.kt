@@ -7,7 +7,6 @@ import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.util.extensions.renderer
 

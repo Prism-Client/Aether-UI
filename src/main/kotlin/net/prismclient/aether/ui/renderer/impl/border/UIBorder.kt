@@ -42,7 +42,13 @@ class UIBorder : UIShape(), UIAnimatable<UIBorder> {
 
     private var cachedBorder: UIBorder? = null
 
-    override fun animate(previous: UIBorder?, current: UIBorder?, progress: Float, component: UIComponent<*>?) {
+    override fun updateAnimationCache(component: UIComponent<*>) {}
+
+    override fun clearAnimationCache() {
+        cachedBorder = null
+    }
+
+    override fun animate(previous: UIBorder?, current: UIBorder?, progress: Float, component: UIComponent<*>) {
         cachedBorder = cachedBorder ?: this.copy()
 
         borderWidth = fromProgress(previous?.borderWidth ?: cachedBorder!!.borderWidth, current?.borderWidth

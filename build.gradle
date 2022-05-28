@@ -48,6 +48,7 @@ dependencies {
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
+        languageVersion = "1.6"
         freeCompilerArgs += [
                 '-Xno-call-assertions',
                 '-Xno-receiver-assertions',
@@ -56,11 +57,11 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
-compileKotlin {
-    kotlinOptions {
-        languageVersion = "1.6"
-    }
-}
+//compileKotlin {
+//    kotlinOptions {
+//        languageVersion = "1.6"
+//    }
+//}
 
 publishing {
     publications {

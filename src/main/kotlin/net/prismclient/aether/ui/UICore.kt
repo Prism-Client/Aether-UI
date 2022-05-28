@@ -90,9 +90,10 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     }
 
     open fun update() {
-        updateThreads.execute {
+//        updateThreads.execute {
             activeScreen?.update()
-        }
+            UIProvider.updateAnimationCache()
+//        }
     }
 
     open fun focus(component: UIComponent<*>) {

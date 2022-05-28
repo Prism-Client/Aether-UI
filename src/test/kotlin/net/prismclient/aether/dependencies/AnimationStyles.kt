@@ -1,5 +1,6 @@
 package net.prismclient.aether.dependencies
 
+import net.prismclient.aether.ui.animation.ease.impl.UILinear
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.extensions.animation
@@ -17,7 +18,7 @@ class AnimationStyles : UIDependable() {
                 }
             }
 
-            keyframe {
+            keyframe(UILinear(5000L)) {
                 background {
                     color = asRGBA(0, 255, 0)
                 }

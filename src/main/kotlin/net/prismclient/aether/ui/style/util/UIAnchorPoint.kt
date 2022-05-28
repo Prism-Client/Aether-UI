@@ -29,7 +29,15 @@ class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
         it.y = y?.copy()
     }
 
-    override fun animate(previous: UIAnchorPoint?, current: UIAnchorPoint?, progress: Float, component: UIComponent<*>?) {
+    override fun updateAnimationCache(component: UIComponent<*>) {
+        // TODO: Anchor point cache updating
+    }
+
+    override fun clearAnimationCache() {
+        // TODO: Anchor point cache clearing
+    }
+
+    override fun animate(previous: UIAnchorPoint?, current: UIAnchorPoint?, progress: Float, component: UIComponent<*>) {
         // TODO: Anchor point animations
     }
 }

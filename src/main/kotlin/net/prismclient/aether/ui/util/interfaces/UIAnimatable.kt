@@ -16,6 +16,19 @@ import net.prismclient.aether.ui.component.UIComponent
  */
 interface UIAnimatable<T> {
     /**
+     * On the offhand chance that the window is resized while the animation is in progress, it
+     * might be necessary to update any cached values. This method is invoked when that rare case
+     * happens.
+     */
+    fun updateAnimationCache(component: UIComponent<*>)
+
+    /**
+     * When the animation is completed the cached data is useless, so this method is invoked
+     * so that you can safely clear that data.
+     */
+    fun clearAnimationCache()
+
+    /**
      * This function is a crucial function for animating renderable objects. Given
      * two classes of [T] (this), all properties within this should be set to the
      * difference between the [previous] and [current] based on the [progress].
@@ -35,5 +48,5 @@ interface UIAnimatable<T> {
      *
      * @param component This parameter is option and can be null depending on the needs of the [UIAnimatable]
      */
-    fun animate(previous: T?, current: T?, progress: Float, component: UIComponent<*>?)
+    fun animate(previous: T?, current: T?, progress: Float, component: UIComponent<*>)
 }
