@@ -37,7 +37,7 @@ import java.util.function.Consumer
  * @author sen
  * @since 1.0
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "LeakingThis")
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var style: T
     var parent: UIComponent<*>? = null
@@ -78,6 +78,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     protected var mouseLeaveListeners: MutableList<Consumer<UIComponent<*>>>? = null
 
     init {
+        // Attempt to apply the style provided to the component.
+        // Throw a InvalidStyleException if the style is not valid.
         try {
             this.style = UIProvider.getStyle(style, false) as T
         } catch (exception: ClassCastException) {
@@ -96,7 +98,13 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
-     * Invoked on creation, and screen resize
+     * [update] is invoked when the component is created, and when the display
+     * has been changed (resized). The component properties such as the position
+     * and size should be calculated within these bounds.
+     *
+     * It is not ensured that the only time that the method is invoked is when the
+     * display has been changed or when the component is created. Animations and layouts
+     * might request for this method to be invoked.
      */
     open fun update() {
         calculateBounds()
@@ -176,6 +184,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         animation?.update()
     }
 
+    /**
+     * Render is the internal function of [UIComponent] which updates animations, renders the background,
+     * and apply the content clipping to the component before calling [renderComponent]. Generally, this
+     * should not be overridden unless there is a specific reason which is not covered by the [renderComponent].
+     */
     open fun render() {
         if (!visible) return
         updateAnimation()
@@ -284,8 +297,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun getX(unit: UIUnit?, ignore: Boolean = false): Float = unit.getX(getParentWidth(), ignore)
 
     @JvmOverloads
-    fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float =
-            calculateUnitX(this, width, ignore)
+    fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float = calculateUnitX(this, width, ignore)
 
     fun calculateUnitX(unit: UIUnit?, width: Float, ignore: Boolean): Float = if (unit == null) 0f else {
         calculateX(unit, this, width, ignore)
@@ -308,59 +320,36 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun getY(unit: UIUnit?, ignore: Boolean = false): Float = unit.getY(getParentHeight(), ignore)
 
     @JvmOverloads
-    fun UIUnit?.getY(height: Float, ignore: Boolean = false) =
-            calculateUnitY(this, height, ignore)
+    fun UIUnit?.getY(height: Float, ignore: Boolean = false) = calculateUnitY(this, height, ignore)
 
     fun calculateUnitY(unit: UIUnit?, height: Float, ignore: Boolean): Float = if (unit == null) 0f else {
         calculateY(unit, this, height, ignore)
     }
 
-    fun getParentX() = if (parent != null)
-            if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
+    fun getParentX() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
 
-    fun getParentY() = if (parent != null)
-            if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
+    fun getParentY() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
 
-    fun getParentWidth() =
-            if (parent != null) parent!!.width else UICore.width
+    fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
 
-    fun getParentHeight() =
-            if (parent != null) parent!!.height else UICore.height
+    fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
 
-    fun getAnchorX() =
-            calculateUnitX(style.anchor?.x, width, false)
+    fun getAnchorX() = calculateUnitX(style.anchor?.x, width, false)
 
-    fun getAnchorY() =
-            calculateUnitY(style.anchor?.y, height, false)
+    fun getAnchorY() = calculateUnitY(style.anchor?.y, height, false)
 
-    // TODO: Cleanup this mess with mouse bubbling and stuff
-
-    fun isMouseInside() =
-            (getMouseX() > x) &&
-            (getMouseY() > y) &&
-            (getMouseX() < x + width) &&
-            (getMouseY() < y + height)
+    fun isMouseInside() = (getMouseX() > x) && (getMouseY() > y) && (getMouseX() < x + width) && (getMouseY() < y + height)
 
     /**
      * Returns true if the mouse is inside the rel x, y, width and height
      */
-    fun isMouseInsideBoundingBox() = ((getMouseX() >= relX) &&
-            (getMouseY() >= relY) &&
-            (getMouseX() <= relX + relWidth) &&
-            (getMouseY() <= relY + relHeight)) &&
-            (parent == null ||
-            (UICore.mouseX >= parent!!.relX) &&
-            (UICore.mouseY >= parent!!.relY) &&
-            (UICore.mouseX <= parent!!.relX + parent!!.relWidth) &&
-            (UICore.mouseY <= parent!!.relY + parent!!.relHeight))
+    fun isMouseInsideBoundingBox() = ((getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)) && (parent == null || (UICore.mouseX >= parent!!.relX) && (UICore.mouseY >= parent!!.relY) && (UICore.mouseX <= parent!!.relX + parent!!.relWidth) && (UICore.mouseY <= parent!!.relY + parent!!.relHeight))
 
     fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 
-    fun getMouseX(): Float =
-            UICore.mouseX - getParentXOffset()
+    fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
 
-    fun getMouseY(): Float =
-            UICore.mouseY - getParentYOffset()
+    fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
 
     fun getParentXOffset(): Float {
         return (if (parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) {
@@ -378,13 +367,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         } else 0f
     }
 
-    fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) =
-        (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
+    fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) = (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
 
 
     /** Other **/
-    inline fun style(block: T.() -> Unit) =
-        block.invoke(style)
+    inline fun style(block: T.() -> Unit) = block.invoke(style)
 
     /**
      * Shorthand for loading animations for when the mouse hovers over the component
@@ -410,5 +397,5 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * @author sen
      * @since 5/25/2022
      */
-    class InvalidStyleSheetException(styleName: String, component: UIComponent<*>?) : Exception("Style of name \"$styleName\" is not a valid instance of $component. Is the style sheet passed an instance of the required style sheeet for the component? If the style sheet is a custom implementation, please check if you have added the copy method which returns an instance of that style sheeet.")
+    class InvalidStyleSheetException(styleName: String, component: UIComponent<*>?) : Exception("Style of name \"$styleName\" is not a valid instance of $component. Is the style sheet passed an instance of the required style sheet for the component? If the style sheet is a custom implementation, please check if you have added the copy method which returns an instance of that style sheet.")
 }

@@ -38,6 +38,9 @@ object UIProvider {
 
     fun getImage(name: String) = images[name]
 
+    fun deleteImage(name: String) =
+        images.remove(name)
+
     /**
      * Adds a [UIFontFamily] into the fonts arraylist. If fonts are loaded by a
      * string instead of a UIFontType, it will automatically be loaded into memory.

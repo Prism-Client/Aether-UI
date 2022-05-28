@@ -28,6 +28,7 @@ import java.util.function.Consumer
  * @param style An instance of [T], a [UIStyleSheet] which is copied to create new keyframes. Any properties set to it
  * will be copied to the new keyframes.
  */
+@Suppress("UNCHECKED_CAST")
 class UIAnimation<T : UIStyleSheet>(
         var style: T,
         val name: String,

@@ -60,7 +60,7 @@ abstract class UIEase(var duration: Long = 1000L, var animationDirection: UIEase
                 "quint" -> QUINT
                 "expo", "exponential" -> EXPO
                 "circ", "circle" -> CIRC
-                else -> LINEAR // TODO: Warn if invalid easeType
+                else -> LINEAR
             }
         }
 
