@@ -45,7 +45,7 @@ class UIRadius(
         bottomLeft = fromProgress(current?.bottomLeft ?: cachedRadius!!.bottomLeft, previous?.bottomLeft ?: cachedRadius!!.bottomLeft, progress)
     }
 
-    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+    override fun saveState(component: UIComponent<*>, keyframe: UIRadius?, retain: Boolean) {
 
     }
 

@@ -1,7 +1,5 @@
 package net.prismclient.aether.ui.util.interfaces
 
-import net.prismclient.aether.ui.animation.ease.UIEase
-import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 
 /**
@@ -52,7 +50,7 @@ interface UIAnimatable<T> {
 
     /**
      * Invoked when the animation with this keyframe is updated. If the parameter [saveState]
-     * is true, then [current] should be the value, else the cached value should be the value
+     * is true, then [component] should be the value, else the cached value should be the value
      */
-    fun saveState(component: UIComponent<*>, retain: Boolean)
+    fun saveState(component: UIComponent<*>, keyframe: T?, retain: Boolean)
 }

@@ -50,6 +50,11 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
     override fun animate(previous: UIBackground?, current: UIBackground?, progress: Float, component: UIComponent<*>) {
         cachedColor = cachedColor ?: color
 
+        if (previous?.radius != null || current?.radius != null)
+            radius = radius ?: UIRadius()
+        if (previous?.border != null || current?.border != null)
+            border = border ?: UIBorder()
+
         color = transition(
             previous?.color ?: cachedColor!!,
             current?.color ?: cachedColor!!,
@@ -59,7 +64,7 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
         border?.animate(previous?.border, current?.border, progress, component)
     }
 
-    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+    override fun saveState(component: UIComponent<*>, keyframe: UIBackground?, retain: Boolean) {
         //TODO("Not yet implemented")
     }
 

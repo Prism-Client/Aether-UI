@@ -292,8 +292,8 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
 
         // Update Position
         if (!component.overridden) {
-            component.x = fromProgress(component.x(current?.x), component.x(previous?.x), progress)
-            component.y = fromProgress(component.y(current?.y), component.y(previous?.y), progress)
+            component.x = fromProgress(component.x(previous?.x), component.x(current?.x), progress)
+            component.y = fromProgress(component.y(previous?.y), component.y(current?.y), progress)
 
             component.x += component.marginLeft - component.anchorX
             component.y += component.marginTop - component.anchorY
@@ -307,17 +307,26 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         font?.animate(previous?.font, current?.font, progress, component)
     }
 
-    override fun saveState(current: UIComponent<*>, retain: Boolean) {
-        anchor?.saveState(current, retain)
+    override fun saveState(component: UIComponent<*>, keyframe: UIStyleSheet?, retain: Boolean) {
+        anchor?.saveState(component, keyframe?.anchor, retain)
 
-        padding?.saveState(current, retain)
-        margin?.saveState(current, retain)
-        background?.saveState(current, retain)
+        padding?.saveState(component, keyframe?.padding, retain)
+        margin?.saveState(component, keyframe?.margin, retain)
+        background?.saveState(component, keyframe?.background, retain)
+        font?.saveState(component, keyframe?.font, retain)
 
-//        component.
+        if (retain) {
+            if (keyframe?.x != null)
+                x = keyframe.x
+            if (keyframe?.y != null)
+                y = keyframe.y
+            if (keyframe?.width != null)
+                width = keyframe.width
+            if (keyframe?.height != null)
+                height = keyframe.height
+        }
 
-        background?.saveState(current, retain)
-        font?.saveState(current, retain)
+        component.update()
     }
 
     fun UIComponent<*>.x(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {

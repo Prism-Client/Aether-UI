@@ -57,7 +57,7 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
         )
     }
 
-    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+    override fun saveState(component: UIComponent<*>, keyframe: UIPadding?, retain: Boolean) {
         //TODO("Not yet implemented")
     }
 

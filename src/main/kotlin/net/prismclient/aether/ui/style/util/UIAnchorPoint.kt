@@ -56,7 +56,7 @@ class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
         )
     }
 
-    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+    override fun saveState(component: UIComponent<*>, keyframe: UIAnchorPoint?, retain: Boolean) {
         // TODO: Save state anchor point
     }
 

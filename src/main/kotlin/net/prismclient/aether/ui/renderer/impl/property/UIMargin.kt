@@ -56,7 +56,7 @@ class UIMargin : UICopy<UIMargin>, UIAnimatable<UIMargin> {
         )
     }
 
-    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+    override fun saveState(component: UIComponent<*>, keyframe: UIMargin?, retain: Boolean) {
         //TODO("Not yet implemented")
     }
 

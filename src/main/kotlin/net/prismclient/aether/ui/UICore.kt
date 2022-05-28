@@ -16,6 +16,15 @@ import java.util.concurrent.Semaphore
 open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     companion object {
         @JvmStatic
+        val debug = true
+
+        /* Debug */
+
+        var renderTime = 0L
+        var contentRenderTime = 0L
+        var updateTime = 0L
+
+        @JvmStatic
         lateinit var instance: UICore
         @JvmStatic
         var activeScreen: UIScreen? = null
@@ -57,7 +66,9 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     }
 
     open fun renderContent() {
+        contentRenderTime = System.nanoTime()
         activeScreen?.renderContent()
+        contentRenderTime = System.nanoTime() - contentRenderTime
     }
 
     open fun render(screenWidth: Float, screenHeight: Float) {
@@ -91,8 +102,10 @@ open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
 
     open fun update() {
 //        updateThreads.execute {
-            activeScreen?.update()
-            UIProvider.updateAnimationCache()
+        var time = System.nanoTime()
+        activeScreen?.update()
+        updateTime = System.nanoTime() - time
+        UIProvider.updateAnimationCache()
 //        }
     }
 

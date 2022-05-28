@@ -224,7 +224,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         fontSize = fromProgress(previous?.fontSize ?: fontCache!!.fontSize, current?.fontSize ?: fontCache!!.fontSize, progress)
     }
 
-    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+    override fun saveState(component: UIComponent<*>, keyframe: UIFont?, retain: Boolean) {
         //TODO("Not yet implemented")
     }
 

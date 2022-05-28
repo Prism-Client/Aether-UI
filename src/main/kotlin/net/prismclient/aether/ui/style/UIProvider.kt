@@ -86,6 +86,7 @@ object UIProvider {
     }
 
     fun updateAnimations() {
+        val time = System.nanoTime()
         for (i in 0 until activeAnimations.size) {
             if (i >= activeAnimations.size) break
             val animation = activeAnimations[i]

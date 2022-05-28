@@ -6,9 +6,12 @@ import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.util.UIFontFamily
+import net.prismclient.aether.ui.util.extensions.align
 import net.prismclient.aether.ui.util.extensions.renderer
 
 class ExampleScreen : UIScreen() {
@@ -21,24 +24,14 @@ class ExampleScreen : UIScreen() {
             dependsOn(::ComponentStyles)
             dependsOn(::AnimationStyles)
 
-            renderer{
-                loadSvg("checkbox", "/demo/thumbs-up.svg")
-            }
-
-            style(UIImageSheet(), "image") {
-                control(UIAlignment.CENTER)
-                size(24f, 24f)
-            }
-
-            button("Text", "btn") {
-                style {
-                    control(UIAlignment.CENTER)
-                    size(48f, 48f)
-                    margin(10f)
-                }
-            }.onMousePressed {
-                if (it.isMouseInsideBoundingBox()) {
-                    UIProvider.dispatchAnimation("testAnimation", it)
+            container("container") {
+                h1("Text") {
+                    style {
+                        align(UIAlignment.CENTER)
+                        font {
+                            textAlignment = ALIGNCENTER or ALIGNMIDDLE
+                        }
+                    }
                 }
             }
         }
@@ -46,5 +39,8 @@ class ExampleScreen : UIScreen() {
 
     override fun render() {
         super.render()
+        renderer {
+
+        }
     }
 }

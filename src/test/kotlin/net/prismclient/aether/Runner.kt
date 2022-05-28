@@ -10,6 +10,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.profiler.Profiler
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -18,6 +19,7 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import org.lwjgl.system.Platform
+import kotlin.math.roundToInt
 
 /**
  * An example runner class with LWJGL 3 & glfw
@@ -143,6 +145,10 @@ object Runner {
         activeScreen = ExampleScreen()
 
         while (!GLFW.glfwWindowShouldClose(window)) {
+            val main = Profiler.profile("Main")
+
+            val render = main.watch("Render")
+
             val t = GLFW.glfwGetTime()
             val n = System.nanoTime()
             val width = (framebufferWidth / contentScaleX).toInt()
@@ -158,23 +164,38 @@ object Runner {
             core!!.beginFrame(width.toFloat(), height.toFloat(), Math.max(contentScaleX, contentScaleY))
             core!!.render(width.toFloat(), height.toFloat())
 
-            renderer {
-                color(-1)
-                font("Poppins-regular", 16f, ALIGNLEFT or ALIGNTOP, 0f)
-                fps.toString().render(0f ,0f)
+            if (UICore.debug) {
+//                renderer {
+//                    color(-1)
+//                    font("Poppins-regular", 16f, ALIGNLEFT or ALIGNTOP, 0f)
+//                    ("FPS: $fps").render(0f, 0f)
+//                    ("Render Time: $renderTime ns $renderAvg%").render(0f, 16f)
+//                    ("Content Render Time: ${UICore.contentRenderTime}").render(0f, 32f)
+//                    ("Last Update Time: ${UICore.updateTime}").render(0f, 48f)
+//                }
             }
 
             core!!.endFrame()
             GLFW.glfwSwapBuffers(window)
             GLFW.glfwPollEvents()
+
+            //main.endWatch()
+
             if (lastSecond + 1000L <= System.currentTimeMillis()) {
                 lastSecond = System.currentTimeMillis()
                 fps = actualFps
                 actualFps = 0
+
+                val avg = render.getAverage()
+                val output = (avg * 100.0).roundToInt().toDouble() / 100.0
+
+                println("avg: ${avg * 100.0}, output: $output")
+
+                Profiler.endProfile()
             } else {
                 actualFps++
             }
-            instance.animationLock.release()
+//            instance.animationLock.release()
         }
         GL.setCapabilities(null)
         Callbacks.glfwFreeCallbacks(window)
