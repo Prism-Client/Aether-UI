@@ -52,7 +52,7 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
-        val contentScale = max(contentScaleX, contentScaleY)
+        val contentScale = max(1f, max(contentScaleX, contentScaleY))
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
             NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
