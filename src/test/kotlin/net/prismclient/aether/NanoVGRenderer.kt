@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.UICore.Companion.contentScaleY
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
+import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIProvider.getImage
 import net.prismclient.aether.ui.style.UIProvider.registerImage
 import net.prismclient.aether.ui.util.extensions.getAlpha
@@ -369,7 +370,8 @@ class NanoVGRenderer : UIRenderer() {
     }
 
     override fun deleteImage(imageName: String) {
-        // TODO Deleting images not yet implemented
+        nvgDeleteImage(ctx, getImage(imageName)?.handle ?: 0)
+        UIProvider.deleteImage(imageName)
     }
 
     override fun loadFont(fontName: String, fontData: ByteBuffer?): Boolean {

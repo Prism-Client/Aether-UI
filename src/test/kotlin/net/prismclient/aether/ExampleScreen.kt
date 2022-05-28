@@ -5,11 +5,10 @@ import net.prismclient.aether.dependencies.ComponentStyles
 import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
-import net.prismclient.aether.ui.component.type.input.button.UICheckbox
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
+import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.util.UIFontFamily
-import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 
 class ExampleScreen : UIScreen() {
@@ -31,11 +30,17 @@ class ExampleScreen : UIScreen() {
                 size(24f, 24f)
             }
 
-            checkbox(true, imageStyle = "image", style = "btn") {
-                style { size(48f, 48f) }
+            button("Text", "btn") {
+                style {
+                    control(UIAlignment.CENTER)
+                    size(48f, 48f)
+                    padding {
 
-                onCheckChange { _, isSelected ->
-                    println("Selected: $isSelected")
+                    }
+                }
+            }.onMousePressed {
+                if (it.isMouseInsideBoundingBox()) {
+                    UIProvider.dispatchAnimation("testAnimation", it)
                 }
             }
         }

@@ -1,14 +1,15 @@
 package net.prismclient.aether.ui.animation
 
-import net.prismclient.aether.ui.animation.util.UIIEase
+import net.prismclient.aether.ui.animation.ease.UIEase
+import net.prismclient.aether.ui.animation.ease.impl.UILinear
+import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.util.*
-import net.prismclient.aether.ui.util.UIAnimationPriority
-import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.unit.util.INITIAL
 import net.prismclient.aether.ui.util.extensions.isNormal
+import net.prismclient.aether.ui.util.interfaces.UICopy
 import java.util.function.Consumer
 
 /**
@@ -23,11 +24,16 @@ import java.util.function.Consumer
  *
  * @author sen
  * @since 3/5/2022
+ *
+ * @param style An instance of [T], a [UIStyleSheet] which is copied to create new keyframes. Any properties set to it
+ * will be copied to the new keyframes.
  */
-abstract class UIAnimation<T>(
-    val name: String,
-    var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
-) : UICopy<UIAnimation<T>> where T : UIStyleSheet, T : UIIEase {
+@Suppress("UNCHECKED_CAST")
+class UIAnimation<T : UIStyleSheet>(
+        var style: T,
+        val name: String,
+        var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
+) : UICopy<UIAnimation<T>> {
     val lifetime = System.currentTimeMillis()
     val timeline: ArrayList<T> = ArrayList()
 
@@ -45,36 +51,57 @@ abstract class UIAnimation<T>(
     var completed: Boolean = false
         protected set
 
-    open fun start(component: UIComponent<*>) {
+    fun start(component: UIComponent<*>) {
         this.component = component
 
         if (timeline.size < 1) {
             println("Timeline must have at least 1 keyframe to start an animation")
             return
-        } else if (timeline.size == 1) {
-            timeline.add(timeline[0])
-            timeline[0] = getStyle()
-        }
+        } //else if (timeline.size == 1) {
+//            timeline.add(timeline[0])
+//            timeline[0] = getStyle()
+//        }
 
         animationLength = 0L
         animating = true
         completed = false
 
-        for (keyframe in timeline)
-            animationLength += keyframe.ease.duration
+        for (keyframe in timeline) {
+            if (keyframe.ease == null)
+                keyframe.ease = UILinear()
+            animationLength += keyframe.ease!!.duration
+        }
 
         onCreationListeners?.forEach { it.accept(this) }
     }
 
-    open fun pause() {
+    fun pause() {
         TODO("Pausing of animations have not yet been implemented")
     }
 
-    open fun stop() {
+    fun stop() {
         TODO("Stopping of animations have not yet been implemented")
     }
 
-    open fun update() {
+    /**
+     * Updates the animation cache on the offhand chance that the window is resized during
+     * the animation
+     */
+    fun updateCache() {
+        component.style.updateAnimationCache(component)
+    }
+
+    /**
+     * Clears the animation cache. It is automatically invoked when the animation is completed.
+     */
+    fun clearCache() {
+        component.style.clearAnimationCache()
+    }
+
+    /**
+     * Invoked on the screen render. The animation is updated here.
+     */
+    fun update() {
         if (completed || !animating)
             return
         if (!this::component.isInitialized)
@@ -83,7 +110,7 @@ abstract class UIAnimation<T>(
         if (activeKeyframe == null) {
             activeKeyframe = timeline[0]
             nextKeyframe = timeline[1]
-            nextKeyframe!!.ease.start()
+            nextKeyframe!!.ease!!.start()
             nextKeyframeIndex = 1
         }
 
@@ -91,7 +118,7 @@ abstract class UIAnimation<T>(
             return
         } else {
             // If current animation past the current time
-            if (nextKeyframe!!.ease.endTime <= System.currentTimeMillis()) {
+            if (nextKeyframe!!.ease!!.endTime <= System.currentTimeMillis()) {
                 if (timeline.size > ++nextKeyframeIndex) {
                     swapKeyframe(timeline[nextKeyframeIndex])
                 } else {
@@ -102,21 +129,23 @@ abstract class UIAnimation<T>(
             }
         }
         component.update()
-        updateKeyframes()
+        component.style.animate(activeKeyframe, nextKeyframe, nextKeyframe!!.ease!!.getValue().toFloat(), component)
         component.updateBounds()
         component.updateStyle()
     }
 
-    abstract fun updateKeyframes()
-
     fun swapKeyframe(next: T) {
         activeKeyframe = nextKeyframe
         nextKeyframe = next
-        nextKeyframe!!.ease.start()
+        nextKeyframe!!.ease!!.start()
         saveState(activeKeyframe!!)
     }
 
-    abstract fun saveState(k: T)
+    fun saveState(keyframe: T) {
+
+        // TODO: abstract fun saveState(k: T)
+
+    }
 
     fun forceComplete() {
         println("Forced animation completion.")
@@ -129,6 +158,9 @@ abstract class UIAnimation<T>(
 
         saveState(timeline[timeline.size - 1])
 
+        // Clear the cache after the state has been saved (if it needs to be saved)
+        clearCache()
+
         UIProvider.completeAnimation(this)
 
         // Invoke the listeners that the animation has been completed
@@ -140,12 +172,19 @@ abstract class UIAnimation<T>(
      *
      * @param block The [UIStyleSheet] that adjusts the component's properties.
      */
-    inline fun keyframe(sheet: T, block: T.() -> Unit): T {
-        // Check if the animation is active
+    inline fun keyframe(ease: UIEase = UILinear(1000L), keep: Boolean = false, block: T.() -> Unit): T {
+        val sheet: T
+        try {
+            sheet = style.copy() as T
+        } catch (e: Exception) {
+            throw UIComponent.InvalidStyleSheetException("anim-$name-${timeline.size}", null)
+        }
         if (animating)
             throw RuntimeException("Cannot add keyframe while animating")
         timeline.add(sheet)
         sheet.name = "anim-$name-${timeline.size}"
+        sheet.ease = ease
+        sheet.animationResult = if (keep) UIAnimationResult.Retain else UIAnimationResult.Reset
         sheet.block()
 
         return sheet
@@ -158,12 +197,6 @@ abstract class UIAnimation<T>(
             return component.calculateUnitX(this, component.getParentWidth(), false)
         return when (this.type) {
             INITIAL -> x
-            PXANIMRELATIVE -> x + this.value
-            RELANIMRELATIVE -> x + component.getParentWidth() * this.value
-            XANIM -> component.x * this.value
-            YANIM -> component.y * this.value
-            WIDTHANIM -> component.width * this.value
-            HEIGHTANIM -> component.height * this.value
             else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
         }
     }
@@ -175,12 +208,6 @@ abstract class UIAnimation<T>(
             return component.calculateUnitY(this, component.getParentHeight(), false)
         return when (this.type) {
             INITIAL -> y
-            PXANIMRELATIVE -> y + this.value
-            RELANIMRELATIVE -> y + component.getParentHeight() * this.value
-            XANIM -> component.x * this.value
-            YANIM -> component.y * this.value
-            WIDTHANIM -> component.width * this.value
-            HEIGHTANIM -> component.height * this.value
             else -> throw UnsupportedOperationException("${this.type} is not a valid type.")
         }
     }
@@ -189,7 +216,7 @@ abstract class UIAnimation<T>(
      * Returns null if type is INITIAL, as a component cannot have it set to that type
      */
     protected operator fun UIUnit?.unaryPlus(): UIUnit? =
-        if (this?.type == INITIAL) null else this
+            if (this?.type == INITIAL) null else this
 
     fun first(event: Consumer<UIAnimation<T>>) {
         if (onCreationListeners == null)
@@ -210,5 +237,9 @@ abstract class UIAnimation<T>(
         this.onCompletionListeners = animation.onCompletionListeners
     }
 
-    protected abstract fun getStyle(): T
+    override fun copy(): UIAnimation<T> = UIAnimation(style, name, priority).also {
+        it.apply(this)
+        for (animation in timeline)
+            it.timeline.add(animation.copy() as T)
+    }
 }

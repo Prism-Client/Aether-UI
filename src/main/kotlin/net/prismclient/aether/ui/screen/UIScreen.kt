@@ -3,7 +3,7 @@ package net.prismclient.aether.ui.screen
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
-import net.prismclient.aether.ui.util.UIDependable
+import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.create
 

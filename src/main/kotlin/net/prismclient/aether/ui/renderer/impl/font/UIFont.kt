@@ -1,23 +1,24 @@
 package net.prismclient.aether.ui.renderer.impl.font
 
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.shape.UIShape
-import net.prismclient.aether.ui.util.extensions.align
-import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
 /**
- * [UIFont] is a renderer which renders a component's font.
+ * [UIFont] is a [UIShape] which renders a string based on a set of requirements
+ * (the properties of this).
  *
  * Note: Width, and height are ignored.
  *
  * @author sen
  * @since 4/26/2022
  */
-open class UIFont : UIShape() {
+open class UIFont : UIShape(), UIAnimatable<UIFont> {
     /**
      * When true, the component will be ensured to be at
      * least the size of the font width and height
@@ -182,6 +183,47 @@ open class UIFont : UIShape() {
         Thin
     }
 
+    override fun copy(): UIFont = UIFont().also {
+        it.apply(this)
+
+        it.overrideParent = overrideParent
+        it.fontRenderType = fontRenderType
+        it.textAlignment = textAlignment
+        it.fontStyle = fontStyle
+        it.fontColor = fontColor
+        it.fontType = fontType
+        it.fontFamily = fontFamily
+        it.fontSize = fontSize
+        it.fontSpacing = fontSpacing
+        it.lineBreakWidth = lineBreakWidth
+        it.lineHeight = lineHeight
+        it.appendedString = appendedString
+
+        if (isOverridden)
+            it.overwriteFontName(fontName)
+    }
+
+    protected var fontCache: FontCache? = null
+
+    override fun updateAnimationCache(component: UIComponent<*>) {
+
+    }
+
+    override fun clearAnimationCache() {
+
+    }
+
+    override fun animate(previous: UIFont?, current: UIFont?, progress: Float, component: UIComponent<*>) {
+        fontCache = fontCache ?: FontCache(fontColor, fontSize, fontSpacing, lineBreakWidth, lineHeight)
+        // fontColor
+        // fontSize
+        // fontSpacing
+        // lineBreakWidth
+        // lineHeight
+        fontColor = transition(current?.fontColor ?: fontCache!!.fontColor, previous?.fontColor ?: fontCache!!.fontColor, progress)
+        fontSize = fromProgress(previous?.fontSize ?: fontCache!!.fontSize, current?.fontSize ?: fontCache!!.fontSize, progress)
+    }
+
     /**
      * Instructs [UIFont] on how to render the text. See the enums for details.
      *
@@ -220,23 +262,5 @@ open class UIFont : UIShape() {
         APPEND
     }
 
-    override fun copy(): UIFont = UIFont().also {
-        it.apply(this)
-
-        it.overrideParent = overrideParent
-        it.fontRenderType = fontRenderType
-        it.textAlignment = textAlignment
-        it.fontStyle = fontStyle
-        it.fontColor = fontColor
-        it.fontType = fontType
-        it.fontFamily = fontFamily
-        it.fontSize = fontSize
-        it.fontSpacing = fontSpacing
-        it.lineBreakWidth = lineBreakWidth
-        it.lineHeight = lineHeight
-        it.appendedString = appendedString
-
-        if (isOverridden)
-            it.overwriteFontName(fontName)
-    }
+    protected inner class FontCache(var fontColor: Int, var fontSize: Float, var fontSpacing: Float, var lineBreakWidth: Float, var lineHeight: Float)
 }

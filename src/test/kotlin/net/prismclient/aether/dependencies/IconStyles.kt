@@ -1,6 +1,6 @@
 package net.prismclient.aether.dependencies
 
-import net.prismclient.aether.ui.util.UIDependable
+import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**

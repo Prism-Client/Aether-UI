@@ -15,12 +15,10 @@ import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.*
 
 /**
- * [UIComponentDSL] is a DSL builder for defining components on the screen.
+ * [UIComponentDSL] is a DSL builder for defining components on the screen. Components should be implemented this way
  *
  * @author sen
  * @since 12/5/2022
- *
- * @see net.prismclient.aether.ui.util.extensions.create
  */
 object UIComponentDSL {
     private var components: ArrayList<UIComponent<*>>? = null
@@ -249,6 +247,9 @@ object UIComponentDSL {
      */
     fun get(): ArrayList<UIComponent<*>> = components!!
 
+    /**
+     * Returns an ArrayList of frames created
+     */
     fun getFrames(): ArrayList<UIFrame<*>> = frames!!
 
     /**

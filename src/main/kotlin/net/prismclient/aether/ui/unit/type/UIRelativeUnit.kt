@@ -1,14 +1,13 @@
 package net.prismclient.aether.ui.unit.type
 
-import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.unit.UIUnit
 
 /**
- * [UIRelativeUnit] represents a [UIUnit]. By default, it is exactly like
- * a [UIUnit] except when in an [UIAnimation] style sheet. When in a [UIAnimation]
- * style sheet, the value is equal to the value += this instead of value = this
+ * [UIRelativeUnit] acts as a normal [UIUnit] except when in an
+ * active animation. When in an active animation this represents the
+ * initial starting point plus the calculated value.
  *
  * @author sen
- * @since 4/5/2022
+ * @since 5/26/2022
  */
 class UIRelativeUnit(value: Float, type: Byte) : UIUnit(value, type)

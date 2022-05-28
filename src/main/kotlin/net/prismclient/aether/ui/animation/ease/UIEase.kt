@@ -3,7 +3,7 @@ package net.prismclient.aether.ui.animation.ease
 import net.prismclient.aether.ui.animation.ease.UIEaseDirection.*
 import net.prismclient.aether.ui.animation.ease.UIEaseType.*
 import net.prismclient.aether.ui.animation.ease.impl.*
-import net.prismclient.aether.ui.util.UICopy
+import net.prismclient.aether.ui.util.interfaces.UICopy
 
 abstract class UIEase(var duration: Long = 1000L, var animationDirection: UIEaseDirection = INOUT) : UICopy<UIEase> {
     var animating: Boolean = false
@@ -60,7 +60,7 @@ abstract class UIEase(var duration: Long = 1000L, var animationDirection: UIEase
                 "quint" -> QUINT
                 "expo", "exponential" -> EXPO
                 "circ", "circle" -> CIRC
-                else -> LINEAR // TODO: Warn if invalid easeType
+                else -> LINEAR
             }
         }
 

@@ -53,8 +53,8 @@ fun calculateX(
 ): Float {
     return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) calculateX(unit, component, width)
     else when (unit.type) {
-        PIXELS, PXANIMRELATIVE -> unit.value
-        RELATIVE, RELANIMRELATIVE -> unit.value * width
+        PIXELS,-> unit.value
+        RELATIVE -> unit.value * width
         EM -> unit.value * (component.style.font?.fontSize ?: 0f)
         ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
         DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
@@ -108,8 +108,8 @@ fun calculateY(unit: UIUnit?, component: UIComponent<*>, height: Float, ignoreOp
         height
     )
     else when (unit.type) {
-        PIXELS, PXANIMRELATIVE -> unit.value
-        RELATIVE, RELANIMRELATIVE -> unit.value * height
+        PIXELS -> unit.value
+        RELATIVE -> unit.value * height
         EM -> unit.value * (component.style.font?.fontSize ?: 0f)
         ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
         DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
@@ -170,12 +170,6 @@ fun align(alignment: UIAlignment, x: UIUnit, y: UIUnit) {
         else -> 0f
     }
 }
-
-/**
- * Returns true if the [UIUnit.type] is a relative animation type
- */
-fun Byte.isAnimationRelative(): Boolean =
-    this == PXANIMRELATIVE || this == RELANIMRELATIVE
 
 /**
  * Returns true if the Unit is of a normal unit that is not unique to a given component

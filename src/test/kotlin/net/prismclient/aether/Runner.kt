@@ -4,8 +4,12 @@ import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Companion.activeScreen
 import net.prismclient.aether.ui.UICore.Companion.instance
 import net.prismclient.aether.ui.callback.UICoreCallback
+import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.util.extensions.renderer
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -153,6 +157,13 @@ object Runner {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
             core!!.beginFrame(width.toFloat(), height.toFloat(), Math.max(contentScaleX, contentScaleY))
             core!!.render(width.toFloat(), height.toFloat())
+
+            renderer {
+                color(-1)
+                font("Poppins-regular", 16f, ALIGNLEFT or ALIGNTOP, 0f)
+                fps.toString().render(0f ,0f)
+            }
+
             core!!.endFrame()
             GLFW.glfwSwapBuffers(window)
             GLFW.glfwPollEvents()
