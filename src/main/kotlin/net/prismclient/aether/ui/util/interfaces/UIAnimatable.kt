@@ -49,4 +49,10 @@ interface UIAnimatable<T> {
      * @param component This parameter is option and can be null depending on the needs of the [UIAnimatable]
      */
     fun animate(previous: T?, current: T?, progress: Float, component: UIComponent<*>)
+
+    /**
+     * Invoked when the animation with this keyframe is updated. If the parameter [saveState]
+     * is true, then [current] should be the value, else the cached value should be the value
+     */
+    fun saveState(component: UIComponent<*>, retain: Boolean)
 }

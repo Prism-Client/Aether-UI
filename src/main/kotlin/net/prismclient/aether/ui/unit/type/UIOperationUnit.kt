@@ -9,4 +9,8 @@ class UIOperationUnit(var unit1: UIUnit, var unit2: UIUnit, var operation: UIOpe
     fun sort(): UIOperationUnit {
         TODO("Operation sorting not yet implemented")
     }
+
+    override fun toString(): String {
+        return "UIOperationUnit(unit1=$unit1, unit2=$unit2, operation=$operation)"
+    }
 }

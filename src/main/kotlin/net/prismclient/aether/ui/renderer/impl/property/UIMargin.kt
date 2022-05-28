@@ -29,7 +29,7 @@ class UIMargin : UICopy<UIMargin>, UIAnimatable<UIMargin> {
     }
 
     override fun animate(previous: UIMargin?, current: UIMargin?, progress: Float, component: UIComponent<*>) {
-        cachedMargin = cachedMargin ?: CachedValues(component.paddingTop, component.paddingRight, component.paddingBottom, component.paddingLeft)
+        cachedMargin = cachedMargin ?: CachedValues(component.marginTop, component.marginRight, component.marginBottom, component.marginLeft)
 
         component.marginTop = fromProgress(
                 if (previous == null) cachedMargin!!.top else component.getY(previous.marginTop),
@@ -44,16 +44,24 @@ class UIMargin : UICopy<UIMargin>, UIAnimatable<UIMargin> {
         )
 
         component.marginBottom = fromProgress(
+            if (current == null) cachedMargin!!.bottom else component.getY(current.marginBottom),
                 if (previous == null) cachedMargin!!.bottom else component.getY(previous.marginBottom),
-                if (current == null) cachedMargin!!.bottom else component.getY(current.marginBottom),
                 progress
         )
 
         component.marginLeft = fromProgress(
-                if (previous == null) cachedMargin!!.left else component.getX(previous.marginLeft),
-                if (current == null) cachedMargin!!.left else component.getX(current.marginLeft),
-                progress
+            if (current == null) cachedMargin!!.left else component.getX(current.marginLeft),
+            if (previous == null) cachedMargin!!.left else component.getX(previous.marginLeft),
+            progress
         )
+    }
+
+    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun toString(): String {
+        return "UIMargin(marginTop=$marginTop, marginRight=$marginRight, marginBottom=$marginBottom, marginLeft=$marginLeft)"
     }
 
     inner class CachedValues(val top: Float, val right: Float, val bottom: Float, val left: Float)

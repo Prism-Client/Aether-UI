@@ -12,15 +12,11 @@ class AnimationStyles : UIDependable() {
     override fun load() {
         animation(UIStyleSheet(), "testAnimation") {
             keyframe {
-                font {
-                    fontSize = 16f
-                }
+
             }
 
             keyframe(UIQuart(1000L)) {
-                font {
-                    fontSize = 32f
-                }
+                padding(100f)
             }
         }
     }

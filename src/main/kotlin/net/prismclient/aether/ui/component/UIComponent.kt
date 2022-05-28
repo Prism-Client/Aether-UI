@@ -55,7 +55,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var relWidth = 0f
     var relHeight = 0f
 
-    /** Padding and Margin **/
+    /** Cached Properties **/
     var paddingTop = 0f
     var paddingRight = 0f
     var paddingBottom = 0f
@@ -65,6 +65,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var marginRight = 0f
     var marginBottom = 0f
     var marginLeft = 0f
+
+    var anchorX = 0f
+    var anchorY = 0f
 
     var wasInside = false
 
@@ -108,8 +111,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      */
     open fun update() {
         calculateBounds()
-        // Update the size, then the position
+        // Update the size, then the anchor, and then the position
         updateSize()
+        updateAnchorPoint()
         updatePosition()
 
         // Update the relative values
@@ -120,13 +124,22 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
+     * Updates the styles anchor point. This should happen after [updateSize]
+     * and before [updatePosition].
+     */
+    open fun updateAnchorPoint() {
+        anchorX = calculateUnitX(style.anchor?.x, width, false)
+        anchorY = calculateUnitY(style.anchor?.y, height, false)
+    }
+
+    /**
      * Invoked from the update method. If not [overridden], the component
      * will update its position relative to its parent
      */
     open fun updatePosition() {
         if (!overridden) {
-            x = +style.x + getParentX() - getAnchorX() + marginLeft
-            y = -style.y + getParentY() - getAnchorY() + marginTop
+            x = +style.x + getParentX() + marginLeft - anchorX
+            y = -style.y + getParentY() + marginTop - anchorY
         }
     }
 
@@ -334,9 +347,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
 
-    fun getAnchorX() = calculateUnitX(style.anchor?.x, width, false)
-
-    fun getAnchorY() = calculateUnitY(style.anchor?.y, height, false)
+//    fun getAnchorX() = calculateUnitX(style.anchor?.x, width, false)
+//
+//    fun getAnchorY() = calculateUnitY(style.anchor?.y, height, false)
 
     fun isMouseInside() = (getMouseX() > x) && (getMouseY() > y) && (getMouseX() < x + width) && (getMouseY() < y + height)
 

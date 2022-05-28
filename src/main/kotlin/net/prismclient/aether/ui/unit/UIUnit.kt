@@ -14,4 +14,8 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  */
 open class UIUnit @JvmOverloads constructor(var value: Float = 0f, var type: Byte = PIXELS) : UICopy<UIUnit> {
     override fun copy() = UIUnit(value, type)
+
+    override fun toString(): String {
+        return "UIUnit(value=$value, type=$type)"
+    }
 }

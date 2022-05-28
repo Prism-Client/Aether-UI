@@ -21,7 +21,7 @@ class ComponentStyles : UIDependable() {
             size(380f, 100f)
             background(asRGBA(0, 0, 0, 0.3f), radius(15f))
 
-            margin(10f)
+//            margin(10f)
 
             font {
                 align(UIAlignment.CENTER)

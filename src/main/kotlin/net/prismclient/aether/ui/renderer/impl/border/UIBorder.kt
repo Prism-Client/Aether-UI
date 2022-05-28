@@ -55,4 +55,8 @@ class UIBorder : UIShape(), UIAnimatable<UIBorder> {
         borderColor = transition(previous?.borderColor ?: cachedBorder!!.borderColor, current?.borderColor
                 ?: cachedBorder!!.borderColor, progress)
     }
+
+    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+        TODO("Not yet implemented")
+    }
 }

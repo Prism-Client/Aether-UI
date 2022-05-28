@@ -142,9 +142,7 @@ class UIAnimation<T : UIStyleSheet>(
     }
 
     fun saveState(keyframe: T) {
-
-        // TODO: abstract fun saveState(k: T)
-
+        component.style.saveState(component, (keyframe.animationResult != UIAnimationResult.Reset))
     }
 
     fun forceComplete() {

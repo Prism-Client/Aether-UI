@@ -34,9 +34,7 @@ class ExampleScreen : UIScreen() {
                 style {
                     control(UIAlignment.CENTER)
                     size(48f, 48f)
-                    padding {
-
-                    }
+                    margin(10f)
                 }
             }.onMousePressed {
                 if (it.isMouseInsideBoundingBox()) {

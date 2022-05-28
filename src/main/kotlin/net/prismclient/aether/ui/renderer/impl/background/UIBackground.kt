@@ -59,6 +59,10 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
         border?.animate(previous?.border, current?.border, progress, component)
     }
 
+    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+        //TODO("Not yet implemented")
+    }
+
     override fun copy(): UIBackground = UIBackground().also {
         it.color = color
         it.radius = radius?.copy()

@@ -57,6 +57,10 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
         )
     }
 
+    override fun saveState(component: UIComponent<*>, retain: Boolean) {
+        //TODO("Not yet implemented")
+    }
+
     override fun toString(): String {
         return "UIPadding(paddingTop=$paddingTop, paddingRight=$paddingRight, paddingBottom=$paddingBottom, paddingLeft=$paddingLeft)"
     }
