@@ -31,14 +31,15 @@ class ExampleScreen : UIScreen() {
             }
 
             val checkbox = checkbox(true, imageStyle = "image", style = "btn") {
-                style { size(48f, 48f) }
+                style {
+                    control(UIAlignment.CENTER)
+                    size(48f, 48f)
+                }
 
                 onCheckChange { _, isSelected ->
                     println("Selected: $isSelected")
                 }
-            }.hover("fadeIn", "fadeOut")
-
-            UIProvider.dispatchAnimation("easeInLeft", checkbox)
+            }.hover("testAnimation", "testAnimation")
         }
     }
 

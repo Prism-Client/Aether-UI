@@ -1,11 +1,13 @@
 package net.prismclient.aether.ui.renderer.impl.background
 
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.extensions.transition
+import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
 /**
  * [UIBackground] represents the background properties of a UIComponent which can be rendered. It also has
@@ -14,7 +16,7 @@ import net.prismclient.aether.ui.util.extensions.transition
  * @author sen
  * @since 4/26/2022
  */
-open class UIBackground : UICopy<UIBackground> {
+open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
     var color = UIDefaults.instance.backgroundColor
     var radius: UIRadius? = null
     var border: UIBorder? = null
@@ -32,32 +34,18 @@ open class UIBackground : UICopy<UIBackground> {
         border!!.block()
     }
 
-    /**
-     * A cached instance of this before an animation is started
-     */
-    protected var cachedBackground: UIBackground? = null
+    protected var cachedColor: Int? = null
 
-    /**
-     * Necessary for animations. Given two background classes, and a progress
-     * the values must be calculated and then applied to this class for the
-     * animation to work properly.
-     *
-     * The given [previousBackground] and [activeBackground] can assume to be the
-     * same type of [UIBackground] as this.
-     *
-     * If the given [previousBackground] or [activeBackground] are null, then the
-     * value should be the cached value
-     */
-    open fun animate(previousBackground: UIBackground?, activeBackground: UIBackground?, progress: Float) {
-        cachedBackground = cachedBackground ?: this.copy()
+    override fun animate(previous: UIBackground?, current: UIBackground?, progress: Float, component: UIComponent<*>?) {
+        cachedColor = cachedColor ?: color
 
         color = transition(
-            previousBackground?.color ?: cachedBackground!!.color,
-            activeBackground?.color ?: cachedBackground!!.color,
+            previous?.color ?: cachedColor!!,
+            current?.color ?: cachedColor!!,
             progress
         )
-
-        radius
+        radius?.animate(previous?.radius, current?.radius, progress, null)
+        border?.animate(previous?.border, current?.border, progress, null)
     }
 
     override fun copy(): UIBackground = UIBackground().also {

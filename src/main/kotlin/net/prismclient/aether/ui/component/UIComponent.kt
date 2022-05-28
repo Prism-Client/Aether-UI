@@ -395,5 +395,5 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * @author sen
      * @since 5/25/2022
      */
-    class InvalidStyleSheetException(styleName: String, component: UIComponent<*>) : Exception("Style of name \"$styleName\" is not a valid instance of $component. Is the style sheet passed an instance of the required style sheeet for the component? If the style sheet is a custom implementation, please check if you have added the copy method which returns an instance of that style sheeet.")
+    class InvalidStyleSheetException(styleName: String, component: UIComponent<*>?) : Exception("Style of name \"$styleName\" is not a valid instance of $component. Is the style sheet passed an instance of the required style sheeet for the component? If the style sheet is a custom implementation, please check if you have added the copy method which returns an instance of that style sheeet.")
 }

@@ -1,10 +1,20 @@
 package net.prismclient.aether.ui.style.util
 
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.px
+import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
-class UIAnchorPoint {
+/**
+ * [UIAnchorPoint] holds two [UIUnit], [x], and [y]. They represent the position
+ * within a component. When the component's position is updated, the two [UIUnit]
+ * are incorporated into the position calculation.
+ *
+ * @author sen
+ * @since 1.0
+ */
+class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
     var x: UIUnit? = null
     var y: UIUnit? = null
 
@@ -17,5 +27,9 @@ class UIAnchorPoint {
     fun copy(): UIAnchorPoint = UIAnchorPoint().also {
         it.x = x?.copy()
         it.y = y?.copy()
+    }
+
+    override fun animate(previous: UIAnchorPoint?, current: UIAnchorPoint?, progress: Float, component: UIComponent<*>?) {
+        // TODO: Anchor point animations
     }
 }
