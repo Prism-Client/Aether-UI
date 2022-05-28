@@ -139,8 +139,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      * Sets the color of the background
      */
     @JvmOverloads
-    inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
-        background { this.color = color; this.radius = radius; this.block() }
+    inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) = background { this.color = color; this.radius = radius; this.block() }
 
     /** Font **/
 
@@ -166,20 +165,14 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
 
     fun padding(unit: UIUnit) = padding(unit, unit, unit, unit)
 
-    fun padding(paddingTop: Float = 0f, paddingRight: Float = 0f, paddingBottom: Float = 0f, paddingLeft: Float = 0f) =
-        padding {
-            this.paddingTop = px(paddingTop)
-            this.paddingRight = px(paddingRight)
-            this.paddingBottom = px(paddingBottom)
-            this.paddingLeft = px(paddingLeft)
-        }
+    fun padding(paddingTop: Float = 0f, paddingRight: Float = 0f, paddingBottom: Float = 0f, paddingLeft: Float = 0f) = padding {
+        this.paddingTop = px(paddingTop)
+        this.paddingRight = px(paddingRight)
+        this.paddingBottom = px(paddingBottom)
+        this.paddingLeft = px(paddingLeft)
+    }
 
-    fun padding(
-        paddingTop: UIUnit? = padding?.paddingTop,
-        paddingRight: UIUnit? = padding?.paddingRight,
-        paddingBottom: UIUnit? = padding?.paddingBottom,
-        paddingLeft: UIUnit? = padding?.paddingLeft
-    ) = padding {
+    fun padding(paddingTop: UIUnit? = padding?.paddingTop, paddingRight: UIUnit? = padding?.paddingRight, paddingBottom: UIUnit? = padding?.paddingBottom, paddingLeft: UIUnit? = padding?.paddingLeft) = padding {
         this.paddingTop = paddingTop
         this.paddingRight = paddingRight
         this.paddingBottom = paddingBottom
@@ -198,20 +191,14 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
 
     fun margin(unit: UIUnit) = margin(unit, unit, unit, unit)
 
-    fun margin(marginTop: Float = 0f, marginRight: Float = 0f, marginBottom: Float = 0f, marginLeft: Float = 0f) =
-        margin {
-            this.marginTop = px(marginTop)
-            this.marginRight = px(marginRight)
-            this.marginBottom = px(marginBottom)
-            this.marginLeft = px(marginLeft)
-        }
+    fun margin(marginTop: Float = 0f, marginRight: Float = 0f, marginBottom: Float = 0f, marginLeft: Float = 0f) = margin {
+        this.marginTop = px(marginTop)
+        this.marginRight = px(marginRight)
+        this.marginBottom = px(marginBottom)
+        this.marginLeft = px(marginLeft)
+    }
 
-    fun margin(
-        marginTop: UIUnit? = margin?.marginTop,
-        marginRight: UIUnit? = margin?.marginRight,
-        marginBottom: UIUnit? = margin?.marginBottom,
-        marginLeft: UIUnit? = margin?.marginLeft
-    ) = margin {
+    fun margin(marginTop: UIUnit? = margin?.marginTop, marginRight: UIUnit? = margin?.marginRight, marginBottom: UIUnit? = margin?.marginBottom, marginLeft: UIUnit? = margin?.marginLeft) = margin {
         this.marginTop = marginTop
         this.marginRight = marginRight
         this.marginBottom = marginBottom
@@ -219,31 +206,6 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     }
 
     override fun copy(): UIStyleSheet = UIStyleSheet().apply(this)
-
-    /**
-     * Applies the properties of an existing sheet to this
-     */
-    open fun apply(sheet: UIStyleSheet): UIStyleSheet {
-        this.name = sheet.name
-
-        this.background = sheet.background?.copy()
-        this.font = sheet.font?.copy()
-
-        this.ease = sheet.ease?.copy()
-        this.animationResult = sheet.animationResult
-
-        this.x = sheet.x?.copy()
-        this.y = sheet.y?.copy()
-        this.width = sheet.width?.copy()
-        this.height = sheet.height?.copy()
-
-        this.padding = sheet.padding?.copy()
-        this.margin = sheet.margin?.copy()
-        this.anchor = sheet.anchor?.copy()
-        this.clipContent = sheet.clipContent
-
-        return this
-    }
 
     protected var initialValue: UIStyleSheet.InitialValues? = null
 
@@ -272,29 +234,28 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     }
 
     override fun animate(previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float, component: UIComponent<*>) {
-        if (initialValue == null)
-            initialValue = InitialValues(
-                component.x,
-                component.y,
-                component.width,
-                component.height,
-                component.style.background?.copy(),
-                component.style.font?.copy()
-            )
+        initialValue = initialValue
+                ?: InitialValues(component.x, component.y, component.width, component.height, component.style.background?.copy(), component.style.font?.copy())
 
         anchor?.animate(previous?.anchor, current?.anchor, progress, component)
 
         // Calculate Bounds
-        padding?.animate(previous?.padding, padding, progress, component)
-        margin?.animate(previous?.margin, margin, progress, component)
+        padding?.animate(previous?.padding, current?.padding, progress, component)
+        margin?.animate(previous?.margin, current?.margin, progress, component)
 
         // Update Size
-        component.width = fromProgress(component.width(previous?.width), component.width(current?.width), progress)
-        component.height = fromProgress(component.height(previous?.height), component.height(current?.height), progress)
+        component.width = fromProgress(component.width(current?.width), component.width(previous?.width), progress)
+        component.height = fromProgress(component.height(current?.height), component.height(previous?.height), progress)
 
         // Update Position
-        component.x = fromProgress(component.x(previous?.x), component.x(current?.x), progress)
-        component.y = fromProgress(component.y(previous?.y), component.y(current?.y), progress)
+        if (!component.overridden) {
+            component.x = fromProgress(component.x(current?.x), component.x(previous?.x), progress)
+            component.y = fromProgress(component.y(current?.y), component.y(previous?.y), progress)
+            // Anchor doesn't need to be added because it is already
+            // calculated  within the component update method
+            component.x += component.getParentX() + component.marginLeft
+            component.y += component.getParentY() + component.marginTop
+        }
 
         // Update bounds
         component.updateBounds()
@@ -304,43 +265,57 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         font?.animate(previous?.font, current?.font, progress, component)
     }
 
-    fun UIComponent<*>.x(unit: UIUnit?): Float =
-        if (unit == null || unit is UIRelativeUnit) {
-            initialValue!!.x
-        } else {
-            0f
-        } + this.getX(unit)
+    fun UIComponent<*>.x(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
+        initialValue!!.x
+    } else {
+        0f
+    } + this.getX(unit)
 
-    fun UIComponent<*>.y(unit: UIUnit?): Float =
-        if (unit == null || unit is UIRelativeUnit) {
-            initialValue!!.y
-        } else {
-            0f
-        } + this.getY(unit)
+    fun UIComponent<*>.y(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
+        initialValue!!.y
+    } else {
+        0f
+    } + this.getY(unit)
 
-    fun UIComponent<*>.width(unit: UIUnit?): Float =
-        if (unit == null || unit is UIRelativeUnit) {
-            initialValue!!.width
-        } else {
-            0f
-        } + this.getX(unit)
+    fun UIComponent<*>.width(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
+        initialValue!!.width
+    } else {
+        0f
+    } + this.getX(unit)
 
-    fun UIComponent<*>.height(unit: UIUnit?): Float =
-        if (unit == null || unit is UIRelativeUnit) {
-            initialValue!!.height
-        } else {
-            0f
-        } + this.getY(unit)
+    fun UIComponent<*>.height(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
+        initialValue!!.height
+    } else {
+        0f
+    } + this.getY(unit)
+
+    /**
+     * Applies the properties of an existing sheet to this
+     */
+    open fun apply(sheet: UIStyleSheet): UIStyleSheet {
+        this.name = sheet.name
+
+        this.background = sheet.background?.copy()
+        this.font = sheet.font?.copy()
+
+        this.ease = sheet.ease?.copy()
+        this.animationResult = sheet.animationResult
+
+        this.x = sheet.x?.copy()
+        this.y = sheet.y?.copy()
+        this.width = sheet.width?.copy()
+        this.height = sheet.height?.copy()
+
+        this.padding = sheet.padding?.copy()
+        this.margin = sheet.margin?.copy()
+        this.anchor = sheet.anchor?.copy()
+        this.clipContent = sheet.clipContent
+
+        return this
+    }
 
     /**
      * Used to store the initial values of an animation
      */
-    protected inner class InitialValues(
-        var x: Float,
-        var y: Float,
-        var width: Float,
-        var height: Float,
-        val background: UIBackground?,
-        val font: UIFont?
-    )
+    protected inner class InitialValues(var x: Float, var y: Float, var width: Float, var height: Float, val background: UIBackground?, val font: UIFont?)
 }

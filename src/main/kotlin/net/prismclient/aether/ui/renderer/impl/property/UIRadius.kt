@@ -37,11 +37,11 @@ class UIRadius(
     }
 
     override fun animate(previous: UIRadius?, current: UIRadius?, progress: Float, component: UIComponent<*>) {
-        cachedRadius = cachedRadius ?: this.copy()
+        cachedRadius = cachedRadius ?: copy()
         
-        topLeft = fromProgress(previous?.topLeft ?: cachedRadius!!.topLeft, current?.topLeft ?: cachedRadius!!.topLeft, progress)
-        topRight = fromProgress(previous?.topRight ?: cachedRadius!!.topRight, current?.topRight ?: cachedRadius!!.topRight, progress)
-        bottomRight = fromProgress(previous?.bottomRight ?: cachedRadius!!.bottomRight, current?.bottomRight ?: cachedRadius!!.bottomRight, progress)
-        bottomLeft = fromProgress(previous?.bottomLeft ?: cachedRadius!!.bottomLeft, current?.bottomLeft ?: cachedRadius!!.bottomLeft, progress)
+        topLeft = fromProgress(current?.topLeft ?: cachedRadius!!.topLeft, previous?.topLeft ?: cachedRadius!!.topLeft, progress)
+        topRight = fromProgress(current?.topRight ?: cachedRadius!!.topRight, previous?.topRight ?: cachedRadius!!.topRight, progress)
+        bottomRight = fromProgress(current?.bottomRight ?: cachedRadius!!.bottomRight, previous?.bottomRight ?: cachedRadius!!.bottomRight, progress)
+        bottomLeft = fromProgress(current?.bottomLeft ?: cachedRadius!!.bottomLeft, previous?.bottomLeft ?: cachedRadius!!.bottomLeft, progress)
     }
 }

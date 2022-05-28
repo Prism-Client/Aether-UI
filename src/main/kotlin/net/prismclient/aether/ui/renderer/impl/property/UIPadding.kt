@@ -2,7 +2,6 @@ package net.prismclient.aether.ui.renderer.impl.property
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.type.UIRelativeUnit
 import net.prismclient.aether.ui.util.extensions.fromProgress
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
@@ -56,6 +55,10 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
                 if (current == null) cachedPadding!!.left else component.getX(current.paddingLeft),
                 progress
         )
+    }
+
+    override fun toString(): String {
+        return "UIPadding(paddingTop=$paddingTop, paddingRight=$paddingRight, paddingBottom=$paddingBottom, paddingLeft=$paddingLeft)"
     }
 
     inner class CachedValues(val top: Float, val right: Float, val bottom: Float, val left: Float)

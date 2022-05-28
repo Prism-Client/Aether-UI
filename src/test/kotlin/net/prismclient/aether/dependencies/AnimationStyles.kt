@@ -1,10 +1,9 @@
 package net.prismclient.aether.dependencies
 
-import net.prismclient.aether.ui.animation.ease.impl.UILinear
+import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.extensions.animation
-import net.prismclient.aether.ui.util.extensions.asRGBA
 
 /**
  * Example of animations as a [UIDependable]
@@ -13,14 +12,14 @@ class AnimationStyles : UIDependable() {
     override fun load() {
         animation(UIStyleSheet(), "testAnimation") {
             keyframe {
-                background {
-                    color = asRGBA(255, 0, 0)
+                font {
+                    fontSize = 16f
                 }
             }
 
-            keyframe(UILinear(5000L)) {
-                background {
-                    color = asRGBA(0, 255, 0)
+            keyframe(UIQuart(1000L)) {
+                font {
+                    fontSize = 32f
                 }
             }
         }

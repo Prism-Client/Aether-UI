@@ -6,9 +6,7 @@ import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.shape.UIShape
-import net.prismclient.aether.ui.util.extensions.align
-import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.extensions.*
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
 /**
@@ -205,6 +203,8 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             it.overwriteFontName(fontName)
     }
 
+    protected var fontCache: FontCache? = null
+
     override fun updateAnimationCache(component: UIComponent<*>) {
 
     }
@@ -214,7 +214,14 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     }
 
     override fun animate(previous: UIFont?, current: UIFont?, progress: Float, component: UIComponent<*>) {
-        // TODO: Animate fonts
+        fontCache = fontCache ?: FontCache(fontColor, fontSize, fontSpacing, lineBreakWidth, lineHeight)
+        // fontColor
+        // fontSize
+        // fontSpacing
+        // lineBreakWidth
+        // lineHeight
+        fontColor = transition(current?.fontColor ?: fontCache!!.fontColor, previous?.fontColor ?: fontCache!!.fontColor, progress)
+        fontSize = fromProgress(previous?.fontSize ?: fontCache!!.fontSize, current?.fontSize ?: fontCache!!.fontSize, progress)
     }
 
     /**
@@ -254,4 +261,6 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
          */
         APPEND
     }
+
+    protected inner class FontCache(var fontColor: Int, var fontSize: Float, var fontSpacing: Float, var lineBreakWidth: Float, var lineHeight: Float)
 }

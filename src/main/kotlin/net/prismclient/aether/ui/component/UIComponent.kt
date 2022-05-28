@@ -69,6 +69,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var wasInside = false
 
     /** Listeners **/
+    protected var initializationListeners: MutableList<Consumer<UIComponent<*>>>? = null
+    protected var updateListeners: MutableList<Consumer<UIComponent<*>>>? = null
+
     protected var mousePressedListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseReleasedListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseEnteredListeners: MutableList<Consumer<UIComponent<*>>>? = null
@@ -88,7 +91,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * for adding components to this one because the init method will place
      * the component before this one in the render list.
      */
-    open fun initialize() {}
+    open fun initialize() {
+        initializationListeners?.forEach { it.accept(this) }
+    }
 
     /**
      * Invoked on creation, and screen resize
@@ -102,6 +107,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         // Update the relative values
         updateBounds()
         updateStyle()
+
+        updateListeners?.forEach { it.accept(this) }
     }
 
     /**
@@ -231,30 +238,38 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     /** Event **/
 
-    open fun onMousePressed(event: Consumer<UIComponent<*>>): UIComponent<*> {
-        if (mousePressedListeners == null)
-            mousePressedListeners = mutableListOf()
+    open fun onInitialization(event: Consumer<UIComponent<*>>): UIComponent<T> {
+        initializationListeners = initializationListeners ?: mutableListOf()
+        initializationListeners?.add(event)
+        return this
+    }
+
+    open fun onUpdate(event: Consumer<UIComponent<*>>): UIComponent<T> {
+        updateListeners = updateListeners ?: mutableListOf()
+        updateListeners?.add(event)
+        return this
+    }
+
+    open fun onMousePressed(event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mousePressedListeners = mousePressedListeners ?: mutableListOf()
         mousePressedListeners!!.add(event)
         return this
     }
 
-    open fun onMouseReleased(event: Consumer<UIComponent<*>>): UIComponent<*> {
-        if (mouseReleasedListeners == null)
-            mouseReleasedListeners = mutableListOf()
+    open fun onMouseReleased(event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseReleasedListeners = mouseReleasedListeners ?: mutableListOf()
         mouseReleasedListeners!!.add(event)
         return this
     }
 
-    open fun onMouseEnter(event: Consumer<UIComponent<*>>): UIComponent<*> {
-        if (mouseEnteredListeners == null)
-            mouseEnteredListeners = mutableListOf()
+    open fun onMouseEnter(event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseEnteredListeners = mouseEnteredListeners ?: mutableListOf()
         mouseEnteredListeners!!.add(event)
         return this
     }
 
-    open fun onMouseLeave(event: Consumer<UIComponent<*>>): UIComponent<*> {
-        if (mouseLeaveListeners == null)
-            mouseLeaveListeners = mutableListOf()
+    open fun onMouseLeave(event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseLeaveListeners = mouseLeaveListeners ?: mutableListOf()
         mouseLeaveListeners!!.add(event)
         return this
     }

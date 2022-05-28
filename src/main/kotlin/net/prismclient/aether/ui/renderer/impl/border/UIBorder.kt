@@ -5,7 +5,6 @@ import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.util.extensions.fromProgress
-import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.extensions.transition
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
@@ -49,10 +48,10 @@ class UIBorder : UIShape(), UIAnimatable<UIBorder> {
     }
 
     override fun animate(previous: UIBorder?, current: UIBorder?, progress: Float, component: UIComponent<*>) {
-        cachedBorder = cachedBorder ?: this.copy()
+        cachedBorder = cachedBorder ?: copy()
 
-        borderWidth = fromProgress(previous?.borderWidth ?: cachedBorder!!.borderWidth, current?.borderWidth
-                ?: cachedBorder!!.borderWidth, progress)
+        borderWidth = fromProgress(current?.borderWidth
+                ?: cachedBorder!!.borderWidth, previous?.borderWidth ?: cachedBorder!!.borderWidth, progress)
         borderColor = transition(previous?.borderColor ?: cachedBorder!!.borderColor, current?.borderColor
                 ?: cachedBorder!!.borderColor, progress)
     }
