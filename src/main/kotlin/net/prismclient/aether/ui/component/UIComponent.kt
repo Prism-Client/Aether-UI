@@ -364,20 +364,30 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
 
-    fun getParentXOffset(): Float {
-        return (if (parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) {
-            parent!!.relX
-        } else 0f) - if (parent != null && parent is UIContainer) {
-            ((parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth)
+
+    // TODO: Fix broken layouts
+    fun getParentXOffset(skip: Boolean = false): Float {
+        val scrollbar = if (!skip && parent is UIContainer) {
+            (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
         } else 0f
+
+        return if (parent is UIFrame) {
+            if (((parent as UIFrame).style as UIFrameSheet).clipContent) {
+                return parent!!.relX
+            } else 0f
+        } else 0f - scrollbar// + getParentXOffset(true)
     }
 
-    fun getParentYOffset(): Float {
-        return (if (parent is UIFrame && (parent!!.style as UIFrameSheet).clipContent) {
-            parent!!.relY
-        } else 0f) - if (parent != null && parent is UIContainer) {
-            ((parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight)
+    fun getParentYOffset(skip: Boolean = false): Float {
+        val scrollbar = if (!skip && parent is UIContainer) {
+            (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
         } else 0f
+
+        return if (parent is UIFrame) {
+            if (((parent as UIFrame).style as UIFrameSheet).clipContent) {
+                return parent!!.relY
+            } else 0f
+        } else 0f - scrollbar// + getParentYOffset(true)
     }
 
     fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) = (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())

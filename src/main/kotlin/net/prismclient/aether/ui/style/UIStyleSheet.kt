@@ -119,9 +119,9 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         anchor!!.y!!.type = RELATIVE
 
         anchor!!.x!!.value = when (alignment) {
-            TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
-            MIDDLELEFT, CENTER, MIDDLERIGHT -> 0.5f
-            BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> 1f
+            TOPLEFT, MIDDLELEFT, BOTTOMLEFT -> 0f
+            TOPCENTER, CENTER, BOTTOMCENTER -> 0.5f
+            TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> 1f
             else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
         }
 

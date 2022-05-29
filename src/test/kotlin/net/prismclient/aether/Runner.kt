@@ -177,13 +177,15 @@ object Runner {
             core!!.beginFrame(width.toFloat(), height.toFloat(), Math.max(contentScaleX, contentScaleY))
             core!!.render(width.toFloat(), height.toFloat())
 
-            renderer {
-                color(-1)
-                font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
-                ("FPS: $fps").render(0f, 0f)
-                ("NanoVG: $nvg").render(0f, 16f)
-                ("Buffer: $buffer").render(0f, 32f)
-                ("Average: ${df.format(frame)}").render(0f, 48f)
+            if (UICore.debug) {
+                renderer {
+                    color(-1)
+                    font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
+                    ("FPS: $fps").render(0f, 0f)
+                    ("NanoVG: $nvg").render(0f, 16f)
+                    ("Buffer: $buffer").render(0f, 32f)
+                    ("Average: ${df.format(frame)}").render(0f, 48f)
+                }
             }
 
             core!!.endFrame()

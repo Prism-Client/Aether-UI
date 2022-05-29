@@ -16,7 +16,7 @@ import java.util.concurrent.Semaphore
 open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
     companion object {
         @JvmStatic
-        val debug = true
+        val debug = false
 
         /* Debug */
 

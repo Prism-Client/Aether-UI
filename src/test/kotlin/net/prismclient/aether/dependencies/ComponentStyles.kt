@@ -48,14 +48,10 @@ class ComponentStyles : UIDependable() {
 
         /** Container w Scrollbar **/
         style(UIContainerSheet(), "container") {
-            control(UIAlignment.CENTER)
             background(asRGBA(0, 0, 0, 0.3f)) {
                 radius = radius(15f)
             }
             contentRadius = radius(15f)
-
-            width = px(400)
-            height = px(400)
 
             verticalScrollbar {
                 x = rel(1f) - px(10) - px(5)
@@ -92,6 +88,15 @@ class ComponentStyles : UIDependable() {
             width = px(200f)
             height = px(200f)
             imageRadius = radius(25f)
+        }
+
+        // Icon Image
+        style(UIImageSheet(), "icon") {
+            anchor(UIAlignment.MIDDLELEFT)
+            //align(UIAlignment.MIDDLELEFT) // TODO: Debug why this is not updating to it's parent
+            size(24f, 24f)
+            margin(marginLeft = 16f, marginTop = 23f + 4f)
+            imageColor = -1
         }
     }
 }

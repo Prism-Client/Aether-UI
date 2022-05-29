@@ -9,7 +9,11 @@ import net.prismclient.aether.ui.util.extensions.renderer
 class IconStyles : UIDependable() {
     override fun load() {
         renderer {
-
+            loadSvg("bag", "/demo/icons/bag.svg")
+            loadSvg("book", "/demo/icons/book.svg")
+            loadSvg("note", "/demo/icons/note.svg")
+            loadSvg("profile", "/demo/icons/profile.svg")
+            loadSvg("settings", "/demo/icons/settings.svg")
         }
     }
 }

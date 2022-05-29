@@ -10,6 +10,9 @@ import net.prismclient.aether.ui.component.UIComponent
  * @since 5/1/2022
  */
 interface UILayout {
+    /**
+     * Invoked when the component is updated. This is when the [UILayout] should update it's components
+     */
     fun updateLayout()
 
     fun addComponent(component: UIComponent<*>)

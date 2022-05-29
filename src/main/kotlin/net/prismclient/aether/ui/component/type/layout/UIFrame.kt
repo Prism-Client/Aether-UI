@@ -38,12 +38,12 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
 
     override fun addComponent(component: UIComponent<*>) {
         components.add(component)
-        component.parent = this
+//        component.parent = this
     }
 
     override fun removeComponent(component: UIComponent<*>) {
         components.remove(component)
-        component.parent = null
+//        component.parent = null
     }
 
     override fun update() {
