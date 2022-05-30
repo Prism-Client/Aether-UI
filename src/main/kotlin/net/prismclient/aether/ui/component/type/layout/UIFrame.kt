@@ -29,7 +29,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
  */
 abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style), UILayout {
     protected val components = ArrayList<UIComponent<*>>()
-    protected lateinit var framebuffer: UIContentFBO
+    protected var framebuffer: UIContentFBO? = null
 
     var frameWidth: Float = 0f
         protected set
@@ -54,8 +54,10 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
     }
 
     open fun createFramebuffer() {
-        if (this::framebuffer.isInitialized)
-            UIRendererDSL.renderer.deleteContentFBO(framebuffer)
+        if (framebuffer != null) {
+            UIRendererDSL.renderer.deleteContentFBO(framebuffer!!)
+            framebuffer = null
+        }
         if (relWidth >= 1f && relHeight >= 1f)
             framebuffer = UIRendererDSL.renderer.createContentFBO(frameWidth, frameHeight)
     }
@@ -64,7 +66,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         frameWidth = +style.frameWidth
         frameHeight = -style.frameHeight
         if (style.clipContent) {
-            if (!this::framebuffer.isInitialized || frameWidth != framebuffer.width || frameHeight != framebuffer.height) {
+            if (framebuffer == null || frameWidth != framebuffer!!.width || frameHeight != framebuffer!!.height) {
                 createFramebuffer()
             }
         }
@@ -74,13 +76,13 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         if (!style.clipContent)
             return
         updateAnimation()
-        if (!this::framebuffer.isInitialized)
+        if (framebuffer != null)
             createFramebuffer()
         // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
         if (relWidth < 1f || relHeight < 1f)
             return
         renderer {
-            renderContent(framebuffer) {
+            renderContent(framebuffer!!) {
                 components.forEach(UIComponent<*>::render)
             }
         }
@@ -108,10 +110,11 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
             return
         }
         renderer {
+            if (framebuffer == null) return
             // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
             if (relWidth >= 1f || relHeight >= 1f) {
                 renderer.renderFBO(
-                        framebuffer,
+                        framebuffer!!,
                         relX,
                         relY,
                         frameWidth,

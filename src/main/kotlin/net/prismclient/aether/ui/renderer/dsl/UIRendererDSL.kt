@@ -16,9 +16,15 @@ import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
 import org.apache.commons.io.FilenameUtils
-import java.lang.Float.max
 import java.nio.ByteBuffer
 
+/**
+ * [UIRendererDSL] is a helper class which makes it easier to render things on screen. It supports
+ * general geometric shapes, as well as image, and text rendering.
+ *
+ * @author sen
+ * @since 1.0
+ */
 object UIRendererDSL {
     lateinit var renderer: UIRenderer
 

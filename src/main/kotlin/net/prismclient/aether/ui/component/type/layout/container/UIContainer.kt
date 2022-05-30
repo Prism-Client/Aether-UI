@@ -67,7 +67,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
         if (relWidth < 1f || relHeight < 1f)
             return
         renderer {
-            renderContent(framebuffer) {
+            renderContent(framebuffer!!) {
                 translate(
                     -(style.horizontalScrollbar.value * expandedWidth),
                     -(style.verticalScrollbar.value * expandedHeight)

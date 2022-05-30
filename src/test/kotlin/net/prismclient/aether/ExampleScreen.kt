@@ -97,6 +97,23 @@ class ExampleScreen : UIScreen {
                         }
                         image("settings", style = "icon")
                     }
+
+                    h2("Parties") {
+                        style {
+                            control(UIAlignment.CENTER)
+                            margin(marginTop = 5f)
+
+                            width = rel(1f)
+                            height = em(1f)
+
+                            background(asRGBA(255, 0, 0, 0.3f))
+
+                            font {
+                                align(UIAlignment.TOPCENTER)
+                                textAlignment = ALIGNTOP or ALIGNCENTER
+                            }
+                        }
+                    }
                 }
             }
 
