@@ -1,7 +1,6 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.UICore.Companion.contentScaleX
-import net.prismclient.aether.ui.UICore.Companion.contentScaleY
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
@@ -12,7 +11,6 @@ import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.extensions.getBlue
 import net.prismclient.aether.ui.util.extensions.getGreen
 import net.prismclient.aether.ui.util.extensions.getRed
-import org.lwjgl.*
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.nvgLinearGradient
 import org.lwjgl.nanovg.NanoVG.*
@@ -52,7 +50,7 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
-        val contentScale = max(contentScaleX, contentScaleY)
+        val contentScale = UICore.devicePxRatio
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
             NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
@@ -101,7 +99,6 @@ class NanoVGRenderer : UIRenderer() {
         bottomRight: Float,
         bottomLeft: Float
     ) {
-        val cs = fbo.contentScale
         nvgImagePattern(ctx, x, y, width, height, 0f, fbos[fbo]!!.image(), 1f, paint)
         nvgBeginPath(ctx)
         color(-1)
@@ -441,25 +438,50 @@ class NanoVGRenderer : UIRenderer() {
     }
 
     override fun stringHeight(text: String): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         nvgTextMetrics(ctx, null, null, lineHeight)
         return lineHeight[0]
     }
 
     override fun stringAscender(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         nvgTextMetrics(ctx, ascender, null, null)
         return ascender[0]
     }
 
     override fun stringDescender(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         nvgTextMetrics(ctx, null, decender, null)
         return abs(decender[0])
     }
 
     override fun wrapWidth(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         return wrapWidth
     }
 
     override fun wrapHeight(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         return wrapHeight
     }
 
