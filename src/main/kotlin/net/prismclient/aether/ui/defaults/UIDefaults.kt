@@ -11,13 +11,13 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
  * Not all properties are available for setting. Only generic classes such as [UIFont],
  * [UIBackground] and so on are applicable for changing the default values.
  *
- * To apply the default, create a new instance of [UIDefaults], and apply it to UICore
+ * To apply the default, create a new instance of [UIDefaults], and apply it to net.prismclient.aether.ui.UICore
  * <pre>
  *     val defaultStyle = UIDefaults()
  *
  *     /* Define properties here */
  *
- *     UICore.instance.apply(defaultStyle)
+ *     net.prismclient.aether.ui.UICore.instance.apply(defaultStyle)
  * </pre>
  *
  * @author sen

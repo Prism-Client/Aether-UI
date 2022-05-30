@@ -199,10 +199,10 @@ object UIRendererDSL {
     }
 
     @JvmOverloads
-    fun loadSvg(name: String, fileLocation: String, scale: Float = max(UICore.contentScaleX, UICore.contentScaleY)) =
+    fun loadSvg(name: String, fileLocation: String, scale: Float =UICore.devicePxRatio) =
         loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale)
 
-    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = max(UICore.contentScaleX, UICore.contentScaleY)): UIImageData {
+    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = UICore.devicePxRatio): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
         return renderer.loadSVG(name, image, scale)

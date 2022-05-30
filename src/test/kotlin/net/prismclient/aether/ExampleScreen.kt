@@ -7,8 +7,10 @@ import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNBASELINE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.util.UIFontFamily
@@ -17,8 +19,8 @@ import net.prismclient.aether.ui.util.extensions.*
 /**
  * Here is an example of how to use the Aether UI library.
  */
-class ExampleScreen : UIScreen() {
-    override fun initialize() {
+class ExampleScreen : UIScreen {
+    override fun build() {
         // To define a font family, you must first create a UIFontFamily object.
         UIFontFamily("Poppins", "/demo/fonts/", "regular", "black", "bold", "light", "thin")
 
@@ -36,6 +38,10 @@ class ExampleScreen : UIScreen() {
             // anywhere. Here is a one specific to this screen:
             dependsOn(::ExampleScreenStyles)
 
+            renderer {
+                loadImage("background", "/demo/background.png")
+            }
+
             container(style = "container") {
                 style {
                     control(UIAlignment.MIDDLELEFT)
@@ -46,6 +52,7 @@ class ExampleScreen : UIScreen() {
                     background {
                         radius = radius(24f)
                     }
+                    clipContent = true
                 }
 
                 list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrientation.Forward, "container") {
@@ -59,13 +66,13 @@ class ExampleScreen : UIScreen() {
 
                     h1("PRISM") {
                         style {
-                            //font = UIFont.from("Poppins", "bold", 20)
                             margin(marginTop = 20f)
                             width = rel(1f)
-                            height = px(24f)
+                            height = em(1f) - descender(1f)
+
                             font {
-                                align(UIAlignment.CENTER)
-                                textAlignment = ALIGNCENTER or ALIGNMIDDLE
+                                align(UIAlignment.BOTTOMCENTER)
+                                textAlignment = ALIGNBASELINE or ALIGNCENTER
                                 fontType = UIFont.FontType.Light
                                 fontSize = 24f
                                 fontSpacing = 24 * 0.24f
@@ -92,10 +99,27 @@ class ExampleScreen : UIScreen() {
                     }
                 }
             }
-        }
-    }
 
-    override fun render() {
-        super.render()
+//
+//                    button("Mods", "btn") {
+//                        style {
+//                            control(UIAlignment.CENTER)
+//                            margin(marginTop = 20f)
+//                            size(148f, 57f)
+//                        }
+//                        image("note", style = "icon")
+//                    }.hover("hoverEnter", "hoverLeave")
+//
+//                    button("Settings", "btn") {
+//                        style {
+//                            control(UIAlignment.CENTER)
+//                            margin(marginTop = 5f)
+//                            size(148f, 57f)
+//                        }
+//                        image("settings", style = "icon")
+//                    }
+//                }
+//            }
+        }
     }
 }

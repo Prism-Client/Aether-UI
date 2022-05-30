@@ -23,6 +23,7 @@ inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit)
     UIProvider.registerStyle(it)
 }
 
+inline fun build(block: UIComponentDSL.() -> Unit) = create(block)
 fun radius(radius: Float): UIRadius = UIRadius().also { it.set(radius) }
 
 @JvmOverloads

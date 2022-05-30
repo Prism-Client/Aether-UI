@@ -100,6 +100,6 @@ object UIProvider {
     /**
      * Returns a list of [UIComponent] with the parent of the provided [self]
      */
-    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> = UICore.activeScreen?.components?.filter { it.parent == self }?.toList()
+    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> = UICore.instance.components?.filter { it.parent == self }?.toList()
             ?: mutableListOf()
 }

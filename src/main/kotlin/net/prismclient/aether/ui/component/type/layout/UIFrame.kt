@@ -125,15 +125,15 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         }
     }
 
-    override fun mouseClicked(mouseX: Float, mouseY: Float) {
-        super.mouseClicked(mouseX, mouseY)
-        for (i in 0 until components.size) {
-            if (i < components.size) {
-                components[i].mouseClicked(mouseX + relX, mouseY + relX)
-            }
-        }
-//        components.forEach { it.mouseClicked(mouseX + relX, mouseY + relY) }
-    }
+//    override fun mousePressed(mouseX: Float, mouseY: Float) {
+//        super.mousePressed(mouseX, mouseY)
+//        for (i in 0 until components.size) {
+//            if (i < components.size) {
+//                components[i].mousePressed(mouseX + relX, mouseY + relX)
+//            }
+//        }
+////        components.forEach { it.mouseClicked(mouseX + relX, mouseY + relY) }
+//    }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)

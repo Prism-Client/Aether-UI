@@ -2,11 +2,12 @@ package net.prismclient.aether.ui.component
 
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.component.propagation.UIMouseEvent
+import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
-import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIProvider
@@ -41,6 +42,13 @@ import java.util.function.Consumer
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var style: T
     var parent: UIComponent<*>? = null
+        set(value) {
+            if (field != null)
+                field!!.childrenCount--
+            if (value != null)
+                value!!.childrenCount++
+            field = value
+        }
     var animation: UIAnimation<*>? = null
     var overridden = false
     var visible = true
@@ -69,7 +77,15 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     var anchorX = 0f
     var anchorY = 0f
 
+    /**
+     * Is true if the mouse was inside this component
+     */
     var wasInside = false
+
+    /**
+     * The amount of children that this component has (increased/decreased by the setting of parent)
+     */
+    var childrenCount = 0
 
     /** Listeners **/
     protected var initializationListeners: MutableList<Consumer<UIComponent<*>>>? = null
@@ -235,11 +251,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         }
     }
 
-    open fun mouseClicked(mouseX: Float, mouseY: Float) {
-        if (this is UIFocusable<*> && !isFocused() && isMouseInsideBoundingBox()) {
-            UICore.instance.focus(this)
-        }
+    open fun mousePressed(event: UIMouseEvent) {
         mousePressedListeners?.forEach { it.accept(this) }
+        if (parent != null && !event.canceled)
+            parent!!.mousePressed(event)
     }
 
     open fun mouseReleased(mouseX: Float, mouseY: Float) {
@@ -358,37 +373,45 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      */
     fun isMouseInsideBoundingBox() = ((getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)) && (parent == null || (UICore.mouseX >= parent!!.relX) && (UICore.mouseY >= parent!!.relY) && (UICore.mouseX <= parent!!.relX + parent!!.relWidth) && (UICore.mouseY <= parent!!.relY + parent!!.relHeight))
 
-    fun isFocused(): Boolean = UICore.instance.focusedComponent == this
+    //fun isFocused(): Boolean = UICore.instance.focusedComponent == this
 
     fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
 
     fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
 
-
-    // TODO: Fix broken layouts
-    fun getParentXOffset(skip: Boolean = false): Float {
-        val scrollbar = if (!skip && parent is UIContainer) {
-            (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
-        } else 0f
+    fun getParentXOffset(): Float {
+        if (parent == null) return 0f
 
         return if (parent is UIFrame) {
-            if (((parent as UIFrame).style as UIFrameSheet).clipContent) {
-                return parent!!.relX
-            } else 0f
-        } else 0f - scrollbar// + getParentXOffset(true)
+            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
+            return if (clipContent) {
+                parent!!.relX
+            } else 0f + parent!!.getParentXOffset()
+        } else 0f
     }
 
-    fun getParentYOffset(skip: Boolean = false): Float {
-        val scrollbar = if (!skip && parent is UIContainer) {
-            (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
-        } else 0f
+    fun getParentYOffset(): Float {
+        if (parent == null) return 0f
 
         return if (parent is UIFrame) {
-            if (((parent as UIFrame).style as UIFrameSheet).clipContent) {
-                return parent!!.relY
-            } else 0f
-        } else 0f - scrollbar// + getParentYOffset(true)
+            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
+            return if (clipContent) {
+                parent!!.relY
+            } else 0f + parent!!.getParentYOffset()
+        } else 0f
     }
+
+//    fun getParentYOffset(skip: Boolean = false): Float {
+//        val scrollbar = if (!skip && parent is UIContainer) {
+//            (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
+//        } else 0f
+//
+//        return if (parent is UIFrame) {
+//            if (((parent as UIFrame).style as UIFrameSheet).clipContent) {
+//                return parent!!.relY
+//            } else 0f
+//        } else 0f - scrollbar// + getParentYOffset(true)
+//    }
 
     fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) = (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
 

@@ -101,14 +101,14 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
         renderScrollbar()
     }
 
-    override fun mouseClicked(mouseX: Float, mouseY: Float) {
-        super.mouseClicked(
-            mouseX - (style.horizontalScrollbar.value * expandedWidth),
-            mouseY - (style.verticalScrollbar.value * expandedHeight)
-        )
-        style.verticalScrollbar.mousePressed(mouseX, mouseY)
-        style.horizontalScrollbar.mousePressed(mouseX, mouseY)
-    }
+//    override fun mousePressed(mouseX: Float, mouseY: Float) {
+//        super.mousePressed(
+//            mouseX - (style.horizontalScrollbar.value * expandedWidth),
+//            mouseY - (style.verticalScrollbar.value * expandedHeight)
+//        )
+//        style.verticalScrollbar.mousePressed(mouseX, mouseY)
+//        style.horizontalScrollbar.mousePressed(mouseX, mouseY)
+//    }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(

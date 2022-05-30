@@ -1,139 +1,208 @@
 package net.prismclient.aether.ui
 
-import net.prismclient.aether.ui.callback.UICoreCallback
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
-import net.prismclient.aether.ui.defaults.UIDefaults
+import net.prismclient.aether.ui.component.propagation.UIMouseEvent
+import net.prismclient.aether.ui.component.propagation.UIPropagatingEvent
+import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
-
+import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
-import net.prismclient.aether.ui.util.UIKey
-import java.util.concurrent.Executors
-import java.util.concurrent.Semaphore
+import net.prismclient.aether.ui.util.extensions.renderer
 
-open class UICore(renderer: UIRenderer, var coreCallback: UICoreCallback) {
-    companion object {
-        @JvmStatic
-        val debug = false
+/**
+ * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
+ * of the library. There a specific functions which must be invoked to properly make user
+ * input work. You can find the methods <a href"https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">here (or in the @see)</a>
+ *
+ * @author sen
+ * @since 1.0
+ * @see <a href"https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">UICore documentation</a>
+ */
+open class UICore(val renderer: UIRenderer) {
+    /**
+     * All active components. The list is automatically created.
+     */
+    var components: ArrayList<UIComponent<*>>? = null
+        protected set
 
-        /* Debug */
-
-        var renderTime = 0L
-        var contentRenderTime = 0L
-        var updateTime = 0L
-
-        @JvmStatic
-        lateinit var instance: UICore
-        @JvmStatic
-        var activeScreen: UIScreen? = null
-            set(value) {
-                instance.focusedComponent = null
-                field = value
-            }
-        var width = 0f
-        var height = 0f
-        var mouseX = 0f
-        var mouseY = 0f
-        var contentScaleX = 0f
-        var contentScaleY = 0f
-
-        fun apply(style: UIDefaults) {
-            UIDefaults.instance = style
-        }
-    }
-
-    val updateThreads = Executors.newFixedThreadPool(1)
-    val animationLock = Semaphore(0)
-
-    var focusedComponent: UIComponent<*>? = null
-
-    var shiftHeld: Boolean = false
-    var ctrlHeld: Boolean = false
-
+    /**
+     * All active frames. The frame is also added to the component list.
+     */
+    var frames: ArrayList<UIFrame<*>>? = null
+        protected set
+    
     init {
         instance = this
         UIProvider.initialize(renderer)
     }
 
-    open fun beginFrame(screenWidth: Float, screenHeight: Float, devicePxRatio: Float) {
-        UIRendererDSL.beginFrame(screenWidth, screenHeight, devicePxRatio)
-    }
-
-    open fun endFrame() {
-        UIRendererDSL.endFrame()
-    }
-
-    open fun renderContent() {
-        contentRenderTime = System.nanoTime()
-        activeScreen?.renderContent()
-        contentRenderTime = System.nanoTime() - contentRenderTime
-    }
-
-    open fun render(screenWidth: Float, screenHeight: Float) {
-        activeScreen?.render()
-    }
-
-    open fun mouseMoved(mouseX: Float, mouseY: Float) {
-        activeScreen?.mouseMoved(mouseX, mouseY)
-    }
-
-    open fun mousePressed(mouseX: Float, mouseY: Float) {
-        if (focusedComponent?.isMouseInsideBoundingBox() == false) {
-            (focusedComponent!! as UIFocusable<*>).removeFocus()
-            focusedComponent = null
-        }
-
-        activeScreen?.mousePressed(mouseX, mouseY)
-    }
-
-    open fun mouseReleased(mouseX: Float, mouseY: Float) {
-        activeScreen?.mouseReleased(mouseX, mouseY)
-    }
-
-    open fun keyPressed(key: UIKey, character: Char) {
-        activeScreen?.keyPressed(key, character)
-    }
-
-    open fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
-        activeScreen?.mouseScrolled(mouseX, mouseY, scrollAmount)
-    }
-
-    open fun update() {
-//        updateThreads.execute {
-        var time = System.nanoTime()
-        activeScreen?.update()
-        updateTime = System.nanoTime() - time
+    /**
+     * Invoked when an action on the window (such as resizing or moving) is performed. The
+     * [width] and [height] of the screen must be passed. Leave [devicePxRatio] as 1.0 if you do
+     * not care about retina displays. If you do, pass the content scale.
+     */
+    open fun update(width: Float, height: Float, devicePxRatio: Float) {
+        updateSize(width, height, devicePxRatio)
+        components?.forEach { it.update() }
+        frames?.forEach { it.update() }
         UIProvider.updateAnimationCache()
-//        }
     }
 
-    open fun focus(component: UIComponent<*>) {
-        if (component is UIFocusable<*>) {
-            focusedComponent = component
-            component.focus()
-        } else {
-            println("$component is not a instance of a UIFocusable")
+    /**
+     * This must be invoked before the rendering of the screen. It updates all active frames.
+     */
+    open fun renderFrames() {
+        frames?.forEach { it.renderContent() }
+    }
+
+    /**
+     * Invoked when the screen should be rendered.
+     */
+    open fun render() {
+        renderer {
+            beginFrame(width, height, devicePxRatio)
+            if (activeScreen != null) {
+                for (i in 0 until components!!.size) components!![i].render()
+            }
+            endFrame()
         }
     }
 
     /**
-     * Returns the first match with a component of the given style
+     * Invoked when the mouse is moved
      */
-    open fun getComponentByStyle(styleName: String): UIComponent<*> {
-        if (activeScreen == null)
-            throw RuntimeException("Attempted to retrieve component by style without an active screen")
-        for (component in activeScreen!!.components) {
-            if (component.style.name == styleName)
-                return component
+    fun mouseMoved(mouseX: Float, mouseY: Float) {
+        Properties.mouseX = mouseX
+        Properties.mouseY = mouseY
+        if (activeScreen != null) {
+            for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
         }
-        throw RuntimeException("Component with given style name not found")
     }
 
-    open fun getComponentsByStyle(styleName: String): List<UIComponent<*>> {
-        if (activeScreen == null)
-            throw RuntimeException("Attempted to retrieve component by style without an active screen")
-        return activeScreen!!.components.filter { it.style.name == styleName }
+    /**
+     * Invoked when the mouse was pressed down
+     */
+    fun mousePressed() {
+        println("mouseX: $mouseX, mouseY: $mouseY")
+
+//        fun peek(index: Int, componentCount: Int): Int {
+//            var i = index
+//
+//            while (i < (i + componentCount)) {
+//                val component = components!![i]
+//
+//                if (component.isMouseInsideBoundingBox()) {
+//                    if (component.childrenCount > 0) {
+//                        i += peek(i, component.childrenCount)
+//                    } else {
+//                        component.mousePressed(UIMouseEvent(mouseX, mouseY, 0))
+//                    }
+//                }
+//                i++
+//            }
+//            return i - index
+//        }
+//
+//        var i = 0
+//
+//        while (i < (components?.size ?: 0)) {
+//            val component = components!![i]
+//
+//            if (component.isMouseInsideBoundingBox()) {
+//                if (component.childrenCount > 0) {
+//                    i += peek(i, component.childrenCount)
+//                } else {
+//                    component.mousePressed(UIMouseEvent(mouseX, mouseY, 0))
+//                }
+//            }
+//            i++
+//        }
+    }
+
+    /**
+     * Invoked when the mouse was released after being pressed
+     */
+    fun mouseRelease() {
+
+    }
+
+    fun keyPressed(key: Char) {
+        // TODO: Implement
+    }
+
+    /**
+     * Invoked when the mouse wheel is scrolled
+     */
+    open fun mouseScrolled(scrollAmount: Float) {
+
+    }
+
+    /**
+     * The companion object of [UICore]. It contains properties useful to components
+     * such as the width and height of the window.
+     */
+    companion object Properties {
+        lateinit var instance: UICore
+            protected set
+        
+        var activeScreen: UIScreen? = null
+            protected set
+
+        /**
+         * The width of the screen. It can be set via [update]
+         */
+        var width: Float = 0f
+            protected set
+
+        /**
+         * The width of the screen. It can be set via [update]
+         */
+        var height: Float = 0f
+            protected set
+
+        /**
+         * The device pixel ratio. It can be set via [update]. It is the equivalent of content scale.
+         */
+        var devicePxRatio: Float = 1f
+            protected set
+
+        /**
+         * The x position of the mouse relative to the screen
+         */
+        var mouseX: Float = 0f
+            protected set
+
+        /**
+         * The y position of the mouse relative to the screen
+         */
+        var mouseY: Float = 0f
+            protected set
+
+        fun updateSize(width: Float, height: Float, devicePxRatio: Float) {
+            this.width = width
+            this.height = height
+            this.devicePxRatio = devicePxRatio
+        }
+
+        fun updateMouse(mouseX: Float, mouseY: Float) {
+            this.mouseX = mouseX
+            this.mouseY = mouseY
+        }
+
+        /**
+         * Sets the active screen to the given [screen] and creates [components] and [frames].
+         */
+        fun displayScreen(screen: UIScreen) {
+            activeScreen = screen
+            instance.components = ArrayList()
+            instance.frames = ArrayList()
+
+            screen.build()
+            instance.frames = UIComponentDSL.getFrames()
+            instance.components = UIComponentDSL.get()
+            UIComponentDSL.finalize()
+            instance.update(width, height, devicePxRatio)
+        }
     }
 }

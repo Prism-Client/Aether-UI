@@ -3,7 +3,6 @@ package net.prismclient.aether.ui.renderer.dsl
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.image.UIImage
-import net.prismclient.aether.ui.component.type.input.UITextField
 import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.input.button.UICheckbox
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
@@ -12,6 +11,7 @@ import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.interfaces.UIDependable
 import java.util.*
 
 /**
@@ -29,6 +29,8 @@ object UIComponentDSL {
     private var activeFrame: UIFrame<*>? = null
     var activeStyle: String? = null
         private set
+
+    // TODO: Validate component styles
 
     /**
      * Must be invoked before calling any other functions or a NPE might be thrown
@@ -144,6 +146,28 @@ object UIComponentDSL {
     inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) =
         net.prismclient.aether.ui.util.extensions.style(sheet, name, block)
 
+    /**
+     * Adds a dependable class. To create a dependable class, make a class
+     * which extends [UIDependable]. See [UIDependable] doc for more information.
+     *
+     * Use this class as: `dependsOn(::ClassName)`
+     *
+     * @see UIDependable
+     */
+    inline fun <T : UIDependable> dependsOn(clazz: () -> T) {
+        clazz().load()
+    }
+
+    /**
+     * Java alternative to [dependsOn]. An instance of [UIDependable] must be passed.
+     *
+     * @see dependsOn
+     */
+    fun dependsOn(clazz: UIDependable) {
+        clazz.load()
+    }
+
+
     /** Components **/
 
     /**
@@ -210,17 +234,6 @@ object UIComponentDSL {
         block: UISlider.() -> Unit = {}
     ) =
         component(UISlider(value, min, max, step, style!!), block)
-
-    @JvmOverloads
-    inline fun textField(
-        text: String,
-        placeholder: String,
-        inputFlavor: UITextField.TextFlavor,
-        maxLength: Int = -1,
-        style: String? = activeStyle,
-        block: UITextField.() -> Unit
-    ) =
-        component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
 
     /** Other **/
 

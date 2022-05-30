@@ -14,6 +14,7 @@ class IconStyles : UIDependable() {
             loadSvg("note", "/demo/icons/note.svg")
             loadSvg("profile", "/demo/icons/profile.svg")
             loadSvg("settings", "/demo/icons/settings.svg")
+            loadImage("background", "/demo/background.png")
         }
     }
 }
