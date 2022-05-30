@@ -34,6 +34,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.21"
     implementation 'commons-io:commons-io:2.11.0'
 
+    testImplementation 'org.apache.commons:commons-collections4:4.4'
+
     testImplementation "org.lwjgl:lwjgl:$lwjglVersion"
     testImplementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
     testImplementation "org.lwjgl:lwjgl-nanovg:$lwjglVersion"

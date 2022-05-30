@@ -44,4 +44,12 @@ class UIRadius(
         bottomRight = fromProgress(current?.bottomRight ?: cachedRadius!!.bottomRight, previous?.bottomRight ?: cachedRadius!!.bottomRight, progress)
         bottomLeft = fromProgress(current?.bottomLeft ?: cachedRadius!!.bottomLeft, previous?.bottomLeft ?: cachedRadius!!.bottomLeft, progress)
     }
+
+    override fun saveState(component: UIComponent<*>, keyframe: UIRadius?, retain: Boolean) {
+
+    }
+
+    override fun toString(): String {
+        return "UIRadius(topLeft=$topLeft, topRight=$topRight, bottomRight=$bottomRight, bottomLeft=$bottomLeft)"
+    }
 }

@@ -6,9 +6,7 @@
   - [Layouts](#layouts)
     - [Grid Layouts](#grid-layout)
 
-# Containers
-Containers are used, as the name suggests, to contain components. All lists and layouts extend the `UIContainer` class. 
-The UIContainer class cam be created. The components will not be overriden, however
+# Containersver
 
 # List
 

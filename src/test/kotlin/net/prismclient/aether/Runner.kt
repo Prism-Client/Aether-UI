@@ -2,9 +2,7 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Companion.activeScreen
-import net.prismclient.aether.ui.UICore.Companion.instance
 import net.prismclient.aether.ui.callback.UICoreCallback
-import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.util.UIKey
@@ -18,6 +16,8 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import org.lwjgl.system.Platform
+import java.text.DecimalFormat
+import kotlin.math.round
 
 /**
  * An example runner class with LWJGL 3 & glfw
@@ -142,39 +142,85 @@ object Runner {
         // Set the active screen (set width, and height first)
         activeScreen = ExampleScreen()
 
+        val averageList = ArrayList<Long>()
+        val nvgList = ArrayList<Long>()
+        val bufferList = ArrayList<Long>()
+
+        var frameT = System.nanoTime()
+
+        var nvg = 0.0
+        var buffer = 0.0
+        var frame = 0.0
+
+        val df = DecimalFormat("#.")
+
+        df.maximumFractionDigits = 8
+
         while (!GLFW.glfwWindowShouldClose(window)) {
-            val t = GLFW.glfwGetTime()
-            val n = System.nanoTime()
+            val t = System.nanoTime()
+
             val width = (framebufferWidth / contentScaleX).toInt()
             val height = (framebufferHeight / contentScaleY).toInt()
             UICore.width = width.toFloat()
             UICore.height = height.toFloat()
             UICore.mouseX = mouseX.toFloat()
             UICore.mouseY = mouseY.toFloat()
+
             core!!.renderContent()
+
             GL11.glViewport(0, 0, framebufferWidth, framebufferHeight)
             GL11.glClearColor(0.3f, 0.3f, 0.3f, 0f)
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
+
+            val t1 = System.nanoTime()
+
             core!!.beginFrame(width.toFloat(), height.toFloat(), Math.max(contentScaleX, contentScaleY))
             core!!.render(width.toFloat(), height.toFloat())
 
-            renderer {
-                color(-1)
-                font("Poppins-regular", 16f, ALIGNLEFT or ALIGNTOP, 0f)
-                fps.toString().render(0f ,0f)
+            if (UICore.debug) {
+                renderer {
+                    color(-1)
+                    font("Poppins-regular", 16f, ALIGNTOP or ALIGNLEFT, 0f)
+                    ("FPS: $fps").render(0f, 0f)
+                    ("NanoVG: $nvg").render(0f, 16f)
+                    ("Buffer: $buffer").render(0f, 32f)
+                    ("Average: ${df.format(frame)}").render(0f, 48f)
+                }
             }
 
             core!!.endFrame()
+
+            nvgList.add(System.nanoTime() - t1)
+
+            val t2 = System.nanoTime()
+
             GLFW.glfwSwapBuffers(window)
             GLFW.glfwPollEvents()
+
+            bufferList.add(System.nanoTime() - t2)
+
+            averageList.add(System.nanoTime() - t)
+
             if (lastSecond + 1000L <= System.currentTimeMillis()) {
                 lastSecond = System.currentTimeMillis()
                 fps = actualFps
                 actualFps = 0
+
+                val sum = averageList.sum() / averageList.size.toDouble()
+                val sum1 = nvgList.sum() / nvgList.size.toDouble()
+                val sum2 = bufferList.sum() / bufferList.size.toDouble()
+
+                nvg = sum1 / sum
+                buffer = sum2 / sum
+                frame = sum / (System.nanoTime() - frameT)
+
+                nvg = round(nvg * 10000) / 10000.0
+                buffer = round(buffer * 10000) / 10000.0
+
+                frameT = System.nanoTime()
             } else {
                 actualFps++
             }
-            instance.animationLock.release()
         }
         GL.setCapabilities(null)
         Callbacks.glfwFreeCallbacks(window)
@@ -182,10 +228,33 @@ object Runner {
         GLFW.glfwSetErrorCallback(null)!!.free()
     }
 
-    val width: Float
-        get() = framebufferWidth / contentScaleX
-    val height: Float
-        get() = framebufferHeight / contentScaleY
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private val keyMap: MutableMap<Int, UIKey> = HashMap()
 
     init {

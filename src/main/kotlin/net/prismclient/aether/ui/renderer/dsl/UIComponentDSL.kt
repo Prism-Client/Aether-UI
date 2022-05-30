@@ -60,9 +60,13 @@ object UIComponentDSL {
         if (activeComponent != null)
             component.parent = activeComponent
         if (components == null || frames == null) return
-        if (component is UIFrame<*>)
+        if (component is UIFrame<*>) {
             frames!!.add(component)
+        }
         if (activeFrame != null) {
+            if (activeComponent == null) {
+                component.parent = activeFrame
+            }
             activeFrame!!.addComponent(component)
         } else {
             components!!.add(component)
@@ -219,7 +223,13 @@ object UIComponentDSL {
         component(UITextField(text, placeholder, inputFlavor, maxLength, style!!), block)
 
     /** Other **/
-    @JvmOverloads
+
+    inline fun image(
+        imageName: String,
+        style: String? = activeStyle,
+        block: UIImage.() -> Unit = {}
+    ) = component(UIImage(imageName, style!!), block)
+
     inline fun image(
         imageName: String,
         imageLocation: String,

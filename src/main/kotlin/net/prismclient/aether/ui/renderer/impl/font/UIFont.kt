@@ -224,6 +224,10 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         fontSize = fromProgress(previous?.fontSize ?: fontCache!!.fontSize, current?.fontSize ?: fontCache!!.fontSize, progress)
     }
 
+    override fun saveState(component: UIComponent<*>, keyframe: UIFont?, retain: Boolean) {
+        //TODO("Not yet implemented")
+    }
+
     /**
      * Instructs [UIFont] on how to render the text. See the enums for details.
      *

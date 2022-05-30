@@ -50,9 +50,11 @@ class UIBorder : UIShape(), UIAnimatable<UIBorder> {
     override fun animate(previous: UIBorder?, current: UIBorder?, progress: Float, component: UIComponent<*>) {
         cachedBorder = cachedBorder ?: copy()
 
-        borderWidth = fromProgress(current?.borderWidth
-                ?: cachedBorder!!.borderWidth, previous?.borderWidth ?: cachedBorder!!.borderWidth, progress)
-        borderColor = transition(previous?.borderColor ?: cachedBorder!!.borderColor, current?.borderColor
-                ?: cachedBorder!!.borderColor, progress)
+        borderWidth = fromProgress(previous?.borderWidth ?: cachedBorder!!.borderWidth, current?.borderWidth ?: cachedBorder!!.borderWidth, progress)
+        borderColor = transition(previous?.borderColor ?: cachedBorder!!.borderColor, current?.borderColor ?: cachedBorder!!.borderColor, progress)
+    }
+
+    override fun saveState(component: UIComponent<*>, keyframe: UIBorder?, retain: Boolean) {
+        TODO("Not yet implemented")
     }
 }

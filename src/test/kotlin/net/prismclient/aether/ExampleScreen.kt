@@ -4,43 +4,92 @@ import net.prismclient.aether.dependencies.AnimationStyles
 import net.prismclient.aether.dependencies.ComponentStyles
 import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
-import net.prismclient.aether.ui.component.type.image.UIImageSheet
+import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
+import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
+import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.util.UIFontFamily
-import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.extensions.*
 
+/**
+ * Here is an example of how to use the Aether UI library.
+ */
 class ExampleScreen : UIScreen() {
     override fun initialize() {
+        // To define a font family, you must first create a UIFontFamily object.
         UIFontFamily("Poppins", "/demo/fonts/", "regular", "black", "bold", "light", "thin")
 
         build {
+            // Dependencies make it easier to organize everything
+            // and reduce boilerplate code. It's a simple interface
+            // which is invoked immediately. You can store styles
+            // and resources there, so they can be reused them late.
             dependsOn(::TextStyles)
             dependsOn(::IconStyles)
             dependsOn(::ComponentStyles)
             dependsOn(::AnimationStyles)
 
-            renderer{
-                loadSvg("checkbox", "/demo/thumbs-up.svg")
-            }
+            // The dependencies above are ones that you might use
+            // anywhere. Here is a one specific to this screen:
+            dependsOn(::ExampleScreenStyles)
 
-            style(UIImageSheet(), "image") {
-                control(UIAlignment.CENTER)
-                size(24f, 24f)
-            }
-
-            button("Text", "btn") {
+            container(style = "container") {
                 style {
-                    control(UIAlignment.CENTER)
-                    size(48f, 48f)
-                    padding {
-
+                    control(UIAlignment.MIDDLELEFT)
+                    x = px(10)
+                    width = px(180)
+                    height = rel(1f) - px(20) // 20 px padding
+                    contentRadius = radius(24f)
+                    background {
+                        radius = radius(24f)
                     }
                 }
-            }.onMousePressed {
-                if (it.isMouseInsideBoundingBox()) {
-                    UIProvider.dispatchAnimation("testAnimation", it)
+
+                list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrientation.Forward, "container") {
+                    style {
+                        size(rel(1f), rel(0.8f))
+                        overflowX = UIContainerSheet.Overflow.None
+                        overflowY = UIContainerSheet.Overflow.None
+                        background = null
+                        clipContent = false
+                    }
+
+                    h1("PRISM") {
+                        style {
+                            //font = UIFont.from("Poppins", "bold", 20)
+                            margin(marginTop = 20f)
+                            width = rel(1f)
+                            height = px(24f)
+                            font {
+                                align(UIAlignment.CENTER)
+                                textAlignment = ALIGNCENTER or ALIGNMIDDLE
+                                fontType = UIFont.FontType.Light
+                                fontSize = 24f
+                                fontSpacing = 24 * 0.24f
+                            }
+                        }
+                    }
+
+                    button("Mods", "btn") {
+                        style {
+                            control(UIAlignment.CENTER)
+                            margin(marginTop = 20f)
+                            size(148f, 57f)
+                        }
+                        image("note", style = "icon")
+                    }.hover("hoverEnter", "hoverLeave")
+
+                    button("Settings", "btn") {
+                        style {
+                            control(UIAlignment.CENTER)
+                            margin(marginTop = 5f)
+                            size(148f, 57f)
+                        }
+                        image("settings", style = "icon")
+                    }
                 }
             }
         }

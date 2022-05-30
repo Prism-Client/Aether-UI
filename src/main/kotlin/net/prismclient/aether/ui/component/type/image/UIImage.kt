@@ -28,7 +28,6 @@ class UIImage(name: String, style: String) : UIComponent<UIImageSheet>(style) {
         name,
         style
     ) {
-        UIImageSheet()
         UIRendererDSL.assumeLoadImage(name, location)
     }
 

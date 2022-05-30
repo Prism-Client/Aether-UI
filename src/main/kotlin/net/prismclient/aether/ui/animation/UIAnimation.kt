@@ -57,10 +57,10 @@ class UIAnimation<T : UIStyleSheet>(
         if (timeline.size < 1) {
             println("Timeline must have at least 1 keyframe to start an animation")
             return
-        } //else if (timeline.size == 1) {
-//            timeline.add(timeline[0])
-//            timeline[0] = getStyle()
-//        }
+        } else if (timeline.size == 1) {
+            timeline.add(timeline[0])
+            timeline[0] = style.copy() as T
+        }
 
         animationLength = 0L
         animating = true
@@ -142,9 +142,7 @@ class UIAnimation<T : UIStyleSheet>(
     }
 
     fun saveState(keyframe: T) {
-
-        // TODO: abstract fun saveState(k: T)
-
+        component.style.saveState(component, keyframe, (keyframe.animationResult != UIAnimationResult.Reset))
     }
 
     fun forceComplete() {
@@ -172,7 +170,7 @@ class UIAnimation<T : UIStyleSheet>(
      *
      * @param block The [UIStyleSheet] that adjusts the component's properties.
      */
-    inline fun keyframe(ease: UIEase = UILinear(1000L), keep: Boolean = false, block: T.() -> Unit): T {
+    inline fun keyframe(ease: UIEase = UILinear(1000L), keep: Boolean = true, block: T.() -> Unit): T {
         val sheet: T
         try {
             sheet = style.copy() as T

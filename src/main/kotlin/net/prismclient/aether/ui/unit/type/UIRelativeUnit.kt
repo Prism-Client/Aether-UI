@@ -10,4 +10,8 @@ import net.prismclient.aether.ui.unit.UIUnit
  * @author sen
  * @since 5/26/2022
  */
-class UIRelativeUnit(value: Float, type: Byte) : UIUnit(value, type)
+class UIRelativeUnit(value: Float, type: Byte) : UIUnit(value, type) {
+    override fun toString(): String {
+        return "UIRelativeUnit(value=$value, type=$type)"
+    }
+}
