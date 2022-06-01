@@ -24,7 +24,6 @@ switch (OperatingSystem.current()) {
         break
 }
 
-
 repositories {
     mavenCentral()
 }

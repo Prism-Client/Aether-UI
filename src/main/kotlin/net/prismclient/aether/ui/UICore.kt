@@ -84,47 +84,58 @@ open class UICore(val renderer: UIRenderer) {
      * Invoked when the mouse was pressed down
      */
     fun mousePressed() {
-        println("mouseX: $mouseX, mouseY: $mouseY")
+        for (i in 0 until components!!.size) components!![i].mousePressed(UIMouseEvent(mouseX, mouseY, 0))
 
-//        fun peek(index: Int, componentCount: Int): Int {
-//            var i = index
-//
-//            while (i < (i + componentCount)) {
+        /**
+         * Iterates through the children of a component and invokes
+         * the mousePressed method if the component is within the
+         * mouse coordinates. Index is the index of the component.
+         */
+//        fun peek(index: Int): Boolean  {
+//            val parent = components!![index]
+//            var j = -1 // The highest z index of the component with the mouse inside it's bounding box
+//            for (i in index until index + parent.childrenCount) {
 //                val component = components!![i]
-//
 //                if (component.isMouseInsideBoundingBox()) {
 //                    if (component.childrenCount > 0) {
-//                        i += peek(i, component.childrenCount)
+//                        return peek(i)
 //                    } else {
-//                        component.mousePressed(UIMouseEvent(mouseX, mouseY, 0))
+//                        j = i
 //                    }
 //                }
-//                i++
 //            }
-//            return i - index
+//            if (j != -1) {
+//                components!![j].mousePressed(UIMouseEvent(mouseX, mouseY, 0))
+//                return true
+//            }
+//            return false
 //        }
 //
 //        var i = 0
+//        var j = -1
 //
 //        while (i < (components?.size ?: 0)) {
 //            val component = components!![i]
 //
 //            if (component.isMouseInsideBoundingBox()) {
 //                if (component.childrenCount > 0) {
-//                    i += peek(i, component.childrenCount)
+//                    if (peek(i)) return
 //                } else {
-//                    component.mousePressed(UIMouseEvent(mouseX, mouseY, 0))
+//                    j = i
 //                }
 //            }
 //            i++
+//        }
+//        if (j != -1) {
+//            components!![j].mousePressed(UIMouseEvent(mouseX, mouseY, 0))
 //        }
     }
 
     /**
      * Invoked when the mouse was released after being pressed
      */
-    fun mouseRelease() {
-
+    fun mouseReleased() {
+        for (i in 0 until components!!.size) components!![i].mouseReleased(mouseX, mouseY)
     }
 
     fun keyPressed(key: Char) {
@@ -135,7 +146,7 @@ open class UICore(val renderer: UIRenderer) {
      * Invoked when the mouse wheel is scrolled
      */
     open fun mouseScrolled(scrollAmount: Float) {
-
+        components?.forEach { it.mouseScrolled(scrollAmount, mouseX, mouseY) }
     }
 
     /**

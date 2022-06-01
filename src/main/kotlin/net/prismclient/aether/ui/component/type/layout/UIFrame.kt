@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.propagation.UIMouseEvent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
@@ -135,8 +136,16 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
 //                components[i].mousePressed(mouseX + relX, mouseY + relX)
 //            }
 //        }
-////        components.forEach { it.mouseClicked(mouseX + relX, mouseY + relY) }
+//        components.forEach { it.mouseClicked(mouseX + relX, mouseY + relY) }
 //    }
+    override fun mousePressed(event: UIMouseEvent) {
+        super.mousePressed(event)
+        for (i in 0 until components.size) {
+            if (i < components.size) {
+                components[i].mousePressed(event)
+            }
+        }
+    }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)

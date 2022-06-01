@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.propagation.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -109,6 +110,11 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
 //        style.verticalScrollbar.mousePressed(mouseX, mouseY)
 //        style.horizontalScrollbar.mousePressed(mouseX, mouseY)
 //    }
+    override fun mousePressed(event: UIMouseEvent) {
+        super.mousePressed(event)
+        style.verticalScrollbar.mousePressed(event.mouseX, event.mouseY)
+        style.horizontalScrollbar.mousePressed(event.mouseX, event.mouseY)
+    }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(

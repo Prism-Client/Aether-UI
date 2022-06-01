@@ -13,6 +13,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
+import org.lwjgl.glfw.GLFWScrollCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.system.MemoryStack
@@ -45,6 +46,12 @@ object Runner {
 
         if (!GLFW.glfwInit())
             throw RuntimeException("Failed to init GLFW")
+        if (Platform.get() === Platform.MACOSX) {
+            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3)
+            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2)
+            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE)
+            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE)
+        }
 
         GLFW.glfwWindowHint(GLFW.GLFW_SCALE_TO_MONITOR, GLFW.GLFW_TRUE)
 
@@ -65,6 +72,8 @@ object Runner {
             if (button == 0) { // 1 = Down, 0 = Up // 0 - LMB, 1 - RMB //
                 if (action == 1) {
                     core!!.mousePressed()
+                } else {
+                    core!!.mouseReleased()
                 }
             }
         }
@@ -83,6 +92,12 @@ object Runner {
             framebufferWidth = (width / contentScaleX).toInt()
             framebufferHeight = (height / contentScaleY).toInt()
             core!!.update(framebufferWidth.toFloat(), framebufferHeight.toFloat(), max(contentScaleX, contentScaleY))
+        }
+
+
+
+        GLFW.glfwSetScrollCallback(window) { window1: Long, xoffset: Double, yoffset: Double ->
+            core!!.mouseScrolled(yoffset.toFloat())
         }
 
         GLFW.glfwMakeContextCurrent(window)

@@ -9,7 +9,6 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNBASELINE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
@@ -59,7 +58,7 @@ class ExampleScreen : UIScreen {
                     style {
                         size(rel(1f), rel(0.8f))
                         overflowX = UIContainerSheet.Overflow.None
-                        overflowY = UIContainerSheet.Overflow.None
+//                        overflowY = UIContainerSheet.Overflow.None
                         background = null
                         clipContent = false
                     }
@@ -98,45 +97,26 @@ class ExampleScreen : UIScreen {
                         image("settings", style = "icon")
                     }
 
-                    h2("Parties") {
-                        style {
-                            control(UIAlignment.CENTER)
-                            margin(marginTop = 5f)
+                    for (i in 0..10) {
+                        h2("Parties") {
+                            style {
+                                control(UIAlignment.CENTER)
+                                margin(marginTop = 5f)
 
-                            width = rel(1f)
-                            height = em(1f)
+                                width = rel(1f)
+                                height = em(1f)
 
-                            background(asRGBA(255, 0, 0, 0.3f))
+                                background(asRGBA(255, 0, 0, 0.3f))
 
-                            font {
-                                align(UIAlignment.TOPCENTER)
-                                textAlignment = ALIGNTOP or ALIGNCENTER
+                                font {
+                                    align(UIAlignment.TOPCENTER)
+                                    textAlignment = ALIGNTOP or ALIGNCENTER
+                                }
                             }
                         }
                     }
                 }
             }
-
-//
-//                    button("Mods", "btn") {
-//                        style {
-//                            control(UIAlignment.CENTER)
-//                            margin(marginTop = 20f)
-//                            size(148f, 57f)
-//                        }
-//                        image("note", style = "icon")
-//                    }.hover("hoverEnter", "hoverLeave")
-//
-//                    button("Settings", "btn") {
-//                        style {
-//                            control(UIAlignment.CENTER)
-//                            margin(marginTop = 5f)
-//                            size(148f, 57f)
-//                        }
-//                        image("settings", style = "icon")
-//                    }
-//                }
-//            }
         }
     }
 }

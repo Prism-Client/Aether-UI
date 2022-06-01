@@ -253,8 +253,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     open fun mousePressed(event: UIMouseEvent) {
         mousePressedListeners?.forEach { it.accept(this) }
-        if (parent != null && !event.canceled)
-            parent!!.mousePressed(event)
+//        if (parent != null && !event.canceled)
+//            parent!!.mousePressed(event)
     }
 
     open fun mouseReleased(mouseX: Float, mouseY: Float) {
@@ -386,7 +386,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
             return if (clipContent) {
                 parent!!.relX
-            } else 0f + parent!!.getParentXOffset()
+            } else 0f + parent!!.getParentXOffset() - if (parent is UIContainer<*>) {
+                (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
+            } else 0f
         } else 0f
     }
 
@@ -397,7 +399,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
             return if (clipContent) {
                 parent!!.relY
-            } else 0f + parent!!.getParentYOffset()
+            } else 0f + parent!!.getParentYOffset() - if (parent is UIContainer<*>) {
+                (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
+            } else 0f
         } else 0f
     }
 
