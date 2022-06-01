@@ -2,8 +2,7 @@ package net.prismclient.aether.ui.component
 
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.component.propagation.UIMouseEvent
-import net.prismclient.aether.ui.component.type.input.button.UIButton
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
@@ -253,8 +252,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     open fun mousePressed(event: UIMouseEvent) {
         mousePressedListeners?.forEach { it.accept(this) }
-//        if (parent != null && !event.canceled)
-//            parent!!.mousePressed(event)
+        if (parent != null && !event.canceled) {
+            event.propagationIndex++
+            parent!!.mousePressed(event)
+        }
     }
 
     open fun mouseReleased(mouseX: Float, mouseY: Float) {
@@ -366,14 +367,30 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 //
 //    fun getAnchorY() = calculateUnitY(style.anchor?.y, height, false)
 
-    fun isMouseInside() = (getMouseX() > x) && (getMouseY() > y) && (getMouseX() < x + width) && (getMouseY() < y + height)
+    fun isMouseInside() = (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
 
     /**
      * Returns true if the mouse is inside the rel x, y, width and height
      */
-    fun isMouseInsideBoundingBox() = ((getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)) && (parent == null || (UICore.mouseX >= parent!!.relX) && (UICore.mouseY >= parent!!.relY) && (UICore.mouseX <= parent!!.relX + parent!!.relWidth) && (UICore.mouseY <= parent!!.relY + parent!!.relHeight))
+    fun isMouseInsideBoundingBox(): Boolean {
+        val check = isMouseInside() //&& (parent == null || parent!!.isMouseInsideBoundingBox()) //&& (parent != null || !parent!!.style.clipContent)
+                //&& if (parent != null) if (parent!!.style.clipContent) (parent!!.isMouseInsideBoundingBox()) else false else true
+        if (parent != null) {
+            if (!parent!!.isMouseInsideBoundingBox()) {
+                return false
+            }
+        }
 
-    //fun isFocused(): Boolean = UICore.instance.focusedComponent == this
+        return check
+    }
+
+    fun check(): Boolean = if (parent != null && parent!!.style.clipContent && !parent!!.check()) false else isMouseInside()
+
+
+    //= ((getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)) && (parent == null || (UICore.mouseX >= parent!!.relX) && (UICore.mouseY >= parent!!.relY) && (UICore.mouseX <= parent!!.relX + parent!!.relWidth) && (UICore.mouseY <= parent!!.relY + parent!!.relHeight)) //&& if (parent != null) if (parent!!.style.clipContent) (parent!!.isMouseInsideBoundingBox()) else false else true
+
+
+
 
     fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
 
@@ -384,9 +401,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
         return if (parent is UIFrame) {
             val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
-            return if (clipContent) {
+            return (if (clipContent) {
                 parent!!.relX
-            } else 0f + parent!!.getParentXOffset() - if (parent is UIContainer<*>) {
+            } else 0f) + parent!!.getParentXOffset() - if (parent is UIContainer<*>) {
                 (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
             } else 0f
         } else 0f
@@ -397,9 +414,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
         return if (parent is UIFrame) {
             val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
-            return if (clipContent) {
+            return (if (clipContent) {
                 parent!!.relY
-            } else 0f + parent!!.getParentYOffset() - if (parent is UIContainer<*>) {
+            } else 0f) + parent!!.getParentYOffset() - if (parent is UIContainer<*>) {
                 (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
             } else 0f
         } else 0f

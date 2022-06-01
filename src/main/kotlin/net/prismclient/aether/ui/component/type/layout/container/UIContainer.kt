@@ -1,7 +1,7 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.propagation.UIMouseEvent
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.util.extensions.renderer

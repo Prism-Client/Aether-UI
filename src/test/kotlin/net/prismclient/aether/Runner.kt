@@ -69,13 +69,13 @@ object Runner {
         }
 
         GLFW.glfwSetMouseButtonCallback(window) { window1: Long, button: Int, action: Int, mods: Int ->
-            if (button == 0) { // 1 = Down, 0 = Up // 0 - LMB, 1 - RMB //
+            //if (button == 0) { // 1 = Down, 0 = Up // 0 - LMB, 1 - RMB //
                 if (action == 1) {
-                    core!!.mousePressed()
+                    core!!.mousePressed(button)
                 } else {
                     core!!.mouseReleased()
                 }
-            }
+            //}
         }
         GLFW.glfwSetCursorPosCallback(window) { handle: Long, xpos: Double, ypos: Double ->
             mouseX = xpos

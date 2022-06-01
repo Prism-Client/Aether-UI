@@ -1,7 +1,7 @@
 package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.propagation.UIMouseEvent
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
@@ -29,7 +29,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @see UIContainer
  */
 abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style), UILayout {
-    protected val components = ArrayList<UIComponent<*>>()
+    val components = ArrayList<UIComponent<*>>()
     protected var framebuffer: UIContentFBO? = null
 
     var frameWidth: Float = 0f
@@ -140,11 +140,11 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
 //    }
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
-        for (i in 0 until components.size) {
-            if (i < components.size) {
-                components[i].mousePressed(event)
-            }
-        }
+//        for (i in 0 until components.size) {
+//            if (i < components.size) {
+//                components[i].mousePressed(event)
+//            }
+//        }
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {

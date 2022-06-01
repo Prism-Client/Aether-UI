@@ -1,8 +1,7 @@
 package net.prismclient.aether.ui
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.propagation.UIMouseEvent
-import net.prismclient.aether.ui.component.propagation.UIPropagatingEvent
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
@@ -13,11 +12,11 @@ import net.prismclient.aether.ui.util.extensions.renderer
 /**
  * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
  * of the library. There a specific functions which must be invoked to properly make user
- * input work. You can find the methods <a href"https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">here (or in the @see)</a>
+ * input work. You can find the methods <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">here (or in the @see)</a>
  *
  * @author sen
  * @since 1.0
- * @see <a href"https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">UICore documentation</a>
+ * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">UICore documentation</a>
  */
 open class UICore(val renderer: UIRenderer) {
     /**
@@ -83,52 +82,49 @@ open class UICore(val renderer: UIRenderer) {
     /**
      * Invoked when the mouse was pressed down
      */
-    fun mousePressed() {
-        for (i in 0 until components!!.size) components!![i].mousePressed(UIMouseEvent(mouseX, mouseY, 0))
-
+    fun mousePressed(mouseButton: Int) {
         /**
          * Iterates through the children of a component and invokes
          * the mousePressed method if the component is within the
          * mouse coordinates. Index is the index of the component.
          */
-//        fun peek(index: Int): Boolean  {
-//            val parent = components!![index]
-//            var j = -1 // The highest z index of the component with the mouse inside it's bounding box
-//            for (i in index until index + parent.childrenCount) {
-//                val component = components!![i]
-//                if (component.isMouseInsideBoundingBox()) {
-//                    if (component.childrenCount > 0) {
-//                        return peek(i)
-//                    } else {
-//                        j = i
-//                    }
-//                }
-//            }
-//            if (j != -1) {
-//                components!![j].mousePressed(UIMouseEvent(mouseX, mouseY, 0))
-//                return true
-//            }
-//            return false
-//        }
-//
-//        var i = 0
-//        var j = -1
-//
-//        while (i < (components?.size ?: 0)) {
-//            val component = components!![i]
-//
-//            if (component.isMouseInsideBoundingBox()) {
-//                if (component.childrenCount > 0) {
-//                    if (peek(i)) return
-//                } else {
-//                    j = i
-//                }
-//            }
-//            i++
-//        }
-//        if (j != -1) {
-//            components!![j].mousePressed(UIMouseEvent(mouseX, mouseY, 0))
-//        }
+        fun peek(list: ArrayList<UIComponent<*>>, index: Int): Boolean {
+            var component: UIComponent<*>? = null
+
+            for (i in index until list.size) {
+                val child = list[i]
+                val check = child.check()
+                if (child.check() || !child.style.clipContent) {
+                    if (child.childrenCount > 0) {
+                        if (peek(if (child is UIFrame) child.components else list, i + if (child is UIFrame) 0 else 1)) return true
+                    }
+                    if (check)
+                        component = child
+                }
+            }
+
+            return if (component != null) {
+                component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, 0))
+                true
+            } else false
+        }
+
+        var i = 0
+        var c: UIComponent<*>? = null
+
+        while (i < (components?.size ?: 0)) {
+            val child = components!![i]
+
+            if (child.check()) {
+                if (child.childrenCount > 0) {
+                    if (peek(if (child is UIFrame) child.components else components!!, if (child is UIFrame) 0 else i)) return
+                    i += child.childrenCount
+                }
+                c = child
+            }
+            i++
+        }
+        c?.mousePressed(UIMouseEvent(mouseX, mouseY, 0, 0))
     }
 
     /**
