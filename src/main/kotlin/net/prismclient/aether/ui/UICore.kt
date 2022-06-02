@@ -8,6 +8,7 @@ import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
  * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
@@ -82,7 +83,7 @@ open class UICore(val renderer: UIRenderer) {
     /**
      * Invoked when the mouse was pressed down
      */
-    fun mousePressed(mouseButton: Int) {
+    fun mousePressed(mouseButton: Int, isRelease: Boolean) {
         /**
          * Iterates through the children of a component and invokes
          * the mousePressed method if the component is within the
@@ -104,7 +105,7 @@ open class UICore(val renderer: UIRenderer) {
             }
 
             return if (component != null) {
-                component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, 0))
+                component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, isRelease, 0))
                 true
             } else false
         }
@@ -124,14 +125,7 @@ open class UICore(val renderer: UIRenderer) {
             }
             i++
         }
-        c?.mousePressed(UIMouseEvent(mouseX, mouseY, 0, 0))
-    }
-
-    /**
-     * Invoked when the mouse was released after being pressed
-     */
-    fun mouseReleased() {
-        for (i in 0 until components!!.size) components!![i].mouseReleased(mouseX, mouseY)
+        c?.mousePressed(UIMouseEvent(mouseX, mouseY, 0, isRelease, 0))
     }
 
     fun keyPressed(key: Char) {
@@ -154,6 +148,12 @@ open class UICore(val renderer: UIRenderer) {
             protected set
         
         var activeScreen: UIScreen? = null
+            protected set
+
+        /**
+         * The focused component (if applicable).
+         */
+        var focusedComponent: UIFocusable<*>? = null
             protected set
 
         /**
@@ -210,6 +210,19 @@ open class UICore(val renderer: UIRenderer) {
             instance.components = UIComponentDSL.get()
             UIComponentDSL.finalize()
             instance.update(width, height, devicePxRatio)
+        }
+
+        fun focus(component: UIFocusable<*>) {
+            focusedComponent = component
+        }
+
+        /**
+         * Aether will attempt to figure out the best component to focus.
+         */
+        fun tryFocus() {
+            if (activeScreen == null)
+                return
+//            for (i in )
         }
     }
 }

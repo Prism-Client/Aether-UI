@@ -57,8 +57,8 @@ class ExampleScreen : UIScreen {
                 list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrientation.Forward, "container") {
                     style {
                         size(rel(1f), rel(0.8f))
+                        background = null
                         overflowY = UIContainerSheet.Overflow.None
-                        background(asRGBA(0, 255, 0, 0.3f))
                     }
 
                     h1("PRISM") {
@@ -66,8 +66,6 @@ class ExampleScreen : UIScreen {
                             margin(marginTop = 20f)
                             width = rel(1f)
                             height = em(1f) - descender(1f)
-
-                            background(asRGBA(0, 0, 255, 0.3f))
 
                             font {
                                 align(UIAlignment.BOTTOMCENTER)
@@ -105,8 +103,6 @@ class ExampleScreen : UIScreen {
 
                                 width = rel(1f)
                                 height = em(1f)
-
-                                background(asRGBA(255, 0, 0, 0.3f))
 
                                 font {
                                     align(UIAlignment.TOPCENTER)

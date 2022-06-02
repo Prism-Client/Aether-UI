@@ -2,21 +2,23 @@ package net.prismclient.aether.ui.component
 
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIKey
 import net.prismclient.aether.ui.util.extensions.calculateY
 import net.prismclient.aether.ui.util.extensions.renderer
+import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 /**
@@ -45,7 +47,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             if (field != null)
                 field!!.childrenCount--
             if (value != null)
-                value!!.childrenCount++
+                value.childrenCount++
             field = value
         }
     var animation: UIAnimation<*>? = null
@@ -94,6 +96,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     protected var mouseReleasedListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseEnteredListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseLeaveListeners: MutableList<Consumer<UIComponent<*>>>? = null
+    protected var focusListeners: MutableList<BiConsumer<UIComponent<*>, Boolean>>? = null
 
     init {
         // Attempt to apply the style provided to the component.
@@ -280,12 +283,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     /** Event **/
 
+    /**
+     * Invoked once on the initialization of the component.
+     */
     open fun onInitialization(event: Consumer<UIComponent<*>>): UIComponent<T> {
         initializationListeners = initializationListeners ?: mutableListOf()
         initializationListeners?.add(event)
         return this
     }
 
+    /**
+     * Invoked when the component is updated. This is usually at the creation
+     * and when the screen is resized. However, it is not ensured that it is
+     * the only time that the method is invoked.
+     */
     open fun onUpdate(event: Consumer<UIComponent<*>>): UIComponent<T> {
         updateListeners = updateListeners ?: mutableListOf()
         updateListeners?.add(event)
@@ -304,15 +315,31 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         return this
     }
 
+    /**
+     * Invoked when the mouse enters the component's bounding box.
+     */
     open fun onMouseEnter(event: Consumer<UIComponent<*>>): UIComponent<T> {
         mouseEnteredListeners = mouseEnteredListeners ?: mutableListOf()
         mouseEnteredListeners!!.add(event)
         return this
     }
 
+    /**
+     * Invoked when the mouse leaves the bounds of the component.
+     */
     open fun onMouseLeave(event: Consumer<UIComponent<*>>): UIComponent<T> {
         mouseLeaveListeners = mouseLeaveListeners ?: mutableListOf()
         mouseLeaveListeners!!.add(event)
+        return this
+    }
+
+    /**
+     * Invoked when the component is focused or de-focused. The [BiConsumer] is the component
+     * and a boolean representing if it was focused or not focused.
+     */
+    open fun onFocus(event: BiConsumer<UIComponent<*>, Boolean>): UIComponent<T> {
+        focusListeners = focusListeners ?: mutableListOf()
+        focusListeners!!.add(event)
         return this
     }
 
@@ -374,7 +401,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      */
     fun isMouseInsideBoundingBox(): Boolean {
         val check = isMouseInside() //&& (parent == null || parent!!.isMouseInsideBoundingBox()) //&& (parent != null || !parent!!.style.clipContent)
-                //&& if (parent != null) if (parent!!.style.clipContent) (parent!!.isMouseInsideBoundingBox()) else false else true
+        //&& if (parent != null) if (parent!!.style.clipContent) (parent!!.isMouseInsideBoundingBox()) else false else true
         if (parent != null) {
             if (!parent!!.isMouseInsideBoundingBox()) {
                 return false
@@ -388,8 +415,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
 
     //= ((getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)) && (parent == null || (UICore.mouseX >= parent!!.relX) && (UICore.mouseY >= parent!!.relY) && (UICore.mouseX <= parent!!.relX + parent!!.relWidth) && (UICore.mouseY <= parent!!.relY + parent!!.relHeight)) //&& if (parent != null) if (parent!!.style.clipContent) (parent!!.isMouseInsideBoundingBox()) else false else true
-
-
 
 
     fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
@@ -452,6 +477,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         }
         return this
     }
+
+    /**
+     * Returns true if this is an instance of [UIFocusable] and is focused
+     */
+    fun isFocused() = if (this is UIFocusable<*>) UICore.focusedComponent == this else false
 
     /**
      * [InvalidStyleSheetException] is thrown when a cast from
