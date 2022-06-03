@@ -12,7 +12,7 @@ object UIProvider {
     /**
      * The maximum time in milliseconds that an animation can live.
      */
-    const val MAX_ANIMATION_DURATION = 25000L
+    private const val MAX_ANIMATION_DURATION = 25000L
 
     lateinit var renderer: UIRenderer
 

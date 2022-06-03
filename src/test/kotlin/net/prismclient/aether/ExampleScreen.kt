@@ -7,10 +7,12 @@ import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
+import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.util.extensions.*
@@ -116,8 +118,19 @@ class ExampleScreen : UIScreen {
                 }
             }
 
+
+            // sidebarEaseIn
+            animation(UIContainerSheet(), "sidebarEaseIn") {
+                keyframe {
+                    x = px(-236f)
+                }
+                keyframe(UIQuart(1000L)) {
+                    x = px(0f)
+                }
+            }
+
             // Sidebar
-            container("container") {
+            val c = container("container") {
                 style {
                     align(UIAlignment.TOPLEFT)
                     size(px(236f), rel(1f))
@@ -125,7 +138,7 @@ class ExampleScreen : UIScreen {
                         radius = null
                     }
                     contentRadius = radius(0f)
-                    clipContent = false
+                    clipContent = true
                 }
                 image("logo", style = "imag") {
                     style {
@@ -139,6 +152,9 @@ class ExampleScreen : UIScreen {
                         y = px(65 + 25 + 32)
                         size(rel(1f), rel(1f) - px(65 + 25 + 32))
                         clipContent = true
+                        verticalScrollbar {
+                            color = asRGBA(87, 164, 255)
+                        }
                     }
 
                     p("MENU").style {
@@ -236,6 +252,7 @@ class ExampleScreen : UIScreen {
                     }
                 }
             }
+            UIProvider.dispatchAnimation("sidebarEaseIn", c)
         }
     }
 }

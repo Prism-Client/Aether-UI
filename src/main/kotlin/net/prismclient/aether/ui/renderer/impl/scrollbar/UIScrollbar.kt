@@ -88,8 +88,11 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
         }
     }
 
-    fun mousePressed(mouseX: Float, mouseY: Float) {
-        if (!shouldRender || (((component!! as UIContainer<*>).expandedWidth <= 0f && type == Scrollbar.Horizontal) || ((component!! as UIContainer<*>).expandedHeight <= 0f && type == Scrollbar.Vertical))) return
+    /**
+     * Invoked when the mouse is pressed. Returns true if the scrollbar was selected
+     */
+    fun mousePressed(mouseX: Float, mouseY: Float): Boolean {
+        if (!shouldRender || (((component!! as UIContainer<*>).expandedWidth <= 0f && type == Scrollbar.Horizontal) || ((component!! as UIContainer<*>).expandedHeight <= 0f && type == Scrollbar.Vertical))) return false
 
         var x = cachedX
         var y = cachedY
@@ -107,7 +110,9 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
         if (component!!.isWithinBounds(x, y, w, h)) {
             selected = true
             mouseOffset = if (type == Scrollbar.Vertical) mouseY - y else mouseX - x
+            return true
         }
+        return false
     }
 
     fun mouseMoved(mouseX: Float, mouseY: Float) {
@@ -149,13 +154,9 @@ class UIScrollbar(val type: Scrollbar) : UIShape() {
     }
 
     override fun copy(): UIScrollbar = UIScrollbar(type).also {
-        it.color = color
-        it.radius = radius?.copy()
+        it.apply(this)
         it.border = border?.copy()
+        it.radius = radius?.copy()
         it.background = background?.copy()
-        it.x = x?.copy()
-        it.y = y?.copy()
-        it.width = width?.copy()
-        it.height = height?.copy()
     }
 }

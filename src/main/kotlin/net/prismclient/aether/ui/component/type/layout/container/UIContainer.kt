@@ -17,12 +17,20 @@ import net.prismclient.aether.ui.util.interfaces.UIFocusable
  * @since 5/12/2022
  */
 open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style), UIFocusable<UIContainer<T>> {
-    var horizontalScrollbarSelected = false
-        protected set
     var verticalScrollbarSelected = false
         protected set
+    var horizontalScrollbarSelected = false
+        protected set
+
+    /**
+     * The expanded width determined by components that leave the component bounds
+     */
     var expandedWidth = 0f
         protected set
+
+    /**
+     * The expanded height determined by components that leave the components bounds
+     */
     var expandedHeight = 0f
         protected set
 
@@ -114,8 +122,11 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style),
 //    }
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
-        style.verticalScrollbar.mousePressed(event.mouseX, event.mouseY)
-        style.horizontalScrollbar.mousePressed(event.mouseX, event.mouseY)
+        verticalScrollbarSelected = style.verticalScrollbar.mousePressed(event.mouseX, event.mouseY)
+        horizontalScrollbarSelected = style.horizontalScrollbar.mousePressed(event.mouseX, event.mouseY)
+
+        if (verticalScrollbarSelected || horizontalScrollbarSelected)
+            captureFocus()
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
@@ -138,7 +149,10 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style),
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
-        style.verticalScrollbar.value += ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
-        mouseMoved(mouseX, mouseY) // Update for animations n stuff
+        if (isFocused()) {
+            style.verticalScrollbar.value += ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
+            println(((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight))
+            mouseMoved(mouseX, mouseY)
+        }
     }
 }

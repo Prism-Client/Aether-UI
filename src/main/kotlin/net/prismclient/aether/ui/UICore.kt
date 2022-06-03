@@ -147,6 +147,7 @@ open class UICore(val renderer: UIRenderer) {
      * Invoked when the mouse wheel is scrolled
      */
     open fun mouseScrolled(scrollAmount: Float) {
+        cap
         components?.forEach { it.mouseScrolled(scrollAmount, mouseX, mouseY) }
     }
 
@@ -228,12 +229,14 @@ open class UICore(val renderer: UIRenderer) {
         }
 
         /**
-         * Aether will attempt to figure out the best component to focus.
+         * Aether will try to attempt to focus a scrollbar (if available)
          */
         fun tryFocus() {
             if (activeScreen == null)
                 return
-//            for (i in )
+            for (i in 0 until instance.frames!!.size) {
+
+            }
         }
     }
 }
