@@ -298,6 +298,9 @@ class NanoVGRenderer : UIRenderer() {
         image.handle = nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.buffer)
         image.width = width[0].toFloat()
         image.height = height[0].toFloat()
+
+//        glbind
+
         image.loaded = true
         registerImage(imageName, image)
         return image

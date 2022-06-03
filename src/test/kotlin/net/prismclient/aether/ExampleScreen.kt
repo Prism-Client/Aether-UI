@@ -113,6 +113,38 @@ class ExampleScreen : UIScreen {
                 }
             }
 
+            animation(UIStyleSheet(), "1") {
+                keyframe(UIQuart(250L), true) {
+                    background(asRGBA(87, 164, 255, 0.1f))
+                    font {
+                        align(UIAlignment.CENTER)
+                        y += descender(0.5f)
+                        textAlignment = UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER
+                        fontFamily = "Poppins"
+                        fontType = UIFont.FontType.Bold
+                        fontSize = 14f
+                        fontColor = asRGBA(87, 164, 255)
+                    }
+                    animationResult = UIAnimationResult.Retain
+                }
+            }
+
+            animation(UIStyleSheet(), "2") {
+                keyframe(UIQuart(250L)) {
+                    background(0)
+                    font {
+                        align(UIAlignment.CENTER)
+                        y += descender(0.5f)
+                        textAlignment = UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER
+                        fontFamily = "Poppins"
+                        fontType = UIFont.FontType.Bold
+                        fontSize = 14f
+                        fontColor = asRGBA(65, 63, 68)
+                    }
+                    animationResult = UIAnimationResult.Retain
+                }
+            }
+
 //            animation(UIStyleSheet(), "crumbLeave") {
 //                keyframe(UIQuart(250L)) {
 //                    background {
@@ -180,12 +212,17 @@ class ExampleScreen : UIScreen {
                         }
                     }
 
-                    button("Mods", "activeCrumb") {
+                    val mods = button("Mods", "activeCrumb") {
                         image("note", "activeCrumbImage")
                     }
-                    button("Settings", "crumb") {
+                    val settings = button("Settings", "crumb") {
                         image("setting", "crumbImage")
                     }.hover("crumbHover", "crumbLeave")
+
+                    settings.onMousePressed {
+                        UIProvider.dispatchAnimation("1", settings)
+                        UIProvider.dispatchAnimation("2", mods)
+                    }
 
                         //.hover("crumbHover", "crumbLeave")
                     button("Store", "crumb") {
@@ -229,7 +266,7 @@ class ExampleScreen : UIScreen {
                                     borderWidth = 1f
                                 }
                             }
-                            clipContent = false
+                            clipContent = true
                         }
                         p("Get 3 months of cosmetics for free") {
                             style {
@@ -265,7 +302,7 @@ class ExampleScreen : UIScreen {
                                 size(161, 41)
                                 y -= px(10f)
                             }
-                        }
+                        }.hover("crumbHover", "crumbLeave")
                     }
                 }
             }

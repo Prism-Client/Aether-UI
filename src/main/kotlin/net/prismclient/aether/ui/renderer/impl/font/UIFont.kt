@@ -226,6 +226,9 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
 
     override fun saveState(component: UIComponent<*>, keyframe: UIFont?, retain: Boolean) {
         //TODO("Not yet implemented")
+        if (retain) {
+            fontColor = keyframe?.fontColor ?: fontCache!!.fontColor
+        }
     }
 
     /**
