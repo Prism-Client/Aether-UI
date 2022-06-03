@@ -484,6 +484,17 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun isFocused() = if (this is UIFocusable<*>) UICore.focusedComponent == this else false
 
     /**
+     * Sets the active focused component to this
+     */
+    fun captureFocus() {
+        if (this is UIFocusable<*>) {
+            UICore.focus(this)
+        } else {
+            println("Attempted to focus component despite not being focusable?")
+        }
+    }
+
+    /**
      * [InvalidStyleSheetException] is thrown when a cast from
      * [UIStyleSheet] to [T] failed.
      *

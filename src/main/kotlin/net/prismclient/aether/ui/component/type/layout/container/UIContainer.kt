@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
  * [UIContainer] is the superclass for all layouts. It introduces scrollbars
@@ -15,14 +16,15 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 5/12/2022
  */
-open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) {
+open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style), UIFocusable<UIContainer<T>> {
     var horizontalScrollbarSelected = false
         protected set
     var verticalScrollbarSelected = false
         protected set
-
     var expandedWidth = 0f
+        protected set
     var expandedHeight = 0f
+        protected set
 
     override fun updateLayout() {}
 

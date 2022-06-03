@@ -4,14 +4,14 @@ import net.prismclient.aether.dependencies.AnimationStyles
 import net.prismclient.aether.dependencies.ComponentStyles
 import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
+import net.prismclient.aether.ui.animation.ease.impl.UIQuart
+import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNBASELINE
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
+import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.util.extensions.*
 
@@ -39,75 +39,198 @@ class ExampleScreen : UIScreen {
 
             renderer {
                 loadImage("background", "/demo/background.png")
+                loadImage("logo", "/demo/logo.png")
             }
 
-            container(style = "container") {
-                style {
-                    control(UIAlignment.MIDDLELEFT)
-                    x = px(10)
-                    width = px(180)
-                    height = rel(1f) - px(20) // 20 px padding
-                    contentRadius = radius(24f)
-                    background {
-                        radius = radius(24f)
-                    }
-                    clipContent = true
+            style(UIStyleSheet(), "activeCrumb") {
+                background(asRGBA(87, 164, 255, 0.1f))
+                size(rel(1f), px(40f))
+                font {
+                    align(UIAlignment.CENTER)
+                    x = px(72f)
+                    y += descender(0.5f)
+                    fontFamily = "Poppins"
+                    fontType = UIFont.FontType.Regular
+                    textAlignment = UIRenderer.ALIGNLEFT or UIRenderer.ALIGNMIDDLE
+                    fontSize = 14f
+                    fontColor = asRGBA(87, 164, 255)
                 }
+            }
 
+            style(UIStyleSheet(), "crumb") {
+                size(rel(1f), px(40f))
+
+                font {
+                    align(UIAlignment.CENTER)
+                    x = px(72f)
+                    y += descender(0.5f)
+                    fontFamily = "Poppins"
+                    fontType = UIFont.FontType.Regular
+                    textAlignment = UIRenderer.ALIGNLEFT or UIRenderer.ALIGNMIDDLE
+                    fontSize = 14f
+                    fontColor = asRGBA(65, 63, 68)
+                }
+            }
+
+            style(UIImageSheet(), "activeCrumbImage") {
+                control(UIAlignment.MIDDLELEFT)
+                size(24f, 24f)
+                margin(marginLeft = 24f)
+                imageColor = asRGBA(87, 164, 255)
+            }
+
+            style(UIImageSheet(), "crumbImage") {
+                control(UIAlignment.MIDDLELEFT)
+                size(24f, 24f)
+                margin(marginLeft = 24f)
+                imageColor = asRGBA(65, 63, 68)
+            }
+            style(UIStyleSheet(), "blueButton") {
+                background(asRGBA(87, 164, 255, 0.1f)) {
+                    radius(8f)
+                }
+                font {
+                    align(UIAlignment.CENTER)
+                    y += descender(0.5f)
+                    textAlignment = UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER
+                    fontFamily = "Poppins"
+                    fontType = UIFont.FontType.Bold
+                    fontSize = 16f
+                    fontColor = asRGBA(87, 164, 255)
+                }
+            }
+
+            animation(UIStyleSheet(), "crumbHover") {
+                keyframe(UIQuart(250L)) {
+                    background {
+                        backgroundColor = asRGBA(97, 97, 97, 0.1f)
+                    }
+                }
+            }
+
+            animation(UIStyleSheet(), "crumbLeave") {
+                keyframe(UIQuart(250L)) {
+                    background {
+                        backgroundColor = 0
+                    }
+                }
+            }
+
+            // Sidebar
+            container("container") {
+                style {
+                    align(UIAlignment.TOPLEFT)
+                    size(px(236f), rel(1f))
+                    background(-1) {
+                        radius = null
+                    }
+                    contentRadius = radius(0f)
+                    clipContent = false
+                }
+                image("logo", style = "imag") {
+                    style {
+                        control(UIAlignment.TOPCENTER)
+                        size(44f, 65f)
+                        margin(marginTop = 25f)
+                    }
+                }
                 list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrientation.Forward, "container") {
                     style {
-                        size(rel(1f), rel(0.8f))
-                        background = null
-                        overflowY = UIContainerSheet.Overflow.None
+                        y = px(65 + 25 + 32)
+                        size(rel(1f), rel(1f) - px(65 + 25 + 32))
+                        clipContent = true
                     }
 
-                    h1("PRISM") {
-                        style {
-                            margin(marginTop = 20f)
-                            width = rel(1f)
-                            height = em(1f) - descender(1f)
+                    p("MENU").style {
+                        margin(marginLeft = 24f, marginBottom = 10f)
+                        height = px(16f) // TODO: Font size calculations
+                        font {
+                            fontColor = asRGBA(191, 189, 193)
+                        }
+                    }
 
-                            font {
-                                align(UIAlignment.BOTTOMCENTER)
-                                textAlignment = ALIGNBASELINE or ALIGNCENTER
-                                fontType = UIFont.FontType.Light
-                                fontSize = 24f
-                                fontSpacing = 24 * 0.24f
+                    button("Mods", "activeCrumb") {
+                        image("note", "activeCrumbImage")
+                    }
+                    button("Settings", "crumb") {
+                        image("setting", "crumbImage")
+                    }.hover("crumbHover", "crumbLeave")
+                    button("Store", "crumb") {
+                        image("bag", "crumbImage")
+                    }.hover("crumbHover", "crumbLeave")
+                    button("Profiles", "crumb") {
+                        image("profile", "crumbImage")
+                    }.hover("crumbHover", "crumbLeave")
+
+                    p("SOCIAL").style {
+                        margin(20f, 0f, 10f, 24f)
+                        height = px(16f) // TODO: Font size calculations
+                        font {
+                            fontColor = asRGBA(191, 189, 193)
+                        }
+                    }
+
+                    button("Messages", "crumb") {
+                        image("message", "crumbImage")
+                    }.hover("crumbHover", "crumbLeave")
+                    button("Friends", "crumb") {
+                        image("friends", "crumbImage")
+                    }.hover("crumbHover", "crumbLeave")
+                    button("Achievements", "crumb") {
+                        image("trophy", "crumbImage")
+                    }.hover("crumbHover", "crumbLeave")
+                    button("Recordings", "crumb") {
+                        image("recording", "crumbImage")
+                    }.hover("crumbHover", "crumbLeave")
+
+                    // Support
+                    container("container") {
+                        style {
+                            control(UIAlignment.TOPCENTER)
+                            size(189f, 172f)
+                            margin(marginTop = 20f, marginBottom = 20f)
+                            background(asRGBA(245, 245, 245)) {
+                                radius(10f)
+                                border {
+                                    borderColor = asRGBA(214, 214, 214)
+                                    borderWidth = 1f
+                                }
                             }
+                            clipContent = false
                         }
-                    }
-
-                    button("Mods", "btn") {
-                        style {
-                            control(UIAlignment.CENTER)
-                            margin(marginTop = 20f)
-                            size(148f, 57f)
-                        }
-                        image("note", style = "icon")
-                    }.hover("hoverEnter", "hoverLeave")
-
-                    button("Settings", "btn") {
-                        style {
-                            control(UIAlignment.CENTER)
-                            margin(marginTop = 5f)
-                            size(148f, 57f)
-                        }
-                        image("settings", style = "icon")
-                    }
-
-                    for (i in 0..10) {
-                        h2("Parties $i") {
+                        p("Get 3 months of cosmetics for free") {
                             style {
-                                control(UIAlignment.CENTER)
-                                margin(marginTop = 5f)
-
-                                width = rel(1f)
-                                height = em(1f)
-
+                                size(189, 80)
                                 font {
                                     align(UIAlignment.TOPCENTER)
-                                    textAlignment = ALIGNTOP or ALIGNCENTER
+                                    y += px(20f)
+                                    textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
+                                    fontRenderType = UIFont.FontRenderType.WRAP
+                                    fontColor = asRGBA(0, 0, 0)
+                                    lineBreakWidth = 189f
+                                    fontSize = 16f
                                 }
+                            }
+                        }
+                        p("Support Prism's development by unlocking cosmetics.") {
+                            style {
+                                size(179, 80)
+                                font {
+                                    align(UIAlignment.TOPCENTER)
+                                    y += px(60f)
+                                    textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
+                                    fontRenderType = UIFont.FontRenderType.WRAP
+                                    fontColor = asRGBA(65, 63, 68)
+                                    lineBreakWidth = 179f
+                                    fontSize = 14f
+                                }
+                            }
+                        }
+                        button("GET PREMIUM", "blueButton") {
+                            style {
+                                control(UIAlignment.BOTTOMCENTER)
+                                size(161, 41)
+                                y -= px(10f)
                             }
                         }
                     }

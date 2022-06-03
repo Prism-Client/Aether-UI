@@ -7,8 +7,8 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIStyleSheet
-import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.interfaces.UIDependable
 
 /**
  * An example of [UIDependable] which has component styles setup
@@ -37,8 +37,8 @@ class ComponentStyles : UIDependable() {
             sliderControl.color = -1
 
             background {
-                radius = radius(2.5f)
-                color = asRGBA(255, 255, 255, 0.3f)
+                radius(2.5f)
+                backgroundColor = asRGBA(255, 255, 255, 0.3f)
                 border {
                     borderWidth = 1f
                     borderColor = asRGBA(255, 255, 255, 0.75f)
@@ -48,10 +48,6 @@ class ComponentStyles : UIDependable() {
 
         /** Container w Scrollbar **/
         style(UIContainerSheet(), "container") {
-            background(asRGBA(0, 0, 0, 0.3f)) {
-                radius = radius(15f)
-            }
-            contentRadius = radius(15f)
 
             verticalScrollbar {
                 x = rel(1f) - px(10) - px(5)
@@ -63,7 +59,7 @@ class ComponentStyles : UIDependable() {
                 color = -1
 
                 background(asRGBA(0, 0, 0, 0.3f)) {
-                    radius = radius(2.5f)
+                    radius(2.5f)
                 }
             }
 
@@ -78,7 +74,7 @@ class ComponentStyles : UIDependable() {
                 color = -1
 
                 background(asRGBA(0, 0, 0, 0.3f)) {
-                    radius = radius(2.5f)
+                    radius(2.5f)
                 }
             }
         }
@@ -87,7 +83,6 @@ class ComponentStyles : UIDependable() {
         style(UIImageSheet(), "imag") {
             width = px(200f)
             height = px(200f)
-            imageRadius = radius(25f)
         }
 
         // Icon Image

@@ -53,7 +53,13 @@ open class UICore(val renderer: UIRenderer) {
      * This must be invoked before the rendering of the screen. It updates all active frames.
      */
     open fun renderFrames() {
-        frames?.forEach { it.renderContent() }
+        renderer {
+            frames?.forEach {
+                beginFrame(width, height, devicePxRatio)
+                it.renderContent()
+                endFrame()
+            }
+        }
     }
 
     /**
@@ -84,6 +90,11 @@ open class UICore(val renderer: UIRenderer) {
      * Invoked when the mouse was pressed down
      */
     fun mousePressed(mouseButton: Int, isRelease: Boolean) {
+        if (isRelease) { // TODO: Mouse release propagation
+            components?.forEach { it.mouseReleased(mouseX, mouseY) }
+            return
+        }
+
         /**
          * Iterates through the children of a component and invokes
          * the mousePressed method if the component is within the

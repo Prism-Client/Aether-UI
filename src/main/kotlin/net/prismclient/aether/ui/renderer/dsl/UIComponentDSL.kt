@@ -247,7 +247,7 @@ object UIComponentDSL {
         imageName: String,
         imageLocation: String,
         style: String? = activeStyle,
-        block: UIImage.() -> Unit = {}
+        block: UIImage.() -> Unit
     ) =
         component(UIImage(imageName, imageLocation, style!!), block)
 

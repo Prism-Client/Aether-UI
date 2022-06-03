@@ -67,14 +67,14 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      */
     var animationResult: UIAnimationResult? = null
 
-    fun position(x: Float, y: Float) = position(px(x), px(y))
+    fun position(x: Number, y: Number) = position(px(x), px(y))
 
     fun position(x: UIUnit, y: UIUnit) {
         this.x = x
         this.y = y
     }
 
-    fun size(width: Float, height: Float) = size(px(width), px(height))
+    fun size(width: Number, height: Number) = size(px(width), px(height))
 
     fun size(width: UIUnit, height: UIUnit) {
         this.width = width
@@ -148,7 +148,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      */
     @JvmOverloads
     inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
-        background { this.color = color; this.radius = radius; this.block() }
+        background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /** Font **/
 

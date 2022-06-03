@@ -17,13 +17,13 @@ import net.prismclient.aether.ui.util.interfaces.UIAnimatable
  * @since 4/26/2022
  */
 open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
-    var color = UIDefaults.instance.backgroundColor
+    var backgroundColor = UIDefaults.instance.backgroundColor
     var radius: UIRadius? = null
     var border: UIBorder? = null
 
     open fun render(x: Float, y: Float, width: Float, height: Float) {
         renderer {
-            color(color)
+            color(backgroundColor)
             rect(x, y, width, height, radius)
             border?.render(x, y, width, height, radius)
         }
@@ -32,6 +32,10 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
     inline fun border(block: UIBorder.() -> Unit) {
         border = border ?: UIBorder()
         border!!.block()
+    }
+
+    fun radius(radius: Float) {
+        this.radius = UIRadius(radius)
     }
 
     protected var cachedColor: Int? = null
@@ -48,16 +52,16 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
     }
 
     override fun animate(previous: UIBackground?, current: UIBackground?, progress: Float, component: UIComponent<*>) {
-        cachedColor = cachedColor ?: color
+        cachedColor = cachedColor ?: backgroundColor
 
         if (previous?.radius != null || current?.radius != null)
             radius = radius ?: UIRadius()
         if (previous?.border != null || current?.border != null)
             border = border ?: UIBorder()
 
-        color = transition(
-            previous?.color ?: cachedColor!!,
-            current?.color ?: cachedColor!!,
+        backgroundColor = transition(
+            previous?.backgroundColor ?: cachedColor!!,
+            current?.backgroundColor ?: cachedColor!!,
             progress
         )
         radius?.animate(previous?.radius, current?.radius, progress, component)
@@ -69,7 +73,7 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
     }
 
     override fun copy(): UIBackground = UIBackground().also {
-        it.color = color
+        it.backgroundColor = backgroundColor
         it.radius = radius?.copy()
         it.border = border?.copy()
     }
