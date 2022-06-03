@@ -3,6 +3,7 @@ package net.prismclient.aether.ui
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
@@ -81,6 +82,16 @@ open class UICore(val renderer: UIRenderer) {
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         Properties.mouseX = mouseX
         Properties.mouseY = mouseY
+
+        // If the focused component isn't null, defocus the focused component
+        // if the mouse is not within it's bounds
+        if (focusedComponent != null) {
+            if (!(focusedComponent as UIComponent<*>).check()) {
+                (focusedComponent as UIComponent<*>).defocus()
+                focusedComponent = null
+            }
+        }
+
         if (activeScreen != null) {
             for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
         }
@@ -147,8 +158,8 @@ open class UICore(val renderer: UIRenderer) {
      * Invoked when the mouse wheel is scrolled
      */
     open fun mouseScrolled(scrollAmount: Float) {
-        cap
-        components?.forEach { it.mouseScrolled(scrollAmount, mouseX, mouseY) }
+        tryFocus()
+        components?.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
     }
 
     /**
@@ -164,6 +175,10 @@ open class UICore(val renderer: UIRenderer) {
 
         /**
          * The focused component (if applicable).
+         *
+         * @see focus
+         * @see defocus
+         * @see tryFocus
          */
         var focusedComponent: UIFocusable<*>? = null
             protected set
@@ -224,8 +239,18 @@ open class UICore(val renderer: UIRenderer) {
             instance.update(width, height, devicePxRatio)
         }
 
+        /**
+         * Focuses the component. Please use [UIComponent.focus] instead.
+         */
         fun focus(component: UIFocusable<*>) {
             focusedComponent = component
+        }
+
+        /**
+         * Defocuses the component. Please use [UIComponent.defocus] instead.
+         */
+        fun defocus() {
+            focusedComponent = null
         }
 
         /**
@@ -234,9 +259,35 @@ open class UICore(val renderer: UIRenderer) {
         fun tryFocus() {
             if (activeScreen == null)
                 return
-            for (i in 0 until instance.frames!!.size) {
 
+            fun peek(contain: UIContainer<*>): Boolean {
+                var component: UIContainer<*>? = null
+                for (i in 0 until contain.components.size) {
+                    val container = contain.components[i] as? UIContainer<*> ?: continue
+                    if (container.check()) {
+                        if (peek(container))
+                            return true
+                        component = container
+                    }
+                }
+                return if (component != null) {
+                    component!!.focus()
+                    true
+                } else false
             }
+
+            var component: UIContainer<*>? = null
+
+            for (i in 0 until instance.frames!!.size) {
+                val frame = instance.frames!![i] as? UIContainer<*> ?: continue
+                if (frame.check()) {
+                    if (peek(frame)) return
+                    component = frame
+                }
+            }
+
+            if (component != null)
+                component!!.focus()
         }
     }
 }

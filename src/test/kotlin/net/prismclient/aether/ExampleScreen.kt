@@ -5,6 +5,7 @@ import net.prismclient.aether.dependencies.ComponentStyles
 import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
+import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
@@ -103,21 +104,35 @@ class ExampleScreen : UIScreen {
             }
 
             animation(UIStyleSheet(), "crumbHover") {
+                keyframe {  }
                 keyframe(UIQuart(250L)) {
                     background {
                         backgroundColor = asRGBA(97, 97, 97, 0.1f)
                     }
+                    animationResult = UIAnimationResult.Retain
                 }
             }
 
+//            animation(UIStyleSheet(), "crumbLeave") {
+//                keyframe(UIQuart(250L)) {
+//                    background {
+//                        backgroundColor = 0
+//                    }
+//                }
+//            }
+
             animation(UIStyleSheet(), "crumbLeave") {
+                keyframe {
+                    background {
+                        backgroundColor = asRGBA(97, 97, 97, 0.1f)
+                    }
+                }
                 keyframe(UIQuart(250L)) {
                     background {
                         backgroundColor = 0
                     }
                 }
             }
-
 
             // sidebarEaseIn
             animation(UIContainerSheet(), "sidebarEaseIn") {
@@ -171,6 +186,8 @@ class ExampleScreen : UIScreen {
                     button("Settings", "crumb") {
                         image("setting", "crumbImage")
                     }.hover("crumbHover", "crumbLeave")
+
+                        //.hover("crumbHover", "crumbLeave")
                     button("Store", "crumb") {
                         image("bag", "crumbImage")
                     }.hover("crumbHover", "crumbLeave")

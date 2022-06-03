@@ -96,6 +96,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     protected var mouseReleasedListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseEnteredListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var mouseLeaveListeners: MutableList<Consumer<UIComponent<*>>>? = null
+
+    /**
+     * The listeners for focus/defocus events. The first parameter of the [BiConsumer] is the
+     * component and the second is if the component was focused
+     */
     protected var focusListeners: MutableList<BiConsumer<UIComponent<*>, Boolean>>? = null
 
     init {
@@ -482,6 +487,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Returns true if this is an instance of [UIFocusable] and is focused
      */
     fun isFocused() = if (this is UIFocusable<*>) UICore.focusedComponent == this else false
+
+    fun focus() {
+        if (this is UIFocusable<*>) {
+            UICore.focus(this)
+            focusListeners?.forEach { it.accept(this, true) }
+        } else {
+            println("Attempted to focus a non-focusable component")
+        }
+    }
+
+    fun defocus() {
+        UICore.defocus()
+        focusListeners?.forEach { it.accept(this, false) }
+    }
 
     /**
      * Sets the active focused component to this

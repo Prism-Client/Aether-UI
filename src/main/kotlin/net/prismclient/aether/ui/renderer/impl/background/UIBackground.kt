@@ -69,6 +69,11 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
     }
 
     override fun saveState(component: UIComponent<*>, keyframe: UIBackground?, retain: Boolean) {
+        if (!retain) {
+            backgroundColor = cachedColor!!
+        }
+        radius?.saveState(component, keyframe?.radius, retain)
+        border?.saveState(component, keyframe?.border, retain)
         //TODO("Not yet implemented")
     }
 
