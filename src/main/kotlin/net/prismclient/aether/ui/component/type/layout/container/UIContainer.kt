@@ -150,7 +150,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style),
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
         if (isFocused()) {
-            style.verticalScrollbar.value += ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
+            style.verticalScrollbar.value -= ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
             mouseMoved(mouseX, mouseY)
         }
     }
