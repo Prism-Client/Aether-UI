@@ -54,6 +54,12 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         updateLayout()
     }
 
+    open fun updateFrame() {
+        updateFramebuffer()
+        components.forEach(UIComponent<*>::update)
+        updateLayout()
+    }
+
     open fun createFramebuffer() {
         if (framebuffer != null) {
             UIRendererDSL.renderer.deleteContentFBO(framebuffer!!)
@@ -126,6 +132,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
                         style.contentRadius?.bottomLeft ?: 0f
                 )
             }
+//            println(relX)
         }
     }
 
