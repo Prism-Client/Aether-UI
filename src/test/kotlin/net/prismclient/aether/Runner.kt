@@ -86,7 +86,7 @@ object Runner {
         glfwMakeContextCurrent(window)
         GL.createCapabilities()
         glfwSetTime(0.0)
-        glfwSwapInterval(0)
+        glfwSwapInterval(1)
 
         core = UICore(NanoVGRenderer())
 

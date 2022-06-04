@@ -36,6 +36,7 @@ object UIComponentDSL {
         private set
     var withinComponentInit = false
         private set
+    var ignore = false
 
     // TODO: Validate component styles
 
@@ -86,7 +87,7 @@ object UIComponentDSL {
      * by the inner methods of this class.
      */
     fun pushComponent(component: UIComponent<*>) {
-        if (activeController != null && !withinComponentInit) {
+        if (activeController != null && !withinComponentInit && !ignore) {
             activeController!!.addComponent(component)
         }
         withinComponentInit = true
@@ -182,6 +183,15 @@ object UIComponentDSL {
      */
     fun control(controller: UIController<*>?) {
         activeController = controller
+    }
+
+    /**
+     * Anything within the block ignores being added to the active controller.
+     */
+    inline fun ignore(block: UIComponentDSL.() -> Unit) {
+        ignore = true
+        block.invoke(this)
+        ignore = false
     }
 
     /**

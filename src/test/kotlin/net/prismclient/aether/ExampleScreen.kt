@@ -177,27 +177,30 @@ class ExampleScreen : UIScreen {
                     }
 
                     animation(UIStyleSheet(), "hover") {
-                        keyframe {}
+                        keyframe {
+                            background(asRGBA(0, 0, 0, 0))
+                        }
                         keyframe(UIQuart(250L)) {
                             background {
-                                backgroundColor = asRGBA(0, 0, 0, 0.3f)
+                                backgroundColor = asRGBA(0, 0, 0, 0.1f)
                             }
                         }
                     }
 
                     animation(UIStyleSheet(), "leave") {
-                        keyframe {}
-                        keyframe(UIQuart(250L)) {
+                        keyframe {
+                            background(asRGBA(0, 0, 0, 0.1f))
+                        }
+                        keyframe(UIQuart(100L)) {
                             background {
                                 backgroundColor = asRGBA(0, 0, 0, 0)
                             }
                         }
                     }
 
-                    // TODO: Fix selectable component depth might throw error?
-                    // TODO: "ignore" block to ignore certain components but retain the layout
                     selectable<UIImageButton> {
                         onSelection {
+                            it.hover("", "")
                             it.applyStyle("activeCrumb")
                             it.image.applyStyle("activeCrumbImage")
                         }
@@ -207,26 +210,27 @@ class ExampleScreen : UIScreen {
                             it.hover("hover", "leave")
                         }
 
-
                         button("Mods", "crumb", "note", "crumbImage")
                         button("Settings", "crumb", "setting", "crumbImage")
                         button("Store", "crumb", "bag", "crumbImage")
                         button("Profiles", "crumb", "profile", "crumbImage")
 
+                        ignore {
+                            p("SOCIAL").style {
+                                margin(20f, 0f, 10f, 24f)
+                                height = px(16f) // TODO: Font size calculations
+                                font(asRGBA(191, 189, 193))
+                            }
+                        }
+
+                        button("Messages", "crumb","message", "crumbImage")
+                        button("Friends", "crumb", "friends", "crumbImage")
+                        button("Achievements", "crumb", "trophy", "crumbImage")
+                        button("Recordings", "crumb", "recording", "crumbImage")
+
                         this.components.forEach { it.onMousePressed { c -> this.selectComponent(c)} }
                         this.selectComponent(0)
                     }
-
-                    p("SOCIAL").style {
-                        margin(20f, 0f, 10f, 24f)
-                        height = px(16f) // TODO: Font size calculations
-                        font(asRGBA(191, 189, 193))
-                    }
-
-                    button("Messages", "crumb","message", "crumbImage")
-                    button("Friends", "crumb", "friends", "crumbImage")
-                    button("Achievements", "crumb", "trophy", "crumbImage")
-                    button("Recordings", "crumb", "recording", "crumbImage")
 
                     // Support
                     container("container") {
