@@ -111,56 +111,16 @@ class ExampleScreen : UIScreen {
                 keyframe {  }
                 keyframe(UIQuart(250L)) {
                     background {
-                        backgroundColor = asRGBA(97, 97, 97, 0.1f)
+                        backgroundColor = asRGBA(0, 0, 0, 0.3f)
                     }
                     animationResult = UIAnimationResult.Retain
                 }
             }
-
-            animation(UIStyleSheet(), "1") {
-                keyframe(UIQuart(250L), true) {
-                    background(asRGBA(87, 164, 255, 0.1f))
-                    font {
-                        align(UIAlignment.CENTER)
-                        y += descender(0.5f)
-                        textAlignment = UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER
-                        fontFamily = "Poppins"
-                        fontType = UIFont.FontType.Bold
-                        fontSize = 14f
-                        fontColor = asRGBA(87, 164, 255)
-                    }
-                    animationResult = UIAnimationResult.Retain
-                }
-            }
-
-            animation(UIStyleSheet(), "2") {
-                keyframe(UIQuart(250L)) {
-                    background(0)
-                    font {
-                        align(UIAlignment.CENTER)
-                        y += descender(0.5f)
-                        textAlignment = UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER
-                        fontFamily = "Poppins"
-                        fontType = UIFont.FontType.Bold
-                        fontSize = 14f
-                        fontColor = asRGBA(65, 63, 68)
-                    }
-                    animationResult = UIAnimationResult.Retain
-                }
-            }
-
-//            animation(UIStyleSheet(), "crumbLeave") {
-//                keyframe(UIQuart(250L)) {
-//                    background {
-//                        backgroundColor = 0
-//                    }
-//                }
-//            }
 
             animation(UIStyleSheet(), "crumbLeave") {
                 keyframe {
                     background {
-                        backgroundColor = asRGBA(97, 97, 97, 0.1f)
+                        backgroundColor = asRGBA(0, 0, 0, 0.3f)
                     }
                 }
                 keyframe(UIQuart(250L)) {
@@ -216,6 +176,24 @@ class ExampleScreen : UIScreen {
                         }
                     }
 
+                    animation(UIStyleSheet(), "hover") {
+                        keyframe {}
+                        keyframe(UIQuart(250L)) {
+                            background {
+                                backgroundColor = asRGBA(0, 0, 0, 0.3f)
+                            }
+                        }
+                    }
+
+                    animation(UIStyleSheet(), "leave") {
+                        keyframe {}
+                        keyframe(UIQuart(250L)) {
+                            background {
+                                backgroundColor = asRGBA(0, 0, 0, 0)
+                            }
+                        }
+                    }
+
                     // TODO: Fix selectable component depth might throw error?
                     // TODO: "ignore" block to ignore certain components but retain the layout
                     selectable<UIImageButton> {
@@ -226,7 +204,9 @@ class ExampleScreen : UIScreen {
                         onDeselection {
                             it.applyStyle("crumb")
                             it.image.applyStyle("crumbImage")
+                            it.hover("hover", "leave")
                         }
+
 
                         button("Mods", "crumb", "note", "crumbImage")
                         button("Settings", "crumb", "setting", "crumbImage")
@@ -301,7 +281,6 @@ class ExampleScreen : UIScreen {
                     }
                 }
             }
-            UIProvider.dispatchAnimation("sidebarEaseIn", c)
         }
     }
 }

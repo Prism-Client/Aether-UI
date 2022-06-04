@@ -243,7 +243,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Updates the active animation (if applicable)
      */
     open fun updateAnimation() {
-        animation?.update()
+        if (animation != null) {
+            animation!!.update()
+            if (animation!!.completed) {
+                animation = null
+            }
+        }
     }
 
     /**
@@ -504,6 +509,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<*> {
         this.hoverAnimation = hoverAnimation
         this.leaveAnimation = leaveAnimation
+        allocateHoverListeners()
         return this
     }
 

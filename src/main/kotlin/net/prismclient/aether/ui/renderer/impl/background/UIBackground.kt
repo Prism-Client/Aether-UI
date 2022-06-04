@@ -4,6 +4,7 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.extensions.transition
@@ -47,33 +48,34 @@ open class UIBackground : UICopy<UIBackground>, UIAnimatable<UIBackground> {
 
     override fun clearAnimationCache() {
         cachedColor = null
-        radius?.clearAnimationCache()
-        border?.clearAnimationCache()
+//        radius?.clearAnimationCache()
+//        border?.clearAnimationCache()
     }
 
     override fun animate(previous: UIBackground?, current: UIBackground?, progress: Float, component: UIComponent<*>) {
         cachedColor = cachedColor ?: backgroundColor
 
-        if (previous?.radius != null || current?.radius != null)
-            radius = radius ?: UIRadius()
-        if (previous?.border != null || current?.border != null)
-            border = border ?: UIBorder()
+//        if (previous?.radius != null || current?.radius != null)
+//            radius = radius ?: UIRadius()
+//        if (previous?.border != null || current?.border != null)
+//            border = border ?: UIBorder()
 
         backgroundColor = transition(
             previous?.backgroundColor ?: cachedColor!!,
             current?.backgroundColor ?: cachedColor!!,
             progress
         )
+//        println("Progress: $progress, Alpha: ${backgroundColor.getAlpha()}")
         radius?.animate(previous?.radius, current?.radius, progress, component)
         border?.animate(previous?.border, current?.border, progress, component)
     }
 
     override fun saveState(component: UIComponent<*>, keyframe: UIBackground?, retain: Boolean) {
-        if (!retain) {
-            backgroundColor = cachedColor!!
-        }
-        radius?.saveState(component, keyframe?.radius, retain)
-        border?.saveState(component, keyframe?.border, retain)
+//        if (!retain) {
+//            backgroundColor = cachedColor!!
+//        }
+//        radius?.saveState(component, keyframe?.radius, retain)
+//        border?.saveState(component, keyframe?.border, retain)
         //TODO("Not yet implemented")
     }
 

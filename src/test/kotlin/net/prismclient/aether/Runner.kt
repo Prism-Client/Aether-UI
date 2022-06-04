@@ -102,7 +102,7 @@ object Runner {
             contentScaleX = sx[0]
             contentScaleY = sy[0]
 
-            core!!.update(framebufferHeight / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
+            core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
         UICore.displayScreen(ExampleScreen())
