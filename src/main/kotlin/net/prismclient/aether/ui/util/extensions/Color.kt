@@ -46,3 +46,8 @@ fun transition(c1: Int, c2: Int, progress: Float): Int {
 
     return asRGBA(red.limit(), green.limit(), blue.limit(), alpha.limit())
 }
+
+/**
+ * Returns a string of the RGBA values
+ */
+fun Int.colorToString() = "RGBA(${this.getRed()}, ${this.getGreen()}, ${this.getBlue()}, ${this.getAlpha()})"

@@ -70,7 +70,8 @@ object UIProvider {
     }
 
     // TODO: Priorities
-    fun dispatchAnimation(animationName: String, component: UIComponent<*>) {
+    fun dispatchAnimation(animationName: String?, component: UIComponent<*>) {
+        if (animationName == null || animationName.isEmpty()) return
         val animation = animations[animationName]
                 ?: throw NullPointerException("Animation of $animationName was not found. Have you created it yet?")
         component.animation = animations[animationName]!!.copy()

@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
@@ -13,24 +14,43 @@ import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
  * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
- * of the library. There a specific functions which must be invoked to properly make user
- * input work. You can find the methods <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">here (or in the @see)</a>
+ * of the library. Most functions within this class should be invoked to properly render
+ * and handle input. See the docs for more information. The components and frames are stored
+ * here, and not in a screen. Most input is also handled here, such as bubbling and scroll
+ * calculations.
+ *
+ * The companion class, [Properties], stores the general―properties―such as the size of
+ * the window (provided by the implementation), and the position of the mouse. There are
+ * also helper functions such as [Properties.displayScreen] to display the screen and also
+ * functions [Properties.updateSize] and [Properties.updateMouse] to update the values without
+ * invoking the [update], and [mouseMoved] functions.
  *
  * @author sen
  * @since 1.0
- * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Components.md#UICore">UICore documentation</a>
+ * @see <a href="https://aether.prismclient.net/getting-started">UICore documentation</a>
+ * @see UIProvider
  */
 open class UICore(val renderer: UIRenderer) {
     /**
-     * All active components. The list is automatically created.
+     * All components that are not nested within a frame
+     *
+     * @see frame
      */
     var components: ArrayList<UIComponent<*>>? = null
         protected set
 
     /**
-     * All active frames. The frame is also added to the component list.
+     * All active frames. The frame is also added to the component list (If not nested).
+     *
+     * @see component
      */
     var frames: ArrayList<UIFrame<*>>? = null
+        protected set
+
+    /**
+     * All active controllers.
+     */
+    var controllers: ArrayList<UIController<*>>? = null
         protected set
     
     init {
@@ -80,8 +100,7 @@ open class UICore(val renderer: UIRenderer) {
      * Invoked when the mouse is moved
      */
     fun mouseMoved(mouseX: Float, mouseY: Float) {
-        Properties.mouseX = mouseX
-        Properties.mouseY = mouseY
+        updateMouse(mouseX, mouseY)
 
         // If the focused component isn't null, defocus the focused component
         // if the mouse is not within it's bounds
@@ -213,12 +232,20 @@ open class UICore(val renderer: UIRenderer) {
         var mouseY: Float = 0f
             protected set
 
+        /**
+         * Sets the [width], [height], and [devicePxRatio] to the given values
+         *
+         * @param devicePxRatio Must be at least 1f. If not, it will be set to 1f.
+         */
         fun updateSize(width: Float, height: Float, devicePxRatio: Float) {
             this.width = width
             this.height = height
-            this.devicePxRatio = devicePxRatio
+            this.devicePxRatio = devicePxRatio.coerceAtLeast(1f)
         }
 
+        /**
+         * Sets the [mouseX] and [mouseY] to the given values
+         */
         fun updateMouse(mouseX: Float, mouseY: Float) {
             this.mouseX = mouseX
             this.mouseY = mouseY
@@ -231,6 +258,7 @@ open class UICore(val renderer: UIRenderer) {
             activeScreen = screen
             instance.components = ArrayList()
             instance.frames = ArrayList()
+            instance.controllers = ArrayList()
 
             screen.build()
             instance.frames = UIComponentDSL.getFrames()

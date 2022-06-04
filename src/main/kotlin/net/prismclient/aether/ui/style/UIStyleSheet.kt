@@ -151,6 +151,9 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /** Font **/
+    @JvmOverloads
+    inline fun font(fontColor: Int, block: UIFont.() -> Unit = {}) =
+            font { this.fontColor = fontColor; this.block() }
 
     /**
      * Creates a font DSL block. If font is null, an instance of it is created

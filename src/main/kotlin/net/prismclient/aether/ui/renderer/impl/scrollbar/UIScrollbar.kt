@@ -6,11 +6,12 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.shape.UIColoredShape
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.util.extensions.limit
 import net.prismclient.aether.ui.util.extensions.renderer
 
-class UIScrollbar(val type: Scrollbar) : UIShape() {
+class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
     var border: UIBorder? = null
     var radius: UIRadius? = null
 

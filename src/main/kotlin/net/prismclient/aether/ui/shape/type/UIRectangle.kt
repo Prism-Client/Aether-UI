@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.shape.type
 
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.shape.UIColoredShape
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.util.extensions.renderer
 
@@ -10,7 +11,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 5/13/2022
  */
-class UIRectangle : UIShape() {
+class UIRectangle : UIColoredShape() {
     var radius: UIRadius? = null
 
     override fun render() {
@@ -22,6 +23,7 @@ class UIRectangle : UIShape() {
 
     override fun copy(): UIShape =
         UIRectangle().also {
+            it.apply(this)
             it.radius = radius?.copy()
-        }.apply(this)
+        }
 }

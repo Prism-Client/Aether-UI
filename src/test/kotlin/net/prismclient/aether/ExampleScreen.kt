@@ -4,9 +4,13 @@ import net.prismclient.aether.dependencies.AnimationStyles
 import net.prismclient.aether.dependencies.ComponentStyles
 import net.prismclient.aether.dependencies.IconStyles
 import net.prismclient.aether.dependencies.TextStyles
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
+import net.prismclient.aether.ui.component.controller.impl.selection.UISelectableController
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
+import net.prismclient.aether.ui.component.type.input.button.UIButton
+import net.prismclient.aether.ui.component.type.input.button.UIImageButton
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
@@ -212,46 +216,37 @@ class ExampleScreen : UIScreen {
                         }
                     }
 
-                    val mods = button("Mods", "activeCrumb") {
-                        image("note", "activeCrumbImage")
-                    }
-                    val settings = button("Settings", "crumb") {
-                        image("setting", "crumbImage")
-                    }.hover("crumbHover", "crumbLeave")
+                    // TODO: Fix selectable component depth might throw error?
+                    // TODO: "ignore" block to ignore certain components but retain the layout
+                    selectable<UIImageButton> {
+                        onSelection {
+                            it.applyStyle("activeCrumb")
+                            it.image.applyStyle("activeCrumbImage")
+                        }
+                        onDeselection {
+                            it.applyStyle("crumb")
+                            it.image.applyStyle("crumbImage")
+                        }
 
-                    settings.onMousePressed {
-                        UIProvider.dispatchAnimation("1", settings)
-                        UIProvider.dispatchAnimation("2", mods)
-                    }
+                        button("Mods", "crumb", "note", "crumbImage")
+                        button("Settings", "crumb", "setting", "crumbImage")
+                        button("Store", "crumb", "bag", "crumbImage")
+                        button("Profiles", "crumb", "profile", "crumbImage")
 
-                        //.hover("crumbHover", "crumbLeave")
-                    button("Store", "crumb") {
-                        image("bag", "crumbImage")
-                    }.hover("crumbHover", "crumbLeave")
-                    button("Profiles", "crumb") {
-                        image("profile", "crumbImage")
-                    }.hover("crumbHover", "crumbLeave")
+                        this.components.forEach { it.onMousePressed { c -> this.selectComponent(c)} }
+                        this.selectComponent(0)
+                    }
 
                     p("SOCIAL").style {
                         margin(20f, 0f, 10f, 24f)
                         height = px(16f) // TODO: Font size calculations
-                        font {
-                            fontColor = asRGBA(191, 189, 193)
-                        }
+                        font(asRGBA(191, 189, 193))
                     }
 
-                    button("Messages", "crumb") {
-                        image("message", "crumbImage")
-                    }.hover("crumbHover", "crumbLeave")
-                    button("Friends", "crumb") {
-                        image("friends", "crumbImage")
-                    }.hover("crumbHover", "crumbLeave")
-                    button("Achievements", "crumb") {
-                        image("trophy", "crumbImage")
-                    }.hover("crumbHover", "crumbLeave")
-                    button("Recordings", "crumb") {
-                        image("recording", "crumbImage")
-                    }.hover("crumbHover", "crumbLeave")
+                    button("Messages", "crumb","message", "crumbImage")
+                    button("Friends", "crumb", "friends", "crumbImage")
+                    button("Achievements", "crumb", "trophy", "crumbImage")
+                    button("Recordings", "crumb", "recording", "crumbImage")
 
                     // Support
                     container("container") {

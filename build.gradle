@@ -53,7 +53,8 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         freeCompilerArgs += [
                 '-Xno-call-assertions',
                 '-Xno-receiver-assertions',
-                '-Xno-param-assertions'
+                '-Xno-param-assertions',
+                '-Xjvm-default=enable'
         ]
     }
 }

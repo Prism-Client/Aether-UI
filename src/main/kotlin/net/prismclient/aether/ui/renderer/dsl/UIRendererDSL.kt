@@ -13,6 +13,7 @@ import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.util.extensions.colorToString
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
 import org.apache.commons.io.FilenameUtils

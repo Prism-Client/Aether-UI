@@ -9,7 +9,6 @@ import net.prismclient.aether.ui.util.extensions.calculateY
 
 abstract class UIShape : UIRenderable, UICopy<UIShape> {
     protected var component: UIComponent<*>? = null
-    var color = 0
     var x: UIUnit? = null
     var y: UIUnit? = null
     var width: UIUnit? = null
@@ -36,7 +35,6 @@ abstract class UIShape : UIRenderable, UICopy<UIShape> {
         y = shape.y?.copy()
         width = shape.width?.copy()
         height = shape.height?.copy()
-        color = shape.color
         return this
     }
 }

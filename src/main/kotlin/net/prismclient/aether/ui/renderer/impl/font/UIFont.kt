@@ -98,7 +98,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         throw IllegalStateException("Use render(text: String) instead")
     }
 
-    fun render(text: String) {
+    open fun render(text: String) {
         renderer {
             font(this@UIFont)
             when (fontRenderType) {
@@ -190,15 +190,14 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         it.fontRenderType = fontRenderType
         it.textAlignment = textAlignment
         it.fontStyle = fontStyle
-        it.fontColor = fontColor
         it.fontType = fontType
+        it.fontColor = fontColor
         it.fontFamily = fontFamily
         it.fontSize = fontSize
         it.fontSpacing = fontSpacing
         it.lineBreakWidth = lineBreakWidth
         it.lineHeight = lineHeight
         it.appendedString = appendedString
-
         if (isOverridden)
             it.overwriteFontName(fontName)
     }

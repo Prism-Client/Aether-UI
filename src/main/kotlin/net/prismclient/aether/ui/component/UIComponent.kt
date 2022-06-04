@@ -41,7 +41,7 @@ import java.util.function.Consumer
  */
 @Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "LeakingThis")
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
-    var style: T
+    lateinit var style: T
     var parent: UIComponent<*>? = null
         set(value) {
             if (field != null)
@@ -88,6 +88,22 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      */
     var childrenCount = 0
 
+    /**
+     * The animation for when this component is hovered over
+     *
+     * @see hover
+     */
+    var hoverAnimation: String? = null
+        protected set
+
+    /**
+     * The animation when the mouse leaves the component
+     *
+     * @see hover
+     */
+    var leaveAnimation: String? = null
+        protected set
+
     /** Listeners **/
     protected var initializationListeners: MutableList<Consumer<UIComponent<*>>>? = null
     protected var updateListeners: MutableList<Consumer<UIComponent<*>>>? = null
@@ -104,6 +120,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     protected var focusListeners: MutableList<BiConsumer<UIComponent<*>, Boolean>>? = null
 
     init {
+        applyStyle(style)
+    }
+
+    /**
+     * Attempts to apply the style to the component.
+     *
+     * @throws NullPointerException If the style is not found
+     * @throws InvalidStyleSheetException If the style is not a valid style sheet of the given component
+     */
+    open fun applyStyle(style: String) {
         // Attempt to apply the style provided to the component.
         // Throw a InvalidStyleException if the style is not valid.
         try {
@@ -326,6 +352,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     open fun onMouseEnter(event: Consumer<UIComponent<*>>): UIComponent<T> {
         mouseEnteredListeners = mouseEnteredListeners ?: mutableListOf()
         mouseEnteredListeners!!.add(event)
+        allocateHoverListeners()
         return this
     }
 
@@ -335,6 +362,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     open fun onMouseLeave(event: Consumer<UIComponent<*>>): UIComponent<T> {
         mouseLeaveListeners = mouseLeaveListeners ?: mutableListOf()
         mouseLeaveListeners!!.add(event)
+        allocateHoverListeners()
         return this
     }
 
@@ -474,13 +502,26 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Shorthand for loading animations for when the mouse hovers over the component
      */
     fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<*> {
-        onMouseEnter {
-            UIProvider.dispatchAnimation(hoverAnimation, this)
-        }
-        onMouseLeave {
-            UIProvider.dispatchAnimation(leaveAnimation, this)
-        }
+        this.hoverAnimation = hoverAnimation
+        this.leaveAnimation = leaveAnimation
         return this
+    }
+
+    /**
+     * Adds the hover listeners if necessary
+     */
+    protected fun allocateHoverListeners() {
+        if (mouseEnteredListeners == null) {
+            onMouseEnter {
+                UIProvider.dispatchAnimation(it.hoverAnimation, this)
+            }
+        }
+
+        if (mouseLeaveListeners == null) {
+            onMouseLeave {
+                UIProvider.dispatchAnimation(it.leaveAnimation, this)
+            }
+        }
     }
 
     /**
