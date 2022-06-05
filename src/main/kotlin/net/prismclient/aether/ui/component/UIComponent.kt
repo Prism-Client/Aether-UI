@@ -12,12 +12,10 @@ import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.type.UIOperationUnit
-import net.prismclient.aether.ui.util.interfaces.UIFocusable
-import net.prismclient.aether.ui.unit.util.*
 import net.prismclient.aether.ui.util.UIKey
-import net.prismclient.aether.ui.util.extensions.calculateY
+import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
@@ -41,7 +39,14 @@ import java.util.function.Consumer
  */
 @Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "LeakingThis")
 abstract class UIComponent<T : UIStyleSheet>(style: String) {
+    /**
+     * The style of the component.
+     */
     lateinit var style: T
+
+    /**
+     * The parent of this component. If the parent is set, the origin point (0, 0) is the parent's position
+     */
     var parent: UIComponent<*>? = null
         set(value) {
             if (field != null)
@@ -51,7 +56,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             field = value
         }
     var animation: UIAnimation<*>? = null
+
+    /**
+     * If true, the position will not update when this component is invoked. Generally this is automatically
+     * enabled when added to layouts.
+     */
     var overridden = false
+
+    /**
+     * If false the component will not be rendered.
+     */
     var visible = true
 
     /** Component plot properties **/
@@ -105,19 +119,72 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         protected set
 
     /** Listeners **/
-    protected var initializationListeners: MutableList<Consumer<UIComponent<*>>>? = null
-    protected var updateListeners: MutableList<Consumer<UIComponent<*>>>? = null
+    /**
+     * The listeners for when the component is first initialized. This is only invoked once.
+     */
+    var initializationListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
 
-    protected var mousePressedListeners: MutableList<Consumer<UIComponent<*>>>? = null
-    protected var mouseReleasedListeners: MutableList<Consumer<UIComponent<*>>>? = null
-    protected var mouseEnteredListeners: MutableList<Consumer<UIComponent<*>>>? = null
-    protected var mouseLeaveListeners: MutableList<Consumer<UIComponent<*>>>? = null
+    /**
+     * The listeners for when the component is updated. This is generally called when the
+     * screen is resized.
+     *
+     * @see update
+     */
+    var updateListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
 
     /**
      * The listeners for focus/defocus events. The first parameter of the [BiConsumer] is the
      * component and the second is if the component was focused
      */
-    protected var focusListeners: MutableList<BiConsumer<UIComponent<*>, Boolean>>? = null
+    var focusListeners: HashMap<String, BiConsumer<UIComponent<*>, Boolean>>? = null
+        protected set
+
+    /**
+     * The listeners for when the component is pressed. This is a bubbling event.
+     *
+     * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
+     */
+    var mousePressedListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
+
+    /**
+     * The listeners for when the mouse is released
+     */
+    var mouseReleasedListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
+
+    /**
+     * The listeners for then the mouse is moved
+     */
+    var mouseMoveListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
+
+    /**
+     * The listeners for when the mouse enters this component. The mouse considered being inside
+     * is if it passes the check for it being within these bounds and the parent(s) of this
+     */
+    var mouseEnteredListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
+
+    /**
+     * Invoked when the mouse leaves this component
+     */
+    var mouseLeaveListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
+
+    /**
+     * Invoked when the mouse is scrolled. This must be focused or a parent of a component
+     * that is focused for this to be invoked. This is a bubbling event.
+     *
+     * @see UIFocusable
+     * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
+     */
+    var mouseScrollListeners: HashMap<String, BiConsumer<UIComponent<*>, Float>>? = null
+        protected set
+
+    // TODO Keypressed listeners
 
     init {
         applyStyle(style)
@@ -147,7 +214,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * the component before this one in the render list.
      */
     open fun initialize() {
-        initializationListeners?.forEach { it.accept(this) }
+        initializationListeners?.forEach { it.value.accept(this) }
     }
 
     /**
@@ -170,7 +237,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         updateBounds()
         updateStyle()
 
-        updateListeners?.forEach { it.accept(this) }
+        // Invoke the update listeners
+        updateListeners?.forEach { it.value.accept(this) }
     }
 
     /**
@@ -178,8 +246,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * and before [updatePosition].
      */
     open fun updateAnchorPoint() {
-        anchorX = calculateUnitX(style.anchor?.x, width, false)
-        anchorY = calculateUnitY(style.anchor?.y, height, false)
+        anchorX = calculate(style.anchor?.x, this, width, height, false)
+        anchorY = calculate(style.anchor?.y, this, width, height, true)
     }
 
     /**
@@ -278,8 +346,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
 
     /** Input **/
 
+    /**
+     * Invoked when the mouse moves
+     */
     open fun mouseMoved(mouseX: Float, mouseY: Float) {
-        if (isMouseInsideBoundingBox()) {
+        if (isMouseInsideBounds()) {
             if (!wasInside) {
                 mouseEntered()
                 wasInside = true
@@ -288,10 +359,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             mouseLeft()
             wasInside = false
         }
+        mouseMoveListeners?.forEach { it.value.accept(this) }
     }
 
     open fun mousePressed(event: UIMouseEvent) {
-        mousePressedListeners?.forEach { it.accept(this) }
+        mousePressedListeners?.forEach { it.value.accept(this) }
         if (parent != null && !event.canceled) {
             event.propagationIndex++
             parent!!.mousePressed(event)
@@ -299,23 +371,35 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     open fun mouseReleased(mouseX: Float, mouseY: Float) {
-        mouseReleasedListeners?.forEach { it.accept(this) }
+        mouseReleasedListeners?.forEach { it.value.accept(this) }
     }
 
+    /**
+     * Invoked when this is focused and a key is pressed
+     */
     open fun keyPressed(key: UIKey, character: Char) {
-
+        // TODO: Keypressed listeners
     }
 
+    /**
+     * Invoked when the mouse is scrolled and this is focused
+     */
     open fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
-
+        mouseScrollListeners?.forEach { it.value.accept(this, scrollAmount) }
     }
 
+    /**
+     * Invoked when the mouse enters this
+     */
     protected open fun mouseEntered() {
-        mouseEnteredListeners?.forEach { it.accept(this) }
+        mouseEnteredListeners?.forEach { it.value.accept(this) }
     }
 
+    /**
+     * Invoked when the mouse leaves this
+     */
     protected open fun mouseLeft() {
-        mouseLeaveListeners?.forEach { it.accept(this) }
+        mouseLeaveListeners?.forEach { it.value.accept(this) }
     }
 
     /** Event **/
@@ -323,9 +407,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Invoked once on the initialization of the component.
      */
-    open fun onInitialization(event: Consumer<UIComponent<*>>): UIComponent<T> {
-        initializationListeners = initializationListeners ?: mutableListOf()
-        initializationListeners?.add(event)
+    @JvmOverloads
+    open fun onInitialization(eventName: String = "Default-${initializationListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        initializationListeners = initializationListeners ?: hashMapOf()
+        initializationListeners!![eventName] = event
         return this
     }
 
@@ -334,41 +419,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * and when the screen is resized. However, it is not ensured that it is
      * the only time that the method is invoked.
      */
-    open fun onUpdate(event: Consumer<UIComponent<*>>): UIComponent<T> {
-        updateListeners = updateListeners ?: mutableListOf()
-        updateListeners?.add(event)
-        return this
-    }
-
-    open fun onMousePressed(event: Consumer<UIComponent<*>>): UIComponent<T> {
-        mousePressedListeners = mousePressedListeners ?: mutableListOf()
-        mousePressedListeners!!.add(event)
-        return this
-    }
-
-    open fun onMouseReleased(event: Consumer<UIComponent<*>>): UIComponent<T> {
-        mouseReleasedListeners = mouseReleasedListeners ?: mutableListOf()
-        mouseReleasedListeners!!.add(event)
-        return this
-    }
-
-    /**
-     * Invoked when the mouse enters the component's bounding box.
-     */
-    open fun onMouseEnter(event: Consumer<UIComponent<*>>): UIComponent<T> {
-        mouseEnteredListeners = mouseEnteredListeners ?: mutableListOf()
-        mouseEnteredListeners!!.add(event)
-        allocateHoverListeners()
-        return this
-    }
-
-    /**
-     * Invoked when the mouse leaves the bounds of the component.
-     */
-    open fun onMouseLeave(event: Consumer<UIComponent<*>>): UIComponent<T> {
-        mouseLeaveListeners = mouseLeaveListeners ?: mutableListOf()
-        mouseLeaveListeners!!.add(event)
-        allocateHoverListeners()
+    @JvmOverloads
+    open fun onUpdate(eventName: String = "Default-${updateListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        updateListeners = updateListeners ?: hashMapOf()
+        updateListeners!![eventName] = event
         return this
     }
 
@@ -376,133 +430,76 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked when the component is focused or de-focused. The [BiConsumer] is the component
      * and a boolean representing if it was focused or not focused.
      */
-    open fun onFocus(event: BiConsumer<UIComponent<*>, Boolean>): UIComponent<T> {
-        focusListeners = focusListeners ?: mutableListOf()
-        focusListeners!!.add(event)
+    @JvmOverloads
+    open fun onFocus(eventName: String = "Default-${focusListeners?.size ?: 0}", event: BiConsumer<UIComponent<*>, Boolean>): UIComponent<T> {
+        focusListeners = focusListeners ?: hashMapOf()
+        focusListeners!![eventName] = event
         return this
     }
 
-    /** Position Calculation **/
-
-    operator fun UIUnit?.unaryPlus() = getX(this)
-
-    operator fun UIUnit?.unaryMinus() = getY(this)
-
+    /**
+     * Invoked when the mouse is pressed. This is a bubbling event.
+     */
     @JvmOverloads
-    fun getX(unit: UIUnit?, ignore: Boolean = false): Float = unit.getX(getParentWidth(), ignore)
-
-    @JvmOverloads
-    fun UIUnit?.getX(width: Float, ignore: Boolean = false): Float = calculateUnitX(this, width, ignore)
-
-    fun calculateUnitX(unit: UIUnit?, width: Float, ignore: Boolean): Float = if (unit == null) 0f else {
-        calculateX(unit, this, width, ignore)
+    open fun onMousePressed(eventName: String = "Default-${mousePressedListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mousePressedListeners = mousePressedListeners ?: hashMapOf()
+        mousePressedListeners!![eventName] = event
+        return this
     }
-
-    @JvmOverloads
-    fun calculateX(unit: UIUnit?, component: UIComponent<*>, width: Float = component.getParentWidth(), ignoreOperation: Boolean = false): Float {
-        return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) net.prismclient.aether.ui.util.extensions.calculateX(unit, component, width)
-        else when (unit.type) {
-            PIXELS -> unit.value
-            RELATIVE -> unit.value * width
-            EM -> unit.value * (component.style.font?.fontSize ?: 0f)
-            ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
-            DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
-            else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
-        }
-    }
-
-    @JvmOverloads
-    fun getY(unit: UIUnit?, ignore: Boolean = false): Float = unit.getY(getParentHeight(), ignore)
-
-    @JvmOverloads
-    fun UIUnit?.getY(height: Float, ignore: Boolean = false) = calculateUnitY(this, height, ignore)
-
-    fun calculateUnitY(unit: UIUnit?, height: Float, ignore: Boolean): Float = if (unit == null) 0f else {
-        calculateY(unit, this, height, ignore)
-    }
-
-    fun getParentX() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
-
-    fun getParentY() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
-
-    fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
-
-    fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
-
-//    fun getAnchorX() = calculateUnitX(style.anchor?.x, width, false)
-//
-//    fun getAnchorY() = calculateUnitY(style.anchor?.y, height, false)
-
-    fun isMouseInside() = (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
 
     /**
-     * Returns true if the mouse is inside the rel x, y, width and height
+     * Invoked when the mouse is released.
      */
-    fun isMouseInsideBoundingBox(): Boolean {
-        val check = isMouseInside() //&& (parent == null || parent!!.isMouseInsideBoundingBox()) //&& (parent != null || !parent!!.style.clipContent)
-        //&& if (parent != null) if (parent!!.style.clipContent) (parent!!.isMouseInsideBoundingBox()) else false else true
-        if (parent != null) {
-            if (!parent!!.isMouseInsideBoundingBox()) {
-                return false
-            }
-        }
-
-        return check
+    @JvmOverloads
+    open fun onMouseReleased(eventName: String = "Default-${mouseReleasedListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseReleasedListeners = mouseReleasedListeners ?: hashMapOf()
+        mouseReleasedListeners!![eventName] = event
+        return this
     }
 
-    fun check(): Boolean = if (parent != null && parent!!.style.clipContent && !parent!!.check()) false else isMouseInside()
-
-
-    //= ((getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)) && (parent == null || (UICore.mouseX >= parent!!.relX) && (UICore.mouseY >= parent!!.relY) && (UICore.mouseX <= parent!!.relX + parent!!.relWidth) && (UICore.mouseY <= parent!!.relY + parent!!.relHeight)) //&& if (parent != null) if (parent!!.style.clipContent) (parent!!.isMouseInsideBoundingBox()) else false else true
-
-
-    fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
-
-    fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
-
-    fun getParentXOffset(): Float {
-        if (parent == null) return 0f
-
-        return if (parent is UIFrame) {
-            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
-            return (if (clipContent) {
-                parent!!.relX
-            } else 0f) + parent!!.getParentXOffset() - if (parent is UIContainer<*>) {
-                (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
-            } else 0f
-        } else 0f
+    /**
+     * Invoked when the mouse is moved
+     */
+    @JvmOverloads
+    open fun onMouseMove(eventName: String = "Default-${mouseMoveListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseMoveListeners = mouseMoveListeners ?: hashMapOf()
+        mouseMoveListeners!![eventName] = event
+        return this
     }
 
-    fun getParentYOffset(): Float {
-        if (parent == null) return 0f
-
-        return if (parent is UIFrame) {
-            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
-            return (if (clipContent) {
-                parent!!.relY
-            } else 0f) + parent!!.getParentYOffset() - if (parent is UIContainer<*>) {
-                (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
-            } else 0f
-        } else 0f
+    /**
+     * Invoked when the mouse enters the component's bounding box.
+     */
+    @JvmOverloads
+    open fun onMouseEnter(eventName: String = "Default-${mouseEnteredListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseEnteredListeners = mouseEnteredListeners ?: hashMapOf()
+        mouseEnteredListeners!![eventName] = event
+        allocateHoverListeners()
+        return this
     }
 
-//    fun getParentYOffset(skip: Boolean = false): Float {
-//        val scrollbar = if (!skip && parent is UIContainer) {
-//            (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
-//        } else 0f
-//
-//        return if (parent is UIFrame) {
-//            if (((parent as UIFrame).style as UIFrameSheet).clipContent) {
-//                return parent!!.relY
-//            } else 0f
-//        } else 0f - scrollbar// + getParentYOffset(true)
-//    }
+    /**
+     * Invoked when the mouse leaves the bounds of the component.
+     */
+    @JvmOverloads
+    open fun onMouseLeave(eventName: String = "Default-${mouseEnteredListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseLeaveListeners = mouseLeaveListeners ?: hashMapOf()
+        mouseLeaveListeners!![eventName] = event
+        allocateHoverListeners()
+        return this
+    }
 
-    fun isWithinBounds(x: Float, y: Float, width: Float, height: Float) = (x <= getMouseX() && y <= getMouseY() && x + width >= getMouseX() && y + height >= getMouseY())
-
-
-    /** Other **/
-    inline fun style(block: T.() -> Unit) = block.invoke(style)
+    /**
+     * Invoked when the mouse is scrolled.
+     *
+     * @param event The component and the amount scrolled
+     */
+    @JvmOverloads
+    open fun onMouseScrolled(eventName: String = "Default-${mouseScrollListeners?.size ?: 0}", event: BiConsumer<UIComponent<*>, Float>): UIComponent<T> {
+        mouseScrollListeners = mouseScrollListeners ?: hashMapOf()
+        mouseScrollListeners!![eventName] = event
+        return this
+    }
 
     /**
      * Shorthand for loading animations for when the mouse hovers over the component
@@ -532,22 +529,118 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
+     * Returns the x position of the parent with consideration f it being a [UIFrame]
+     */
+    fun getParentX() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
+
+    /**
+     * Returns the y position of the parent with consideration of it being a [UIFrame]
+     */
+    fun getParentY() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
+
+    /**
+     * Returns the width of the component or the window if there is no parent
+     */
+    fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
+
+    /**
+     * Returns the height of the parent or the window if there is no parent
+     */
+    fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
+
+    /**
+     * Returns true if the mouse is inside the [relX], [relY], [relWidth], and [relHeight]
+     */
+    fun isMouseInside() = (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
+
+    /**
+     * Returns true if the [isMouseInside] check is true, and it is also inside the parent of this (and it's parent, and so on, if applicable)
+     */
+    fun isMouseInsideBounds(): Boolean = if (parent != null && parent!!.style.clipContent && !parent!!.isMouseInsideBounds()) false else isMouseInside()
+
+    /**
+     * Returns the x position of the mouse with consideration to the parent
+     */
+    fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
+
+    /**
+     * Returns the y position of the mouse with consideration to the parent
+     */
+    fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
+
+    /**
+     * Returns the offset of the parent on the x-axis. It incorporates for [UIFrame] and [UIContainer] scroll offsets.
+     */
+    fun getParentXOffset(): Float {
+        if (parent == null) return 0f
+
+        return if (parent is UIFrame) {
+            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
+            return (if (clipContent) {
+                parent!!.relX
+            } else 0f) + parent!!.getParentXOffset() - if (parent is UIContainer<*>) {
+                (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
+            } else 0f
+        } else 0f
+    }
+
+    /**
+     * Returns the offset of the parent on the y-axis. It incorporates for [UIFrame] and [UIContainer] scrolling offsets
+     */
+    fun getParentYOffset(): Float {
+        if (parent == null) return 0f
+
+        return if (parent is UIFrame) {
+            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
+            return (if (clipContent) {
+                parent!!.relY
+            } else 0f) + parent!!.getParentYOffset() - if (parent is UIContainer<*>) {
+                (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
+            } else 0f
+        } else 0f
+    }
+
+    /**
+     * Shorthand for calculating the x or width of this component
+     */
+    protected operator fun UIUnit?.unaryPlus() = computeUnit(this, false)
+
+    /**
+     * Shorthand for calculation the y or height of this component
+     */
+    protected operator fun UIUnit?.unaryMinus() = computeUnit(this, true)
+
+    /**
+     * Returns the computed version of the given unit based on this and the parent of this
+     */
+    fun computeUnit(unit: UIUnit?, isY: Boolean) = calculate(unit, this, getParentWidth(), getParentHeight(), isY)
+
+    /** Other **/
+    inline fun style(block: T.() -> Unit) = block.invoke(style)
+
+    /**
      * Returns true if this is an instance of [UIFocusable] and is focused
      */
     fun isFocused() = if (this is UIFocusable<*>) UICore.focusedComponent == this else false
 
+    /**
+     * Focuses this component if applicable
+     */
     fun focus() {
         if (this is UIFocusable<*>) {
             UICore.focus(this)
-            focusListeners?.forEach { it.accept(this, true) }
+            focusListeners?.forEach { it.value.accept(this, true) }
         } else {
             println("Attempted to focus a non-focusable component")
         }
     }
 
+    /**
+     * Removes the focus from this component
+     */
     fun defocus() {
         UICore.defocus()
-        focusListeners?.forEach { it.accept(this, false) }
+        focusListeners?.forEach { it.value.accept(this, false) }
     }
 
     /**

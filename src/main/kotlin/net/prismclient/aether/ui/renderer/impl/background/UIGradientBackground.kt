@@ -2,8 +2,7 @@ package net.prismclient.aether.ui.renderer.impl.background
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.extensions.calculateX
-import net.prismclient.aether.ui.util.extensions.calculateY
+import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
@@ -31,10 +30,10 @@ class UIGradientBackground : UIBackground() {
 
     override fun update(component: UIComponent<*>?) {
         super.update(component)
-        gradientXCache = (component?.relX ?: 0f) + calculateX(gradientX, component, component?.relWidth ?: 0f)
-        gradientYCache = (component?.relY ?: 0f) + calculateY(gradientY, component, component?.relHeight ?: 0f)
-        gradientWidthCache = calculateX(gradientWidth, component, component?.relWidth ?: 0f)
-        gradientHeightCache = calculateY(gradientHeight, component, component?.relHeight ?: 0f)
+        gradientXCache = (component?.relX ?: 0f) + calculate(gradientX, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
+        gradientYCache = (component?.relY ?: 0f) + calculate(gradientY, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
+        gradientWidthCache = calculate(gradientWidth, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
+        gradientHeightCache = calculate(gradientHeight, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
     }
 
     override fun render() {
@@ -58,8 +57,9 @@ class UIGradientBackground : UIBackground() {
         }
     }
 
-    enum class GradientType {
-        LINEAR,
-        RADIAL
-    }
+    // TODO: GradientType
+//    enum class GradientType {
+//        LINEAR,
+//        RADIAL
+//    }
 }

@@ -7,10 +7,9 @@ import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIColoredShape
-import net.prismclient.aether.ui.shape.UIShape
+import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.limit
 import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.rel
 import net.prismclient.aether.ui.util.extensions.renderer
 
 class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
@@ -35,10 +34,10 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
         shouldRender()
 
         // Update the values
-        cachedX = container.relX + container.calculateUnitX(x, container.relWidth, false)
-        cachedY = container.relY + container.calculateUnitY(y, container.relHeight, false)
-        cachedWidth = container.calculateUnitX(width, container.relWidth, false)
-        cachedHeight = container.calculateUnitY(height, container.relHeight, false)
+        cachedX = container.relX + calculate(x, container, container.relWidth, container.relHeight, false)
+        cachedY = container.relY + calculate(y, container, container.relWidth, container.relHeight, true)
+        cachedWidth = calculate(width, container, container.relWidth, container.relHeight, false)
+        cachedHeight = calculate(height, container, container.relWidth, container.relHeight, true)
 
         if (type == Scrollbar.Vertical) {
             sliderSize = cachedHeight * (cachedHeight / (container.expandedHeight + cachedHeight))
@@ -100,7 +99,7 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
     /**
      * Invoked when the mouse is pressed. Returns true if the scrollbar was selected
      */
-    fun mousePressed(mouseX: Float, mouseY: Float): Boolean {
+    fun mousePressed(): Boolean {
         if (!shouldRender || (((component!! as UIContainer<*>).expandedWidth <= 0f && type == Scrollbar.Horizontal) || ((component!! as UIContainer<*>).expandedHeight <= 0f && type == Scrollbar.Vertical))) return false
 
         var x = cachedX
@@ -116,7 +115,10 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
             w = sliderSize
         }
 
-        if (component!!.isWithinBounds(x, y, w, h)) {
+        val mouseX = component!!.getMouseX()
+        val mouseY = component!!.getMouseY()
+
+        if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
             selected = true
             mouseOffset = if (type == Scrollbar.Vertical) mouseY - y else mouseX - x
             return true

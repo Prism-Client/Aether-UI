@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.style.util
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.fromProgress
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
@@ -44,14 +45,14 @@ class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
         anchorCache = anchorCache ?: AnchorCache(component.anchorX, component.anchorY)
 
         component.anchorX = fromProgress(
-            if (current?.x != null) component.calculateUnitX(current.x, component.width, false) else anchorCache!!.x,
-            if (previous?.x != null) component.calculateUnitX(previous.x, component.width, false) else anchorCache!!.x,
+            if (current?.x != null) calculate(current.x, component, component.width, component.height, false) else anchorCache!!.x,
+            if (previous?.x != null) calculate(previous.x, component, component.width, component.height, false) else anchorCache!!.x,
             progress
         )
 
         component.anchorY = fromProgress(
-            if (current?.y != null) component.calculateUnitY(current.y, component.height, false) else anchorCache!!.y,
-            if (previous?.y != null) component.calculateUnitY(previous.y, component.height, false) else anchorCache!!.y,
+            if (current?.y != null) calculate(current.y, component, component.width, component.height, true) else anchorCache!!.y,
+            if (previous?.y != null) calculate(previous.x, component, component.width, component.height, true) else anchorCache!!.y,
             progress
         )
     }

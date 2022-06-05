@@ -1,31 +1,103 @@
 package net.prismclient.aether.ui.util.extensions
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
-import net.prismclient.aether.ui.unit.util.*
+import net.prismclient.aether.ui.unit.type.UIRangeUnit
+import net.prismclient.aether.ui.unit.util.UIOperation
 import net.prismclient.aether.ui.unit.util.UIOperation.*
 
-/** General Units **/
+/**
+ * The default unit type. Represents the value in pixels.
+ */
+const val PIXELS: Byte = 0
 
+/**
+ * Represents the screen width or height, depending on the unit times the value.
+ *
+ * @see WIDTH
+ * @see HEIGHT
+ */
+const val RELATIVE: Byte = 1
+
+/**
+ * The font size of the active component
+ */
+const val EM: Byte = 2
+
+/**
+ * The ascender of the active font
+ */
+const val ASCENDER: Byte = 3
+
+/**
+ * The descender of the active font
+ */
+const val DESCENDER: Byte = 4
+
+/**
+ * Like relative, but it is always the width
+ */
+const val WIDTH: Byte = 5
+
+/**
+ * Like relative, but it is always the height
+ */
+const val HEIGHT: Byte = 6
+
+/**
+ * The border width of the active component
+ */
+const val BORDER: Byte = 7
+
+/** Unit Functions **/
+
+/**
+ * Creates a unit that represents the value in pixels.
+ */
 fun px(value: Number) = UIUnit(value.toFloat(), PIXELS)
 
-
+/**
+ * Creates a unit that represents the value times the width or height of the parent (the window or a component etc..)
+ *
+ * @param value Is the amount times the width or height.
+ */
 fun rel(value: Number) = UIUnit(value.toFloat(), RELATIVE)
 
+/**
+ * [rel] but described in percentage
+ *
+ * @see rel
+ */
 fun percent(value: Number) = UIUnit(value.toFloat() / 100f, RELATIVE)
 
+/**
+ * Creates a unit that represents the font size of this (else 0 if not applicable)
+ */
 fun em(value: Number) = UIUnit(value.toFloat(), EM)
 
+/**
+ * The ascender of the active font (else 0 if not applicable)
+ */
 fun ascender(value: Number) = UIUnit(value.toFloat(), ASCENDER)
 
+/**
+ * The descender of the active font (else 0 if not applicable)
+ */
 fun descender(value: Number) = UIUnit(value.toFloat(), DESCENDER)
 
+/**
+ * Simplified way of creating a [UIUnit]
+ */
 fun unit(value: Number, type: Byte) = UIUnit(value.toFloat(), type)
 
+/**
+ * Simplified way of creating a [UIOperationUnit]
+ */
 fun operation(unit1: UIUnit, unit2: UIUnit, operation: UIOperation) = UIOperationUnit(unit1, unit2, operation)
+
+fun range(unit: UIUnit, min: UIUnit, max: UIUnit) = UIRangeUnit(unit, min, max)
 
 /** Operator functions **/
 
@@ -37,111 +109,44 @@ operator fun UIUnit?.times(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, 
 
 operator fun UIUnit?.div(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, DIVIDE)
 
-/** Calculation functions **/
-
 /**
- * Calculates a [UIUnit] given a component on the x-axis.
+ * Calculates the given unit based on the given properties.
  *
- * @param ignoreOperation When true, the calculation will to care if the [UIUnit] is an instance of [UIOperationUnit]
+ * @param unit The unit to calculate.
+ * @param component The component used to calculate certain properties. If not available, the assumed value is
+ * @param width The width of the space for this unit (For example, the width of the screen is the width for a component unit)
+ * @param height This height of the space for this unit
+ * @param isY If true, calculate the y-axis, otherwise calculate the x-axis.
  */
-@JvmOverloads
-fun calculateX(unit: UIUnit?, component: UIComponent<*>?, width: Float, ignoreOperation: Boolean = false): Float {
-    return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) operateX(unit, component, width)
-    else when (unit.type) {
-        PIXELS,-> unit.value
-        RELATIVE -> unit.value * width
-        EM -> unit.value * (component?.style?.font?.fontSize ?: 0f)
-        ASCENDER -> unit.value * (component?.style?.font?.getAscend() ?: 0f)
-        DESCENDER -> unit.value * (component?.style?.font?.getDescend() ?: 0f)
-        IMAGEWIDTH -> ((component as UIImage).activeImage?.width?.toFloat() ?: 0f) * unit.value
-        IMAGEHEIGHT -> ((component as UIImage).activeImage?.height?.toFloat() ?: 0f) * unit.value
-        else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
-    }
-}
-
-/**
- * Returns the value of a [UIOperationUnit] on the y-axis
- */
-fun operateX(operationUnit: UIOperationUnit, component: UIComponent<*>?, width: Float): Float =
-    when (operationUnit.operation) {
-        ADD -> calculateX(operationUnit.unit1, component, width, false) + calculateX(
-            operationUnit.unit2,
-            component,
-            width,
-            false
-        )
-        SUBTRACT -> calculateX(operationUnit.unit1, component, width, false) - calculateX(
-            operationUnit.unit2,
-            component,
-            width,
-            false
-        )
-        MULTIPLY -> calculateX(operationUnit.unit1, component, width, false) * calculateX(
-            operationUnit.unit2,
-            component,
-            width,
-            false
-        )
-        DIVIDE -> calculateX(operationUnit.unit1, component, width, false) / calculateX(
-            operationUnit.unit2,
-            component,
-            width,
-            false
-        )
+fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: Float, isY: Boolean): Float {
+    fun calculateOperation(unit: UIOperationUnit, component: UIComponent<*>?, width: Float, height: Float, isY: Boolean): Float {
+        val unit1 = calculate(unit.unit1, component, width, height, isY)
+        val unit2 = calculate(unit.unit2, component, width, height, isY)
+        return when (unit.operation) {
+            ADD -> unit1 + unit2
+            SUBTRACT -> unit1 - unit2
+            MULTIPLY -> unit1 * unit2
+            DIVIDE -> unit1 / unit2
+        }
     }
 
-/**
- * Calculates a [UIUnit] given a component on the y-axis.
- *
- * @param ignoreOperation When true, the calculation will to care if the [UIUnit] is an instance of [UIOperationUnit]
- */
-@JvmOverloads
-fun calculateY(unit: UIUnit?, component: UIComponent<*>?, height: Float, ignoreOperation: Boolean = false): Float {
-    return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) operateY(unit, component, height)
-    else when (unit.type) {
+    if (unit == null) return 0f
+    if (unit is UIOperationUnit) return calculateOperation(unit, component, width, height, isY)
+    if (unit is UIRangeUnit) return calculate(unit.unit, component, width, height, isY)
+            .coerceAtLeast(calculate(unit.min, component, width, height, isY))
+            .coerceAtMost(calculate(unit.max, component, width, height, isY))
+
+    return when (unit.type) {
         PIXELS -> unit.value
-        RELATIVE -> unit.value * height
-        EM -> unit.value * (component?.style?.font?.fontSize ?: 0f)
-        ASCENDER -> unit.value * (component?.style?.font?.getAscend() ?: 0f)
-        DESCENDER -> unit.value * (component?.style?.font?.getDescend() ?: 0f)
-        IMAGEWIDTH -> ((component as UIImage).activeImage?.width?.toFloat() ?: 0f) * unit.value
-        IMAGEHEIGHT -> ((component as UIImage).activeImage?.height?.toFloat() ?: 0f) * unit.value
-        else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
+        RELATIVE -> (if (isY) height else width) * unit.value
+        ASCENDER -> (component?.style?.font?.getAscend() ?: 0f) * unit.value
+        DESCENDER -> (component?.style?.font?.getDescend() ?: 0f) * unit.value
+        EM -> (component?.style?.font?.fontSize ?: 0f) * unit.value
+        WIDTH -> width * unit.value
+        HEIGHT -> height * unit.value
+        else -> throw RuntimeException("${unit.type} is not considered a unit type.")
     }
 }
-
-/**
- * Returns the value of a [UIOperationUnit] on the y-axis
- */
-fun operateY(operationUnit: UIOperationUnit, component: UIComponent<*>?, height: Float): Float =
-    when (operationUnit.operation) {
-        ADD -> calculateY(operationUnit.unit1, component, height, false) + calculateY(
-            operationUnit.unit2,
-            component,
-            height,
-            false
-        )
-        SUBTRACT -> calculateY(operationUnit.unit1, component, height, false) - calculateY(
-            operationUnit.unit2,
-            component,
-            height,
-            false
-        )
-        MULTIPLY -> calculateY(operationUnit.unit1, component, height, false) * calculateY(
-            operationUnit.unit2,
-            component,
-            height,
-            false
-        )
-        DIVIDE -> calculateY(operationUnit.unit1, component, height, false) / calculateY(
-            operationUnit.unit2,
-            component,
-            height,
-            false
-        )
-    }
-
-/** Other **/
 
 /**
  * Given an alignment and two units, the function will make the two
@@ -161,9 +166,3 @@ fun align(alignment: UIAlignment, x: UIUnit, y: UIUnit) {
         else -> 0f
     }
 }
-
-/**
- * Returns true if the Unit is of a normal unit that is not unique to a given component
- */
-fun Byte.isNormal(): Boolean =
-    this == PIXELS || this == RELATIVE || this == EM || this == ASCENDER || this == DESCENDER

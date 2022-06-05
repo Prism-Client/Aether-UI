@@ -13,7 +13,7 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.unit.type.UIRelativeUnit
-import net.prismclient.aether.ui.unit.util.RELATIVE
+import net.prismclient.aether.ui.util.extensions.RELATIVE
 import net.prismclient.aether.ui.util.extensions.fromProgress
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.rel
@@ -273,10 +273,10 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     override fun animate(previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float, component: UIComponent<*>) {
         initialValue = initialValue
             ?: InitialValues(
-                component.getX(x),
-                component.getY(y),
-                component.getX(width),
-                component.getY(height),
+                component.computeUnit(x, false),
+                component.computeUnit(y, true),
+                component.computeUnit(width, false),
+                component.computeUnit(height, true),
                 component.style.background?.copy(),
                 component.style.font?.copy()
             )
@@ -348,25 +348,25 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         initialValue!!.x
     } else {
         0f
-    } + this.getX(unit)
+    } + this.computeUnit(unit, false)
 
     fun UIComponent<*>.y(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
         initialValue!!.y
     } else {
         0f
-    } + this.getY(unit)
+    } + this.computeUnit(unit, true)
 
     fun UIComponent<*>.width(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
         initialValue!!.width
     } else {
         0f
-    } + this.getX(unit)
+    } + this.computeUnit(unit, false)
 
     fun UIComponent<*>.height(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
         initialValue!!.height
     } else {
         0f
-    } + this.getY(unit)
+    } + this.computeUnit(unit, true)
 
     /**
      * Applies the properties of an existing sheet to this

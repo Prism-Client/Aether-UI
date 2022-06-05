@@ -32,26 +32,26 @@ class UIMargin : UICopy<UIMargin>, UIAnimatable<UIMargin> {
         cachedMargin = cachedMargin ?: CachedValues(component.marginTop, component.marginRight, component.marginBottom, component.marginLeft)
 
         component.marginTop = fromProgress(
-                if (previous == null) cachedMargin!!.top else component.getY(previous.marginTop),
-                if (current == null) cachedMargin!!.top else component.getY(current.marginTop),
+                if (previous == null) cachedMargin!!.top else component.computeUnit(previous.marginTop, true),
+                if (current == null) cachedMargin!!.top else component.computeUnit(current.marginTop, true),
                 progress
         )
 
         component.marginRight = fromProgress(
-                if (previous == null) cachedMargin!!.right else component.getX(previous.marginRight),
-                if (current == null) cachedMargin!!.right else component.getX(current.marginRight),
+                if (previous == null) cachedMargin!!.right else component.computeUnit(previous.marginRight, false),
+                if (current == null) cachedMargin!!.right else component.computeUnit(current.marginRight, false),
                 progress
         )
 
         component.marginBottom = fromProgress(
-            if (current == null) cachedMargin!!.bottom else component.getY(current.marginBottom),
-                if (previous == null) cachedMargin!!.bottom else component.getY(previous.marginBottom),
+            if (current == null) cachedMargin!!.bottom else component.computeUnit(current.marginBottom, true),
+                if (previous == null) cachedMargin!!.bottom else component.computeUnit(previous.marginBottom, true),
                 progress
         )
 
         component.marginLeft = fromProgress(
-            if (current == null) cachedMargin!!.left else component.getX(current.marginLeft),
-            if (previous == null) cachedMargin!!.left else component.getX(previous.marginLeft),
+            if (current == null) cachedMargin!!.left else component.computeUnit(current.marginLeft, false),
+            if (previous == null) cachedMargin!!.left else component.computeUnit(previous.marginLeft, false),
             progress
         )
     }

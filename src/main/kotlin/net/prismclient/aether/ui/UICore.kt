@@ -105,7 +105,7 @@ open class UICore(val renderer: UIRenderer) {
         // If the focused component isn't null, defocus the focused component
         // if the mouse is not within it's bounds
         if (focusedComponent != null) {
-            if (!(focusedComponent as UIComponent<*>).check()) {
+            if (!(focusedComponent as UIComponent<*>).isMouseInsideBounds()) {
                 (focusedComponent as UIComponent<*>).defocus()
                 focusedComponent = null
             }
@@ -135,8 +135,8 @@ open class UICore(val renderer: UIRenderer) {
 
             for (i in index until list.size) {
                 val child = list[i]
-                val check = child.check()
-                if (child.check() || !child.style.clipContent) {
+                val check = child.isMouseInsideBounds()
+                if (child.isMouseInsideBounds() || !child.style.clipContent) {
                     if (child.childrenCount > 0) {
                         if (peek(if (child is UIFrame) child.components else list, i + if (child is UIFrame) 0 else 1)) return true
                     }
@@ -157,7 +157,7 @@ open class UICore(val renderer: UIRenderer) {
         while (i < (components?.size ?: 0)) {
             val child = components!![i]
 
-            if (child.check()) {
+            if (child.isMouseInsideBounds()) {
                 if (child.childrenCount > 0) {
                     if (peek(if (child is UIFrame) child.components else components!!, if (child is UIFrame) 0 else i)) return
                     i += child.childrenCount
@@ -292,7 +292,7 @@ open class UICore(val renderer: UIRenderer) {
                 var component: UIContainer<*>? = null
                 for (i in 0 until contain.components.size) {
                     val container = contain.components[i] as? UIContainer<*> ?: continue
-                    if (container.check()) {
+                    if (container.isMouseInsideBounds()) {
                         if (peek(container))
                             return true
                         component = container
@@ -308,7 +308,7 @@ open class UICore(val renderer: UIRenderer) {
 
             for (i in 0 until instance.frames!!.size) {
                 val frame = instance.frames!![i] as? UIContainer<*> ?: continue
-                if (frame.check()) {
+                if (frame.isMouseInsideBounds()) {
                     if (peek(frame)) return
                     component = frame
                 }

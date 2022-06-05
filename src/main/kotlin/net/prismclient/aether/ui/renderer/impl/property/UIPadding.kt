@@ -33,26 +33,26 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
         cachedPadding = cachedPadding ?: CachedValues(component.paddingTop, component.paddingRight, component.paddingBottom, component.paddingLeft)
 
         component.paddingTop = fromProgress(
-                if (previous == null) cachedPadding!!.top else component.getY(previous.paddingTop),
-                if (current == null) cachedPadding!!.top else component.getY(current.paddingTop),
+                if (previous == null) cachedPadding!!.top else component.computeUnit(previous.paddingTop, true),
+                if (current == null) cachedPadding!!.top else component.computeUnit(current.paddingTop, true),
                 progress
         )
 
         component.paddingRight = fromProgress(
-                if (previous == null) cachedPadding!!.right else component.getX(previous.paddingRight),
-                if (current == null) cachedPadding!!.right else component.getX(current.paddingRight),
+                if (previous == null) cachedPadding!!.right else component.computeUnit(previous.paddingRight, false),
+                if (current == null) cachedPadding!!.right else component.computeUnit(current.paddingRight, false),
                 progress
         )
 
         component.paddingBottom = fromProgress(
-                if (previous == null) cachedPadding!!.bottom else component.getY(previous.paddingBottom),
-                if (current == null) cachedPadding!!.bottom else component.getY(current.paddingBottom),
+                if (previous == null) cachedPadding!!.bottom else component.computeUnit(previous.paddingBottom, true),
+                if (current == null) cachedPadding!!.bottom else component.computeUnit(current.paddingBottom, true),
                 progress
         )
 
         component.paddingLeft = fromProgress(
-                if (previous == null) cachedPadding!!.left else component.getX(previous.paddingLeft),
-                if (current == null) cachedPadding!!.left else component.getX(current.paddingLeft),
+                if (previous == null) cachedPadding!!.left else component.computeUnit(previous.paddingLeft, false),
+                if (current == null) cachedPadding!!.left else component.computeUnit(current.paddingLeft, false),
                 progress
         )
     }

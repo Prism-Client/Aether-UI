@@ -112,18 +112,10 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style),
         renderScrollbar()
     }
 
-//    override fun mousePressed(mouseX: Float, mouseY: Float) {
-//        super.mousePressed(
-//            mouseX - (style.horizontalScrollbar.value * expandedWidth),
-//            mouseY - (style.verticalScrollbar.value * expandedHeight)
-//        )
-//        style.verticalScrollbar.mousePressed(mouseX, mouseY)
-//        style.horizontalScrollbar.mousePressed(mouseX, mouseY)
-//    }
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
-        verticalScrollbarSelected = style.verticalScrollbar.mousePressed(event.mouseX, event.mouseY)
-        horizontalScrollbarSelected = style.horizontalScrollbar.mousePressed(event.mouseX, event.mouseY)
+        verticalScrollbarSelected = style.verticalScrollbar.mousePressed()
+        horizontalScrollbarSelected = style.horizontalScrollbar.mousePressed()
 
         if (verticalScrollbarSelected || horizontalScrollbarSelected)
             captureFocus()

@@ -2,9 +2,8 @@ package net.prismclient.aether.ui.shape
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.interfaces.UICopy
-import net.prismclient.aether.ui.util.extensions.calculateX
-import net.prismclient.aether.ui.util.extensions.calculateY
 
 /**
  * [UIShape] is an extension of the class [UIObject] which provides
@@ -34,10 +33,10 @@ abstract class UIShape : UIObject(), UICopy<UIShape> {
 
     override fun update(component: UIComponent<*>?) {
         this.component = component
-        cachedX = (component?.x ?: 0f) + calculateX(x, component, component?.width ?: 0f)
-        cachedY = (component?.y ?: 0f) + calculateY(y, component, component?.height ?: 0f)
-        cachedWidth = calculateX(width, component, component?.width ?: 0f)
-        cachedHeight = calculateY(height, component, component?.height ?: 0f)
+        cachedX = (component?.x ?: 0f) + calculate(x, component, component?.width ?: 0f, component?.height ?: 0f, false)
+        cachedY = (component?.y ?: 0f) + calculate(y, component, component?.width ?: 0f, component?.height ?: 0f, true)
+        cachedWidth = calculate(width, component, component?.width ?: 0f, component?.height ?: 0f, false)
+        cachedHeight = calculate(height, component, component?.width ?: 0f, component?.height ?: 0f, true)
     }
 
     open fun apply(shape: UIShape): UIShape {

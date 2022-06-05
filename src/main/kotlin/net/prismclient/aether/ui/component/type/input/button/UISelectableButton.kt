@@ -22,7 +22,7 @@ open class UISelectableButton<T : UIStyleSheet>(checked: Boolean = false, text: 
 
     init {
         onMousePressed {
-            if (isMouseInsideBoundingBox()) {
+            if (isMouseInside()) {
                 this.checked = !this.checked
             }
         }
