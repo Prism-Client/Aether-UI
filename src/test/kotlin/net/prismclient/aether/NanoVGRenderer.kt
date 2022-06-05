@@ -378,10 +378,10 @@ class NanoVGRenderer : UIRenderer() {
         return true
     }
 
-    private val rows = NVGTextRow.create(maxRows)
     private val ascender = floatArrayOf(0f)
     private val decender = floatArrayOf(0f)
     private val lineHeight = floatArrayOf(0f)
+
     override fun renderString(text: String, x: Float, y: Float) {
         nvgFontBlur(ctx, 0f)
         nvgFontFace(ctx, fontName)
@@ -396,7 +396,8 @@ class NanoVGRenderer : UIRenderer() {
     private var wrapHeight = 0f
 
     override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int {
-        val rows = NVGTextRow.create(100)
+        // TODO :Rewrite text wrapping
+        val rows = NVGTextRow.calloc(100)//private val rows = NVGTextRow.create(maxRows)
         wrapWidth = 0f
 
         // Set the font state
@@ -418,10 +419,12 @@ class NanoVGRenderer : UIRenderer() {
         for (i in 0 until nrows) {
             val row = rows[i]
             val w = nnvgText(ctx, x, h, row.start(), row.end()) - x // Render the text
-            wrapWidth = Math.max(wrapWidth, w)
+            wrapWidth = max(wrapWidth, w)
             h += lineHeight[0] + splitHeight // Increase by the font height plus the split height
         }
         wrapHeight = h - y
+
+        rows.free()
         return nrows
     }
 

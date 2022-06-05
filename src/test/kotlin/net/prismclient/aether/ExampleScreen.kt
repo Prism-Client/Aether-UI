@@ -189,7 +189,7 @@ class ExampleScreen : UIScreen {
                         keyframe {
                             background(asRGBA(0, 0, 0, 0.1f))
                         }
-                        keyframe(UIQuart(100L)) {
+                        keyframe(UIQuart(250L)) {
                             background {
                                 backgroundColor = asRGBA(0, 0, 0, 0)
                             }

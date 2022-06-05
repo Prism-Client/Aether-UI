@@ -45,19 +45,14 @@ operator fun UIUnit?.div(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, DI
  * @param ignoreOperation When true, the calculation will to care if the [UIUnit] is an instance of [UIOperationUnit]
  */
 @JvmOverloads
-fun calculateX(
-    unit: UIUnit?,
-    component: UIComponent<*>,
-    width: Float = component.getParentWidth(),
-    ignoreOperation: Boolean = false
-): Float {
-    return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) calculateX(unit, component, width)
+fun calculateX(unit: UIUnit?, component: UIComponent<*>?, width: Float, ignoreOperation: Boolean = false): Float {
+    return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) operateX(unit, component, width)
     else when (unit.type) {
         PIXELS,-> unit.value
         RELATIVE -> unit.value * width
-        EM -> unit.value * (component.style.font?.fontSize ?: 0f)
-        ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
-        DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
+        EM -> unit.value * (component?.style?.font?.fontSize ?: 0f)
+        ASCENDER -> unit.value * (component?.style?.font?.getAscend() ?: 0f)
+        DESCENDER -> unit.value * (component?.style?.font?.getDescend() ?: 0f)
         IMAGEWIDTH -> ((component as UIImage).activeImage?.width?.toFloat() ?: 0f) * unit.value
         IMAGEHEIGHT -> ((component as UIImage).activeImage?.height?.toFloat() ?: 0f) * unit.value
         else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
@@ -67,7 +62,7 @@ fun calculateX(
 /**
  * Returns the value of a [UIOperationUnit] on the y-axis
  */
-fun calculateX(operationUnit: UIOperationUnit, component: UIComponent<*>, width: Float): Float =
+fun operateX(operationUnit: UIOperationUnit, component: UIComponent<*>?, width: Float): Float =
     when (operationUnit.operation) {
         ADD -> calculateX(operationUnit.unit1, component, width, false) + calculateX(
             operationUnit.unit2,
@@ -101,18 +96,14 @@ fun calculateX(operationUnit: UIOperationUnit, component: UIComponent<*>, width:
  * @param ignoreOperation When true, the calculation will to care if the [UIUnit] is an instance of [UIOperationUnit]
  */
 @JvmOverloads
-fun calculateY(unit: UIUnit?, component: UIComponent<*>, height: Float, ignoreOperation: Boolean = false): Float {
-    return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) calculateY(
-        unit,
-        component,
-        height
-    )
+fun calculateY(unit: UIUnit?, component: UIComponent<*>?, height: Float, ignoreOperation: Boolean = false): Float {
+    return if (unit == null) 0f else if (!ignoreOperation && unit is UIOperationUnit) operateY(unit, component, height)
     else when (unit.type) {
         PIXELS -> unit.value
         RELATIVE -> unit.value * height
-        EM -> unit.value * (component.style.font?.fontSize ?: 0f)
-        ASCENDER -> unit.value * (component.style.font?.getAscend() ?: 0f)
-        DESCENDER -> unit.value * (component.style.font?.getDescend() ?: 0f)
+        EM -> unit.value * (component?.style?.font?.fontSize ?: 0f)
+        ASCENDER -> unit.value * (component?.style?.font?.getAscend() ?: 0f)
+        DESCENDER -> unit.value * (component?.style?.font?.getDescend() ?: 0f)
         IMAGEWIDTH -> ((component as UIImage).activeImage?.width?.toFloat() ?: 0f) * unit.value
         IMAGEHEIGHT -> ((component as UIImage).activeImage?.height?.toFloat() ?: 0f) * unit.value
         else -> throw RuntimeException("{${unit.type} is not a valid Unit Type.}")
@@ -122,7 +113,7 @@ fun calculateY(unit: UIUnit?, component: UIComponent<*>, height: Float, ignoreOp
 /**
  * Returns the value of a [UIOperationUnit] on the y-axis
  */
-fun calculateY(operationUnit: UIOperationUnit, component: UIComponent<*>, height: Float): Float =
+fun operateY(operationUnit: UIOperationUnit, component: UIComponent<*>?, height: Float): Float =
     when (operationUnit.operation) {
         ADD -> calculateY(operationUnit.unit1, component, height, false) + calculateY(
             operationUnit.unit2,

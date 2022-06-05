@@ -9,6 +9,8 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIColoredShape
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.util.extensions.limit
+import net.prismclient.aether.ui.util.extensions.px
+import net.prismclient.aether.ui.util.extensions.rel
 import net.prismclient.aether.ui.util.extensions.renderer
 
 class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
@@ -26,7 +28,7 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
     private var sliderSize = 0f // Width/Height of the overall slider
     private var mouseOffset = 0f
 
-    override fun update(component: UIComponent<*>) {
+    override fun update(component: UIComponent<*>?) {
         this.component = component
         val container = component as UIContainer<*>
 
@@ -43,6 +45,12 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
         } else if (type == Scrollbar.Horizontal) {
             sliderSize = cachedWidth * (cachedWidth / (container.expandedWidth + cachedWidth))
         }
+
+        background?.x = px(cachedX)
+        background?.y = px(cachedY)
+        background?.width = px(cachedWidth)
+        background?.height = px(cachedHeight)
+        background?.update(null)
     }
 
     fun shouldRender() {

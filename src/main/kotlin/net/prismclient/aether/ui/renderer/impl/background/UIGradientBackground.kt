@@ -2,6 +2,8 @@ package net.prismclient.aether.ui.renderer.impl.background
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.extensions.calculateX
+import net.prismclient.aether.ui.util.extensions.calculateY
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
@@ -27,12 +29,12 @@ class UIGradientBackground : UIBackground() {
     var gradientHeightCache = 0f
         private set
 
-    override fun update(component: UIComponent<*>) {
+    override fun update(component: UIComponent<*>?) {
         super.update(component)
-        gradientXCache = component.relX + component.calculateUnitX(gradientX, component.relWidth, false)
-        gradientYCache = component.relY + component.calculateUnitY(gradientY, component.relHeight, false)
-        gradientWidthCache = component.calculateUnitX(gradientWidth, component.relWidth, false)
-        gradientHeightCache = component.calculateUnitY(gradientHeight, component.relHeight, false)
+        gradientXCache = (component?.relX ?: 0f) + calculateX(gradientX, component, component?.relWidth ?: 0f)
+        gradientYCache = (component?.relY ?: 0f) + calculateY(gradientY, component, component?.relHeight ?: 0f)
+        gradientWidthCache = calculateX(gradientWidth, component, component?.relWidth ?: 0f)
+        gradientHeightCache = calculateY(gradientHeight, component, component?.relHeight ?: 0f)
     }
 
     override fun render() {

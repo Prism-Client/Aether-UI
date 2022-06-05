@@ -11,12 +11,12 @@ import net.prismclient.aether.ui.component.UIComponent
  * @since 5/4/2022
  */
 abstract class UIObject {
-    lateinit var component: UIComponent<*>
+    var component: UIComponent<*>? = null
 
     /**
      * Invoked within the component when it is updated
      */
-    abstract fun update(component: UIComponent<*>)
+    abstract fun update(component: UIComponent<*>?)
 
     /**
      * Invoked when the shape should be rendered. All

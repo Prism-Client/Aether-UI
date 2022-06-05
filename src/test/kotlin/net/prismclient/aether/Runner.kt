@@ -121,12 +121,10 @@ object Runner {
                 beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
                 color(-1)
                 renderImage("background", 0f, 0f, UICore.width, UICore.height)
-
-                renderer.test()
                 endFrame()
             }
 
-//            core!!.render()
+            core!!.render()
 
             glfwSwapBuffers(window)
             glfwPollEvents()

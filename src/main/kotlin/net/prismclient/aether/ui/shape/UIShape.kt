@@ -32,12 +32,12 @@ abstract class UIShape : UIObject(), UICopy<UIShape> {
     var cachedHeight = 0f
         protected set
 
-    override fun update(component: UIComponent<*>) {
+    override fun update(component: UIComponent<*>?) {
         this.component = component
-        cachedX = calculateX(x, component, component.width) + component.x
-        cachedY = calculateY(y, component, component.height) + component.y
-        cachedWidth = calculateX(width, component, component.width)
-        cachedHeight = calculateY(height, component, component.height)
+        cachedX = (component?.x ?: 0f) + calculateX(x, component, component?.width ?: 0f)
+        cachedY = (component?.y ?: 0f) + calculateY(y, component, component?.height ?: 0f)
+        cachedWidth = calculateX(width, component, component?.width ?: 0f)
+        cachedHeight = calculateY(height, component, component?.height ?: 0f)
     }
 
     open fun apply(shape: UIShape): UIShape {
