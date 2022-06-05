@@ -296,10 +296,8 @@ class NanoVGRenderer : UIRenderer() {
             return image
         }
         image.handle = nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.buffer)
-        image.width = width[0].toFloat()
-        image.height = height[0].toFloat()
-
-//        glbind
+        image.width = width[0]
+        image.height = height[0]
 
         image.loaded = true
         registerImage(imageName, image)
@@ -339,8 +337,8 @@ class NanoVGRenderer : UIRenderer() {
             NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY or NVG_IMAGE_GENERATE_MIPMAPS,
             rast
         )
-        image.width = w.toFloat()
-        image.height = h.toFloat()
+        image.width = w
+        image.height = h
         image.loaded = true
         registerImage(svgName, image)
         return image
