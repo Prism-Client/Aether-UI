@@ -15,6 +15,7 @@ import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.impl.background.UIGradientBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
@@ -145,10 +146,7 @@ class ExampleScreen : UIScreen {
                 style {
                     align(UIAlignment.TOPLEFT)
                     size(px(236f), rel(1f))
-                    background(-1) {
-                        radius = null
-                    }
-                    contentRadius = radius(0f)
+                    background(-1)
                     clipContent = true
                 }
                 image("logo", style = "imag") {

@@ -4,6 +4,7 @@ package net.prismclient.aether
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
 import net.prismclient.aether.ui.UICore.Properties.updateSize
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import org.lwjgl.glfw.Callbacks
@@ -76,9 +77,9 @@ object Runner {
         }
 
         glfwSetFramebufferSizeCallback(window) { handle: Long, width: Int, height: Int ->
-            framebufferWidth = (width / contentScaleX).toInt()
-            framebufferHeight = (height / contentScaleY).toInt()
-            core!!.update(framebufferWidth.toFloat(), framebufferHeight.toFloat(), max(contentScaleX, contentScaleY))
+            framebufferWidth =width
+            framebufferHeight = height
+            core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
         glfwSetScrollCallback(window) { handle: Long, xscroll: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }
@@ -86,7 +87,7 @@ object Runner {
         glfwMakeContextCurrent(window)
         GL.createCapabilities()
         glfwSetTime(0.0)
-        glfwSwapInterval(1)
+        glfwSwapInterval(0)
 
         core = UICore(NanoVGRenderer())
 
@@ -108,7 +109,6 @@ object Runner {
         UICore.displayScreen(ExampleScreen())
 
         while (!glfwWindowShouldClose(window)) {
-            updateSize(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
             updateMouse(mouseX.toFloat(), mouseY.toFloat())
 
             core!!.renderFrames()
@@ -118,13 +118,15 @@ object Runner {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
             renderer {
-                beginFrame(UICore.width, UICore.height, UICore.devicePxRatio)
+                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
                 color(-1)
                 renderImage("background", 0f, 0f, UICore.width, UICore.height)
+
+                renderer.test()
                 endFrame()
             }
 
-            core!!.render()
+//            core!!.render()
 
             glfwSwapBuffers(window)
             glfwPollEvents()

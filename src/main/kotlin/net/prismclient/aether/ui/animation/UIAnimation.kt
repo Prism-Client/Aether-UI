@@ -33,7 +33,7 @@ class UIAnimation<T : UIStyleSheet>(
         var style: T,
         val name: String,
         var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
-) : UICopy<UIAnimation<T>> {
+) : UICopy<UIAnimation<T>> { // TODO: update cache property
     val lifetime = System.currentTimeMillis()
     val timeline: ArrayList<T> = ArrayList()
 

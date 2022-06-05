@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.util.extensions
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.animation.UIAnimationPriority
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
+import net.prismclient.aether.ui.renderer.impl.background.UIGradientBackground
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
@@ -28,3 +29,5 @@ fun radius(radius: Float): UIRadius = UIRadius().also { it.set(radius) }
 
 @JvmOverloads
 inline fun <T : UIStyleSheet> animation(sheet: T, name: String, priority: UIAnimationPriority = UIAnimationPriority.NORMAL, block: UIAnimation<T>.() -> Unit) = UIAnimation(sheet, name, priority).also(block).also { UIProvider.registerAnimation(it) }
+
+inline fun gradient(block: UIGradientBackground.() -> Unit): UIGradientBackground = UIGradientBackground().also(block)

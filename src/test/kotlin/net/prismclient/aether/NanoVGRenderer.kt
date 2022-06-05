@@ -7,10 +7,7 @@ import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIProvider.getImage
 import net.prismclient.aether.ui.style.UIProvider.registerImage
-import net.prismclient.aether.ui.util.extensions.getAlpha
-import net.prismclient.aether.ui.util.extensions.getBlue
-import net.prismclient.aether.ui.util.extensions.getGreen
-import net.prismclient.aether.ui.util.extensions.getRed
+import net.prismclient.aether.ui.util.extensions.*
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.nvgLinearGradient
 import org.lwjgl.nanovg.NanoVG.*
@@ -45,7 +42,7 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun color(color: Int) {
         super.color(color)
-        nvgRGBA(r().toByte(), g().toByte(), b().toByte(), a().toByte(), this.color)
+        nvgRGBA(color.getRed().toByte(), color.getGreen().toByte(), color.getBlue().toByte(), color.getAlpha().toByte(), this.color)
     }
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
@@ -504,6 +501,18 @@ class NanoVGRenderer : UIRenderer() {
             fill()
         }
     }
+
+//    override fun test() {
+//    color(asRGBA(255,0,0, 0.3f))
+//    rect(100f, 100f, 100f, 100f, 10f, 10f, 10f, 10f)
+//    color(asRGBA(0,255,0, 0.3f))
+//    nvgBeginPath(ctx)
+//    nvgRoundedRect(ctx, 90f, 90f, 120f, 120f, 20f)
+//    nvgRoundedRect(ctx, 100f, 100f, 100f, 100f, 10f)
+//    nvgPathWinding(ctx, NVG_HOLE)
+//    nvgFillColor(ctx, color)
+//    nvgFill(ctx)
+//}
 
     companion object {
         private const val maxRows = 100 /* Max rows created from [wrapString] */

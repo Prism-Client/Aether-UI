@@ -9,10 +9,8 @@ class UIColorSwatchSheet : UIStyleSheet() {
             field = value.setAlpha(255)
         }
 
-    override fun copy(): UIStyleSheet {
-        val it = UIColorSwatchSheet()
+    override fun copy(): UIColorSwatchSheet = UIColorSwatchSheet().also {
         it.apply(this)
         it.swatchColor = swatchColor
-        return it
     }
 }

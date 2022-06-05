@@ -72,7 +72,7 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
         var w = cachedWidth
         var h = cachedHeight
 
-        background?.render(x, y, w, h)
+        background?.render()
 
         if (type == Scrollbar.Vertical) {
             y += (h - sliderSize) * value

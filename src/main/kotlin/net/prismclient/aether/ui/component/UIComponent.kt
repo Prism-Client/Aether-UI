@@ -233,10 +233,10 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
-     * Updates the stylesheet
+     * Updates the shapes within the style sheet
      */
     open fun updateStyle() {
-        // Update font if not null
+        style.background?.update(this)
         style.font?.update(this)
     }
 
@@ -260,7 +260,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     open fun render() {
         if (!visible) return
         updateAnimation()
-        style.background?.render(relX, relY, relWidth, relHeight)
+        style.background?.render()
         renderer {
             if (style.clipContent) {
                 scissor(relX, relY, relWidth, relHeight) {

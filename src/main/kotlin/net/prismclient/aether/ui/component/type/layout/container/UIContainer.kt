@@ -94,7 +94,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style),
         // and update the FBO if needed
         if (!style.clipContent)
             updateAnimation()
-        style.background?.render(relX, relY, relWidth, relHeight)
+        style.background?.render()
         renderer {
             if (!style.clipContent) {
                 translate(

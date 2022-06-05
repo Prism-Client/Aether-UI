@@ -16,6 +16,7 @@ import net.prismclient.aether.ui.unit.type.UIRelativeUnit
 import net.prismclient.aether.ui.unit.util.RELATIVE
 import net.prismclient.aether.ui.util.extensions.fromProgress
 import net.prismclient.aether.ui.util.extensions.px
+import net.prismclient.aether.ui.util.extensions.rel
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
 
@@ -46,6 +47,17 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     open var height: UIUnit? = null
 
     open var background: UIBackground? = null
+        set(value) {
+            field = value
+
+            // For the background to be rendered normally
+            // the width and height have to be 100%, so if
+            // they are not set, set them to 100%
+            if (value != null) {
+                value.width = value.width ?: rel(1)
+                value.height = value.height ?: rel(1)
+            }
+        }
     open var font: UIFont? = null
 
     open var padding: UIPadding? = null

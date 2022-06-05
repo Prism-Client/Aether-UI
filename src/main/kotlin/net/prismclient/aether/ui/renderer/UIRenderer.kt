@@ -448,24 +448,4 @@ abstract class UIRenderer {
      * Returns the height of the latest call to [wrapString]
      */
     abstract fun wrapHeight(): Float
-
-    /**
-     * Returns the red of the active color
-     */
-    protected fun r() = activeColor.getRed()
-
-    /**
-     * Returns the green of the active color
-     */
-    protected fun g() = activeColor.getGreen()
-
-    /**
-     * Returns the blue of the active color
-     */
-    protected fun b() = activeColor.getBlue()
-
-    /**
-     * Returns the alpha of the active color
-     */
-    protected fun a() = activeColor.getAlpha()
 }

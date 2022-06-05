@@ -99,7 +99,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         // Remove updating animation as animations are updated when the content is rendered
         if (!style.clipContent)
             updateAnimation()
-        style.background?.render(relX, relY, relWidth, relHeight)
+        style.background?.render()
         renderer {
             if (!style.clipContent) {
                 renderComponent()
@@ -126,13 +126,12 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
                         relY,
                         frameWidth,
                         frameHeight,
-                        style.contentRadius?.topLeft ?: 0f,
-                        style.contentRadius?.topRight ?: 0f,
-                        style.contentRadius?.bottomRight ?: 0f,
-                        style.contentRadius?.bottomLeft ?: 0f
+                        style.background?.radius?.topLeft ?: 0f,
+                        style.background?.radius?.topRight ?: 0f,
+                        style.background?.radius?.bottomRight ?: 0f,
+                        style.background?.radius?.bottomLeft ?: 0f
                 )
             }
-//            println(relX)
         }
     }
 
