@@ -62,12 +62,12 @@ abstract class UIRenderer {
         const val ALIGNBASELINE = 64
 
         /* Images */
-        const val MIPMAP = 0
-        const val REPEATX = 1
-        const val REPEATY = 2
-        const val FLIPY = 4
-        const val PREMULTIPLIED = 8
-        const val NEAREST = 16
+        const val MIPMAP = 1
+        const val REPEATX = 2
+        const val REPEATY = 4
+        const val FLIPY = 8
+        const val PREMULTIPLIED = 16
+        const val NEAREST = 32
 
         /* Line Cap/Join */
         const val BUTT = 0

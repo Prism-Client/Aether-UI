@@ -13,13 +13,6 @@ import net.prismclient.aether.ui.util.extensions.colorToString
  * @param T The stylesheet (used for inheritance) leave as UIStyleSheet.
  */
 open class UIButton<T : UIStyleSheet>(var text: String, style: String) : UIComponent<T>(style) {
-    override fun updateAnimation() {
-        super.updateAnimation()
-        if (animation != null) {
-            println("Text: $text, Color: ${style.background?.backgroundColor?.colorToString() ?: "null"}")
-        }
-    }
-
     override fun renderComponent() {
         style.font?.render(text)
     }

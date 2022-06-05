@@ -47,7 +47,6 @@ fun transition(color1: Int, color2: Int, progress: Float): Int {
     val green = (green1 + ((green2 - green1) * progress + 0.5)).toInt()
     val blue = (blue1 + ((blue2 - blue1) * progress + 0.5)).toInt()
     val alpha = (alpha1 + ((alpha2 - alpha1) * progress + 0.5)).toInt()
-    println(alpha)
     return red shl 16 or (green shl 8) or blue or (alpha shl 24)
 }
 

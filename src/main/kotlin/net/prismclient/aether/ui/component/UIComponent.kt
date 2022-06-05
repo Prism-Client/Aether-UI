@@ -130,6 +130,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * @throws InvalidStyleSheetException If the style is not a valid style sheet of the given component
      */
     open fun applyStyle(style: String) {
+        animation = null
         // Attempt to apply the style provided to the component.
         // Throw a InvalidStyleException if the style is not valid.
         try {
