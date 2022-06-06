@@ -76,9 +76,11 @@ open class UICore(val renderer: UIRenderer) {
     open fun renderFrames() {
         renderer {
             frames?.forEach {
-                beginFrame(width, height, devicePxRatio)
-                it.renderContent()
-                endFrame()
+                if (it.visible) {
+                    beginFrame(width, height, devicePxRatio)
+                    it.renderContent()
+                    endFrame()
+                }
             }
         }
     }
@@ -90,7 +92,11 @@ open class UICore(val renderer: UIRenderer) {
         renderer {
             beginFrame(width, height, devicePxRatio)
             if (activeScreen != null) {
-                for (i in 0 until components!!.size) components!![i].render()
+                for (i in 0 until components!!.size) {
+                    val component = components!![i]
+                    if (component.visible)
+                        component.render()
+                }
             }
             endFrame()
         }
