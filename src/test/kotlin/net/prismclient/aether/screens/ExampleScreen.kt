@@ -1,5 +1,6 @@
-package net.prismclient.aether
+package net.prismclient.aether.screens
 
+import net.prismclient.aether.ExampleScreenStyles
 import net.prismclient.aether.dependencies.AnimationStyles
 import net.prismclient.aether.dependencies.ComponentStyles
 import net.prismclient.aether.dependencies.IconStyles

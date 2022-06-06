@@ -1,11 +1,9 @@
 package net.prismclient.aether
 
 
+import net.prismclient.aether.screens.ExampleScreen
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
-import net.prismclient.aether.ui.UICore.Properties.updateSize
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
-import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW.*
