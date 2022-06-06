@@ -13,12 +13,19 @@ import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.util.extensions.colorToString
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
 import org.apache.commons.io.FilenameUtils
-import java.lang.Float.max
 import java.nio.ByteBuffer
 
+/**
+ * [UIRendererDSL] is a helper class which makes it easier to render things on screen. It supports
+ * general geometric shapes, as well as image, and text rendering.
+ *
+ * @author sen
+ * @since 1.0
+ */
 object UIRendererDSL {
     lateinit var renderer: UIRenderer
 
@@ -199,10 +206,10 @@ object UIRendererDSL {
     }
 
     @JvmOverloads
-    fun loadSvg(name: String, fileLocation: String, scale: Float = max(UICore.contentScaleX, UICore.contentScaleY)) =
+    fun loadSvg(name: String, fileLocation: String, scale: Float =UICore.devicePxRatio) =
         loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale)
 
-    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = max(UICore.contentScaleX, UICore.contentScaleY)): UIImageData {
+    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = UICore.devicePxRatio): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
         return renderer.loadSVG(name, image, scale)

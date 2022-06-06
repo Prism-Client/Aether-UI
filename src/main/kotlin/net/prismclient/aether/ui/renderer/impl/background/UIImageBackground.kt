@@ -7,7 +7,7 @@ package net.prismclient.aether.ui.renderer.impl.background
  * @since 4/26/2022
  */
 class UIImageBackground : UIBackground() {
-    override fun render(x: Float, y: Float, width: Float, height: Float) {
-        TODO("Image backgrounds have not yet been implemented")
-    }
+//    override fun render(x: Float, y: Float, width: Float, height: Float) {
+//        TODO("Image backgrounds have not yet been implemented")
+//    }
 }

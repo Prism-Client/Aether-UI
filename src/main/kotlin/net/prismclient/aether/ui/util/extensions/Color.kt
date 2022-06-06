@@ -13,11 +13,9 @@ fun Int.setAlpha(alpha: Int): Int = (this and 0x00FFFFFF) or (alpha shl 24)
 fun Int.setAlpha(alpha: Float): Int = (this and 0x00FFFFFF) or ((alpha * 255f + 0.5).toInt() shl 24)
 
 fun asRGBA(r: Int, g: Int, b: Int, a: Int = 255) =
-    a and 0xFF shl 24 or (r and 0xFF shl 16) or (g and 0xFF shl 8) or (b and 0xFF)
+    r shl 16 or (g shl 8) or b or (a shl 24)
 
-fun asRGBA(r: Float, g: Float, b: Float, a: Float = 1f): Int =
-    (a * 255 + 0.5).toInt() and 0xFF shl 24 or ((r * 255 + 0.5).toInt() and 0xFF shl 16) or ((g * 255 + 0.5).toInt() and 0xFF shl 8) or ((b * 255 + 0.5).toInt() and 0xFF)
-
+fun asRGBA(r: Float, g: Float, b: Float, a: Float = 1f): Int = asRGBA((r * 255 + 0.5).toInt(), (g * 255 + 0.5).toInt(), (b * 255 + 0.5).toInt(), (a * 255 + 0.5).toInt())
 fun asRGBA(r: Int, g: Int, b: Int, a: Float) = asRGBA(r, g, b, (a * 255 + 0.5).toInt())
 
 fun Int.limitRange(): Int =
@@ -36,13 +34,24 @@ fun Float.limit(): Float = this.coerceAtMost(1f).coerceAtLeast(0f)
 /**
  * Creates a new color from two provided values based on the progress between each value.
  */
-fun transition(c1: Int, c2: Int, progress: Float): Int {
-    val prog = progress.limit()
-
-    val red = c1.getRed() + ((c2.getRed() - c1.getRed()) * prog).toInt()
-    val green = c1.getGreen() + ((c2.getGreen() - c1.getGreen()) * prog).toInt()
-    val blue = c1.getBlue() + ((c2.getBlue() - c1.getBlue()) * prog).toInt()
-    val alpha = c1.getAlpha() + ((c2.getAlpha() - c1.getAlpha()) * prog).toInt()
-
-    return asRGBA(red.limit(), green.limit(), blue.limit(), alpha.limit())
+fun transition(color1: Int, color2: Int, progress: Float): Int {
+    val red1 = color1 shr 16 and 0xFF
+    val green1 = color1 shr 8 and 0xFF
+    val blue1 = color1 and 0xFF
+    val alpha1 = color1 shr 24 and 0xFF
+    val red2 = color2 shr 16 and 0xFF
+    val green2 = color2 shr 8 and 0xFF
+    val blue2 = color2 and 0xFF
+    val alpha2 = color2 shr 24 and 0xFF
+    val red = (red1 + ((red2 - red1) * progress + 0.5)).toInt()
+    val green = (green1 + ((green2 - green1) * progress + 0.5)).toInt()
+    val blue = (blue1 + ((blue2 - blue1) * progress + 0.5)).toInt()
+    val alpha = (alpha1 + ((alpha2 - alpha1) * progress + 0.5)).toInt()
+    return red shl 16 or (green shl 8) or blue or (alpha shl 24)
 }
+
+
+/**
+ * Returns a string of the RGBA values
+ */
+fun Int.colorToString() = "RGBA(${this.getRed()}, ${this.getGreen()}, ${this.getBlue()}, ${this.getAlpha()})"

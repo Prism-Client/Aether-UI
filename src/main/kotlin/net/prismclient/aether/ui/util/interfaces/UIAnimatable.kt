@@ -45,6 +45,8 @@ interface UIAnimatable<T> {
      * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Animation.md#understanding-the-animation-implementation">Understanding the animation implementation</a>
      *
      * @param component This parameter is option and can be null depending on the needs of the [UIAnimatable]
+     * @see updateAnimationCache
+     * @see clearAnimationCache
      */
     fun animate(previous: T?, current: T?, progress: Float, component: UIComponent<*>)
 

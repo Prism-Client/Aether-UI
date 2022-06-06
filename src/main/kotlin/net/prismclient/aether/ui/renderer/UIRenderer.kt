@@ -62,12 +62,12 @@ abstract class UIRenderer {
         const val ALIGNBASELINE = 64
 
         /* Images */
-        const val MIPMAP = 0
-        const val REPEATX = 1
-        const val REPEATY = 2
-        const val FLIPY = 4
-        const val PREMULTIPLIED = 8
-        const val NEAREST = 16
+        const val MIPMAP = 1
+        const val REPEATX = 2
+        const val REPEATY = 4
+        const val FLIPY = 8
+        const val PREMULTIPLIED = 16
+        const val NEAREST = 32
 
         /* Line Cap/Join */
         const val BUTT = 0
@@ -448,24 +448,4 @@ abstract class UIRenderer {
      * Returns the height of the latest call to [wrapString]
      */
     abstract fun wrapHeight(): Float
-
-    /**
-     * Returns the red of the active color
-     */
-    protected fun r() = activeColor.getRed()
-
-    /**
-     * Returns the green of the active color
-     */
-    protected fun g() = activeColor.getGreen()
-
-    /**
-     * Returns the blue of the active color
-     */
-    protected fun b() = activeColor.getBlue()
-
-    /**
-     * Returns the alpha of the active color
-     */
-    protected fun a() = activeColor.getAlpha()
 }

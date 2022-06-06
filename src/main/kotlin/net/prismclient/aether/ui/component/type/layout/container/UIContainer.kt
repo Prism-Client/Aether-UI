@@ -1,9 +1,11 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
  * [UIContainer] is the superclass for all layouts. It introduces scrollbars
@@ -14,14 +16,23 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 5/12/2022
  */
-open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) {
-    var horizontalScrollbarSelected = false
-        protected set
+open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style), UIFocusable<UIContainer<T>> {
     var verticalScrollbarSelected = false
         protected set
+    var horizontalScrollbarSelected = false
+        protected set
 
+    /**
+     * The expanded width determined by components that leave the component bounds
+     */
     var expandedWidth = 0f
+        protected set
+
+    /**
+     * The expanded height determined by components that leave the components bounds
+     */
     var expandedHeight = 0f
+        protected set
 
     override fun updateLayout() {}
 
@@ -67,7 +78,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
         if (relWidth < 1f || relHeight < 1f)
             return
         renderer {
-            renderContent(framebuffer) {
+            renderContent(framebuffer!!) {
                 translate(
                     -(style.horizontalScrollbar.value * expandedWidth),
                     -(style.verticalScrollbar.value * expandedHeight)
@@ -83,7 +94,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
         // and update the FBO if needed
         if (!style.clipContent)
             updateAnimation()
-        style.background?.render(relX, relY, relWidth, relHeight)
+        style.background?.render()
         renderer {
             if (!style.clipContent) {
                 translate(
@@ -101,13 +112,13 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
         renderScrollbar()
     }
 
-    override fun mouseClicked(mouseX: Float, mouseY: Float) {
-        super.mouseClicked(
-            mouseX - (style.horizontalScrollbar.value * expandedWidth),
-            mouseY - (style.verticalScrollbar.value * expandedHeight)
-        )
-        style.verticalScrollbar.mousePressed(mouseX, mouseY)
-        style.horizontalScrollbar.mousePressed(mouseX, mouseY)
+    override fun mousePressed(event: UIMouseEvent) {
+        super.mousePressed(event)
+        verticalScrollbarSelected = style.verticalScrollbar.mousePressed()
+        horizontalScrollbarSelected = style.horizontalScrollbar.mousePressed()
+
+        if (verticalScrollbarSelected || horizontalScrollbarSelected)
+            captureFocus()
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
@@ -130,7 +141,9 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style) 
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
-        style.verticalScrollbar.value += ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
-        mouseMoved(mouseX, mouseY) // Update for animations n stuff
+        if (isFocused()) {
+            style.verticalScrollbar.value -= ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
+            mouseMoved(mouseX, mouseY)
+        }
     }
 }

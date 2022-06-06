@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
@@ -28,8 +29,8 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @see UIContainer
  */
 abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style), UILayout {
-    protected val components = ArrayList<UIComponent<*>>()
-    protected lateinit var framebuffer: UIContentFBO
+    val components = ArrayList<UIComponent<*>>()
+    protected var framebuffer: UIContentFBO? = null
 
     var frameWidth: Float = 0f
         protected set
@@ -53,9 +54,17 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         updateLayout()
     }
 
+    open fun updateFrame() {
+        updateFramebuffer()
+        components.forEach(UIComponent<*>::update)
+        updateLayout()
+    }
+
     open fun createFramebuffer() {
-        if (this::framebuffer.isInitialized)
-            UIRendererDSL.renderer.deleteContentFBO(framebuffer)
+        if (framebuffer != null) {
+            UIRendererDSL.renderer.deleteContentFBO(framebuffer!!)
+            framebuffer = null
+        }
         if (relWidth >= 1f && relHeight >= 1f)
             framebuffer = UIRendererDSL.renderer.createContentFBO(frameWidth, frameHeight)
     }
@@ -64,7 +73,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         frameWidth = +style.frameWidth
         frameHeight = -style.frameHeight
         if (style.clipContent) {
-            if (!this::framebuffer.isInitialized || frameWidth != framebuffer.width || frameHeight != framebuffer.height) {
+            if (framebuffer == null || frameWidth != framebuffer!!.width || frameHeight != framebuffer!!.height) {
                 createFramebuffer()
             }
         }
@@ -74,13 +83,13 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         if (!style.clipContent)
             return
         updateAnimation()
-        if (!this::framebuffer.isInitialized)
+        if (framebuffer != null)
             createFramebuffer()
         // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
         if (relWidth < 1f || relHeight < 1f)
             return
         renderer {
-            renderContent(framebuffer) {
+            renderContent(framebuffer!!) {
                 components.forEach(UIComponent<*>::render)
             }
         }
@@ -90,7 +99,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         // Remove updating animation as animations are updated when the content is rendered
         if (!style.clipContent)
             updateAnimation()
-        style.background?.render(relX, relY, relWidth, relHeight)
+        style.background?.render()
         renderer {
             if (!style.clipContent) {
                 renderComponent()
@@ -108,31 +117,40 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
             return
         }
         renderer {
+            if (framebuffer == null) return
             // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
             if (relWidth >= 1f || relHeight >= 1f) {
                 renderer.renderFBO(
-                        framebuffer,
+                        framebuffer!!,
                         relX,
                         relY,
                         frameWidth,
                         frameHeight,
-                        style.contentRadius?.topLeft ?: 0f,
-                        style.contentRadius?.topRight ?: 0f,
-                        style.contentRadius?.bottomRight ?: 0f,
-                        style.contentRadius?.bottomLeft ?: 0f
+                        style.background?.radius?.topLeft ?: 0f,
+                        style.background?.radius?.topRight ?: 0f,
+                        style.background?.radius?.bottomRight ?: 0f,
+                        style.background?.radius?.bottomLeft ?: 0f
                 )
             }
         }
     }
 
-    override fun mouseClicked(mouseX: Float, mouseY: Float) {
-        super.mouseClicked(mouseX, mouseY)
-        for (i in 0 until components.size) {
-            if (i < components.size) {
-                components[i].mouseClicked(mouseX + relX, mouseY + relX)
-            }
-        }
+//    override fun mousePressed(mouseX: Float, mouseY: Float) {
+//        super.mousePressed(mouseX, mouseY)
+//        for (i in 0 until components.size) {
+//            if (i < components.size) {
+//                components[i].mousePressed(mouseX + relX, mouseY + relX)
+//            }
+//        }
 //        components.forEach { it.mouseClicked(mouseX + relX, mouseY + relY) }
+//    }
+    override fun mousePressed(event: UIMouseEvent) {
+        super.mousePressed(event)
+//        for (i in 0 until components.size) {
+//            if (i < components.size) {
+//                components[i].mousePressed(event)
+//            }
+//        }
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {

@@ -10,8 +10,8 @@ import java.nio.ByteBuffer
  */
 class UIImageData {
     var handle: Int = -1
-    var width: Float = -1f
-    var height: Float = -1f
+    var width: Int = -1
+    var height: Int = -1
     var buffer: ByteBuffer? = null
     var imageType: ImageType = ImageType.Image
     var loaded: Boolean = false

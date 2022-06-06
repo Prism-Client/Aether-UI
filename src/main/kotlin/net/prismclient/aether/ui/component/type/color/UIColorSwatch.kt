@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui.component.type.color
 
-import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.util.extensions.*
 import java.awt.Color
@@ -15,13 +14,13 @@ class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style) {
     fun updateHSB() =
         Color.RGBtoHSB(style.swatchColor.getRed(), style.swatchColor.getGreen(), style.swatchColor.getBlue(), hsb)
 
-    fun getActiveColor() =
-        UICore.instance.coreCallback.getPixelColor(
-            UICore.mouseX.coerceAtLeast(relX + getParentXOffset())
-                .coerceAtMost(relX + relWidth + getParentXOffset() - 1f),
-            UICore.mouseY.coerceAtLeast(relY + getParentYOffset() + 2f)
-                .coerceAtMost(relY + relWidth + getParentYOffset())
-        )
+    fun getActiveColor() = 0
+//        UICore__.instance.coreCallback.getPixelColor(
+//            UICore__.mouseX.coerceAtLeast(relX + getParentXOffset())
+//                .coerceAtMost(relX + relWidth + getParentXOffset() - 1f),
+//            UICore__.mouseY.coerceAtLeast(relY + getParentYOffset() + 2f)
+//                .coerceAtMost(relY + relWidth + getParentYOffset())
+//        )
 
     fun adjustHue(hue: Float) {
         updateHSB()
@@ -66,13 +65,13 @@ class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style) {
         }
     }
 
-    override fun mouseClicked(mouseX: Float, mouseY: Float) {
-        super.mouseClicked(mouseX, mouseY)
-        if (isMouseInsideBoundingBox()) {
-            focused = true
-            mouseMoved(mouseX, mouseY)
-        }
-    }
+//    override fun mousePressed(mouseX: Float, mouseY: Float) {
+//        super.mousePressed(mouseX, mouseY)
+//        if (isMouseInsideBoundingBox()) {
+//            focused = true
+//            mouseMoved(mouseX, mouseY)
+//        }
+//    }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)

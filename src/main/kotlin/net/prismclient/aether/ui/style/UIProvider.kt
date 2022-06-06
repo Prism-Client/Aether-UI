@@ -12,7 +12,7 @@ object UIProvider {
     /**
      * The maximum time in milliseconds that an animation can live.
      */
-    const val MAX_ANIMATION_DURATION = 25000L
+    private const val MAX_ANIMATION_DURATION = 25000L
 
     lateinit var renderer: UIRenderer
 
@@ -70,7 +70,10 @@ object UIProvider {
     }
 
     // TODO: Priorities
-    fun dispatchAnimation(animationName: String, component: UIComponent<*>) {
+    fun dispatchAnimation(animationName: String?, component: UIComponent<*>) {
+        if (animationName == null || animationName.isEmpty()) return
+        val animation = animations[animationName]
+                ?: throw NullPointerException("Animation of $animationName was not found. Have you created it yet?")
         component.animation = animations[animationName]!!.copy()
         component.animation!!.start(component)
         activeAnimations.add(component.animation!!)
@@ -100,6 +103,6 @@ object UIProvider {
     /**
      * Returns a list of [UIComponent] with the parent of the provided [self]
      */
-    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> = UICore.activeScreen?.components?.filter { it.parent == self }?.toList()
+    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> = UICore.instance.components?.filter { it.parent == self }?.toList()
             ?: mutableListOf()
 }

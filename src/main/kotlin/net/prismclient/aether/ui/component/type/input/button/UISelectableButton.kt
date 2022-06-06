@@ -21,8 +21,8 @@ open class UISelectableButton<T : UIStyleSheet>(checked: Boolean = false, text: 
     var checkListeners: MutableList<BiConsumer<UISelectableButton<T>, Boolean>>? = null
 
     init {
-        onMousePressed { _ ->
-            if (isMouseInsideBoundingBox()) {
+        onMousePressed {
+            if (isMouseInside()) {
                 this.checked = !this.checked
             }
         }

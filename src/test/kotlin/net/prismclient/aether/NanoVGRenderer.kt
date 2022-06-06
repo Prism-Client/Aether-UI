@@ -1,18 +1,13 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.UICore.Companion.contentScaleX
-import net.prismclient.aether.ui.UICore.Companion.contentScaleY
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIProvider.getImage
 import net.prismclient.aether.ui.style.UIProvider.registerImage
-import net.prismclient.aether.ui.util.extensions.getAlpha
-import net.prismclient.aether.ui.util.extensions.getBlue
-import net.prismclient.aether.ui.util.extensions.getGreen
-import net.prismclient.aether.ui.util.extensions.getRed
-import org.lwjgl.*
+import net.prismclient.aether.ui.util.extensions.*
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.nvgLinearGradient
 import org.lwjgl.nanovg.NanoVG.*
@@ -47,12 +42,12 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun color(color: Int) {
         super.color(color)
-        nvgRGBA(r().toByte(), g().toByte(), b().toByte(), a().toByte(), this.color)
+        nvgRGBA(color.getRed().toByte(), color.getGreen().toByte(), color.getBlue().toByte(), color.getAlpha().toByte(), this.color)
     }
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
-        val contentScale = max(1f, max(contentScaleX, contentScaleY))
+        val contentScale = UICore.devicePxRatio
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
             NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
@@ -101,7 +96,6 @@ class NanoVGRenderer : UIRenderer() {
         bottomRight: Float,
         bottomLeft: Float
     ) {
-        val cs = fbo.contentScale
         nvgImagePattern(ctx, x, y, width, height, 0f, fbos[fbo]!!.image(), 1f, paint)
         nvgBeginPath(ctx)
         color(-1)
@@ -299,8 +293,9 @@ class NanoVGRenderer : UIRenderer() {
             return image
         }
         image.handle = nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.buffer)
-        image.width = width[0].toFloat()
-        image.height = height[0].toFloat()
+        image.width = width[0]
+        image.height = height[0]
+
         image.loaded = true
         registerImage(imageName, image)
         return image
@@ -339,8 +334,8 @@ class NanoVGRenderer : UIRenderer() {
             NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY or NVG_IMAGE_GENERATE_MIPMAPS,
             rast
         )
-        image.width = w.toFloat()
-        image.height = h.toFloat()
+        image.width = w
+        image.height = h
         image.loaded = true
         registerImage(svgName, image)
         return image
@@ -383,10 +378,10 @@ class NanoVGRenderer : UIRenderer() {
         return true
     }
 
-    private val rows = NVGTextRow.create(maxRows)
     private val ascender = floatArrayOf(0f)
     private val decender = floatArrayOf(0f)
     private val lineHeight = floatArrayOf(0f)
+
     override fun renderString(text: String, x: Float, y: Float) {
         nvgFontBlur(ctx, 0f)
         nvgFontFace(ctx, fontName)
@@ -401,7 +396,8 @@ class NanoVGRenderer : UIRenderer() {
     private var wrapHeight = 0f
 
     override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int {
-        val rows = NVGTextRow.create(100)
+        // TODO :Rewrite text wrapping
+        val rows = NVGTextRow.calloc(100)//private val rows = NVGTextRow.create(maxRows)
         wrapWidth = 0f
 
         // Set the font state
@@ -423,10 +419,12 @@ class NanoVGRenderer : UIRenderer() {
         for (i in 0 until nrows) {
             val row = rows[i]
             val w = nnvgText(ctx, x, h, row.start(), row.end()) - x // Render the text
-            wrapWidth = Math.max(wrapWidth, w)
+            wrapWidth = max(wrapWidth, w)
             h += lineHeight[0] + splitHeight // Increase by the font height plus the split height
         }
         wrapHeight = h - y
+
+        rows.free()
         return nrows
     }
 
@@ -441,25 +439,50 @@ class NanoVGRenderer : UIRenderer() {
     }
 
     override fun stringHeight(text: String): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         nvgTextMetrics(ctx, null, null, lineHeight)
         return lineHeight[0]
     }
 
     override fun stringAscender(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         nvgTextMetrics(ctx, ascender, null, null)
         return ascender[0]
     }
 
     override fun stringDescender(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         nvgTextMetrics(ctx, null, decender, null)
         return abs(decender[0])
     }
 
     override fun wrapWidth(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         return wrapWidth
     }
 
     override fun wrapHeight(): Float {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         return wrapHeight
     }
 
@@ -481,6 +504,18 @@ class NanoVGRenderer : UIRenderer() {
             fill()
         }
     }
+
+//    override fun test() {
+//    color(asRGBA(255,0,0, 0.3f))
+//    rect(100f, 100f, 100f, 100f, 10f, 10f, 10f, 10f)
+//    color(asRGBA(0,255,0, 0.3f))
+//    nvgBeginPath(ctx)
+//    nvgRoundedRect(ctx, 90f, 90f, 120f, 120f, 20f)
+//    nvgRoundedRect(ctx, 100f, 100f, 100f, 100f, 10f)
+//    nvgPathWinding(ctx, NVG_HOLE)
+//    nvgFillColor(ctx, color)
+//    nvgFill(ctx)
+//}
 
     companion object {
         private const val maxRows = 100 /* Max rows created from [wrapString] */
