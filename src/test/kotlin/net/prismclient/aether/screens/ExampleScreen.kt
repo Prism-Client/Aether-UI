@@ -1,6 +1,5 @@
 package net.prismclient.aether.screens
 
-import net.prismclient.aether.ExampleScreenStyles
 import net.prismclient.aether.dependencies.AnimationStyles
 import net.prismclient.aether.dependencies.ComponentStyles
 import net.prismclient.aether.dependencies.IconStyles
@@ -39,7 +38,7 @@ class ExampleScreen : UIScreen {
 
             // The dependencies above are ones that you might use
             // anywhere. Here is a one specific to this screen:
-            dependsOn(::ExampleScreenStyles)
+//            dependsOn(::ExampleScreenStyles)
 
             renderer {
                 loadImage("background", "/demo/background.png")
