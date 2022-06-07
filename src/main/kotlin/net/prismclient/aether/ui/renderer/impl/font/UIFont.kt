@@ -6,6 +6,7 @@ import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.shape.UIShape
+import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.*
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
@@ -21,7 +22,9 @@ import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 open class UIFont : UIShape(), UIAnimatable<UIFont> {
     /**
      * When true, the component will be ensured to be at
-     * least the size of the font width and height
+     * least the size of the font width and height. It does
+     * not update the x and y positions of the component if
+     * the text spans to the left or up
      */
     var overrideParent: Boolean = true
 
@@ -74,12 +77,15 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         }
     var fontSize = UIDefaults.instance.fontSize
     var fontSpacing = UIDefaults.instance.fontSpacing
-    var lineBreakWidth = 0f
+    var lineBreakWidth: UIUnit? = null
     var lineHeight = 0f
     var lineCount = 0
     var appendedString: String? = null
     var stringWidth = 0f
     var stringHeight = 0f
+
+    var cachedLineBreakWidth: Float = 0f
+        private set
 
     /**
      * If true, fontName will not update automatically. It will only update when [overwriteFontName] is called
@@ -93,6 +99,11 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         align(alignment, x!!, y!!)
     }
 
+    override fun update(component: UIComponent<*>?) {
+        super.update(component)
+        cachedLineBreakWidth = calculate(lineBreakWidth, component, component!!.x, component.y, false)
+    }
+
     @Deprecated("Use render(text: String) instead", ReplaceWith("render(text: String)"))
     override fun render() {
         throw IllegalStateException("Use render(text: String) instead")
@@ -102,39 +113,39 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         renderer {
             font(this@UIFont)
             when (fontRenderType) {
-                FontRenderType.NORMAL -> {
-                    text.render(cachedX, cachedY)
-                    stringWidth = text.width()
-                    stringHeight = text.height()
-                }
+                FontRenderType.NORMAL -> text.render(cachedX, cachedY)
                 FontRenderType.NEWLINE -> {
 
                 }
                 FontRenderType.WRAP -> {
-                    val c: Int = text.render(cachedX, cachedY, lineBreakWidth, lineHeight)
+//                    val c: Int = text.render(cachedX, cachedY, lineBreakWidth, lineHeight)
 //                    if (lineCount != c) {
 //                        //component!!.update()
 //                        lineCount = c
 //                    }
-                    stringWidth = getWrappedWidth()
-                    stringHeight = getWrappedHeight()
+//                    stringWidth = getWrappedWidth()
+//                    stringHeight = getWrappedHeight()
                 }
                 FontRenderType.CLIP, FontRenderType.APPEND -> {
-                    stringWidth = text.render(cachedX, cachedY, component!!.relX + lineBreakWidth, null, false)
+                    stringWidth = text.render(cachedX, cachedY, component!!.relX + cachedLineBreakWidth, null, false)
                     stringHeight = text.height()
                 }
             }
 
+            stringWidth = ((x() + width()) - cachedX)
+            stringHeight = ((y() + height()) - cachedY)
+
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
-//            if (overrideParent && (stringWidth > component!!.width || stringHeight > component!!.height)) {
-//                component!!.width = max(stringWidth, component!!.width)
-//                component!!.height = max(stringHeight, component!!.height)
-//                component!!.updatePosition()
-////                component!!.updateBounds()
-////                component!!.updateStyle()
-//                println("Updated parent!")
-//            }
+            if (overrideParent && !component!!.overridden && (stringWidth > component!!.width || stringHeight > component!!.height)) {
+                component!!.width = stringWidth.coerceAtLeast(component!!.width)
+                component!!.height = stringHeight.coerceAtLeast(component!!.height)
+                component!!.calculateBounds()
+                component!!.updateAnchorPoint()
+                component!!.updatePosition()
+                component!!.updateBounds()
+                component!!.updateStyle()
+            }
         }
     }
 
@@ -270,5 +281,5 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         APPEND
     }
 
-    protected inner class FontCache(var fontColor: Int, var fontSize: Float, var fontSpacing: Float, var lineBreakWidth: Float, var lineHeight: Float)
+    protected inner class FontCache(var fontColor: Int, var fontSize: Float, var fontSpacing: Float, var lineBreakWidth: UIUnit?, var lineHeight: Float)
 }

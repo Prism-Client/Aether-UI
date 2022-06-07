@@ -630,8 +630,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         if (this is UIFocusable<*>) {
             UICore.focus(this)
             focusListeners?.forEach { it.value.accept(this, true) }
-        } else {
-            println("Attempted to focus a non-focusable component")
         }
     }
 

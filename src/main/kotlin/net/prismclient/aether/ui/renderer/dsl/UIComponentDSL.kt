@@ -231,16 +231,22 @@ object UIComponentDSL {
 
     /** Label Components **/
     @JvmOverloads
-    inline fun h1(text: String, block: UILabel.() -> Unit = {}) = component(UILabel(text, "h1"), block)
+    inline fun text(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) = component(UILabel(text, style!!), block)
 
     @JvmOverloads
-    inline fun h2(text: String, block: UILabel.() -> Unit = {}) = component(UILabel(text, "h2"), block)
+    inline fun label(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) = text(text, style, block)
 
     @JvmOverloads
-    inline fun h3(text: String, block: UILabel.() -> Unit = {}) = component(UILabel(text, "h3"), block)
+    inline fun h1(text: String, block: UILabel.() -> Unit = {}) = text(text, "h1", block)
 
     @JvmOverloads
-    inline fun p(text: String, block: UILabel.() -> Unit = {}) = component(UILabel(text, "p"), block)
+    inline fun h2(text: String, block: UILabel.() -> Unit = {}) = text(text, "h2", block)
+
+    @JvmOverloads
+    inline fun h3(text: String, block: UILabel.() -> Unit = {}) = text(text, "h3", block)
+
+    @JvmOverloads
+    inline fun p(text: String, block: UILabel.() -> Unit = {}) = text(text, "p", block)
 
     /** Button **/
     @JvmOverloads

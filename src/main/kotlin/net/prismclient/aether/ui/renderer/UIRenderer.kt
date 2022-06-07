@@ -420,14 +420,24 @@ abstract class UIRenderer {
     abstract fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int
 
     /**
-     * Returns the width of the provided string
+     * Returns the x position of the most recently rendered string with text alignment calculated
      */
-    abstract fun stringWidth(text: String): Float
+    abstract fun stringX(): Float
 
     /**
-     * Returns the height of the provided string (a singular line)
+     * Returns the y position of the most recently rendered string with text alignment calculated
      */
-    abstract fun stringHeight(text: String): Float
+    abstract fun stringY(): Float
+
+    /**
+     * Returns the width of the most recently rendered string
+     */
+    abstract fun stringWidth(): Float
+
+    /**
+     * Returns the height of the most recently rendered string
+     */
+    abstract fun stringHeight(): Float
 
     /**
      * Returns the Ascender of the provided string
@@ -440,12 +450,8 @@ abstract class UIRenderer {
     abstract fun stringDescender(): Float
 
     /**
-     * Returns the width of the latest call to [wrapString]
+     * Retrieves the bounds of the most recently rendered string. Returns an
+     * array of 4 with the x, y, x + w, and y + h representing the text bounds.
      */
-    abstract fun wrapWidth(): Float
-
-    /**
-     * Returns the height of the latest call to [wrapString]
-     */
-    abstract fun wrapHeight(): Float
+    abstract fun textBounds(): FloatArray
 }

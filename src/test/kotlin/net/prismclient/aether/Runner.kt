@@ -2,6 +2,7 @@ package net.prismclient.aether
 
 
 import net.prismclient.aether.screens.ExampleScreen
+import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -104,7 +105,8 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        UICore.displayScreen(ExampleScreen())
+        UICore.displayScreen(TestingScreen())
+//        UICore.displayScreen(ExampleScreen())
 
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())

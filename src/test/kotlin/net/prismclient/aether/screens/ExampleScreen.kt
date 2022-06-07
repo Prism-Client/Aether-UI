@@ -249,7 +249,7 @@ class ExampleScreen : UIScreen {
                                     textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
                                     fontRenderType = UIFont.FontRenderType.WRAP
                                     fontColor = asRGBA(0, 0, 0)
-                                    lineBreakWidth = 189f
+                                    lineBreakWidth = px(189)
                                     fontSize = 16f
                                 }
                             }
@@ -263,7 +263,7 @@ class ExampleScreen : UIScreen {
                                     textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
                                     fontRenderType = UIFont.FontRenderType.WRAP
                                     fontColor = asRGBA(65, 63, 68)
-                                    lineBreakWidth = 179f
+                                    lineBreakWidth = px(179)
                                     fontSize = 14f
                                 }
                             }

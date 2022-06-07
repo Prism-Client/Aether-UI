@@ -8,6 +8,8 @@ import net.prismclient.aether.ui.renderer.UIRenderer.Properties.MIPMAP
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.MITER
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATX
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATY
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.render
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.width
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
@@ -152,23 +154,53 @@ object UIRendererDSL {
         return new.width()
     }
 
-    fun String.width(): Float = renderer.stringWidth(this)
+    /**
+     * Returns the x position of the most recently rendered string with relations to (0, 0)
+     */
+    fun x(): Float = renderer.stringX()
 
-    fun String.height(): Float = renderer.stringHeight(this)
+    /**
+     * Returns the y position of the most recently rendered string with relations to (0, 0)
+     */
+    fun y(): Float = renderer.stringY()
+
+    /**
+     * Returns the width of the most recently rendered string
+     */
+    fun width(): Float = renderer.stringWidth()
+
+    /**
+     * Returns the height of the most recently rendered string
+     */
+    fun height(): Float = renderer.stringHeight()
+
+    /**
+     * Returns the width of the given string based on the most recently set font
+     */
+    fun String.width(): Float {
+        val previous = color
+        renderer.color(0)
+        this.render(0f, 0f)
+        renderer.color(previous)
+        return renderer.stringWidth()
+    }
+
+    /**
+     * Returns the height of the given string based on the most recently set font
+     */
+    fun String.height(): Float {
+        val previous = color
+        renderer.color(0)
+        this.render(0f, 0f)
+        renderer.color(previous)
+        return renderer.stringHeight()
+    }
 
     fun ascender() = renderer.stringAscender()
 
     fun descender() = renderer.stringDescender()
 
-    /**
-     * Returns thw width of the most recent call to a wrapped string
-     */
-    fun getWrappedWidth(): Float = renderer.wrapWidth()
-
-    /**
-     * Returns the height of the most recent call to a wrapped string
-     */
-    fun getWrappedHeight(): Float = renderer.wrapHeight()
+    fun bounds() = renderer.textBounds()
 
     fun loadFont(name: String, fileLocation: String) = loadFont(name, fileLocation.toByteBuffer())
 

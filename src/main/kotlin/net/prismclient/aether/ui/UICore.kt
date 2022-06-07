@@ -152,6 +152,7 @@ open class UICore(val renderer: UIRenderer) {
             }
 
             return if (component != null) {
+                component.focus()
                 component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, isRelease, 0))
                 true
             } else false
@@ -172,6 +173,7 @@ open class UICore(val renderer: UIRenderer) {
             }
             i++
         }
+        c?.focus()
         c?.mousePressed(UIMouseEvent(mouseX, mouseY, 0, isRelease, 0))
     }
 
@@ -192,9 +194,11 @@ open class UICore(val renderer: UIRenderer) {
      * such as the width and height of the window.
      */
     companion object Properties {
+        @JvmStatic
         lateinit var instance: UICore
             protected set
-        
+
+        @JvmStatic
         var activeScreen: UIScreen? = null
             protected set
 
@@ -205,36 +209,42 @@ open class UICore(val renderer: UIRenderer) {
          * @see defocus
          * @see tryFocus
          */
+        @JvmStatic
         var focusedComponent: UIFocusable<*>? = null
             protected set
 
         /**
          * The width of the screen. It can be set via [update]
          */
+        @JvmStatic
         var width: Float = 0f
             protected set
 
         /**
          * The width of the screen. It can be set via [update]
          */
+        @JvmStatic
         var height: Float = 0f
             protected set
 
         /**
          * The device pixel ratio. It can be set via [update]. It is the equivalent of content scale.
          */
+        @JvmStatic
         var devicePxRatio: Float = 1f
             protected set
 
         /**
          * The x position of the mouse relative to the screen
          */
+        @JvmStatic
         var mouseX: Float = 0f
             protected set
 
         /**
          * The y position of the mouse relative to the screen
          */
+        @JvmStatic
         var mouseY: Float = 0f
             protected set
 
@@ -243,6 +253,7 @@ open class UICore(val renderer: UIRenderer) {
          *
          * @param devicePxRatio Must be at least 1f. If not, it will be set to 1f.
          */
+        @JvmStatic
         fun updateSize(width: Float, height: Float, devicePxRatio: Float) {
             this.width = width
             this.height = height
@@ -252,6 +263,7 @@ open class UICore(val renderer: UIRenderer) {
         /**
          * Sets the [mouseX] and [mouseY] to the given values
          */
+        @JvmStatic
         fun updateMouse(mouseX: Float, mouseY: Float) {
             this.mouseX = mouseX
             this.mouseY = mouseY
@@ -260,6 +272,7 @@ open class UICore(val renderer: UIRenderer) {
         /**
          * Sets the active screen to the given [screen] and creates [components] and [frames].
          */
+        @JvmStatic
         fun displayScreen(screen: UIScreen) {
             activeScreen = screen
             instance.components = ArrayList()
@@ -276,6 +289,7 @@ open class UICore(val renderer: UIRenderer) {
         /**
          * Focuses the component. Please use [UIComponent.focus] instead.
          */
+        @JvmStatic
         fun focus(component: UIFocusable<*>) {
             focusedComponent = component
         }
@@ -283,6 +297,7 @@ open class UICore(val renderer: UIRenderer) {
         /**
          * Defocuses the component. Please use [UIComponent.defocus] instead.
          */
+        @JvmStatic
         fun defocus() {
             focusedComponent = null
         }
@@ -290,6 +305,7 @@ open class UICore(val renderer: UIRenderer) {
         /**
          * Aether will try to attempt to focus a scrollbar (if available)
          */
+        @JvmStatic
         fun tryFocus() {
             if (activeScreen == null)
                 return
@@ -312,14 +328,21 @@ open class UICore(val renderer: UIRenderer) {
 
             var component: UIContainer<*>? = null
 
+            // Find the deepest UIContainer within the mouse's bounds
             for (i in 0 until instance.frames!!.size) {
+                // UIContainers are what control scrolling, so
+                // if it is not an instance of it, skip and continue
                 val frame = instance.frames!![i] as? UIContainer<*> ?: continue
                 if (frame.isMouseInsideBounds()) {
+                    // Iterate through the frame to see if there are more
+                    // containers with it. If there are, it will pass true
+                    // and this function will return, else this will be invoked
                     if (peek(frame)) return
                     component = frame
                 }
             }
 
+            // If a container was found, then focus it
             if (component != null)
                 component!!.focus()
         }
