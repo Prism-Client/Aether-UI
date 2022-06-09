@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
@@ -314,7 +315,7 @@ open class UICore(val renderer: UIRenderer) {
                 var component: UIContainer<*>? = null
                 for (i in 0 until contain.components.size) {
                     val container = contain.components[i] as? UIContainer<*> ?: continue
-                    if (container.isMouseInsideBounds()) {
+                    if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
                         if (peek(container))
                             return true
                         component = container
@@ -332,13 +333,13 @@ open class UICore(val renderer: UIRenderer) {
             for (i in 0 until instance.frames!!.size) {
                 // UIContainers are what control scrolling, so
                 // if it is not an instance of it, skip and continue
-                val frame = instance.frames!![i] as? UIContainer<*> ?: continue
-                if (frame.isMouseInsideBounds()) {
+                val container = instance.frames!![i] as? UIContainer<*> ?: continue
+                if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
                     // Iterate through the frame to see if there are more
                     // containers with it. If there are, it will pass true
                     // and this function will return, else this will be invoked
-                    if (peek(frame)) return
-                    component = frame
+                    if (peek(container)) return
+                    component = container
                 }
             }
 

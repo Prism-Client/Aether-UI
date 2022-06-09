@@ -616,7 +616,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun computeUnit(unit: UIUnit?, isY: Boolean) = calculate(unit, this, getParentWidth(), getParentHeight(), isY)
 
     /** Other **/
-    inline fun style(block: T.() -> Unit) = block.invoke(style)
+    inline fun style(block: T.() -> Unit): UIComponent<T> = apply { block.invoke(style) }
 
     /**
      * Returns true if this is an instance of [UIFocusable] and is focused
@@ -639,17 +639,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun defocus() {
         UICore.defocus()
         focusListeners?.forEach { it.value.accept(this, false) }
-    }
-
-    /**
-     * Sets the active focused component to this
-     */
-    fun captureFocus() {
-        if (this is UIFocusable<*>) {
-            UICore.focus(this)
-        } else {
-            println("Attempted to focus component despite not being focusable?")
-        }
     }
 
     /**

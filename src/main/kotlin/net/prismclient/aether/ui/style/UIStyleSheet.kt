@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
+import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
@@ -163,9 +164,6 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /** Font **/
-    @JvmOverloads
-    inline fun font(fontColor: Int, block: UIFont.() -> Unit = {}) =
-            font { this.fontColor = fontColor; this.block() }
 
     /**
      * Creates a font DSL block. If font is null, an instance of it is created
@@ -173,6 +171,26 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     inline fun font(block: UIFont.() -> Unit) {
         font = font ?: UIFont()
         font!!.block()
+    }
+
+    /**
+     * Creates a font DSL block which optionally accepts a size, color, text alignment, font family, and font type.
+     */
+    @JvmOverloads
+    inline fun font(
+        fontSize: Float = font?.fontSize ?: UIDefaults.instance.fontSize,
+        fontColor: Int = font?.fontColor ?: UIDefaults.instance.fontColor,
+        textAlignment: Int = font?.textAlignment ?: UIDefaults.instance.textAlignment,
+        fontFamily: String = font?.fontFamily ?: UIDefaults.instance.fontFamily,
+        fontType: UIFont.FontType = font?.fontType ?: UIDefaults.instance.fontType,
+        block: UIFont.() -> Unit = {}
+    ) = font {
+        this.fontSize = fontSize
+        this.fontColor = fontColor
+        this.textAlignment = textAlignment
+        this.fontFamily = fontFamily
+        this.fontType = fontType
+        this.block()
     }
 
     /** Plotting **/
@@ -310,8 +328,8 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
             component.x = fromProgress(component.x(previous?.x), component.x(current?.x), progress)
             component.y = fromProgress(component.y(previous?.y), component.y(current?.y), progress)
 
-            component.x += component.marginLeft - component.anchorX
-            component.y += component.marginTop - component.anchorY
+            component.x += component.marginLeft - component.anchorX + component.getParentX()
+            component.y += component.marginTop - component.anchorY + component.getParentY()
         }
 
         // Update bounds
@@ -347,13 +365,13 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     fun UIComponent<*>.x(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
         initialValue!!.x
     } else {
-        0f
+        this.getParentX()
     } + this.computeUnit(unit, false)
 
     fun UIComponent<*>.y(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
         initialValue!!.y
     } else {
-        0f
+        this.getParentY()
     } + this.computeUnit(unit, true)
 
     fun UIComponent<*>.width(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {

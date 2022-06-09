@@ -1,21 +1,52 @@
 package net.prismclient.aether.ui.util.extensions
 
+/**
+ * Returns the red color of the given [Int]
+ *
+ * @see asRGBA
+ */
 fun Int.getRed(): Int = this shr 16 and 0xFF
 
+/**
+ * Returns the green color of the given [Int]
+ *
+ * @see asRGBA
+ */
 fun Int.getGreen(): Int = this shr 8 and 0xFF
 
+
+/**
+ * Returns the blue color of the given [Int]
+ *
+ * @see asRGBA
+ */
 fun Int.getBlue(): Int = this and 0xFF
 
+/**
+ * Returns the alpha color of the given [Int]
+ *
+ * @see asRGBA
+ */
 fun Int.getAlpha(): Int = this shr 24 and 0xFF
 
 fun Int.setAlpha(alpha: Int): Int = (this and 0x00FFFFFF) or (alpha shl 24)
 
 fun Int.setAlpha(alpha: Float): Int = (this and 0x00FFFFFF) or ((alpha * 255f + 0.5).toInt() shl 24)
 
+/**
+ * Returns an [Int] with the given RGBA integer values.
+ */
 fun asRGBA(r: Int, g: Int, b: Int, a: Int = 255) =
     r shl 16 or (g shl 8) or b or (a shl 24)
 
+/**
+ * Returns an [Int] with the given RGBA int, with a float alpha value.
+ */
 fun asRGBA(r: Float, g: Float, b: Float, a: Float = 1f): Int = asRGBA((r * 255 + 0.5).toInt(), (g * 255 + 0.5).toInt(), (b * 255 + 0.5).toInt(), (a * 255 + 0.5).toInt())
+
+/**
+ * Returns an [Int] with the given RGBA float values
+ */
 fun asRGBA(r: Int, g: Int, b: Int, a: Float) = asRGBA(r, g, b, (a * 255 + 0.5).toInt())
 
 fun Int.limitRange(): Int =

@@ -14,7 +14,10 @@ abstract class UIObject {
     var component: UIComponent<*>? = null
 
     /**
-     * Invoked within the component when it is updated
+     * Invoked within the component when it is updated. In most cases
+     * a component will be passed, however in some cases there might not
+     * be a component to use, so it will be null. It depends if you need
+     * it or not when creating shapes.
      */
     abstract fun update(component: UIComponent<*>?)
 

@@ -434,6 +434,11 @@ class NanoVGRenderer : UIRenderer() {
         }
         wrapHeight = h - y
 
+        nvgTextBoxBounds(ctx, x, y, width, text, bounds)
+
+        // Increase the height by the split height times the rows
+        bounds[2] = bounds[2] + (splitHeight * nrows)
+
 //        TODO: Multiline bounds
 
         rows.free()

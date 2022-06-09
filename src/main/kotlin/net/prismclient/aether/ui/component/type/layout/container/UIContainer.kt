@@ -17,6 +17,11 @@ import net.prismclient.aether.ui.util.interfaces.UIFocusable
  * @since 5/12/2022
  */
 open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style), UIFocusable<UIContainer<T>> {
+    /**
+     * How sensitive the scrolling will be
+     */
+    var scrollSensitivity: Float = 10f
+
     var verticalScrollbarSelected = false
         protected set
     var horizontalScrollbarSelected = false
@@ -118,7 +123,7 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style),
         horizontalScrollbarSelected = style.horizontalScrollbar.mousePressed()
 
         if (verticalScrollbarSelected || horizontalScrollbarSelected)
-            captureFocus()
+            focus()
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
@@ -135,14 +140,14 @@ open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style),
             mouseX - (style.horizontalScrollbar.value * expandedWidth),
             mouseY - (style.verticalScrollbar.value * expandedHeight)
         )
-        style.verticalScrollbar.mouseMoved(mouseX, mouseY)
-        style.horizontalScrollbar.mouseMoved(mouseX, mouseY)
+        style.verticalScrollbar.mouseMoved()
+        style.horizontalScrollbar.mouseMoved()
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
         if (isFocused()) {
-            style.verticalScrollbar.value -= ((scrollAmount * 4f) / style.verticalScrollbar.cachedHeight)
+            style.verticalScrollbar.value -= ((scrollAmount * scrollSensitivity) / style.verticalScrollbar.cachedHeight)
             mouseMoved(mouseX, mouseY)
         }
     }

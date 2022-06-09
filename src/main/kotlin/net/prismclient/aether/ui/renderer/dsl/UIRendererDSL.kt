@@ -52,13 +52,23 @@ object UIRendererDSL {
     fun endFrame() = renderer.endFrame()
 
     /** Color **/
+
+    /**
+     * Sets the color to the given RGBA int
+     */
     fun color(rgba: Int) {
         color = rgba
         renderer.color(color)
     }
 
+    /**
+     * Sets the color to the given RGBA values with all ints except the alpha as a float
+     */
     fun color(r: Int, g: Int, b: Int, a: Float = 1f) = color(asRGBA(r, g, b, a))
 
+    /**
+     * Sets the color to the given RGBA with all ints
+     */
     @JvmOverloads
     fun color(r: Int, g: Int, b: Int, a: Int = 255) = color(asRGBA(r, g, b, a))
 
@@ -66,11 +76,17 @@ object UIRendererDSL {
     operator fun Int.unaryPlus() = color(this)
 
     /** Font **/
+    /**
+     * Sets the active font context to the provided [font]
+     */
     fun font(font: UIFont) {
         color(font.fontColor)
         font(font.fontName, font.fontSize, font.textAlignment, font.fontSpacing)
     }
 
+    /**
+     * Sets the active font context to the provided values. To set the color use [color]
+     */
     fun font(fontFace: String, fontSize: Float, fontAlignment: Int, fontSpacing: Float) {
         UIRendererDSL.fontFace = fontFace
         UIRendererDSL.fontSize = fontSize
@@ -80,7 +96,7 @@ object UIRendererDSL {
     }
 
     /**
-     * Renders a string
+     * Renders a string at the given [x] and [y] position
      *
      * @see font
      */

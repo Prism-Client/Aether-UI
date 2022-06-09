@@ -104,7 +104,7 @@ class ExampleScreen : UIScreen {
             }
 
             animation(UIStyleSheet(), "crumbHover") {
-                keyframe {  }
+                keyframe { }
                 keyframe(UIQuart(250L)) {
                     background {
                         backgroundColor = asRGBA(0, 0, 0, 0.3f)
@@ -142,7 +142,7 @@ class ExampleScreen : UIScreen {
                     align(UIAlignment.TOPLEFT)
                     size(px(236f), rel(1f))
                     background(-1)
-                    clipContent = true
+                    clipContent = false
                 }
                 image("logo", style = "imag") {
                     style {
@@ -163,7 +163,6 @@ class ExampleScreen : UIScreen {
 
                     p("MENU").style {
                         margin(marginLeft = 24f, marginBottom = 10f)
-                        height = px(16f) // TODO: Font size calculations
                         font {
                             fontColor = asRGBA(191, 189, 193)
                         }
@@ -211,17 +210,16 @@ class ExampleScreen : UIScreen {
                         ignore {
                             p("SOCIAL").style {
                                 margin(20f, 0f, 10f, 24f)
-                                height = px(16f) // TODO: Font size calculations
-                                font(asRGBA(191, 189, 193))
+                                font(fontColor = asRGBA(191, 189, 193))
                             }
                         }
 
-                        button("Messages", "crumb","message", "crumbImage")
+                        button("Messages", "crumb", "message", "crumbImage")
                         button("Friends", "crumb", "friends", "crumbImage")
                         button("Achievements", "crumb", "trophy", "crumbImage")
                         button("Recordings", "crumb", "recording", "crumbImage")
 
-                        this.components.forEach { it.onMousePressed { c -> this.selectComponent(c)} }
+                        this.components.forEach { it.onMousePressed { c -> this.selectComponent(c) } }
                         this.selectComponent(0)
                     }
 
@@ -238,42 +236,30 @@ class ExampleScreen : UIScreen {
                                     borderWidth = 1f
                                 }
                             }
-                            clipContent = true
+                            clipContent = false
                         }
-                        p("Get 3 months of cosmetics for free") {
-                            style {
-                                size(189, 80)
-                                font {
-                                    align(UIAlignment.TOPCENTER)
-                                    y += px(20f)
-                                    textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
-                                    fontRenderType = UIFont.FontRenderType.WRAP
-                                    fontColor = asRGBA(0, 0, 0)
-                                    lineBreakWidth = px(189)
-                                    fontSize = 16f
-                                }
+                        val title = p("Get 3 months of cosmetics for free").style {
+                            control(UIAlignment.TOPCENTER)
+                            y = px(20f)
+                            font(16f, asRGBA(0, 0, 0), UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
+                                align(UIAlignment.TOPCENTER)
+                                fontRenderType = UIFont.FontRenderType.WRAP
+                                lineBreakWidth = px(189)
                             }
                         }
-                        p("Support Prism's development by unlocking cosmetics.") {
-                            style {
-                                size(179, 80)
-                                font {
-                                    align(UIAlignment.TOPCENTER)
-                                    y += px(60f)
-                                    textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
-                                    fontRenderType = UIFont.FontRenderType.WRAP
-                                    fontColor = asRGBA(65, 63, 68)
-                                    lineBreakWidth = px(179)
-                                    fontSize = 14f
-                                }
+                        p("Support Prism's development by unlocking cosmetics.").style {
+                            control(UIAlignment.TOPCENTER)
+                            y = px(52)
+                            font(14f, asRGBA(65, 63, 68), UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
+                                align(UIAlignment.TOPCENTER)
+                                fontRenderType = UIFont.FontRenderType.WRAP
+                                lineBreakWidth = px(179)
                             }
                         }
-                        button("GET PREMIUM", "blueButton") {
-                            style {
-                                control(UIAlignment.BOTTOMCENTER)
-                                size(161, 41)
-                                y -= px(10f)
-                            }
+                        button("GET PREMIUM", "blueButton").style {
+                            control(UIAlignment.BOTTOMCENTER)
+                            size(161, 41)
+                            y -= px(10f)
                         }.hover("crumbHover", "crumbLeave")
                     }
                 }

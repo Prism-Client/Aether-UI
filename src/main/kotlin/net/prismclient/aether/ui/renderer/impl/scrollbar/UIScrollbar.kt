@@ -126,7 +126,9 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
         return false
     }
 
-    fun mouseMoved(mouseX: Float, mouseY: Float) {
+    fun mouseMoved() {
+        val mouseX = component!!.getMouseX()
+        val mouseY = component!!.getMouseY()
         if (selected) {
             value = if (type == Scrollbar.Vertical) {
                 (mouseY - cachedY - mouseOffset) / (cachedHeight - sliderSize)
@@ -140,22 +142,31 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
         selected = false
     }
 
-    @JvmOverloads
-    inline fun background(color: Int, block: UIBackground.() -> Unit = {}) =
-        background { this.backgroundColor = color; this.block() }
-
+    /**
+     * A DSL block for creating a background to this [UIScrollbar]
+     */
     inline fun background(block: UIBackground.() -> Unit) {
         background = background ?: UIBackground()
         background!!.block()
     }
 
+    /**
+     * Shorthand for adding a color, and radius (optional) for the background to this [UIScrollbar]
+     */
+    @JvmOverloads
+    inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
+        background { this.backgroundColor = color; this.radius = radius; this.block() }
+
+    /**
+     * A DSL block for creating a border to this [UIScrollbar]
+     */
     inline fun border(block: UIBorder.() -> Unit) {
         border = border ?: UIBorder()
         border!!.block()
     }
 
     /**
-     * Describes the type of scrollbar
+     * Describes the direction of the scrollbar
      *
      * @author sen
      * @since 5/12/2022
