@@ -36,6 +36,15 @@ open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
         border!!.block()
     }
 
+    @JvmOverloads
+    inline fun border(borderColor: Int = 0, borderWidth: Float = 0f, block: UIBorder.() -> Unit = {}) {
+        border {
+            this.borderColor = borderColor
+            this.borderWidth = borderWidth
+            block()
+        }
+    }
+
     fun radius(radius: Float) {
         this.radius = UIRadius(radius)
     }

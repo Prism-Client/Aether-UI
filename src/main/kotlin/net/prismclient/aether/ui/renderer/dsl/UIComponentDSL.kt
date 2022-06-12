@@ -27,6 +27,7 @@ import java.util.*
 object UIComponentDSL {
     private var components: ArrayList<UIComponent<*>>? = null
     private var frames: ArrayList<UIFrame<*>>? = null
+    private var componentStack: Stack<UIComponent<*>>? = null
     private var frameStack: Stack<UIFrame<*>>? = null
     private var styleStack: Stack<String>? = null
     private var activeComponent: UIComponent<*>? = null
@@ -46,6 +47,7 @@ object UIComponentDSL {
     fun create() {
         components = ArrayList()
         frames = ArrayList()
+        componentStack = Stack()
         frameStack = Stack()
         styleStack = Stack()
     }
@@ -56,6 +58,7 @@ object UIComponentDSL {
     fun finalize() {
         components = null
         frames = null
+        componentStack = null
         frameStack = null
         styleStack = null
         activeComponent = null
@@ -91,13 +94,6 @@ object UIComponentDSL {
             activeController!!.addComponent(component)
         }
         withinComponentInit = true
-        // If the active component is not null, then this
-        // component's parent should be the active component
-//        if (activeComponent != null) {
-//            component.parent = activeComponent
-//            insertComponent(component)
-//            return
-//        }
 
         insertComponent(component)
 
@@ -107,6 +103,7 @@ object UIComponentDSL {
             activeFrame = component
             frameStack!!.add(component)
         } else {
+            componentStack!!.push(component)
             activeComponent = component
         }
     }
@@ -125,7 +122,9 @@ object UIComponentDSL {
                 } else null
             }
         }
-        activeComponent = null
+        if (activeComponent != null)
+            componentStack!!.pop()
+        activeComponent = if (!componentStack!!.isEmpty()) componentStack!!.peek() else null
     }
 
     /** Style **/
@@ -253,15 +252,8 @@ object UIComponentDSL {
     inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) = component(UIButton(text, style!!), block)
 
     @JvmOverloads
-    inline fun button(text: String, style: String? = activeStyle, imageName: String, imagesStyle: String, block: UIImageButton.() -> Unit = {}): UIImageButton {
-        val button = UIImageButton(text, style!!)
-        pushComponent(button)
-        button.image = image(imageName, imagesStyle)
-        button.also(block)
-        button.initialize()
-        popComponent(button)
-        return button
-    }
+    inline fun button(text: String, style: String? = activeStyle, imageName: String, imagesStyle: String, block: UIImageButton.() -> Unit = {}) =
+        component(UIImageButton(imageName, imagesStyle, text, style!!), block)
 
     inline fun checkbox(checked: Boolean = false, selectedImageName: String = "checkbox", imageStyle: String, style: String? = null, block: UICheckbox.() -> Unit) = checkbox(checked, selectedImageName, "", imageStyle, style, block)
 
@@ -298,4 +290,20 @@ object UIComponentDSL {
      * Returns true if the Component DSL builder is active
      */
     fun isActive() = components != null
+
+
+
+    /**
+     * Creates a DSL block for creating components. When started and completed, the stacks will be allocated/cleared
+     *
+     * @see ubuild
+     */
+    @JvmStatic
+    inline fun build(block: UIComponentDSL.() -> Unit) = net.prismclient.aether.ui.util.extensions.create(block)
+
+    /**
+     * Unsafe version of [build]. Does not allocate/deallocate the stacks, thus nothing will be reset
+     */
+    @JvmStatic
+    inline fun ubuild(block: UIComponentDSL.() -> Unit) = UIComponentDSL.block()
 }

@@ -238,7 +238,7 @@ class ExampleScreen : UIScreen {
                             }
                             clipContent = false
                         }
-                        val title = p("Get 3 months of cosmetics for free").style {
+                        p("Get 3 months of cosmetics for free").style {
                             control(UIAlignment.TOPCENTER)
                             y = px(20f)
                             font(16f, asRGBA(0, 0, 0), UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {

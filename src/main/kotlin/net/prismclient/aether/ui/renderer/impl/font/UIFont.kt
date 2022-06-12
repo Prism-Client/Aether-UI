@@ -155,8 +155,8 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     override fun update(component: UIComponent<*>?) {
         if (ignore) return
         super.update(component)
-        cachedLineBreakWidth = calculate(lineBreakWidth, component, component!!.x, component.y, false)
-        cachedLineHeight = calculate(lineHeight, component, component.x, component.y, true)
+        cachedLineBreakWidth = calculate(lineBreakWidth, component?.parent, component?.parent?.width ?: 0f, component?.parent?.height ?: 0f, false)
+        cachedLineHeight = calculate(lineHeight, component?.parent, component?.parent?.width ?: 0f, component?.parent?.height ?: 0f, true)
 
         if (component is UILabel) {
             render(component.text)

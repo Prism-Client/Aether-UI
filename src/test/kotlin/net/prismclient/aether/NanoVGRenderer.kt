@@ -35,6 +35,7 @@ class NanoVGRenderer : UIRenderer() {
     private val none = NVGColor.create().also { nvgRGBAf(0f, 0f, 0f, 0f, it) }
     private val outlineColor = NVGColor.create()
     private val paint = NVGPaint.create()
+
     override fun beginFrame(width: Float, height: Float, devicePixelRatio: Float) {
         nvgBeginFrame(ctx, width, height, devicePixelRatio)
     }

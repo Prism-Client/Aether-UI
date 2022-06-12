@@ -14,7 +14,12 @@ import net.prismclient.aether.ui.util.interfaces.UIFocusable
  * @since 5/6/2022
  * @see UITextField.filter Pre-made text filters.
  */
-open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String) : UIButton<UITextFieldSheet>(text, style), UIFocusable<UITextField> {
+open class UITextField(
+    text: String,
+    var placeholder: String? = null,
+    var filter: TextFilter,
+    style: String
+) : UIButton<UITextFieldSheet>(text, style), UIFocusable<UITextField> {
     override fun renderComponent() {
         style.font?.render(text.ifEmpty { placeholder ?: "" })
     }

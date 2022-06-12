@@ -1,6 +1,10 @@
 package net.prismclient.aether.screens
 
+import net.prismclient.aether.components.promotion.PromotionComponent
+import net.prismclient.aether.components.promotion.PromotionStyleSheet
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
+import net.prismclient.aether.ui.component.type.input.textfield.UITextField
+import net.prismclient.aether.ui.component.type.input.textfield.UITextFieldSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNBASELINE
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNBOTTOM
@@ -24,48 +28,32 @@ class TestingScreen : UIScreen {
                 loadSvg("image", "/demo/icons/game.svg")
             }
 
-            style(UIStyleSheet(), "LargeButton") {
-                size(340, 100)
-                background(asRGBA(0, 0, 0, 0.1f), radius(16f)) {
-                    border {
+            style(PromotionStyleSheet(), "Promotion") {
+                size(189, 172)
+                background(asRGBA(214, 214, 216, 0.3f)) {
+                    border(asRGBA(255, 255, 255, 0.8f), 1f)
+                    radius(10f)
+                }
+
+                buttonColor = asRGBA(87, 164, 255)
+            }
+
+            //component(PromotionComponent("This is some title of some sort o/", "Some description of some sort idk", "Click me!", "Promotion")) {}
+
+            style(UITextFieldSheet(), "textField") {
+                background(asRGBA(0, 0, 0, 0.1f), radius(8f)) {
+                    border(asRGBA(214, 214, 216), 1f) {
                         borderDirection = UIRendererDSL.StrokeDirection.INSIDE
-                        borderColor = asRGBA(255, 255, 255, 0.5f)
-                        borderWidth = 2f
                     }
                 }
-                font {
-                    x = px(24 + 48 + 24)
-                    y = px(28)
-                    textAlignment = ALIGNTOP or ALIGNLEFT
-                    fontFamily = "Poppins"
-                    fontType = UIFont.FontType.Bold
-                    fontSize = 14f
-                    fontColor = -1
+            }
+
+            component(UITextField("", "Search for anything...", UITextField.any, "textField")) {
+                style {
+                    control(UIAlignment.TOPRIGHT)
+                    size(448, 39)
+                    x -= px(30); y = px(30)
                 }
-            }
-
-            style(UIImageSheet(), "LargeButtonIcon") {
-                control(UIAlignment.MIDDLELEFT)
-                size(48f, 48f)
-                x += px(28)
-                imageColor = asRGBA(214, 214, 216, 1f)
-            }
-
-            style(UIStyleSheet(), "LargeButtonDescription") {
-                x = px(24 + 48 + 24)
-                y = px(28) + px(14f)
-                background(asRGBA(0, 0, 255, 0.3f))
-                font {
-                    textAlignment = ALIGNTOP or ALIGNLEFT
-                    fontFamily = "Poppins"
-                    fontType = UIFont.FontType.Regular
-                    fontSize = 10f
-                    fontColor = -1
-                }
-            }
-
-            button("Controls", "LargeButton", "image", "LargeButtonIcon") {
-                text("This is a short description.", "LargeButtonDescription").parent = this
             }
         }
     }
