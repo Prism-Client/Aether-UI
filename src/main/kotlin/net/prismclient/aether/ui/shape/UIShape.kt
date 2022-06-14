@@ -19,9 +19,6 @@ abstract class UIShape : UIObject(), UICopy<UIShape> {
     var width: UIUnit? = null
     var height: UIUnit? = null
 
-    var offsetX = 0f
-    var offsetY = 0f
-
     var cachedX = 0f
         protected set
     var cachedY = 0f

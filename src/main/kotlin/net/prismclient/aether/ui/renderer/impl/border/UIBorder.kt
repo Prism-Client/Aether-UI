@@ -57,4 +57,7 @@ class UIBorder : UIShape(), UIAnimatable<UIBorder> {
     override fun saveState(component: UIComponent<*>, keyframe: UIBorder?, retain: Boolean) {
         TODO("Not yet implemented")
     }
+
+    override fun toString(): String =
+        "UIBorder(borderWidth=$borderWidth, borderColor=$borderColor, borderDirection=$borderDirection)"
 }

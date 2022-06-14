@@ -12,9 +12,10 @@ import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.UIKey
+import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.input.UIKeyAction
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -377,8 +378,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Invoked when this is focused and a key is pressed
      */
-    open fun keyPressed(key: UIKey, character: Char) {
-        // TODO: Keypressed listeners
+    open fun keyPressed(character: Char, key: UIKey) {
+        //keyPressedListeners?.forEach { it.value.accept(this) }
     }
 
     /**
@@ -554,7 +555,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     fun isMouseInside() = (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
 
     /**
-     * Returns true if the [isMouseInside] check is true, and it is also inside the parent of this (and it's parent, and so on, if applicable)
+     * Propagates through this, and up to check if the mouse is inside.
+     * Returns true if the mouse is inside all the components that nest this.
      */
     fun isMouseInsideBounds(): Boolean = if (parent != null && parent!!.style.clipContent && !parent!!.isMouseInsideBounds()) false else isMouseInside()
 

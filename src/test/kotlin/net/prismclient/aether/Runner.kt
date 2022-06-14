@@ -6,6 +6,8 @@ import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.input.UIKey
+import net.prismclient.aether.ui.util.input.UIKeyAction
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -15,6 +17,7 @@ import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import org.lwjgl.system.Platform
 import kotlin.math.max
+
 
 /**
  * An example runner class with LWJGL 3 & glfw
@@ -32,6 +35,28 @@ object Runner {
     var fps = 0
     var lastSecond = System.currentTimeMillis()
     var core: UICore? = null
+
+    val keymap = HashMap<Int, UIKey>()
+
+    init {
+        // Map the GLFW key mappings to UIKey
+        org.lwjgl.glfw.GLFW::class.java.declaredFields.forEach { field ->
+            if (field.name.startsWith("GLFW_KEY_")) {
+                val fieldName = field.name.removePrefix("GLFW_")
+                UIKey::class.java.enumConstants.forEach {
+                    if (it.name.contentEquals(fieldName)) {
+                        keymap[field.get(null) as Int] = it
+                    }
+                }
+            }
+        }
+
+//        keymap.forEach { t, u ->
+//            println("$t -> $u")
+//        }
+
+        ///GLFW.getDeclaredFields().map(f -> f.getName().startsWith("GLFW_KEY_")).forEach(key -> key.get(null) ...)
+    }
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -62,26 +87,36 @@ object Runner {
         }
 
         glfwSetMouseButtonCallback(window) { _: Long, button: Int, action: Int, _: Int ->
-            core!!.mousePressed(button, action == GLFW_RELEASE)
+            core!!.mouseChanged(button, action == GLFW_RELEASE)
         }
-        glfwSetCursorPosCallback(window) { handle: Long, xpos: Double, ypos: Double ->
+        glfwSetCursorPosCallback(window) { _: Long, xpos: Double, ypos: Double ->
             mouseX = xpos
             mouseY = ypos
             core!!.mouseMoved(mouseX.toFloat(), mouseY.toFloat())
         }
 
-        glfwSetWindowContentScaleCallback(window) { handle: Long, xscale: Float, yscale: Float ->
+        glfwSetWindowContentScaleCallback(window) { _: Long, xscale: Float, yscale: Float ->
             contentScaleX = xscale
             contentScaleY = yscale
         }
 
-        glfwSetFramebufferSizeCallback(window) { handle: Long, width: Int, height: Int ->
+        glfwSetFramebufferSizeCallback(window) { _: Long, width: Int, height: Int ->
             framebufferWidth =width
             framebufferHeight = height
             core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        glfwSetScrollCallback(window) { handle: Long, xscroll: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }
+        glfwSetKeyCallback(window) { _: Long, keyCode: Int, scanCode: Int, action: Int, _: Int ->
+            core!!.keyChanged(
+                glfwGetKeyName(keyCode, scanCode)?.get(0) ?: '\u0000', keymap[keyCode] ?: UIKey.UNKOWN, when (action) {
+                GLFW_PRESS -> UIKeyAction.PRESS
+                GLFW_RELEASE -> UIKeyAction.RELEASE
+                GLFW_REPEAT -> UIKeyAction.REPEAT
+                else -> throw IllegalStateException("Unknown action $action")
+            })
+        }
+
+        glfwSetScrollCallback(window) { _: Long, _: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }
 
         glfwMakeContextCurrent(window)
         GL.createCapabilities()
@@ -134,4 +169,5 @@ object Runner {
         glfwTerminate()
         glfwSetErrorCallback(null)!!.free()
     }
+
 }

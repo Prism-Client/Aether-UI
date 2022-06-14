@@ -12,6 +12,11 @@ import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
+import net.prismclient.aether.ui.util.input.UIKeyAction
+import net.prismclient.aether.ui.util.input.UIKey
+
+import net.prismclient.aether.ui.util.input.UIKeyAction.*
+import net.prismclient.aether.ui.util.input.UIKey.*
 
 /**
  * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
@@ -53,7 +58,12 @@ open class UICore(val renderer: UIRenderer) {
      */
     var controllers: ArrayList<UIController<*>>? = null
         protected set
-    
+
+    var isShiftHeld = false
+        protected set
+    var isCtrlHeld = false
+        protected set
+
     init {
         instance = this
         UIProvider.initialize(renderer)
@@ -104,7 +114,8 @@ open class UICore(val renderer: UIRenderer) {
     }
 
     /**
-     * Invoked when the mouse is moved
+     * Invoked when the mouse is moved. Invokes all components regardless
+     * of their eligibility to be focused or bubbled.
      */
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
@@ -123,11 +134,21 @@ open class UICore(val renderer: UIRenderer) {
         }
     }
 
+    protected var lmbCount = 0
+    protected var lmbTime = 0L
+
     /**
-     * Invoked when the mouse was pressed down
+     * This method is invoked when the mouse is pressed down. [mouseButton] represents the
+     * button which was pressed. 0, as the left button, 1 as the right, and 2 as the middle
+     * respectively. [isRelease] should be true when the button is released
+     *
+     * This is a propagating event when [isRelease] is false so the most inner component will
+     * have itself invoked, and it will go up from there.
+     *
+     * @see mouseScrolled
      */
-    fun mousePressed(mouseButton: Int, isRelease: Boolean) {
-        if (isRelease) { // TODO: Mouse release propagation
+    fun mouseChanged(mouseButton: Int, isRelease: Boolean) {
+        if (isRelease) {
             components?.forEach { it.mouseReleased(mouseX, mouseY) }
             return
         }
@@ -137,7 +158,7 @@ open class UICore(val renderer: UIRenderer) {
          * the mousePressed method if the component is within the
          * mouse coordinates. Index is the index of the component.
          */
-        fun peek(list: ArrayList<UIComponent<*>>, index: Int): Boolean {
+        fun peek(list: ArrayList<UIComponent<*>>, index: Int, clickCount: Int): Boolean {
             var component: UIComponent<*>? = null
 
             for (i in index until list.size) {
@@ -145,7 +166,7 @@ open class UICore(val renderer: UIRenderer) {
                 val check = child.isMouseInsideBounds()
                 if (child.isMouseInsideBounds() || !child.style.clipContent) {
                     if (child.childrenCount > 0) {
-                        if (peek(if (child is UIFrame) child.components else list, i + if (child is UIFrame) 0 else 1)) return true
+                        if (peek(if (child is UIFrame) child.components else list, i + if (child is UIFrame) 0 else 1, clickCount)) return true
                     }
                     if (check)
                         component = child
@@ -154,10 +175,19 @@ open class UICore(val renderer: UIRenderer) {
 
             return if (component != null) {
                 component.focus()
-                component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, isRelease, 0))
+                component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, clickCount))
                 true
             } else false
         }
+
+        // Handle count
+        val clickCount = if (mouseButton == 0) {
+            if (lmbTime > System.currentTimeMillis() + 500L)
+                lmbCount = 0
+            lmbTime = System.currentTimeMillis()
+            lmbCount++
+            lmbCount
+        } else 1
 
         var i = 0
         var c: UIComponent<*>? = null
@@ -167,7 +197,7 @@ open class UICore(val renderer: UIRenderer) {
 
             if (child.isMouseInsideBounds()) {
                 if (child.childrenCount > 0) {
-                    if (peek(if (child is UIFrame) child.components else components!!, if (child is UIFrame) 0 else i)) return
+                    if (peek(if (child is UIFrame) child.components else components!!, if (child is UIFrame) 0 else i, clickCount)) return
                     i += child.childrenCount
                 }
                 c = child
@@ -175,15 +205,29 @@ open class UICore(val renderer: UIRenderer) {
             i++
         }
         c?.focus()
-        c?.mousePressed(UIMouseEvent(mouseX, mouseY, 0, isRelease, 0))
-    }
-
-    fun keyPressed(key: Char) {
-        // TODO: Implement
+        c?.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, clickCount))
     }
 
     /**
-     * Invoked when the mouse wheel is scrolled
+     * Invoked when a key has been pressed, released or held. Only invokes the focused component.
+     *
+     * @param character The character of the given [UIKey], or '\u0000'
+     * @param key The key which was changed
+     * @param keyAction The action that was preformed on the key
+     */
+    fun keyChanged(character: Char, key: UIKey, keyAction: UIKeyAction) {
+        when (key) {
+            KEY_LEFT_CONTROL, KEY_RIGHT_CONTROL -> isCtrlHeld = keyAction == PRESS || keyAction == REPEAT
+            KEY_LEFT_SHIFT, KEY_RIGHT_SHIFT -> isShiftHeld = keyAction == PRESS || keyAction == REPEAT
+            else -> {}
+        }
+
+        (focusedComponent as? UIComponent<*>)?.keyPressed(character, key)
+    }
+
+    /**
+     * Invoked when the mouse wheel is scrolled. Invokes all components regardless
+     * of their eligibility to be focused or bubbled.
      */
     open fun mouseScrolled(scrollAmount: Float) {
         tryFocus()

@@ -1,6 +1,8 @@
 package net.prismclient.aether.ui.component.type.input.textfield
 
 import net.prismclient.aether.ui.component.type.input.button.UIButton
+import net.prismclient.aether.ui.event.input.UIMouseEvent
+import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
@@ -20,9 +22,108 @@ open class UITextField(
     var filter: TextFilter,
     style: String
 ) : UIButton<UITextFieldSheet>(text, style), UIFocusable<UITextField> {
-    override fun renderComponent() {
-        style.font?.render(text.ifEmpty { placeholder ?: "" })
+    /**
+     * If true, the placeholder text will be rendered if this is defocused
+     */
+    var resetOnDefocus: Boolean = false
+
+    /* Properties */
+    var caretPosition = 0
+    var caretEndPosition = 0
+    var selected = false
+
+    override fun updateStyle() {
+        super.updateStyle()
+        style.caret.update(this)
     }
+
+    override fun renderComponent() {
+        if (style.font != null) {
+            val temp = style.font!!.fontColor
+            if (text.isEmpty())
+                style.font!!.fontColor = style.placeholderColor
+            style.font!!.render(if (text.isEmpty() && !isFocused()) placeholder ?: "" else text)
+            style.font!!.fontColor = temp
+            style.caret.render()
+        }
+    }
+
+    override fun mousePressed(event: UIMouseEvent) {
+        if (isMouseInsideBounds()) {
+            // Update the caret position
+
+        }
+        super.mousePressed(event)
+    }
+
+    override fun keyPressed(character: Char, key: UIKey) {
+        if (character != '\u0000') {
+            if (filter.accept(character)) {
+                if (selected) {
+                    clear()
+                }
+
+//                if (caretPosition == text.length) {
+//                    text += character
+//                    caretPosition++
+//                    caretEndPosition++
+//                    text = text.substring(0, caretPosition) + character + text.substring(caretPosition)
+//                    caretPosition++
+//                    caretEndPosition++
+//                }
+            }
+            updateTextField()
+        } else {
+            when (key) {
+                UIKey.KEY_BACKSPACE -> {}
+                UIKey.KEY_LEFT -> {}
+                UIKey.KEY_RIGHT -> {}
+            }
+        }
+        super.keyPressed(character, key)
+    }
+
+    /**
+     * Updates the caret position and selection of the text field. This should be invoked
+     * when the text or caret position has been changed.
+     *
+     * @see select
+     * @see deselect
+     * @see clear
+     */
+    fun updateTextField() {
+        // TODO:
+    }
+
+    /**
+     * Selects the text with the [startingIndex] as the caret position and the [endingIndex] as the place to select
+     */
+    fun select(startingIndex: Int, endingIndex: Int) {
+        caretPosition = startingIndex
+        caretEndPosition = endingIndex
+        selected = true
+        updateTextField()
+    }
+
+    /**
+     * Deselects the text if avaliable
+     */
+    fun deselect() {
+        caretEndPosition = caretPosition
+        selected = false
+        updateTextField()
+    }
+
+    /**
+     * Resets hte selection and clears the text
+     */
+    fun clear() {
+        deselect()
+        text = ""
+        updateTextField()
+    }
+
+    // ontextfield update
 
     /**
      * [TextFilter] holds a string which is compared to the input character. If the character
@@ -34,7 +135,9 @@ open class UITextField(
      * @see UITextField.Filters Pre-made filters
      *
      */
-    class TextFilter(val pattern: String, val maxLength: Int = -1)
+    class TextFilter(val pattern: String, val maxLength: Int = -1) {
+        fun accept(char: Char) = pattern.contains(char)
+    }
 
     companion object Filters {
         @JvmStatic
@@ -58,7 +161,7 @@ open class UITextField(
 //import net.prismclient.aether.ui.component.util.interfaces.UIFocusable
 //import net.prismclient.aether.ui.renderer.impl.font.UIFont
 //import net.prismclient.aether.ui.style.impl.UITextFieldSheet
-//import net.prismclient.aether.ui.util.UIKey
+//import net.prismclient.aether.ui.util.input.UIKey
 //import net.prismclient.aether.ui.util.extensions.renderer
 //import java.lang.Integer.max
 //import java.lang.Integer.min

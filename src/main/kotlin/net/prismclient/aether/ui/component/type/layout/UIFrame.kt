@@ -6,7 +6,7 @@ import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
-import net.prismclient.aether.ui.util.UIKey
+import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
@@ -135,24 +135,6 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         }
     }
 
-//    override fun mousePressed(mouseX: Float, mouseY: Float) {
-//        super.mousePressed(mouseX, mouseY)
-//        for (i in 0 until components.size) {
-//            if (i < components.size) {
-//                components[i].mousePressed(mouseX + relX, mouseY + relX)
-//            }
-//        }
-//        components.forEach { it.mouseClicked(mouseX + relX, mouseY + relY) }
-//    }
-    override fun mousePressed(event: UIMouseEvent) {
-        super.mousePressed(event)
-//        for (i in 0 until components.size) {
-//            if (i < components.size) {
-//                components[i].mousePressed(event)
-//            }
-//        }
-    }
-
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)
         components.forEach { it.mouseReleased(mouseX + relX, mouseY + relY) }
@@ -166,10 +148,5 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
         components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
-    }
-
-    override fun keyPressed(key: UIKey, character: Char) {
-        super.keyPressed(key, character)
-        components.forEach { it.keyPressed(key, character) }
     }
 }
