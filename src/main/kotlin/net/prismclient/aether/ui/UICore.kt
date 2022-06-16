@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.event.input.UIMouseEvent
@@ -13,11 +12,15 @@ import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
-import net.prismclient.aether.ui.util.input.UIKeyAction
-import net.prismclient.aether.ui.util.input.UIKey
 
 import net.prismclient.aether.ui.util.input.UIKeyAction.*
 import net.prismclient.aether.ui.util.input.UIKey.*
+import net.prismclient.aether.ui.util.input.UIModifierKey
+import java.util.*
+import java.util.function.BiConsumer
+import java.util.function.Consumer
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
@@ -72,6 +75,7 @@ open class UICore(val renderer: UIRenderer) {
      */
     open fun update(width: Float, height: Float, devicePxRatio: Float) {
         updateSize(width, height, devicePxRatio)
+        updateListeners?.forEach { it.value.run() }
         components?.forEach { it.update() }
         frames?.forEach { it.update() }
         UIProvider.updateAnimationCache()
@@ -110,19 +114,16 @@ open class UICore(val renderer: UIRenderer) {
     }
 
     /**
-     * Invoked when the mouse is moved. Invokes all components regardless
-     * of their eligibility to be focused or bubbled.
+     * Invoked when the mouse is moved. Invokes all components regardless of their
+     * eligibility to be focused or bubbled. The [Properties.mouseX] and [Properties.mouseY]
+     * properties can be found in [UICore.Properties]
      */
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
-
-        if (activeScreen != null) {
+        mouseMoveListeners?.forEach { it.value.run() }
+        if (activeScreen != null)
             for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
-        }
     }
-
-    protected var lmbCount = 0
-    protected var lmbTime = 0L
 
     /**
      * This method is invoked when the mouse is pressed down. [mouseButton] represents the
@@ -136,6 +137,7 @@ open class UICore(val renderer: UIRenderer) {
      */
     fun mouseChanged(mouseButton: Int, isRelease: Boolean) {
         if (isRelease) {
+            mouseReleasedListeners?.forEach { it.value.run() }
             components?.forEach { it.mouseReleased(mouseX, mouseY) }
             return
         }
@@ -147,6 +149,8 @@ open class UICore(val renderer: UIRenderer) {
                 focusedComponent = null
             }
         }
+
+        mousePressedListeners?.forEach { it.value.run() }
 
         /**
          * Iterates through the children of a component and invokes
@@ -176,13 +180,7 @@ open class UICore(val renderer: UIRenderer) {
         }
 
         // Handle count
-        val clickCount = if (mouseButton == 0) {
-            if (lmbTime > System.currentTimeMillis() + 500L)
-                lmbCount = 0
-            lmbTime = System.currentTimeMillis()
-            lmbCount++
-            lmbCount
-        } else 1
+        val clickCount = 1
 
         var i = 0
         var c: UIComponent<*>? = null
@@ -207,14 +205,14 @@ open class UICore(val renderer: UIRenderer) {
      * Invoked when a key has been pressed. This only invokes the focused component.
      *
      * @param character The key which was pressed or '\u0000'
-     * @param isCtrlHeld If left/right ctrl is held during the invocation of this
-     * @param isAltHeld If the left/right alt is held during the invocation of this
-     * @param isShiftHeld If left/right shift is held during the invocation of this
+     * @see updateModifierKey To update keys such as Shift, Alt, Tab etc...
      */
-    fun keyPressed(character: Char, isCtrlHeld: Boolean, isAltHeld: Boolean, isShiftHeld: Boolean) {
-        updateModifierKeys(isCtrlHeld, isAltHeld, isShiftHeld)
+    fun keyPressed(character: Char) {
+        keyPressListeners?.forEach { it.value.accept(character) }
         (focusedComponent as? UIComponent<*>)?.keyPressed(character)
     }
+
+    // getActiveModifierKeys
 
     /**
      * Invoked when the mouse wheel is scrolled. Invokes all components regardless
@@ -222,6 +220,7 @@ open class UICore(val renderer: UIRenderer) {
      */
     open fun mouseScrolled(scrollAmount: Float) {
         tryFocus()
+        mouseScrollListeners?.forEach { it.value.accept(scrollAmount) }
         components?.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
     }
 
@@ -284,17 +283,61 @@ open class UICore(val renderer: UIRenderer) {
         var mouseY: Float = 0f
             protected set
 
+        /**
+         * Invoked whenever the layout needs to be updated. This can be when the screen
+         * is resized or created. Invoked prior to components.
+         */
         @JvmStatic
-        var isCtrlHeld = false
+        var updateListeners: HashMap<String, Runnable>? = null
+            protected set
+
+        /**
+         * The listeners for then the mouse is moved. Invoked prior to components.
+         */
+        @JvmStatic
+        var mouseMoveListeners: HashMap<String, Runnable>? = null
+            protected set
+
+        /**
+         * Invoked when the mouse is pressed. Invoked prior to components.
+         */
+        @JvmStatic
+        var mousePressedListeners: HashMap<String, Runnable>? = null
+            protected set
+
+        /**
+         * Invoked when the mouse is released. Invoked prior to components.
+         */
+        @JvmStatic
+        var mouseReleasedListeners: HashMap<String, Runnable>? = null
+            protected set
+
+        /**
+         * Invoked when a key is pressed. Invoked prior to components.
+         */
+        @JvmStatic
+        var keyPressListeners: HashMap<String, Consumer<Char>>? = null
+            protected set
+
+        /**
+         * Invoked when the mouse is scrolled. Invoked prior to components.
+         */
+        @JvmStatic
+        var mouseScrollListeners: HashMap<String, Consumer<Float>>? = null
             protected set
 
         @JvmStatic
-        var isAltHeld = false
-            protected set
+        var modifierKeys: EnumMap<UIModifierKey, Boolean> = EnumMap(UIModifierKey::class.java)
 
         @JvmStatic
-        var isShiftHeld = false
-            protected set
+        var modifierKeyListeners: HashMap<String, BiConsumer<UIModifierKey, Boolean>> = hashMapOf()
+
+        init {
+            // Populate the modifier keys
+            UIModifierKey.values().forEach {
+                modifierKeys[it] = false
+            }
+        }
 
         /**
          * Sets the [width], [height], and [devicePxRatio] to the given values
@@ -318,14 +361,76 @@ open class UICore(val renderer: UIRenderer) {
         }
 
         /**
-         * Changes the status of the modifier keys: [isCtrlHeld] and [isShiftHeld]
-         *
-         * @see keyPressed
+         * Updates the given [modifierKey] to the given [value].
          */
-        fun updateModifierKeys(isCtrlHeld: Boolean, isAltHeld: Boolean, isShiftHeld: Boolean) {
-            this.isCtrlHeld = isCtrlHeld
-            this.isAltHeld = isAltHeld
-            this.isShiftHeld = isShiftHeld
+        @JvmStatic
+        fun updateModifierKey(modifierKey: UIModifierKey, value: Boolean) {
+            modifierKeys[modifierKey] = value
+            modifierKeyListeners.forEach { it.value.accept(modifierKey, value) }
+        }
+
+        /**
+         * Adds an update listener with the given [eventName].
+         */
+        @JvmStatic
+        fun onUpdate(eventName: String, event: Runnable) {
+            updateListeners = updateListeners ?: hashMapOf()
+            updateListeners!![eventName] = event
+        }
+
+        /**
+         * Adds a mouse move listener with the given [eventName]. The [mouseX] and [mouseY] properties
+         * can be found within the companion of this class.
+         */
+        @JvmStatic
+        fun onMouseMove(eventName: String, event: Runnable) {
+            mouseMoveListeners = mouseMoveListeners ?: hashMapOf()
+            mouseMoveListeners!![eventName] = event
+        }
+
+        /**
+         * Adds a mouse pressed listener with the given [eventName].
+         */
+        @JvmStatic
+        fun onMousePressed(eventName: String, event: Runnable) {
+            mousePressedListeners = mousePressedListeners ?: hashMapOf()
+            mousePressedListeners!![eventName] = event
+        }
+
+        /**
+         * Adds a mouse released listener with the given [eventName].
+         */
+        @JvmStatic
+        fun onMouseReleased(eventName: String, event: Runnable) {
+            mouseReleasedListeners = mouseReleasedListeners ?: hashMapOf()
+            mouseReleasedListeners!![eventName] = event
+        }
+
+        /**
+         * Adds a key pressed listener with the given [eventName].
+         */
+        @JvmStatic
+        fun onKeyPressed(eventName: String, event: Consumer<Char>) {
+            keyPressListeners = keyPressListeners ?: hashMapOf()
+            keyPressListeners!![eventName] = event
+        }
+
+        /**
+         * Adds a mouse scroll listener with the given [eventName].
+         */
+        @JvmStatic
+        fun onMouseScrolled(eventName: String, event: Consumer<Float>) {
+            mouseScrollListeners = mouseScrollListeners ?: hashMapOf()
+            mouseScrollListeners!![eventName] = event
+        }
+
+        /**
+         * Adds an event listener to [modifierKeyListeners] which is invoked when a modifier key is enabled / disabled
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun onModifierKeyChange(name: String = "Default-${modifierKeyListeners.size}", event: BiConsumer<UIModifierKey, Boolean>) {
+            modifierKeyListeners[name] = event
         }
 
         /**
