@@ -57,29 +57,32 @@ open class UITextField(
     }
 
     override fun keyPressed(character: Char, key: UIKey) {
+        if (text.length > filter.maxLength && filter.maxLength != -1) return
         if (character != '\u0000') {
+            println(character)
             if (filter.accept(character)) {
                 if (selected) {
                     clear()
                 }
 
-//                if (caretPosition == text.length) {
-//                    text += character
-//                    caretPosition++
-//                    caretEndPosition++
-//                    text = text.substring(0, caretPosition) + character + text.substring(caretPosition)
-//                    caretPosition++
-//                    caretEndPosition++
-//                }
+                text = text.substring(0, caretPosition) + character + text.substring(caretPosition, text.length)
+
+                caretPosition++
             }
-            updateTextField()
         } else {
             when (key) {
-                UIKey.KEY_BACKSPACE -> {}
-                UIKey.KEY_LEFT -> {}
-                UIKey.KEY_RIGHT -> {}
+                UIKey.KEY_BACKSPACE -> {
+                    if (text.isNotEmpty() && caretPosition > 0) {
+                        text = text.substring(0, caretPosition - 1) + text.substring(caretPosition, text.length)
+                        caretPosition--
+                    }
+                }
+                UIKey.KEY_LEFT -> caretPosition = (caretPosition - 1).coerceAtLeast(0)
+                UIKey.KEY_RIGHT -> caretPosition = (caretPosition + 1).coerceAtMost(text.length)
+                else -> {}
             }
         }
+        updateTextField()
         super.keyPressed(character, key)
     }
 

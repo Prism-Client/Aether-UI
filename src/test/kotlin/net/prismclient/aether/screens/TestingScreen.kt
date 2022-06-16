@@ -46,6 +46,11 @@ class TestingScreen : UIScreen {
                         borderDirection = UIRendererDSL.StrokeDirection.INSIDE
                     }
                 }
+                font {
+                    align(UIAlignment.TOPLEFT)
+                    fontFamily = "Poppins"
+                    fontSize = 16f
+                }
             }
 
             component(UITextField("", "Search for anything...", UITextField.any, "textField")) {

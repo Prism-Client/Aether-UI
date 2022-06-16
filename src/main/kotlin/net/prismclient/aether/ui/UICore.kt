@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.event.input.UIMouseEvent
@@ -59,11 +60,6 @@ open class UICore(val renderer: UIRenderer) {
     var controllers: ArrayList<UIController<*>>? = null
         protected set
 
-    var isShiftHeld = false
-        protected set
-    var isCtrlHeld = false
-        protected set
-
     init {
         instance = this
         UIProvider.initialize(renderer)
@@ -120,15 +116,6 @@ open class UICore(val renderer: UIRenderer) {
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
 
-        // If the focused component isn't null, defocus the focused component
-        // if the mouse is not within it's bounds
-        if (focusedComponent != null) {
-            if (!(focusedComponent as UIComponent<*>).isMouseInsideBounds()) {
-                (focusedComponent as UIComponent<*>).defocus()
-                focusedComponent = null
-            }
-        }
-
         if (activeScreen != null) {
             for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
         }
@@ -151,6 +138,14 @@ open class UICore(val renderer: UIRenderer) {
         if (isRelease) {
             components?.forEach { it.mouseReleased(mouseX, mouseY) }
             return
+        }
+
+        // Defocus the active component if it's not within the bounds of it
+        if (focusedComponent != null) {
+            if (!(focusedComponent as UIComponent<*>).isMouseInsideBounds()) {
+                (focusedComponent as UIComponent<*>).defocus()
+                focusedComponent = null
+            }
         }
 
         /**
@@ -209,20 +204,16 @@ open class UICore(val renderer: UIRenderer) {
     }
 
     /**
-     * Invoked when a key has been pressed, released or held. Only invokes the focused component.
+     * Invoked when a key has been pressed. This only invokes the focused component.
      *
-     * @param character The character of the given [UIKey], or '\u0000'
-     * @param key The key which was changed
-     * @param keyAction The action that was preformed on the key
+     * @param character The key which was pressed or '\u0000'
+     * @param isCtrlHeld If left/right ctrl is held during the invocation of this
+     * @param isAltHeld If the left/right alt is held during the invocation of this
+     * @param isShiftHeld If left/right shift is held during the invocation of this
      */
-    fun keyChanged(character: Char, key: UIKey, keyAction: UIKeyAction) {
-        when (key) {
-            KEY_LEFT_CONTROL, KEY_RIGHT_CONTROL -> isCtrlHeld = keyAction == PRESS || keyAction == REPEAT
-            KEY_LEFT_SHIFT, KEY_RIGHT_SHIFT -> isShiftHeld = keyAction == PRESS || keyAction == REPEAT
-            else -> {}
-        }
-
-        (focusedComponent as? UIComponent<*>)?.keyPressed(character, key)
+    fun keyPressed(character: Char, isCtrlHeld: Boolean, isAltHeld: Boolean, isShiftHeld: Boolean) {
+        updateModifierKeys(isCtrlHeld, isAltHeld, isShiftHeld)
+        (focusedComponent as? UIComponent<*>)?.keyPressed(character)
     }
 
     /**
@@ -293,6 +284,18 @@ open class UICore(val renderer: UIRenderer) {
         var mouseY: Float = 0f
             protected set
 
+        @JvmStatic
+        var isCtrlHeld = false
+            protected set
+
+        @JvmStatic
+        var isAltHeld = false
+            protected set
+
+        @JvmStatic
+        var isShiftHeld = false
+            protected set
+
         /**
          * Sets the [width], [height], and [devicePxRatio] to the given values
          *
@@ -312,6 +315,17 @@ open class UICore(val renderer: UIRenderer) {
         fun updateMouse(mouseX: Float, mouseY: Float) {
             this.mouseX = mouseX
             this.mouseY = mouseY
+        }
+
+        /**
+         * Changes the status of the modifier keys: [isCtrlHeld] and [isShiftHeld]
+         *
+         * @see keyPressed
+         */
+        fun updateModifierKeys(isCtrlHeld: Boolean, isAltHeld: Boolean, isShiftHeld: Boolean) {
+            this.isCtrlHeld = isCtrlHeld
+            this.isAltHeld = isAltHeld
+            this.isShiftHeld = isShiftHeld
         }
 
         /**
@@ -336,6 +350,12 @@ open class UICore(val renderer: UIRenderer) {
          */
         @JvmStatic
         fun focus(component: UIFocusable<*>) {
+            // Check if the given value is a valid instance of UIComponent
+            try {
+                component as UIComponent<*>
+            } catch (castException: ClassCastException) {
+                throw RuntimeException("When trying to focus, the provided value is not an instance of UIComponent. Make sure you are only using the UIFocus interface to focus UIComponents.")
+            }
             focusedComponent = component
         }
 

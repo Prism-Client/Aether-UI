@@ -143,6 +143,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         protected set
 
     /**
+     * The listeners for then the mouse is moved. This is not a bubbling event.
+     */
+    var mouseMoveListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+        protected set
+
+    /**
      * The listeners for when the component is pressed. This is a bubbling event.
      *
      * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
@@ -151,41 +157,44 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         protected set
 
     /**
-     * The listeners for when the mouse is released
+     * The listeners for when the mouse is released. Despite being the opposite of
+     * [mousePressedListeners], this is NOT a bubbling event.
      */
     var mouseReleasedListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
         protected set
 
     /**
-     * The listeners for then the mouse is moved
-     */
-    var mouseMoveListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
-        protected set
-
-    /**
      * The listeners for when the mouse enters this component. The mouse considered being inside
-     * is if it passes the check for it being within these bounds and the parent(s) of this
+     * is if it passes the check for it being within these bounds and the parent(s) of this. This
+     * is not a bubbling event.
      */
     var mouseEnteredListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
         protected set
 
     /**
-     * Invoked when the mouse leaves this component
+     * The opposite of [mouseEnteredListeners]. Invoked when the mouse leaves this component. This
+     * is not a bubbling event.
      */
     var mouseLeaveListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
         protected set
 
     /**
+     * Invoked when a key is pressed. This must be focused or a parent of a component
+     * that is focused to be invoked. This is not a bubbling event.
+     *
+     * @see UIFocusable
+     */
+    var keyPressListeners: HashMap<String, BiConsumer<UIComponent<*>, Char>>? = null
+
+    /**
      * Invoked when the mouse is scrolled. This must be focused or a parent of a component
-     * that is focused for this to be invoked. This is a bubbling event.
+     * that is focused to be invoked. This is a bubbling event.
      *
      * @see UIFocusable
      * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
      */
     var mouseScrollListeners: HashMap<String, BiConsumer<UIComponent<*>, Float>>? = null
         protected set
-
-    // TODO Keypressed listeners
 
     init {
         applyStyle(style)
@@ -376,20 +385,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
-     * Invoked when this is focused and a key is pressed
-     */
-    open fun keyPressed(character: Char, key: UIKey) {
-        //keyPressedListeners?.forEach { it.value.accept(this) }
-    }
-
-    /**
-     * Invoked when the mouse is scrolled and this is focused
-     */
-    open fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
-        mouseScrollListeners?.forEach { it.value.accept(this, scrollAmount) }
-    }
-
-    /**
      * Invoked when the mouse enters this
      */
     protected open fun mouseEntered() {
@@ -401,6 +396,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      */
     protected open fun mouseLeft() {
         mouseLeaveListeners?.forEach { it.value.accept(this) }
+    }
+
+    /**
+     * Invoked when this is focused and a key is pressed
+     */
+    open fun keyPressed(character: Char) {
+        keyPressListeners?.forEach { it.value.accept(this, character) }
+    }
+
+    /**
+     * Invoked when the mouse is scrolled and this is focused
+     */
+    open fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
+        mouseScrollListeners?.forEach { it.value.accept(this, scrollAmount) }
     }
 
     /** Event **/
@@ -439,6 +448,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
+     * Invoked when the mouse is moved
+     */
+    @JvmOverloads
+    open fun onMouseMove(eventName: String = "Default-${mouseMoveListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+        mouseMoveListeners = mouseMoveListeners ?: hashMapOf()
+        mouseMoveListeners!![eventName] = event
+        return this
+    }
+
+    /**
      * Invoked when the mouse is pressed. This is a bubbling event.
      */
     @JvmOverloads
@@ -455,16 +474,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     open fun onMouseReleased(eventName: String = "Default-${mouseReleasedListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
         mouseReleasedListeners = mouseReleasedListeners ?: hashMapOf()
         mouseReleasedListeners!![eventName] = event
-        return this
-    }
-
-    /**
-     * Invoked when the mouse is moved
-     */
-    @JvmOverloads
-    open fun onMouseMove(eventName: String = "Default-${mouseMoveListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
-        mouseMoveListeners = mouseMoveListeners ?: hashMapOf()
-        mouseMoveListeners!![eventName] = event
         return this
     }
 
@@ -487,6 +496,13 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
         mouseLeaveListeners = mouseLeaveListeners ?: hashMapOf()
         mouseLeaveListeners!![eventName] = event
         allocateHoverListeners()
+        return this
+    }
+
+    @JvmOverloads
+    open fun onKeyPress(eventName: String = "Default-${keyPressListeners?.size ?: 0}", event: BiConsumer<UIComponent<*>, Char>): UIComponent<T> {
+        keyPressListeners = keyPressListeners ?: hashMapOf()
+        keyPressListeners!![eventName] = event
         return this
     }
 

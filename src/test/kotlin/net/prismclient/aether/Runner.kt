@@ -10,6 +10,7 @@ import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIKeyAction
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW.*
+import org.lwjgl.glfw.GLFWCharCallbackI
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
@@ -106,14 +107,28 @@ object Runner {
             core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        glfwSetKeyCallback(window) { _: Long, keyCode: Int, scanCode: Int, action: Int, _: Int ->
-            core!!.keyChanged(
-                glfwGetKeyName(keyCode, scanCode)?.get(0) ?: '\u0000', keymap[keyCode] ?: UIKey.UNKOWN, when (action) {
-                GLFW_PRESS -> UIKeyAction.PRESS
-                GLFW_RELEASE -> UIKeyAction.RELEASE
-                GLFW_REPEAT -> UIKeyAction.REPEAT
-                else -> throw IllegalStateException("Unknown action $action")
-            })
+        var ctrlHeld = false
+        var altHeld = false
+        var shiftHeld = false
+
+        glfwSetKeyCallback(window) { _: Long, keyCode: Int, _: Int, action: Int, _: Int ->
+            if (action == GLFW_PRESS) {
+                when (keyCode) {
+                    GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> ctrlHeld = true
+                    GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT -> altHeld = true
+                    GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> shiftHeld = true
+                }
+            } else if (action == GLFW_RELEASE) {
+                when (keyCode) {
+                    GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> ctrlHeld = false
+                    GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT -> altHeld = false
+                    GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> shiftHeld = false
+                }
+            }
+        }
+
+        glfwSetCharCallback(window) { window, codepoint ->
+            println(Character.toChars(codepoint))
         }
 
         glfwSetScrollCallback(window) { _: Long, _: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }
