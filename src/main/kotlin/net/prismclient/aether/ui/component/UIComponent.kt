@@ -185,6 +185,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * @see UIFocusable
      */
     var keyPressListeners: HashMap<String, BiConsumer<UIComponent<*>, Char>>? = null
+        protected set
 
     /**
      * Invoked when the mouse is scrolled. This must be focused or a parent of a component

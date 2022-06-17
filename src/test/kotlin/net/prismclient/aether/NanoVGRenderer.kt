@@ -390,7 +390,7 @@ class NanoVGRenderer : UIRenderer() {
     private val ascender = floatArrayOf(0f)
     private val descender = floatArrayOf(0f)
     private val lineHeight = floatArrayOf(0f)
-    private val bounds = floatArrayOf(0f, 0f, 0f, 0f)
+    private val bounds = floatArrayOf(0f, 0f, 0f, 0f, 0f)
 
     override fun renderString(text: String, x: Float, y: Float) {
         nvgFontBlur(ctx, 0f)
@@ -399,7 +399,7 @@ class NanoVGRenderer : UIRenderer() {
         nvgTextAlign(ctx, fontAlignment)
         nvgFillColor(ctx, color)
         nvgTextLetterSpacing(ctx, fontSpacing)
-        nvgTextBounds(ctx, x, y, text, bounds)
+        bounds[4] = nvgTextBounds(ctx, x, y, text, bounds)
         nvgText(ctx, x, y, text)
     }
 
@@ -437,6 +437,7 @@ class NanoVGRenderer : UIRenderer() {
 
         nvgTextBoxBounds(ctx, x, y, width, text, bounds)
 
+        bounds[4] = bounds[3] - bounds[0]
         // Increase the height by the split height times the rows
         bounds[2] = bounds[2] + (splitHeight * nrows)
 
@@ -466,6 +467,11 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun textBounds(): FloatArray = bounds
 
+    override fun boundsOf(text: String): FloatArray {
+        bounds[4] = nvgTextBounds(ctx, 0f, 0f, text, bounds)
+        return bounds
+    }
+
     private fun fill() {
         nvgFillColor(ctx, color)
         nvgFill(ctx)
@@ -483,6 +489,9 @@ class NanoVGRenderer : UIRenderer() {
         } else {
             fill()
         }
+    }
+
+    override fun test() {
     }
 
     companion object {

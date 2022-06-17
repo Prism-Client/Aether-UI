@@ -40,26 +40,43 @@ class TestingScreen : UIScreen {
 
             //component(PromotionComponent("This is some title of some sort o/", "Some description of some sort idk", "Click me!", "Promotion")) {}
 
-            style(UITextFieldSheet(), "textField") {
-                background(asRGBA(0, 0, 0, 0.1f), radius(8f)) {
-                    border(asRGBA(214, 214, 216), 1f) {
-                        borderDirection = UIRendererDSL.StrokeDirection.INSIDE
-                    }
-                }
+//            style(UITextFieldSheet(), "textField") {
+//                background(asRGBA(0, 0, 0, 0.1f), radius(8f)) {
+//                    border(asRGBA(214, 214, 216), 1f) {
+//                        borderDirection = UIRendererDSL.StrokeDirection.INSIDE
+//                    }
+//                }
+//                font {
+//                    align(UIAlignment.TOPLEFT)
+//                    fontFamily = "Poppins"
+//                    fontSize = 16f
+//                    isSelectable = true
+//                    selectionColor = asRGBA(0, 120, 200, 0.3f)
+//                }
+//                clipContent = false
+//            }
+
+//            component(UITextField("", "Search for anything...", UITextField.any, "textField")) {
+//                style {
+//                    control(UIAlignment.TOPRIGHT)
+//                    size(448, 39)
+//                    x -= px(30); y = px(30)
+//                }
+//            }
+
+            style(UIStyleSheet(), "label") {
+                position(100f, 100f)
                 font {
                     align(UIAlignment.TOPLEFT)
                     fontFamily = "Poppins"
-                    fontSize = 16f
+                    fontSize = 100f
+                    isSelectable = true
+                    selectionColor = asRGBA(255, 0, 0, 0.5f) //asRGBA(0, 120, 200, 0.3f)
+                    isSelectable = true
                 }
+                clipContent = false
             }
-
-            component(UITextField("", "Search for anything...", UITextField.any, "textField")) {
-                style {
-                    control(UIAlignment.TOPRIGHT)
-                    size(448, 39)
-                    x -= px(30); y = px(30)
-                }
-            }
+            label("Some text", "label")
         }
     }
 }

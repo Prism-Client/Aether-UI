@@ -454,4 +454,8 @@ abstract class UIRenderer {
      * array of 4 with the x, y, x + w, and y + h representing the text bounds.
      */
     abstract fun textBounds(): FloatArray
+
+    abstract fun boundsOf(text: String): FloatArray
+
+    abstract fun test()
 }

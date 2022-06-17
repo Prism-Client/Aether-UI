@@ -75,7 +75,6 @@ open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
             current?.backgroundColor ?: cachedColor!!,
             progress
         )
-//        println("Progress: $progress, Alpha: ${backgroundColor.getAlpha()}")
         radius?.animate(previous?.radius, current?.radius, progress, component)
         border?.animate(previous?.border, current?.border, progress, component)
     }

@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.renderer.impl.font
 
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
@@ -51,7 +52,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * special name, use [overwriteFontName] to set it to that font name.
      */
     var fontName: String = UIDefaults.instance.fontName
-        private set
+        protected set
 
     /**
      * Specifies if the style is Normal or Italic
@@ -109,6 +110,18 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     var appendedString: String? = null
 
     /**
+     * Instructs Aether that this is a selectable font. Selectable fonts are highlighted
+     * when the mouse clicks and drags over the font. It also allows for functions such
+     * as copying the text.
+     */
+    var isSelectable = false
+
+    /**
+     * The color of the selection if [isSelectable]
+     */
+    var selectionColor = 0
+
+    /**
      * The amount of lines in the text. 1 by default if it is a single line render type
      *
      * @see fontRenderType
@@ -129,22 +142,38 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         protected set
 
     /**
+     * For this to be true, [isSelectable] must be true, and the mouse has to select this text
+     *
+     * @see isSelectable
+     */
+    var selected = false
+
+    /**
+     * The holder of the current position of the caret/cursor and the ending selection position (if applicable).
+     * This is null if [isSelectable] is false
+     */
+    var position: Positions? = null
+
+    /**
      * If true, fontName will not update automatically. It will only update when [overwriteFontName] is called
      *
      * @see overwriteFontName
      */
     var isOverridden = false
-        private set
+        protected set
 
     /**
      * If true, the font will not be updated. Used internally to avoid recursive calls
      */
-    private var ignore = false
+    protected var ignore = false
 
     var cachedLineBreakWidth: Float = 0f
-        private set
+        protected set
     var cachedLineHeight: Float = 0f
-        private set
+        protected set
+
+    var cachedString: String = ""
+        protected set
 
     open fun align(alignment: UIAlignment) {
         x ?: run { x = px(0) }
@@ -155,8 +184,37 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     override fun update(component: UIComponent<*>?) {
         if (ignore) return
         super.update(component)
-        cachedLineBreakWidth = calculate(lineBreakWidth, component?.parent, component?.parent?.width ?: 0f, component?.parent?.height ?: 0f, false)
-        cachedLineHeight = calculate(lineHeight, component?.parent, component?.parent?.width ?: 0f, component?.parent?.height ?: 0f, true)
+        cachedLineBreakWidth = calculate(lineBreakWidth, component?.parent, component?.parent?.width
+                ?: 0f, component?.parent?.height ?: 0f, false)
+        cachedLineHeight = calculate(lineHeight, component?.parent, component?.parent?.width
+                ?: 0f, component?.parent?.height ?: 0f, true)
+
+        // Selection handling
+        if (isSelectable) {
+            // Allocate
+            position = Positions(false, 0, 0)
+            // Add a mouse listener to the component
+            component!!.onMousePressed("UIFontSelectionListener") {
+                updateCaretPosition(getClosestTextIndex(it.getMouseX(), it.getMouseY()))
+                selected = true
+            }
+            component.onMouseMove("UIFontMoveListener") {
+                if (selected) {
+                    select(position!!.caretPosition, getClosestTextIndex(it.getMouseX(), it.getMouseY()))
+                }
+            }
+            UICore.onMousePressed("$this-DeselectionListener") {
+                deselect()
+            }
+            UICore.onMouseReleased("$this-DeselectionListener") {
+                selected = false
+            }
+        } else {
+            // Deallocate and remove the listener if it is not selectable
+            position = null
+            component!!.mousePressedListeners?.remove("UIFontSelectionListener")
+            UICore.mousePressedListeners?.remove("$this-DeselectionListener") // TODO: Delete when GC
+        }
 
         if (component is UILabel) {
             render(component.text)
@@ -183,6 +241,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
 
     open fun render(text: String) {
         lineCount = 1
+        cachedString = text
         renderer {
             font(this@UIFont)
             when (fontRenderType) {
@@ -198,6 +257,15 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
 
             textWidth = (x() + width()) - cachedX + (cachedX - component!!.x)
             textHeight = (y() + height()) - cachedY + (cachedY - component!!.y)
+        }
+//        select(0, 9)
+        renderSelection()
+    }
+
+    open fun renderSelection() {
+        renderer {
+            color(selectionColor)
+            rect(cachedX + cachedString.indexOffset(position!!.caretPosition), cachedY, cachedString.indexOffset(position!!.selectionPosition) - cachedString.indexOffset(position!!.caretPosition), fontSize)
         }
     }
 
@@ -226,6 +294,68 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     }
 
     /**
+     * Invoked when the caret position or selection has been changed.
+     */
+    open fun updateSelection() {
+        // TODO: Selection handling
+    }
+
+    /**
+     * Changes the caret position to [index]. This does nothing if this is not [isSelectable]
+     */
+    open fun updateCaretPosition(index: Int) {
+        if (position != null) {
+            position!!.caretPosition = index
+            position!!.selectionPosition = index
+        }
+    }
+
+    /**
+     * Selects the text with the [startingIndex] as the caret position and the [endingIndex]
+     * as the place to select. Does nothing if this is not [isSelectable].
+     */
+    open fun select(startingIndex: Int, endingIndex: Int) {
+        if (position != null) {
+            position!!.caretPosition = startingIndex
+            position!!.selectionPosition = endingIndex
+            selected = true
+        }
+    }
+
+    /**
+     * Deselects the text. It does nothing if this is not [isSelectable].
+     */
+    open fun deselect() {
+        if (position != null) {
+            position!!.selectionPosition = position!!.caretPosition
+            selected = false
+        }
+    }
+
+    /**
+     * Returns the closest index of text relative to the [mouseX] and [mouseY]
+     */
+    open fun getClosestTextIndex(mouseX: Float, mouseY: Float): Int {
+        renderer {
+            // TODO: Multiline support
+            if (mouseY >= cachedX && mouseY <= cachedX + fontSize) {
+                var w = cachedX
+                var previous = 0f
+                for (i in cachedString.indices) {
+                    val width = boundsOf(cachedString[i].toString())[4] / 2f
+                    if (mouseX >= w && mouseX <= w + width + previous) return i
+                    w += width + previous
+                    previous = width
+
+                    // Ending of the last character
+                    if (i >= cachedString.length - 1 && mouseX >= w && mouseX <= w + width + previous) return i + 1
+                }
+            }
+        }
+        return 0
+    }
+
+    /**
      * Updates [fontName] based on the [fontStyle], [fontType] and [fontFamily]
      */
     protected open fun updateFontName() {
@@ -250,13 +380,14 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         // fontSpacing
         // lineBreakWidth
         // lineHeight
-        fontColor = transition(current?.fontColor ?: fontCache!!.fontColor, previous?.fontColor ?: fontCache!!.fontColor, progress)
-        fontSize = fromProgress(previous?.fontSize ?: fontCache!!.fontSize, current?.fontSize ?: fontCache!!.fontSize, progress)
+        fontColor = transition(current?.fontColor ?: fontCache!!.fontColor, previous?.fontColor
+                ?: fontCache!!.fontColor, progress)
+        fontSize = fromProgress(previous?.fontSize ?: fontCache!!.fontSize, current?.fontSize
+                ?: fontCache!!.fontSize, progress)
     }
 
     override fun saveState(component: UIComponent<*>, keyframe: UIFont?, retain: Boolean) {
-        if (fontCache == null)
-            throw RuntimeException("WTF")
+        if (fontCache == null) throw RuntimeException("WTF")
         //TODO("Not yet implemented")
         if (retain) {
             fontColor = keyframe?.fontColor ?: fontCache!!.fontColor
@@ -308,8 +439,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * @since 5/15/2022
      */
     enum class FontStyle {
-        Normal,
-        Italic
+        Normal, Italic
     }
 
     /**
@@ -319,12 +449,18 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * @since 5/15/2022
      */
     enum class FontType {
-        Regular,
-        Black,
-        Bold,
-        Light,
-        Thin
+        Regular, Black, Bold, Light, Thin
     }
+
+    /**
+     * [Positions] is automatically allocated when the property [isSelectable] is true. It describes
+     * the position which the caret is at; the position where the mouse clicked relative to the font. It
+     * also holds the ending point if a selection in the font is active.
+     *
+     * @author sen
+     * @since 6/15/2022
+     */
+    class Positions(var selected: Boolean, var caretPosition: Int, var selectionPosition: Int)
 
     override fun copy(): UIFont = UIFont().also {
         it.apply(this)
@@ -341,8 +477,10 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         it.lineBreakWidth = lineBreakWidth
         it.lineHeight = lineHeight
         it.appendedString = appendedString
-        if (isOverridden)
-            it.overwriteFontName(fontName)
+        it.isSelectable = isSelectable
+        it.selectionColor = selectionColor
+
+        if (isOverridden) it.overwriteFontName(fontName)
     }
 
     protected inner class FontCache(var fontColor: Int, var fontSize: Float, var fontSpacing: Float, var lineBreakWidth: UIUnit?, var lineHeight: UIUnit?)

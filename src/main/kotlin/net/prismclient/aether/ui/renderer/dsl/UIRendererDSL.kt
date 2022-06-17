@@ -196,7 +196,7 @@ object UIRendererDSL {
     fun String.width(): Float {
         val previous = color
         renderer.color(0)
-        this.render(0f, 0f)
+        (if (this[this.length - 1] == ' ') "$this " else this).render(0f, 0f)
         renderer.color(previous)
         return renderer.stringWidth()
     }
@@ -212,11 +212,25 @@ object UIRendererDSL {
         return renderer.stringHeight()
     }
 
+    /**
+     * Returns the x offset of the given string base on the index
+     */
+    fun String.indexOffset(index: Int): Float {
+        var w = 0f
+        if (index > this.length - 1)
+            return boundsOf(this)[4]
+        for (i in 0 until index)
+            w += boundsOf(this[i].toString())[4]
+        return w
+    }
+
     fun ascender() = renderer.stringAscender()
 
     fun descender() = renderer.stringDescender()
 
     fun bounds() = renderer.textBounds()
+
+    fun boundsOf(text: String) = renderer.boundsOf(text)
 
     fun loadFont(name: String, fileLocation: String) = loadFont(name, fileLocation.toByteBuffer())
 

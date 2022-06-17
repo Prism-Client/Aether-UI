@@ -81,12 +81,6 @@ object Runner {
             throw RuntimeException()
         }
 
-        glfwSetKeyCallback(window) { _: Long, keyCode: Int, _: Int, action: Int, _: Int ->
-            if (keyCode == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-                UICore.displayScreen(ExampleScreen())
-            }
-        }
-
         glfwSetMouseButtonCallback(window) { _: Long, button: Int, action: Int, _: Int ->
             core!!.mouseChanged(button, action == GLFW_RELEASE)
         }
@@ -111,24 +105,28 @@ object Runner {
         var altHeld = false
         var shiftHeld = false
 
-        glfwSetKeyCallback(window) { _: Long, keyCode: Int, _: Int, action: Int, _: Int ->
-            if (action == GLFW_PRESS) {
-                when (keyCode) {
-                    GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> ctrlHeld = true
-                    GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT -> altHeld = true
-                    GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> shiftHeld = true
-                }
-            } else if (action == GLFW_RELEASE) {
-                when (keyCode) {
-                    GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> ctrlHeld = false
-                    GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT -> altHeld = false
-                    GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> shiftHeld = false
-                }
+        glfwSetKeyCallback(window) { _: Long, keyCode: Int, scanCode: Int, action: Int, _: Int ->
+            // Check if the key is null
+            if (glfwGetKeyName(keyCode, scanCode) == null) {
+
             }
+//            if (action == GLFW_PRESS) {
+//                when (keyCode) {
+//                    GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> ctrlHeld = true
+//                    GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT -> altHeld = true
+//                    GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> shiftHeld = true
+//                }
+//            } else if (action == GLFW_RELEASE) {
+//                when (keyCode) {
+//                    GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> ctrlHeld = false
+//                    GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT -> altHeld = false
+//                    GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> shiftHeld = false
+//                }
+//            }
         }
 
         glfwSetCharCallback(window) { window, codepoint ->
-            println(Character.toChars(codepoint))
+            UICore.instance.keyPressed(Character.toChars(codepoint)[0])
         }
 
         glfwSetScrollCallback(window) { _: Long, _: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }

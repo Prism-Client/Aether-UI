@@ -229,6 +229,8 @@ open class UICore(val renderer: UIRenderer) {
      * such as the width and height of the window.
      */
     companion object Properties {
+        @JvmStatic var debug: Boolean = true
+
         @JvmStatic
         lateinit var instance: UICore
             protected set
