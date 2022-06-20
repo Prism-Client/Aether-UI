@@ -42,6 +42,11 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
 open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     var name: String = ""
 
+    /**
+     * When true, the property will not be cleared when the screen is closed
+     */
+    var immutable: Boolean = false
+
     open var x: UIUnit? = null
     open var y: UIUnit? = null
     open var width: UIUnit? = null

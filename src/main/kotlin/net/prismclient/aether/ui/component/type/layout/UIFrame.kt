@@ -135,6 +135,10 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
         }
     }
 
+    override fun deallocate() {
+        components.forEach { it.deallocate() }
+    }
+
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)
         components.forEach { it.mouseReleased(mouseX + relX, mouseY + relY) }

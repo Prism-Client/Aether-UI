@@ -229,6 +229,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
+     * Invoked when the component is deleted because of the screen being closed. Any listeners attached to this
+     * are automatically removed. However, listeners that have been added to UICore must be deleted.
+     */
+    open fun deallocate() {}
+
+    /**
      * [update] is invoked when the component is created, and when the display
      * has been changed (resized). The component properties such as the position
      * and size should be calculated within these bounds.
@@ -522,7 +528,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Shorthand for loading animations for when the mouse hovers over the component
      */
-    fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<*> {
+    open  fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<*> {
         this.hoverAnimation = hoverAnimation
         this.leaveAnimation = leaveAnimation
         allocateHoverListeners()
@@ -532,7 +538,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Adds the hover listeners if necessary
      */
-    protected fun allocateHoverListeners() {
+    protected open fun allocateHoverListeners() {
         if (mouseEnteredListeners == null) {
             onMouseEnter {
                 UIProvider.dispatchAnimation(it.hoverAnimation, this)
@@ -549,48 +555,48 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Returns the x position of the parent with consideration f it being a [UIFrame]
      */
-    fun getParentX() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
+    open fun getParentX() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
 
     /**
      * Returns the y position of the parent with consideration of it being a [UIFrame]
      */
-    fun getParentY() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
+    open fun getParentY() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
 
     /**
      * Returns the width of the component or the window if there is no parent
      */
-    fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
+    open fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
 
     /**
      * Returns the height of the parent or the window if there is no parent
      */
-    fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
+    open fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
 
     /**
      * Returns true if the mouse is inside the [relX], [relY], [relWidth], and [relHeight]
      */
-    fun isMouseInside() = (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
+    open fun isMouseInside() = (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
 
     /**
      * Propagates through this, and up to check if the mouse is inside.
      * Returns true if the mouse is inside all the components that nest this.
      */
-    fun isMouseInsideBounds(): Boolean = if (parent != null && parent!!.style.clipContent && !parent!!.isMouseInsideBounds()) false else isMouseInside()
+    open fun isMouseInsideBounds(): Boolean = if (parent != null && parent!!.style.clipContent && !parent!!.isMouseInsideBounds()) false else isMouseInside()
 
     /**
      * Returns the x position of the mouse with consideration to the parent
      */
-    fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
+    open fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
 
     /**
      * Returns the y position of the mouse with consideration to the parent
      */
-    fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
+    open fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
 
     /**
      * Returns the offset of the parent on the x-axis. It incorporates for [UIFrame] and [UIContainer] scroll offsets.
      */
-    fun getParentXOffset(): Float {
+    open fun getParentXOffset(): Float {
         if (parent == null) return 0f
 
         return if (parent is UIFrame) {
@@ -606,7 +612,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Returns the offset of the parent on the y-axis. It incorporates for [UIFrame] and [UIContainer] scrolling offsets
      */
-    fun getParentYOffset(): Float {
+    open fun getParentYOffset(): Float {
         if (parent == null) return 0f
 
         return if (parent is UIFrame) {
@@ -622,27 +628,27 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Shorthand for calculating the x or width of this component
      */
-    protected operator fun UIUnit?.unaryPlus() = computeUnit(this, false)
+    protected operator open fun UIUnit?.unaryPlus() = computeUnit(this, false)
 
     /**
      * Shorthand for calculation the y or height of this component
      */
-    protected operator fun UIUnit?.unaryMinus() = computeUnit(this, true)
+    protected operator open fun UIUnit?.unaryMinus() = computeUnit(this, true)
 
     /**
      * Returns the computed version of the given unit based on this and the parent of this
      */
-    fun computeUnit(unit: UIUnit?, isY: Boolean) = calculate(unit, this, getParentWidth(), getParentHeight(), isY)
+    open fun computeUnit(unit: UIUnit?, isY: Boolean) = calculate(unit, this, getParentWidth(), getParentHeight(), isY)
 
     /**
      * Returns true if this is an instance of [UIFocusable] and is focused
      */
-    fun isFocused() = if (this is UIFocusable<*>) UICore.focusedComponent == this else false
+    open fun isFocused() = if (this is UIFocusable<*>) UICore.focusedComponent == this else false
 
     /**
      * Focuses this component if applicable
      */
-    fun focus() {
+    open fun focus() {
         if (this is UIFocusable<*>) {
             UICore.focus(this)
             focusListeners?.forEach { it.value.accept(this, true) }
@@ -652,7 +658,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Removes the focus from this component
      */
-    fun defocus() {
+    open fun defocus() {
         UICore.defocus()
         focusListeners?.forEach { it.value.accept(this, false) }
     }

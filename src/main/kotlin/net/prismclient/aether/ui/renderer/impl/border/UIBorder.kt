@@ -18,7 +18,7 @@ import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 class UIBorder : UIShape(), UIAnimatable<UIBorder> {
     var borderWidth = 0f
     var borderColor = 0
-    var borderDirection: UIRendererDSL.StrokeDirection = UIRendererDSL.StrokeDirection.OUTSIDE
+    var borderDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE
 
     fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
         renderer {

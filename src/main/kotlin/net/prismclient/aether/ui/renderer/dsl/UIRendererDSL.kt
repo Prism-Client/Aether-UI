@@ -11,6 +11,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer.Properties.REPEATY
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.render
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.width
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
@@ -29,26 +30,40 @@ import java.nio.ByteBuffer
  * @since 1.0
  */
 object UIRendererDSL {
+    @JvmStatic
     lateinit var renderer: UIRenderer
 
+    @JvmStatic
     private var color = 0
+    @JvmStatic
     private var alpha = 0
 
+    @JvmStatic
     private var fontFace = ""
+    @JvmStatic
     private var fontSize = 0f
+    @JvmStatic
     private var fontAlignment = 0
+    @JvmStatic
     private var fontSpacing = 0f
 
     private var stroke = false
+    @JvmStatic
     private var strokeWidth = 0f
-    private var strokeDirection = StrokeDirection.OUTSIDE
+    @JvmStatic
+    private var strokeDirection = UIStrokeDirection.OUTSIDE
+    @JvmStatic
     private var pos = 0f
+    @JvmStatic
     private var siz = 0f
+    @JvmStatic
     private var halfsw = 0f
 
     /** General **/
+    @JvmStatic
     fun beginFrame(width: Float, height: Float, pxRatio: Float) = renderer.beginFrame(width, height, pxRatio)
 
+    @JvmStatic
     fun endFrame() = renderer.endFrame()
 
     /** Color **/
@@ -56,6 +71,7 @@ object UIRendererDSL {
     /**
      * Sets the color to the given RGBA int
      */
+    @JvmStatic
     fun color(rgba: Int) {
         color = rgba
         renderer.color(color)
@@ -64,12 +80,14 @@ object UIRendererDSL {
     /**
      * Sets the color to the given RGBA values with all ints except the alpha as a float
      */
+    @JvmStatic
     fun color(r: Int, g: Int, b: Int, a: Float = 1f) = color(asRGBA(r, g, b, a))
 
     /**
      * Sets the color to the given RGBA with all ints
      */
     @JvmOverloads
+    @JvmStatic
     fun color(r: Int, g: Int, b: Int, a: Int = 255) = color(asRGBA(r, g, b, a))
 
     @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
@@ -79,6 +97,7 @@ object UIRendererDSL {
     /**
      * Sets the active font context to the provided [font]
      */
+    @JvmStatic
     fun font(font: UIFont) {
         color(font.fontColor)
         font(font.fontName, font.fontSize, font.textAlignment, font.fontSpacing)
@@ -87,6 +106,7 @@ object UIRendererDSL {
     /**
      * Sets the active font context to the provided values. To set the color use [color]
      */
+    @JvmStatic
     fun font(fontFace: String, fontSize: Float, fontAlignment: Int, fontSpacing: Float) {
         UIRendererDSL.fontFace = fontFace
         UIRendererDSL.fontSize = fontSize
@@ -100,11 +120,13 @@ object UIRendererDSL {
      *
      * @see font
      */
+    @JvmStatic
     fun String.render(x: Float, y: Float) = renderer.renderString(this, x, y)
 
     /**
      * Renders the string within the given alignment based on the plot.
      */
+    @JvmStatic
     fun String.render(alignment: UIAlignment, x: Float, y: Float, width: Float, height: Float) {
         val alignedX: Float = when (alignment) {
             UIAlignment.TOPCENTER, UIAlignment.CENTER, UIAlignment.BOTTOMCENTER -> width / 2f
@@ -123,6 +145,7 @@ object UIRendererDSL {
     /**
      * Renders a string with a line break when the length of the string exceeds the width cap
      */
+    @JvmStatic
     fun String.render(x: Float, y: Float, width: Float, splitHeight: Float) =
         renderer.wrapString(this, x, y, width, splitHeight)
 
@@ -137,6 +160,7 @@ object UIRendererDSL {
      * @param ignoreLastSpace If true, the last space (if applicable) is omitted.
      * @return The width of the rendered string
      */
+    @JvmStatic
     @JvmOverloads
     fun String.render(
         x: Float,
@@ -173,26 +197,31 @@ object UIRendererDSL {
     /**
      * Returns the x position of the most recently rendered string with relations to (0, 0)
      */
+    @JvmStatic
     fun x(): Float = renderer.stringX()
 
     /**
      * Returns the y position of the most recently rendered string with relations to (0, 0)
      */
+    @JvmStatic
     fun y(): Float = renderer.stringY()
 
     /**
      * Returns the width of the most recently rendered string
      */
+    @JvmStatic
     fun width(): Float = renderer.stringWidth()
 
     /**
      * Returns the height of the most recently rendered string
      */
+    @JvmStatic
     fun height(): Float = renderer.stringHeight()
 
     /**
      * Returns the width of the given string based on the most recently set font
      */
+    @JvmStatic
     fun String.width(): Float {
         val previous = color
         renderer.color(0)
@@ -204,6 +233,7 @@ object UIRendererDSL {
     /**
      * Returns the height of the given string based on the most recently set font
      */
+    @JvmStatic
     fun String.height(): Float {
         val previous = color
         renderer.color(0)
@@ -215,6 +245,7 @@ object UIRendererDSL {
     /**
      * Returns the x offset of the given string base on the index
      */
+    @JvmStatic
     fun String.indexOffset(index: Int): Float {
         var w = 0f
         if (index > this.length - 1)
@@ -224,25 +255,34 @@ object UIRendererDSL {
         return w
     }
 
+    @JvmStatic
     fun ascender() = renderer.stringAscender()
 
+    @JvmStatic
     fun descender() = renderer.stringDescender()
 
+    @JvmStatic
     fun bounds() = renderer.textBounds()
 
+    @JvmStatic
     fun boundsOf(text: String) = renderer.boundsOf(text)
 
+    @JvmStatic
     fun loadFont(name: String, fileLocation: String) = loadFont(name, fileLocation.toByteBuffer())
 
+    @JvmStatic
     fun loadFont(name: String, buffer: ByteBuffer) = renderer.loadFont(name, buffer)
 
+    @JvmStatic
     operator fun UIFont.unaryPlus() = font(this)
 
     /** Image **/
+    @JvmStatic
     @JvmOverloads
     fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) =
         renderImage(imageName, x, y, width, height, radius, radius, radius, radius)
 
+    @JvmStatic
     fun renderImage(
         imageName: String,
         x: Float,
@@ -258,19 +298,23 @@ object UIRendererDSL {
     // TODO: Maybe something like loadAll(type: String, fileLocation: String)
     // loadAll("svg", "/aether/svgs/")
 
+    @JvmStatic
     fun loadImage(name: String, fileLocation: String, flags: Int = MIPMAP or REPEATX or REPEATY) =
         loadImage(name, fileLocation.toByteBuffer(), flags)
 
+    @JvmStatic
     fun loadImage(name: String, buffer: ByteBuffer, flags: Int): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
         return renderer.loadImage(name, image, flags)
     }
 
+    @JvmStatic
     @JvmOverloads
     fun loadSvg(name: String, fileLocation: String, scale: Float =UICore.devicePxRatio) =
         loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale)
 
+    @JvmStatic
     fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = UICore.devicePxRatio): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
@@ -278,6 +322,7 @@ object UIRendererDSL {
     }
 
     /** Asset Loading **/
+    @JvmStatic
     @JvmOverloads
     fun loadAsset(
         name: String,
@@ -295,6 +340,7 @@ object UIRendererDSL {
     /**
      * Loads an image or svg from the provided file location.
      */
+    @JvmStatic
     fun assumeLoadImage(name: String, fileLocation: String): UIImageData =
         when (FilenameUtils.getExtension(fileLocation)) {
             "png", "jpeg" -> loadImage(name, fileLocation)
@@ -309,15 +355,18 @@ object UIRendererDSL {
         }
 
     /** Shapes **/
+    @JvmStatic
     @JvmOverloads
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) =
         rect(x, y, width, height, radius, radius, radius, radius)
 
+    @JvmStatic
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(
         x, y, width, height, radius?.topLeft
             ?: 0f, radius?.topRight ?: 0f, radius?.bottomRight ?: 0f, radius?.bottomRight ?: 0f
     )
 
+    @JvmStatic
     fun rect(
         x: Float,
         y: Float,
@@ -341,33 +390,46 @@ object UIRendererDSL {
     /**
      * Must be placed inside a [line] block
      */
+    @JvmStatic
     fun line(x: Float, y: Float) = renderer.line(x, y)
 
+    @JvmStatic
     fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) = renderer.bezier(x, y, x1, y1, x2, y2)
 
+    @JvmStatic
     fun ellipse(x: Float, y: Float, width: Float, height: Float) = renderer.ellipse(x, y, width - pos, height - pos)
 
+    @JvmStatic
     fun circle(x: Float, y: Float, radius: Float) = renderer.circle(x, y, radius - pos)
 
+    @JvmStatic
     fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) =
         renderer.triangle(x, y, x1, y1, x2, y2)
 
     /** Transformations and DSL blocks **/
+    @JvmStatic
     fun save() = renderer.save()
 
+    @JvmStatic
     fun restore() = renderer.restore()
 
+    @JvmStatic
     fun translate(x: Float, y: Float) = renderer.translate(x, y)
 
+    @JvmStatic
     fun scale(x: Float, y: Float) = renderer.scale(x, y)
 
+    @JvmStatic
     fun rotate(angle: Float) = renderer.rotate(angle)
 
+    @JvmStatic
     fun rotate(degree: Double) = renderer.rotate(degree)
 
+    @JvmStatic
     fun scissor(x: Float, y: Float, width: Float, height: Float) = renderer.scissor(x, y, width, height)
 
-    fun stroke(strokeWidth: Float, strokeDirection: StrokeDirection) {
+    @JvmStatic
+    fun stroke(strokeWidth: Float, strokeDirection: UIStrokeDirection) {
         stroke = true
         UIRendererDSL.strokeWidth = strokeWidth
         UIRendererDSL.strokeDirection = strokeDirection
@@ -375,17 +437,18 @@ object UIRendererDSL {
         halfsw = if (halfsw < 0.1f) 0f else halfsw
         // Calculate the stroke direction
         pos = when (UIRendererDSL.strokeDirection) {
-            StrokeDirection.INSIDE -> UIRendererDSL.strokeWidth / 2f
-            StrokeDirection.OUTSIDE -> 0f - (UIRendererDSL.strokeWidth / 2f)
-            StrokeDirection.CENTER -> 0f
+            UIStrokeDirection.INSIDE -> UIRendererDSL.strokeWidth / 2f
+            UIStrokeDirection.OUTSIDE -> 0f - (UIRendererDSL.strokeWidth / 2f)
+            UIStrokeDirection.CENTER -> 0f
         }
         siz = when (UIRendererDSL.strokeDirection) {
-            StrokeDirection.INSIDE -> -UIRendererDSL.strokeWidth
-            StrokeDirection.OUTSIDE -> UIRendererDSL.strokeWidth
-            StrokeDirection.CENTER -> 0f
+            UIStrokeDirection.INSIDE -> -UIRendererDSL.strokeWidth
+            UIStrokeDirection.OUTSIDE -> UIRendererDSL.strokeWidth
+            UIStrokeDirection.CENTER -> 0f
         }
     }
 
+    @JvmStatic
     fun finishStroke() {
         stroke = false
         pos = 0f
@@ -394,6 +457,7 @@ object UIRendererDSL {
         halfsw = 0f
     }
 
+    @JvmStatic
     inline fun translate(x: Float, y: Float, block: UIRendererDSL.() -> Unit) {
         save()
         translate(x, y)
@@ -401,6 +465,7 @@ object UIRendererDSL {
         restore()
     }
 
+    @JvmStatic
     inline fun scale(x: Float, y: Float, block: UIRendererDSL.() -> Unit) {
         save()
         scale(x, y)
@@ -408,6 +473,7 @@ object UIRendererDSL {
         restore()
     }
 
+    @JvmStatic
     inline fun rotate(angle: Float, block: UIRendererDSL.() -> Unit) {
         save()
         rotate(angle)
@@ -415,6 +481,7 @@ object UIRendererDSL {
         restore()
     }
 
+    @JvmStatic
     inline fun rotate(angle: Double, block: UIRendererDSL.() -> Unit) {
         save()
         rotate(angle)
@@ -422,6 +489,7 @@ object UIRendererDSL {
         restore()
     }
 
+    @JvmStatic
     inline fun scissor(x: Float, y: Float, width: Float, height: Float, block: UIRendererDSL.() -> Unit) {
         save()
         scissor(x, y, width, height)
@@ -429,10 +497,11 @@ object UIRendererDSL {
         restore()
     }
 
+    @JvmStatic
     inline fun stroke(
         strokeColor: Int,
         strokeWidth: Float,
-        strokeDirection: StrokeDirection = StrokeDirection.OUTSIDE,
+        strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE,
         block: UIRendererDSL.() -> Unit
     ) {
         renderer.stroke(strokeWidth, strokeColor)
@@ -442,6 +511,7 @@ object UIRendererDSL {
         renderer.finishStroke()
     }
 
+    @JvmStatic
     inline fun renderContent(fbo: UIContentFBO, block: UIRendererDSL.() -> Unit) {
         renderer.bindContentFBO(fbo)
         renderer.beginFrame(fbo.scaledWidth, fbo.scaledHeight, fbo.contentScale)
@@ -456,18 +526,10 @@ object UIRendererDSL {
      * @param lineCap Accepts BUTT, ROUND, SQUARE
      * @param lineJoin Accepts MITER, ROUND, BEVEL
      */
+    @JvmStatic
     inline fun line(x: Float, y: Float, lineCap: Int = BUTT, lineJoin: Int = MITER, lineWidth: Float = 1f, block: UIRendererDSL.() -> Unit) {
         renderer.startLine(x, y, lineCap, lineJoin, lineWidth)
         this.block()
         renderer.finishLine()
-    }
-
-    /**
-     * Instructs the renderer how to render the stroke. When center, the stroke is
-     * centered to the outline of the given shape. Outside, is the outside of the shape
-     * , and inside is the inside of the shape.
-     */
-    enum class StrokeDirection {
-        CENTER, OUTSIDE, INSIDE
     }
 }

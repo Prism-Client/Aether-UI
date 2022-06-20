@@ -24,10 +24,11 @@ import kotlin.collections.HashMap
 
 /**
  * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
- * of the library. Most functions within this class should be invoked to properly render
- * and handle input. See the docs for more information. The components and frames are stored
- * here, and not in a screen. Most input is also handled here, such as bubbling and scroll
- * calculations.
+ * of the library. It controls and manages what to do with input and rendering. It holds
+ * what would be the equivalent of the components within a UIScreen. Most functions within
+ * this class should be invoked to properly render and handle input. See the docs for more
+ * information. The components and frames are stored here, and not in a screen. Most input
+ * is also handled here, such as bubbling and scroll calculations.
  *
  * The companion class, [Properties], stores the general―properties―such as the size of
  * the window (provided by the implementation), and the position of the mouse. There are
@@ -212,8 +213,6 @@ open class UICore(val renderer: UIRenderer) {
         (focusedComponent as? UIComponent<*>)?.keyPressed(character)
     }
 
-    // getActiveModifierKeys
-
     /**
      * Invoked when the mouse wheel is scrolled. Invokes all components regardless
      * of their eligibility to be focused or bubbled.
@@ -226,7 +225,8 @@ open class UICore(val renderer: UIRenderer) {
 
     /**
      * The companion object of [UICore]. It contains properties useful to components
-     * such as the width and height of the window.
+     * such as the width and height of the window. It also has utility functions such
+     * as de-focusing the focused component and adding listeners to input.
      */
     companion object Properties {
         @JvmStatic var debug: Boolean = true
@@ -328,6 +328,18 @@ open class UICore(val renderer: UIRenderer) {
         var mouseScrollListeners: HashMap<String, Consumer<Float>>? = null
             protected set
 
+        /**
+         * Invoked when the screen is deleted. This is used to deallocate listeners added to UICore.
+         */
+        @JvmStatic
+        var deallocationListeners: HashMap<String, Runnable>? = null
+            protected set
+
+        /**
+         * The list of modifier keys. The value is if the key is pressed
+         *
+         * @see UIModifierKey
+         */
         @JvmStatic
         var modifierKeys: EnumMap<UIModifierKey, Boolean> = EnumMap(UIModifierKey::class.java)
 
@@ -337,7 +349,7 @@ open class UICore(val renderer: UIRenderer) {
         init {
             // Populate the modifier keys
             UIModifierKey.values().forEach {
-                modifierKeys[it] = false
+                modifierKeys[it] = true
             }
         }
 
@@ -426,12 +438,17 @@ open class UICore(val renderer: UIRenderer) {
             mouseScrollListeners!![eventName] = event
         }
 
+        @JvmStatic
+        fun onDeallocation(eventName: String, event: Runnable) {
+            deallocationListeners = deallocationListeners ?: hashMapOf()
+            deallocationListeners!![eventName] = event
+        }
+
         /**
          * Adds an event listener to [modifierKeyListeners] which is invoked when a modifier key is enabled / disabled
          */
         @JvmStatic
-        @JvmOverloads
-        fun onModifierKeyChange(name: String = "Default-${modifierKeyListeners.size}", event: BiConsumer<UIModifierKey, Boolean>) {
+        fun onModifierKeyChange(name: String, event: BiConsumer<UIModifierKey, Boolean>) {
             modifierKeyListeners[name] = event
         }
 
@@ -440,6 +457,9 @@ open class UICore(val renderer: UIRenderer) {
          */
         @JvmStatic
         fun displayScreen(screen: UIScreen) {
+            if (activeScreen != null)
+                deallocateComponents()
+
             activeScreen = screen
             instance.components = ArrayList()
             instance.frames = ArrayList()
@@ -517,6 +537,17 @@ open class UICore(val renderer: UIRenderer) {
             // If a container was found, then focus it
             if (component != null)
                 component!!.focus()
+        }
+
+        /**
+         * Invoked when the screen is changed and there was an existing one.
+         *
+         * @throws NullPointerException If the components list of this is null
+         */
+        fun deallocateComponents() {
+            instance.components!!.forEach { it.deallocate() }
+            deallocationListeners?.forEach { it.value.run() }
+            deallocationListeners?.clear()
         }
     }
 }

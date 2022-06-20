@@ -20,7 +20,7 @@ enum class UIModifierKey {
     ARROW_DOWN,
     TAB,
     ESCAPE,
-    CAPSLOCK,
+    CAPS_LOCK,
     BACKSPACE,
     ENTER,
 }

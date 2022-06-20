@@ -11,7 +11,10 @@ import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.input.UIModifierKey
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
+import java.lang.Integer.max
+import java.lang.Integer.min
 
 /**
  * [UIFont] controls the rendering of text on string. It is a default part
@@ -130,23 +133,21 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         protected set
 
     /**
-     * The width of the text
-     */
-    var textWidth = 0f
-        protected set
-
-    /**
-     * The height of the text
-     */
-    var textHeight = 0f
-        protected set
-
-    /**
-     * For this to be true, [isSelectable] must be true, and the mouse has to select this text
+     * The bounds of the most recently rendered text. It represents the x, y
+     * and the ending x, y positions of the text. The fifth value represents
+     * the next position that the text would be rendered at.
      *
-     * @see isSelectable
+     * @see UIRenderer.textBounds
+     */
+    var textBounds: FloatArray = floatArrayOf(0f, 0f, 0f, 0f, 0f)
+
+    /**
+     * When true, the text is actively selected.
+     *
+     * @see isSelectable Must be true.
      */
     var selected = false
+        protected set
 
     /**
      * The holder of the current position of the caret/cursor and the ending selection position (if applicable).
@@ -163,7 +164,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         protected set
 
     /**
-     * If true, the font will not be updated. Used internally to avoid recursive calls
+     * If true, the font will not be updated. Used internally to avoid recursive calls.
      */
     protected var ignore = false
 
@@ -172,8 +173,9 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     var cachedLineHeight: Float = 0f
         protected set
 
-    var cachedString: String = ""
+    var cachedText: String = ""
         protected set
+    protected var isShiftHeld = false
 
     open fun align(alignment: UIAlignment) {
         x ?: run { x = px(0) }
@@ -184,45 +186,70 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     override fun update(component: UIComponent<*>?) {
         if (ignore) return
         super.update(component)
-        cachedLineBreakWidth = calculate(lineBreakWidth, component?.parent, component?.parent?.width
-                ?: 0f, component?.parent?.height ?: 0f, false)
-        cachedLineHeight = calculate(lineHeight, component?.parent, component?.parent?.width
-                ?: 0f, component?.parent?.height ?: 0f, true)
 
         // Selection handling
         if (isSelectable) {
-            // Allocate
+            // Allocate, and add listeners for when the mouse is moved, pressed and released
             position = Positions(false, 0, 0)
-            // Add a mouse listener to the component
-            component!!.onMousePressed("UIFontSelectionListener") {
-                updateCaretPosition(getClosestTextIndex(it.getMouseX(), it.getMouseY()))
-                selected = true
+            val pos = position!!
+            UICore.onMousePressed("$this-SelectionListener") { // TODO: function for bounds
+                if (component!!.getMouseY() >= cachedY + textBounds[1] && component.getMouseY() <= cachedY + textBounds[1] + fontSize) {
+                    updateCaretPosition(getClosestTextIndex(component.getMouseX(), component.getMouseY()))
+                    selected = true
+                }
             }
-            component.onMouseMove("UIFontMoveListener") {
+            UICore.onMouseMove("$this-MoveListener") {
                 if (selected) {
-                    select(position!!.caretPosition, getClosestTextIndex(it.getMouseX(), it.getMouseY()))
+                    select(getClosestTextIndex(component!!.getMouseX(), component.getMouseY()), pos.selectionPosition)
                 }
             }
             UICore.onMousePressed("$this-DeselectionListener") {
-                deselect()
+                if (component!!.getMouseY() <= cachedY + textBounds[1] && component.getMouseY() <= cachedY + textBounds[1] + fontSize) {
+                    deselect()
+                }
             }
-            UICore.onMouseReleased("$this-DeselectionListener") {
-                selected = false
+            UICore.onMouseReleased("$this-DeselectionListener") { selected = false }
+            UICore.onModifierKeyChange("$this-ModifierListener") { key, value ->
+                if (key == UIModifierKey.LEFT_SHIFT || key == UIModifierKey.RIGHT_SHIFT) isShiftHeld = !value
+                if (value) return@onModifierKeyChange
+                when (key) {
+                    UIModifierKey.ARROW_LEFT -> {
+                        if (hasSelection() && !isShiftHeld)
+                            updateCaretPosition(min(pos.caretPosition, pos.selectionPosition))
+                        else if (isShiftHeld)
+                            select((pos.caretPosition - 1).coerceAtLeast(0), pos.selectionPosition)
+                        else updateCaretPosition((pos.caretPosition - 1).coerceAtLeast(0))
+                    }
+                    UIModifierKey.ARROW_RIGHT -> {
+                        if (hasSelection() && !isShiftHeld)
+                            updateCaretPosition(max(pos.caretPosition, pos.selectionPosition))
+                        else if (isShiftHeld)
+                            select((pos.caretPosition + 1).coerceAtMost(cachedText.length), pos.selectionPosition)
+                        else updateCaretPosition((pos.caretPosition + 1).coerceAtMost(cachedText.length))
+                    }
+                    else -> {}
+                }
+            }
+            UICore.onDeallocation("$this-DeallocationListener") {
+                // Deallocate all previous event calls
+                UICore.mousePressedListeners?.remove("$this-MoveListener")
+                UICore.mousePressedListeners?.remove("$this-DeselectionListener")
+                UICore.mousePressedListeners?.remove("$this-DeselectionListener")
             }
         } else {
             // Deallocate and remove the listener if it is not selectable
             position = null
             component!!.mousePressedListeners?.remove("UIFontSelectionListener")
-            UICore.mousePressedListeners?.remove("$this-DeselectionListener") // TODO: Delete when GC
+            UICore.mousePressedListeners?.remove("$this-DeselectionListener")
         }
 
         if (component is UILabel) {
             render(component.text)
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
-            if (overrideParent && (textWidth > component.width || textHeight > component.height)) {
-                component.width = textWidth.coerceAtLeast(component.width)
-                component.height = textHeight.coerceAtLeast(component.height)
+            if (overrideParent && (textBounds[2] > component.width || textBounds[3] > component.height)) {
+                component.width = textBounds[2].coerceAtLeast(component.width)
+                component.height = textBounds[3].coerceAtLeast(component.height)
                 component.calculateBounds()
                 component.updateAnchorPoint()
                 component.updatePosition()
@@ -235,37 +262,37 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     }
 
     @Deprecated("Use render(text: String) instead", ReplaceWith("render(text: String)"))
-    override fun render() {
-        throw IllegalStateException("Use render(text: String) instead")
-    }
+    override fun render() = throw IllegalStateException("Use render(text: String) instead")
 
     open fun render(text: String) {
+        // TODO: Multiline
         lineCount = 1
-        cachedString = text
+        cachedText = text
         renderer {
             font(this@UIFont)
             when (fontRenderType) {
                 FontRenderType.NORMAL -> text.render(cachedX, cachedY)
                 FontRenderType.NEWLINE -> {
-
+                    val lines = text.split("\n")
+                    for (i in lines.indices) {
+                        lines[i].render(cachedX, cachedY + i * fontSize)
+                    }
                 }
                 FontRenderType.WRAP -> lineCount = text.render(cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight)
                 FontRenderType.CLIP, FontRenderType.APPEND -> {
-                    textWidth = text.render(cachedX, cachedY, component!!.relX + cachedLineBreakWidth, null, false)
+                    //textWidth = text.render(cachedX, cachedY, component!!.relX + cachedLineBreakWidth, null, false)
                 }
             }
 
-            textWidth = (x() + width()) - cachedX + (cachedX - component!!.x)
-            textHeight = (y() + height()) - cachedY + (cachedY - component!!.y)
+            textBounds = bounds()
         }
-//        select(0, 9)
         renderSelection()
     }
 
     open fun renderSelection() {
         renderer {
             color(selectionColor)
-            rect(cachedX + cachedString.indexOffset(position!!.caretPosition), cachedY, cachedString.indexOffset(position!!.selectionPosition) - cachedString.indexOffset(position!!.caretPosition), fontSize)
+            rect(cachedX + cachedText.indexOffset(position!!.caretPosition) - boundsOf(cachedText)[0], cachedY + boundsOf(cachedText)[1], cachedText.indexOffset(position!!.selectionPosition) - cachedText.indexOffset(position!!.caretPosition), fontSize)
         }
     }
 
@@ -294,17 +321,11 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     }
 
     /**
-     * Invoked when the caret position or selection has been changed.
-     */
-    open fun updateSelection() {
-        // TODO: Selection handling
-    }
-
-    /**
      * Changes the caret position to [index]. This does nothing if this is not [isSelectable]
      */
     open fun updateCaretPosition(index: Int) {
         if (position != null) {
+            deselect()
             position!!.caretPosition = index
             position!!.selectionPosition = index
         }
@@ -318,7 +339,6 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         if (position != null) {
             position!!.caretPosition = startingIndex
             position!!.selectionPosition = endingIndex
-            selected = true
         }
     }
 
@@ -328,7 +348,6 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     open fun deselect() {
         if (position != null) {
             position!!.selectionPosition = position!!.caretPosition
-            selected = false
         }
     }
 
@@ -338,22 +357,25 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     open fun getClosestTextIndex(mouseX: Float, mouseY: Float): Int {
         renderer {
             // TODO: Multiline support
-            if (mouseY >= cachedX && mouseY <= cachedX + fontSize) {
-                var w = cachedX
-                var previous = 0f
-                for (i in cachedString.indices) {
-                    val width = boundsOf(cachedString[i].toString())[4] / 2f
-                    if (mouseX >= w && mouseX <= w + width + previous) return i
-                    w += width + previous
-                    previous = width
+            var w = cachedX
+            var previous = 0f
+            for (i in cachedText.indices) {
+                val width = boundsOf(cachedText[i].toString())[4] / 2f
+                if (mouseX >= w && mouseX <= w + width + previous) return i
+                w += width + previous
+                previous = width
 
-                    // Ending of the last character
-                    if (i >= cachedString.length - 1 && mouseX >= w && mouseX <= w + width + previous) return i + 1
-                }
+                // Ending of the last character
+                if (i >= cachedText.length - 1 && mouseX >= w) return i + 1
             }
         }
         return 0
     }
+
+    /**
+     * Returns true if the [Positions.caretPosition] and [Positions.selectionPosition] aren't equal.
+     */
+    open fun hasSelection() = position!!.caretPosition != position!!.selectionPosition
 
     /**
      * Updates [fontName] based on the [fontStyle], [fontType] and [fontFamily]
