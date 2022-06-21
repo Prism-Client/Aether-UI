@@ -8,10 +8,13 @@ import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.input.button.UIImageButton
+import net.prismclient.aether.ui.component.type.input.textfield.UITextField
+import net.prismclient.aether.ui.component.type.input.textfield.UITextFieldSheet
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
@@ -23,22 +26,13 @@ import net.prismclient.aether.ui.util.extensions.*
  */
 class ExampleScreen : UIScreen {
     override fun build() {
-        // To define a font family, you must first create a UIFontFamily object.
         UIFontFamily("Poppins", "/demo/fonts/", "regular", "black", "bold", "light", "thin")
 
         build {
-            // Dependencies make it easier to organize everything
-            // and reduce boilerplate code. It's a simple interface
-            // which is invoked immediately. You can store styles
-            // and resources there, so they can be reused them late.
             dependsOn(::TextStyles)
             dependsOn(::IconStyles)
             dependsOn(::ComponentStyles)
             dependsOn(::AnimationStyles)
-
-            // The dependencies above are ones that you might use
-            // anywhere. Here is a one specific to this screen:
-//            dependsOn(::ExampleScreenStyles)
 
             renderer {
                 loadImage("background", "/demo/background.png")
@@ -137,12 +131,12 @@ class ExampleScreen : UIScreen {
             }
 
             // Sidebar
-            val c = container("container") {
+            container("container") {
                 style {
                     align(UIAlignment.TOPLEFT)
                     size(px(236f), rel(1f))
                     background(-1)
-                    clipContent = false
+                    clipContent = true
                 }
                 image("logo", style = "imag") {
                     style {
@@ -262,6 +256,53 @@ class ExampleScreen : UIScreen {
                             y -= px(10f)
                         }.hover("crumbHover", "crumbLeave")
                     }
+                }
+            }
+
+            val title = h3("SETTINGS").style {
+                position(277f, 30f)
+                font {
+                    align(UIAlignment.MIDDLELEFT)
+                    fontSpacing = fontSize * 0.025f
+                }
+            }
+
+            p("Configure Prism Client's settings to improve and optimize your experience!").style {
+                background(asRGBA(255, 0, 0, 0.3f))
+                size(rel(1f) - px(277 + 448 + 30), px(font!!.fontSize))
+                position(px(277f), dependentUnit value@{
+                    return@value title.y + title.height
+                })
+                font {
+                    overrideParent = false
+                }
+                clipContent = true
+            }
+
+            style(UITextFieldSheet(), "textField") {
+                background(asRGBA(0, 0, 0, 0.1f), radius(8f)) {
+                    border(asRGBA(214, 214, 216), 1f, UIStrokeDirection.INSIDE)
+                }
+                font {
+                    align(UIAlignment.MIDDLELEFT)
+                    x += px(20)
+                    fontFamily = "Poppins"
+                    fontSize = 14f
+                    isSelectable = true
+                    selectionColor = asRGBA(0, 120, 200, 0.3f)
+                    textAlignment = UIRenderer.ALIGNLEFT or UIRenderer.ALIGNMIDDLE
+                }
+                clipContent = false
+            }
+
+            component(UITextField("", "Search for anything...", UITextField.any, "textField")) {
+                style {
+                    control(UIAlignment.TOPRIGHT)
+                    size(448, 39)
+                    x -= px(30); y = px(30)
+                }
+                onTextChanged("textListener") {
+                    //println("This text has been changed to: ${it.text}")
                 }
             }
         }

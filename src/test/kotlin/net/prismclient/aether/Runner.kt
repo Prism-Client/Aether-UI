@@ -1,6 +1,7 @@
 package net.prismclient.aether
 
 
+import net.prismclient.aether.screens.ExampleScreen
 import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
@@ -88,7 +89,7 @@ object Runner {
         }
 
         glfwSetFramebufferSizeCallback(window) { _: Long, width: Int, height: Int ->
-            framebufferWidth =width
+            framebufferWidth = width
             framebufferHeight = height
             core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
         }
@@ -97,7 +98,7 @@ object Runner {
             // Check if the key is null
             if (glfwGetKeyName(keyCode, scanCode) == null) {
                 if (action == GLFW_PRESS && keyCode == GLFW_KEY_ESCAPE) {
-                    UICore.displayScreen(TestingScreen())
+                    UICore.displayScreen(ExampleScreen())
                 }
                 val isRelease = action == GLFW_RELEASE
                 when (keyCode) {
@@ -160,8 +161,8 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        UICore.displayScreen(TestingScreen())
-//        UICore.displayScreen(ExampleScreen())
+//        UICore.displayScreen(TestingScreen())
+        UICore.displayScreen(ExampleScreen())
 
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())
