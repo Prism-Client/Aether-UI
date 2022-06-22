@@ -363,11 +363,11 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             }
             // Vertical row check. If the mouse is at
             // the end or start, return the start, or end index
-            if (mouseX <= cachedX + rowBounds[0]) {
-                return i
-            } else if (mouseX >= cachedX + rowBounds[2]) {
-                return i + row.length
-            }
+//            if (mouseX <= cachedX + rowBounds[0]) {
+//                return i
+//            } else if (mouseX >= cachedX + rowBounds[2]) {
+//                return i + row.length
+//            }
 
             var x = cachedX + rowBounds[0]
             var previous = 0f
@@ -375,8 +375,8 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             // Iterate through the row. Return the character at the index closest
             // to the mouse for the first portion of it, and the last portion of
             // the previous character.
-            for (char in row) {
-                val width = UIRendererDSL.boundsOf(char.toString())[4] / 2f
+            for (j in row.indices) {
+                val width = UIRendererDSL.boundsOf(row[j].toString())[4] / 2f
 
                 if (mouseX >= x && mouseX <= x + width + previous)
                     return i
@@ -385,7 +385,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                 previous = width
 
                 i++ // Last character
-                if (i >= row.length && mouseX >= width)
+                if (j >= row.length - 1)// && mouseX >= width)
                     return i
             }
         }
@@ -398,9 +398,9 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     open fun getXOffset(index: Int): Float {
         var i = 0
         for (row in cachedText) {
-            if (index < row.length)
+            if (index < i + row.length)
                 return row.indexOffset(index - i)
-            else i += row.length
+            i += row.length
         }
         return 0f
     }
@@ -408,9 +408,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     /**
      * Returns the y offset of the caret position. Returns 0f if index is out of bounds.
      */
-    open fun getYOffset(index: Int): Float {
-        return 0f
-    }
+    open fun getYOffset(index: Int): Float = getActiveLineIndex(index) * (fontSize + fontSpacing)
 
     /**
      * Returns true if the [Positions.caretPosition] and [Positions.selectionPosition] aren't equal.
@@ -418,13 +416,16 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     open fun hasSelection() = position!!.caretPosition != position!!.selectionPosition
 
     /**
-     * Returns the line of the given index. Returns the first line if [index] < 0 or [index] >= [lineCount].
+     * Returns the index of the given index. Returns the first line if [index] < 0 or [index] >= [lineCount].
      */
-    open fun getActiveLine(index: Int): String {
-        for (row in cachedText)
-            if (index < row.length)
-                return row
-        return cachedText[0]
+    open fun getActiveLineIndex(index: Int): Int {
+        var j = 0
+        for (i in cachedText.indices) {
+            if (index < cachedText[i].length + j)
+                return i
+            j += cachedText[i].length
+        }
+        return 0
     }
 
     /**
