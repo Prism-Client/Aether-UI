@@ -147,7 +147,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun String.render(x: Float, y: Float, width: Float, splitHeight: Float) =
-        renderer.wrapString(this, x, y, width, splitHeight)
+        renderer.wrapString(this, x, y, width, splitHeight, null)
 
     /**
      * Renders a string until the given width, where then the string is

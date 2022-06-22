@@ -96,7 +96,7 @@ class PromotionComponent(
 
                 // Create the font. This is a shorthand for creating it,
                 // it can be set manually inside the font block
-                font(16f, -1, UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
+                font(fontSize = 16f, fontColor = -1, textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
                     // UIFont is an is a UIShape, which has a unique x, and y values relative to the component
                     align(UIAlignment.TOPCENTER)
                     fontFamily = "Poppins"
@@ -117,11 +117,11 @@ class PromotionComponent(
                 control(UIAlignment.TOPCENTER)
                 y = px(57)
                 font(
-                    14f,
-                    asRGBA(255, 255, 255, 0.5f),
-                    UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP,
-                    "Poppins",
-                    UIFont.FontType.Light
+                        "Poppins",
+                        14f,
+                        asRGBA(255, 255, 255, 0.5f),
+                        UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP,
+                        UIFont.FontType.Light
                 ) {
                     align(UIAlignment.TOPCENTER)
                     fontRenderType = UIFont.FontRenderType.WRAP
@@ -140,11 +140,11 @@ class PromotionComponent(
                 // create the component to the value in the style sheet
                 background(0, radius(8f))
                 font(
-                    16f,
-                    asRGBA(87, 164, 255),
-                    UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER,
-                    "Poppins",
-                    UIFont.FontType.Bold
+                        "Poppins",
+                        16f,
+                        asRGBA(87, 164, 255),
+                        UIRenderer.ALIGNMIDDLE or UIRenderer.ALIGNCENTER,
+                        UIFont.FontType.Bold
                 ) {
                     align(UIAlignment.CENTER)
                     // descender = bottom portion of text (basically)

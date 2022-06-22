@@ -106,7 +106,7 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
             (font.textAlignment and ALIGNRIGHT) != 0 -> -bounds[4]
             else -> 0f
         }
-        style.caret.offsetY = font.cachedY + boundsOf(style.font!!.cachedText)[1] - y
+        //style.caret.offsetY = font.cachedY + boundsOf(style.font!!.cachedText)[1] - y
 
         if (blink && isFocused()) style.caret.render()
         if (timeSinceLastBlink + style.blinkRate <= System.currentTimeMillis()) {

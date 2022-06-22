@@ -2,10 +2,6 @@ package net.prismclient.aether.ui.renderer
 
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.util.extensions.getAlpha
-import net.prismclient.aether.ui.util.extensions.getBlue
-import net.prismclient.aether.ui.util.extensions.getGreen
-import net.prismclient.aether.ui.util.extensions.getRed
 import java.nio.ByteBuffer
 
 /**
@@ -416,8 +412,10 @@ abstract class UIRenderer {
      * @param y The y position of the string
      * @param width The width to wrap the text at
      * @param splitHeight The spacing between the individual lines
+     * @param lines Sets the given ArrayList to the lines which were wrapped. The length of [lines] is te
+     * @return The amount of lines. It is equal to the size of [lines]
      */
-    abstract fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int
+    abstract fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float, lines: ArrayList<String>?): Int
 
     /**
      * Returns the x position of the most recently rendered string with text alignment calculated
@@ -455,7 +453,10 @@ abstract class UIRenderer {
      */
     abstract fun textBounds(): FloatArray
 
+    /**
+     * Returns the bounds of the given text
+     *
+     * @see textBounds
+     */
     abstract fun boundsOf(text: String): FloatArray
-
-    abstract fun test()
 }

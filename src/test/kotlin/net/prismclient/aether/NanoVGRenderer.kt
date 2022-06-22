@@ -2,9 +2,6 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.ascender
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.descender
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.render
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.style.UIProvider
@@ -406,7 +403,7 @@ class NanoVGRenderer : UIRenderer() {
     private var wrapWidth = 0f
     private var wrapHeight = 0f
 
-    override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int {
+    override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float, lines: ArrayList<String>?): Int {
         // TODO: Rewrite text wrapping
         val rows = NVGTextRow.calloc(100)//private val rows = NVGTextRow.create(maxRows)
         wrapWidth = 0f
@@ -429,6 +426,7 @@ class NanoVGRenderer : UIRenderer() {
         // Iterate through the rows
         for (i in 0 until nrows) {
             val row = rows[i]
+            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
             val w = nnvgText(ctx, x, h, row.start(), row.end()) - x // Render the text
             wrapWidth = max(wrapWidth, w)
             h += lineHeight[0] + splitHeight // Increase by the font height plus the split height
@@ -444,7 +442,7 @@ class NanoVGRenderer : UIRenderer() {
 //        TODO: Multiline bounds
 
         rows.free()
-        return nrows
+        return  nrows
     }
 
     override fun stringX(): Float = bounds[0]
@@ -468,6 +466,11 @@ class NanoVGRenderer : UIRenderer() {
     override fun textBounds(): FloatArray = bounds
 
     override fun boundsOf(text: String): FloatArray {
+        nvgFontBlur(ctx, 0f)
+        nvgFontFace(ctx, fontName)
+        nvgFontSize(ctx, fontSize)
+        nvgTextAlign(ctx, fontAlignment)
+        nvgTextLetterSpacing(ctx, fontSpacing)
         bounds[4] = nvgTextBounds(ctx, 0f, 0f, text, bounds)
         return bounds
     }
@@ -489,12 +492,5 @@ class NanoVGRenderer : UIRenderer() {
         } else {
             fill()
         }
-    }
-
-    override fun test() {
-    }
-
-    companion object {
-        private const val maxRows = 100 /* Max rows created from [wrapString] */
     }
 }

@@ -183,12 +183,12 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      */
     @JvmOverloads
     inline fun font(
-        fontSize: Float = font?.fontSize ?: UIDefaults.instance.fontSize,
-        fontColor: Int = font?.fontColor ?: UIDefaults.instance.fontColor,
-        textAlignment: Int = font?.textAlignment ?: UIDefaults.instance.textAlignment,
-        fontFamily: String = font?.fontFamily ?: UIDefaults.instance.fontFamily,
-        fontType: UIFont.FontType = font?.fontType ?: UIDefaults.instance.fontType,
-        block: UIFont.() -> Unit = {}
+            fontFamily: String = font?.fontFamily ?: UIDefaults.instance.fontFamily,
+            fontSize: Float = font?.fontSize ?: UIDefaults.instance.fontSize,
+            fontColor: Int = font?.fontColor ?: UIDefaults.instance.fontColor,
+            textAlignment: Int = font?.textAlignment ?: UIDefaults.instance.textAlignment,
+            fontType: UIFont.FontType = font?.fontType ?: UIDefaults.instance.fontType,
+            block: UIFont.() -> Unit = {}
     ) = font {
         this.fontSize = fontSize
         this.fontColor = fontColor

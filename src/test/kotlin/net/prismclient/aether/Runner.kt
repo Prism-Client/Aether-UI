@@ -161,8 +161,8 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-//        UICore.displayScreen(TestingScreen())
-        UICore.displayScreen(ExampleScreen())
+        UICore.displayScreen(TestingScreen())
+//        UICore.displayScreen(ExampleScreen())
 
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())

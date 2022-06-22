@@ -235,7 +235,7 @@ class ExampleScreen : UIScreen {
                         p("Get 3 months of cosmetics for free").style {
                             control(UIAlignment.TOPCENTER)
                             y = px(20f)
-                            font(16f, asRGBA(0, 0, 0), UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
+                            font(fontSize = 16f, fontColor = asRGBA(0, 0, 0), textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
                                 align(UIAlignment.TOPCENTER)
                                 fontRenderType = UIFont.FontRenderType.WRAP
                                 lineBreakWidth = px(189)
@@ -244,7 +244,7 @@ class ExampleScreen : UIScreen {
                         p("Support Prism's development by unlocking cosmetics.").style {
                             control(UIAlignment.TOPCENTER)
                             y = px(52)
-                            font(14f, asRGBA(65, 63, 68), UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
+                            font(fontSize = 14f, fontColor = asRGBA(65, 63, 68), textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
                                 align(UIAlignment.TOPCENTER)
                                 fontRenderType = UIFont.FontRenderType.WRAP
                                 lineBreakWidth = px(179)
