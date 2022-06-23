@@ -324,7 +324,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                 }
                 FontRenderType.WRAP -> {
                     cachedText.clear()
-                    lineCount = renderer.wrapString(text, cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight, cachedText)
+                    lineCount = render.wrapString(text, cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight, cachedText)
                     setBounds()
                 } // TODO: Clip & Append
                 FontRenderType.CLIP -> {}

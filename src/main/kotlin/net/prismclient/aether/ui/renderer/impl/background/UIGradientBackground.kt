@@ -38,7 +38,7 @@ class UIGradientBackground : UIBackground() {
 
     override fun render() {
         renderer {
-            renderer.linearGradient(
+            render.linearGradient(
                 cachedX,
                 cachedY,
                 cachedWidth,

@@ -28,7 +28,7 @@ import java.nio.ByteBuffer
  */
 object UIRendererDSL {
     @JvmStatic
-    lateinit var renderer: UIRenderer
+    lateinit var render: UIRenderer
 
     @JvmStatic
     private var color = 0
@@ -67,10 +67,10 @@ object UIRendererDSL {
 
     /** General **/
     @JvmStatic
-    fun beginFrame(width: Float, height: Float, pxRatio: Float) = renderer.beginFrame(width, height, pxRatio)
+    fun beginFrame(width: Float, height: Float, pxRatio: Float) = render.beginFrame(width, height, pxRatio)
 
     @JvmStatic
-    fun endFrame() = renderer.endFrame()
+    fun endFrame() = render.endFrame()
 
     /** Color **/
 
@@ -80,7 +80,7 @@ object UIRendererDSL {
     @JvmStatic
     fun color(rgba: Int) {
         color = rgba
-        renderer.color(color)
+        render.color(color)
     }
 
     /**
@@ -118,7 +118,7 @@ object UIRendererDSL {
         UIRendererDSL.fontSize = fontSize
         UIRendererDSL.fontAlignment = fontAlignment
         UIRendererDSL.fontSpacing = fontSpacing
-        renderer.font(fontFace, fontSize, fontAlignment, fontSpacing)
+        render.font(fontFace, fontSize, fontAlignment, fontSpacing)
     }
 
     /**
@@ -127,7 +127,7 @@ object UIRendererDSL {
      * @see font
      */
     @JvmStatic
-    fun String.render(x: Float, y: Float) = renderer.renderString(this, x, y)
+    fun String.render(x: Float, y: Float) = render.renderString(this, x, y)
 
     /**
      * Renders the string within the given alignment based on the plot.
@@ -152,7 +152,7 @@ object UIRendererDSL {
      * Renders a string with a line break when the length of the string exceeds the width cap
      */
     @JvmStatic
-    fun String.render(x: Float, y: Float, width: Float, splitHeight: Float) = renderer.wrapString(this, x, y, width, splitHeight, null)
+    fun String.render(x: Float, y: Float, width: Float, splitHeight: Float) = render.wrapString(this, x, y, width, splitHeight, null)
 
     /**
      * Renders a string until the given width, where then the string is
@@ -197,25 +197,25 @@ object UIRendererDSL {
      * Returns the x position of the most recently rendered string with relations to (0, 0)
      */
     @JvmStatic
-    fun x(): Float = renderer.stringX()
+    fun x(): Float = render.stringX()
 
     /**
      * Returns the y position of the most recently rendered string with relations to (0, 0)
      */
     @JvmStatic
-    fun y(): Float = renderer.stringY()
+    fun y(): Float = render.stringY()
 
     /**
      * Returns the width of the most recently rendered string
      */
     @JvmStatic
-    fun width(): Float = renderer.stringWidth()
+    fun width(): Float = render.stringWidth()
 
     /**
      * Returns the height of the most recently rendered string
      */
     @JvmStatic
-    fun height(): Float = renderer.stringHeight()
+    fun height(): Float = render.stringHeight()
 
     /**
      * Returns the width of the given string based on the most recently set font
@@ -223,10 +223,10 @@ object UIRendererDSL {
     @JvmStatic
     fun String.width(): Float {
         val previous = color
-        renderer.color(0)
+        render.color(0)
         (if (this[this.length - 1] == ' ') "$this " else this).render(0f, 0f)
-        renderer.color(previous)
-        return renderer.stringWidth()
+        render.color(previous)
+        return render.stringWidth()
     }
 
     /**
@@ -235,10 +235,10 @@ object UIRendererDSL {
     @JvmStatic
     fun String.height(): Float {
         val previous = color
-        renderer.color(0)
+        render.color(0)
         this.render(0f, 0f)
-        renderer.color(previous)
-        return renderer.stringHeight()
+        render.color(previous)
+        return render.stringHeight()
     }
 
     /**
@@ -253,22 +253,22 @@ object UIRendererDSL {
     }
 
     @JvmStatic
-    fun ascender() = renderer.stringAscender()
+    fun ascender() = render.stringAscender()
 
     @JvmStatic
-    fun descender() = renderer.stringDescender()
+    fun descender() = render.stringDescender()
 
     @JvmStatic
-    fun bounds() = renderer.textBounds()
+    fun bounds() = render.textBounds()
 
     @JvmStatic
-    fun boundsOf(text: String) = renderer.boundsOf(text)
+    fun boundsOf(text: String) = render.boundsOf(text)
 
     @JvmStatic
     fun loadFont(name: String, fileLocation: String) = loadFont(name, fileLocation.toByteBuffer())
 
     @JvmStatic
-    fun loadFont(name: String, buffer: ByteBuffer) = renderer.loadFont(name, buffer)
+    fun loadFont(name: String, buffer: ByteBuffer) = render.loadFont(name, buffer)
 
     @JvmStatic
     operator fun UIFont.unaryPlus() = font(this)
@@ -279,7 +279,7 @@ object UIRendererDSL {
     fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) = renderImage(imageName, x, y, width, height, radius, radius, radius, radius)
 
     @JvmStatic
-    fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) = renderer.renderImage(imageName, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+    fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) = render.renderImage(imageName, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
 
     // TODO: Maybe something like loadAll(type: String, fileLocation: String)
     // loadAll("svg", "/aether/svgs/")
@@ -291,7 +291,7 @@ object UIRendererDSL {
     fun loadImage(name: String, buffer: ByteBuffer, flags: Int): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
-        return renderer.loadImage(name, image, flags)
+        return render.loadImage(name, image, flags)
     }
 
     @JvmStatic
@@ -302,7 +302,7 @@ object UIRendererDSL {
     fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = UICore.devicePxRatio): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
-        return renderer.loadSVG(name, image, scale)
+        return render.loadSVG(name, image, scale)
     }
 
     /** Asset Loading **/
@@ -339,47 +339,47 @@ object UIRendererDSL {
             ?: 0f, radius?.topRight ?: 0f, radius?.bottomRight ?: 0f, radius?.bottomRight ?: 0f)
 
     @JvmStatic
-    fun rect(x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) = renderer.rect(x + pos, y + pos, width + siz, height + siz, topLeft + halfsw, topRight + halfsw, bottomRight + halfsw, bottomLeft + halfsw)
+    fun rect(x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) = render.rect(x + pos, y + pos, width + siz, height + siz, topLeft + halfsw, topRight + halfsw, bottomRight + halfsw, bottomLeft + halfsw)
 
     /**
      * Must be placed inside a [line] block
      */
     @JvmStatic
-    fun line(x: Float, y: Float) = renderer.line(x, y)
+    fun line(x: Float, y: Float) = render.line(x, y)
 
     @JvmStatic
-    fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) = renderer.bezier(x, y, x1, y1, x2, y2)
+    fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) = render.bezier(x, y, x1, y1, x2, y2)
 
     @JvmStatic
-    fun ellipse(x: Float, y: Float, width: Float, height: Float) = renderer.ellipse(x, y, width - pos, height - pos)
+    fun ellipse(x: Float, y: Float, width: Float, height: Float) = render.ellipse(x, y, width - pos, height - pos)
 
     @JvmStatic
-    fun circle(x: Float, y: Float, radius: Float) = renderer.circle(x, y, radius - pos)
+    fun circle(x: Float, y: Float, radius: Float) = render.circle(x, y, radius - pos)
 
     @JvmStatic
-    fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) = renderer.triangle(x, y, x1, y1, x2, y2)
+    fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) = render.triangle(x, y, x1, y1, x2, y2)
 
     /** Transformations and DSL blocks **/
     @JvmStatic
-    fun save() = renderer.save()
+    fun save() = render.save()
 
     @JvmStatic
-    fun restore() = renderer.restore()
+    fun restore() = render.restore()
 
     @JvmStatic
-    fun translate(x: Float, y: Float) = renderer.translate(x, y)
+    fun translate(x: Float, y: Float) = render.translate(x, y)
 
     @JvmStatic
-    fun scale(x: Float, y: Float) = renderer.scale(x, y)
+    fun scale(x: Float, y: Float) = render.scale(x, y)
 
     @JvmStatic
-    fun rotate(angle: Float) = renderer.rotate(angle)
+    fun rotate(angle: Float) = render.rotate(angle)
 
     @JvmStatic
-    fun rotate(degree: Double) = renderer.rotate(degree)
+    fun rotate(degree: Double) = render.rotate(degree)
 
     @JvmStatic
-    fun scissor(x: Float, y: Float, width: Float, height: Float) = renderer.scissor(x, y, width, height)
+    fun scissor(x: Float, y: Float, width: Float, height: Float) = render.scissor(x, y, width, height)
 
     @JvmStatic
     fun stroke(strokeWidth: Float, strokeDirection: UIStrokeDirection) {
@@ -452,20 +452,20 @@ object UIRendererDSL {
 
     @JvmStatic
     inline fun stroke(strokeColor: Int, strokeWidth: Float, strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE, block: UIRendererDSL.() -> Unit) {
-        renderer.stroke(strokeWidth, strokeColor)
+        render.stroke(strokeWidth, strokeColor)
         stroke(strokeWidth, strokeDirection)
         this.block()
         finishStroke()
-        renderer.finishStroke()
+        render.finishStroke()
     }
 
     @JvmStatic
     inline fun renderContent(fbo: UIContentFBO, block: UIRendererDSL.() -> Unit) {
-        renderer.bindContentFBO(fbo)
-        renderer.beginFrame(fbo.scaledWidth, fbo.scaledHeight, fbo.contentScale)
+        render.bindContentFBO(fbo)
+        render.beginFrame(fbo.scaledWidth, fbo.scaledHeight, fbo.contentScale)
         this.block()
-        renderer.endFrame()
-        renderer.unbindContentFBO()
+        render.endFrame()
+        render.unbindContentFBO()
     }
 
     /**
@@ -476,8 +476,8 @@ object UIRendererDSL {
      */
     @JvmStatic
     inline fun line(x: Float, y: Float, lineCap: Int = BUTT, lineJoin: Int = MITER, lineWidth: Float = 1f, block: UIRendererDSL.() -> Unit) {
-        renderer.startLine(x, y, lineCap, lineJoin, lineWidth)
+        render.startLine(x, y, lineCap, lineJoin, lineWidth)
         this.block()
-        renderer.finishLine()
+        render.finishLine()
     }
 }

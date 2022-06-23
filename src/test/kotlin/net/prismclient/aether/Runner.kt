@@ -2,6 +2,7 @@ package net.prismclient.aether
 
 
 import net.prismclient.aether.screens.ExampleScreen
+import net.prismclient.aether.screens.PrismMainMenu
 import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
@@ -161,7 +162,7 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        UICore.displayScreen(TestingScreen())
+        UICore.displayScreen(PrismMainMenu())
 //        UICore.displayScreen(ExampleScreen())
 
         while (!glfwWindowShouldClose(window)) {

@@ -31,10 +31,10 @@ class UIFontType(val normal: String = "", val italic: String = "") {
         this.italicBuffer = italicBuffer
 
         if (normalBuffer != null) {
-            UIProvider.renderer.loadFont(normal, normalBuffer)
+            UIProvider.render.loadFont(normal, normalBuffer)
         }
         if (italicBuffer != null) {
-            UIProvider.renderer.loadFont(italic, italicBuffer)
+            UIProvider.render.loadFont(italic, italicBuffer)
             hasItalic = true
         }
         if (normalBuffer != null || italicBuffer != null) loaded = true
