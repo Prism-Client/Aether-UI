@@ -4,10 +4,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.util.UIFontFamily
-import net.prismclient.aether.ui.util.extensions.asRGBA
-import net.prismclient.aether.ui.util.extensions.build
-import net.prismclient.aether.ui.util.extensions.renderer
-import net.prismclient.aether.ui.util.extensions.style
+import net.prismclient.aether.ui.util.extensions.*
 
 class TestingScreen : UIScreen {
     override fun build() {
@@ -20,12 +17,15 @@ class TestingScreen : UIScreen {
             style("style") {
                 font("Poppins", 64f, -1, UIRenderer.ALIGNTOP or UIRenderer.ALIGNLEFT)
             }
-            label("Hello \nWorld", "style").style {
-                position(50f, 50f)
+            label("Hello\nWorld\nHow\nare\nyou?", "style").style {
+                position(150f, 150f)
                 background(asRGBA(0, 0, 0, 0.1f))
                 font {
+                    textAlignment = UIRenderer.ALIGNTOP or UIRenderer.ALIGNCENTER
                     isSelectable = true
                     fontRenderType = UIFont.FontRenderType.NEWLINE
+                    selectionColor = asRGBA(0, 120, 200, 0.3f)
+                    lineHeight = px(25)
                 }
                 clipContent = false
             }

@@ -7,6 +7,7 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.boundsOf
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.indexOffset
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.UIStyleSheet
@@ -14,12 +15,25 @@ import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.*
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
+import java.lang.Integer.max
+import java.lang.Integer.min
 import java.util.regex.Pattern
 
 /**
  * [UIFont] controls the rendering of text on string. It is a default part
  * of [UIStyleSheet]. Because this is a shape, it has its own position
  * relative to the component and can be transformed your desire.
+ *
+ * Multiline text is an available feature. By default, it is impossible to render
+ * multiline text. However, it can be enabled by changing [fontRenderType] to a multiline
+ * supported type. Backend a stored variable, [cachedText] is used to store the text which
+ * is then used to calculate selections and other things. If it is not a multiline supported
+ * type, the text will always be a size of 1.
+ *
+ * An important feature pertain to this class is selection. The mouse and keyboard
+ * are able to select a portion of singular, and multiline text. In the case of multiline
+ * text, the length of each line is increased by 1 because of the ability to have the caret
+ * at the end of a selection.
  *
  * Note: Properties width, and height are ignored.
  *
@@ -180,6 +194,9 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         protected set
     protected var isShiftHeld = false
 
+    /**
+     * Aligns the text to the given [alignment]
+     */
     open fun align(alignment: UIAlignment) {
         x ?: run { x = px(0) }
         y ?: run { y = px(0) }
@@ -191,11 +208,12 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         super.update(component)
 
         cachedLineBreakWidth = calculate(lineBreakWidth, component!!, component.width, component.height, false)
+        cachedLineHeight = calculate(lineHeight, component, component.width, component.height, false)
 
         // Selection handling
         if (isSelectable) {
             // Allocate, and add listeners for when the mouse is moved, pressed and released
-            position = Positions(false, 0, 0)
+            position = Positions(0, 0)
             val pos = position!!
             UICore.onMousePressed("$this-SelectionListener") { // TODO: function for bounds
                 val mousePosition = getClosestTextIndex(component.getMouseX(), component.getMouseY())
@@ -204,7 +222,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     updateCaretPosition(mousePosition)
                     selected = true
                 }
-                println("Updated to mouse position: $mousePosition")
+                println("Caret position: ${mousePosition}")
             }
             UICore.onMouseMove("$this-MoveListener") {
                 if (selected) {
@@ -220,19 +238,19 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             UICore.onModifierKeyChange("$this-ModifierListener") { key, value ->
                 if (key == UIModifierKey.LEFT_SHIFT || key == UIModifierKey.RIGHT_SHIFT) isShiftHeld = !value
                 if (value) return@onModifierKeyChange
-//                when (key) {
-//                    UIModifierKey.ARROW_LEFT -> {
-//                        if (hasSelection() && !isShiftHeld) updateCaretPosition(min(pos.caretPosition, pos.selectionPosition))
-//                        else if (isShiftHeld) select((pos.caretPosition - 1).coerceAtLeast(0), pos.selectionPosition)
-//                        else updateCaretPosition((pos.caretPosition - 1).coerceAtLeast(0))
-//                    }
-//                    UIModifierKey.ARROW_RIGHT -> {
-//                        if (hasSelection() && !isShiftHeld) updateCaretPosition(max(pos.caretPosition, pos.selectionPosition))
-//                        else if (isShiftHeld) select((pos.caretPosition + 1).coerceAtMost(cachedText.length), pos.selectionPosition)
-//                        else updateCaretPosition((pos.caretPosition + 1).coerceAtMost(cachedText.length))
-//                    }
-//                    else -> {}
-//                }
+                when (key) {
+                    UIModifierKey.ARROW_LEFT -> {
+                        if (hasSelection() && !isShiftHeld) updateCaretPosition(min(pos.caretPosition, pos.selectionPosition))
+                        else if (isShiftHeld) select(getPreviousPosition(pos.caretPosition), pos.selectionPosition)
+                        else updateCaretPosition(getPreviousPosition(pos.caretPosition))
+                    }
+                    UIModifierKey.ARROW_RIGHT -> {
+                        if (hasSelection() && !isShiftHeld) updateCaretPosition(max(pos.caretPosition, pos.selectionPosition))
+                        else if (isShiftHeld) select(getNextPosition(pos.caretPosition), pos.selectionPosition)
+                        else updateCaretPosition(getNextPosition(pos.caretPosition))
+                    }
+                    else -> {} // TODO: Up and down keys
+                }
             }
             UICore.onDeallocation("$this-DeallocationListener") {
                 // Deallocate all previous event calls
@@ -252,8 +270,8 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
             if (overrideParent && (textBounds[2] - cachedX > component.width || textBounds[3] - cachedY > component.height)) {
-                component.width = (textBounds[2] - cachedX).coerceAtLeast(component.width)
-                component.height = (textBounds[3] - cachedY).coerceAtLeast(component.height)
+                component.width = (textBounds[2] - cachedX)
+                component.height = (textBounds[3] - cachedY)
                 component.calculateBounds()
                 component.updateAnchorPoint()
                 component.updatePosition()
@@ -278,38 +296,84 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     cachedText.clear()
                     cachedText.add(0, text)
                     text.render(cachedX, cachedY)
+                    textBounds = bounds()
                 }
                 FontRenderType.NEWLINE -> {
                     cachedText.clear()
                     val lines = text.split(newline)
+                    var minx = Float.MAX_VALUE
+                    var miny = Float.MAX_VALUE
+                    var maxx = 0f
+                    var maxy = 0f
+                    var next = 0f
 
                     for (i in lines.indices) {
-                        cachedText.add(lines[i])
-                        lines[i].render(cachedX, cachedY + i * fontSize)
+                        val line = lines[i]
+                        cachedText.add(line)
+                        val bound = boundsOf(line)
+                        line.render(cachedX, cachedY + i * (cachedLineHeight + fontSize))
+                        minx = bounds()[0].coerceAtMost(minx)
+                        miny = bounds()[1].coerceAtMost(miny)
+                        maxx = bounds()[2].coerceAtLeast(maxx)
+                        maxy = bounds()[3].coerceAtLeast(maxy)
+                        next = bounds()[4].coerceAtLeast(next)
                     }
+                    textBounds[0] = minx
+                    textBounds[1] = miny
+                    textBounds[2] = maxx
+                    textBounds[3] = maxy
+                    textBounds[4] = next
                 }
                 FontRenderType.WRAP -> {
                     lineCount = text.render(cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight)
-                    // TODO: Lines
-                }
-                FontRenderType.CLIP -> {} // TODO: Clip
-                FontRenderType.APPEND -> {
-                    //textWidth = text.render(cachedX, cachedY, component!!.relX + cachedLineBreakWidth, null, false)
-                }
+                } // TODO: Clip & Append
+                FontRenderType.CLIP -> {}
+                FontRenderType.APPEND -> {}
             }
-
-            textBounds = bounds()
         }
         renderSelection()
     }
 
+    /**
+     * As the name suggests, the selection is rendered over the selected text.
+     */
     open fun renderSelection() {
         if (position != null) {
             renderer {
                 color(selectionColor)
-                color(asRGBA(0f, 0f, 255f, 0.3f))
-                rect(cachedX + getXOffset(position!!.caretPosition), cachedY + getYOffset(position!!.selectionPosition), 100f, 100f)
-                // TODO: rect(cachedX + cachedText.indexOffset(position!!.caretPosition) - boundsOf(cachedText)[0], cachedY + boundsOf(cachedText)[1], cachedText.indexOffset(position!!.selectionPosition) - cachedText.indexOffset(position!!.caretPosition), fontSize)
+                val caretLine = getLine(position!!.caretPosition)
+                val selectionLine = getLine(position!!.selectionPosition)
+
+                if (caretLine == selectionLine) {
+                    val caretX = getXOffset(position!!.caretPosition)
+                    rect(cachedX + caretX, cachedY + getYOffset(position!!.caretPosition), getXOffset(position!!.selectionPosition) - caretX, fontSize)
+                } else {
+                    val larger = max(position!!.caretPosition, position!!.selectionPosition)
+                    val smaller = min(position!!.caretPosition, position!!.selectionPosition)
+                    val largerLine = getLine(larger)
+                    val smallerLine = getLine(smaller)
+
+                    val smallBounds = boundsOf(cachedText[smallerLine])
+                    val smallerX = getXOffset(smaller)
+                    val smallerY = getYOffset(smaller)
+
+                    // Start selection
+                    rect(cachedX + smallerX, cachedY + smallerY, smallBounds[4] + smallBounds[0] - smallerX, fontSize)
+
+                    var y = cachedY + ((fontSize + cachedLineHeight) * (smallerLine + 1)) - boundsOf(cachedText[0])[1]
+
+                    // Fully selected lines
+                    for (i in smallerLine + 1 until (largerLine - smallerLine) + smallerLine) {
+                        val bounds = boundsOf(cachedText[i])
+                        rect(cachedX + bounds[0],  bounds[1] + y, bounds[4], bounds[3] - bounds[1])
+                        y += cachedLineHeight + fontSize
+                    }
+
+                    val bounds = boundsOf(cachedText[largerLine])
+
+                    // End selection
+                    rect(cachedX + bounds[0], bounds[1] + y, getXOffset(larger) - bounds[0], fontSize)
+                }
             }
         }
     }
@@ -335,6 +399,32 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     }
 
     /**
+     * Returns the next position of the given [index]. Because there is an extra
+     * position add per line, this will return the previous position of the line.
+     */
+    open fun getNextPosition(index: Int): Int {
+        var i = 0
+        for (line in cachedText) {
+            if (index == i + line.length) return (index + 2).coerceAtMost(getTextLength())
+            i += line.length + 1
+        }
+        return (index + 1).coerceAtMost(getTextLength())
+    }
+
+    /**
+     * Returns the previous position of the given [index]. Because there is an extra
+     * position add per line, this will return the previous position of the line.
+     */
+    open fun getPreviousPosition(index: Int): Int {
+        var i = 0
+        for (line in cachedText) {
+            if (index == i) return (index - 2).coerceAtLeast(0)
+            i += line.length + 1
+        }
+        return (index - 1).coerceAtLeast(0)
+    }
+
+    /**
      * Changes the caret position to [index]. This does nothing if this is not [isSelectable]
      */
     open fun updateCaretPosition(index: Int) {
@@ -349,25 +439,27 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * Returns the closest index of text relative to the [mouseX] and [mouseY].
      */
     open fun getClosestTextIndex(mouseX: Float, mouseY: Float): Int {
-        var yOffset = 0f
+        var yOffset = boundsOf(cachedText[0])[1]
         var i = 0
         for (row in cachedText) {
-            val rowBounds = UIRendererDSL.boundsOf(row)
+            val rowBounds = boundsOf(row)
             val y = cachedY + yOffset
 
-            yOffset += rowBounds[3] + fontSpacing
+            yOffset += fontSize + cachedLineHeight
+
             // Row check
-            if (mouseY <= y + rowBounds[1] || mouseY >= y + rowBounds[3]) {
-                i += row.length
+            if (mouseY < y || mouseY > y + fontSize + cachedLineHeight) {
+                // Caret can be at the end spot
+                i += row.length + 1
                 continue
             }
             // Vertical row check. If the mouse is at
             // the end or start, return the start, or end index
-//            if (mouseX <= cachedX + rowBounds[0]) {
-//                return i
-//            } else if (mouseX >= cachedX + rowBounds[2]) {
-//                return i + row.length
-//            }
+            if (mouseX <= cachedX + rowBounds[0]) {
+                return i
+            } else if (mouseX >= cachedX + rowBounds[2]) {
+                return i + row.length
+            }
 
             var x = cachedX + rowBounds[0]
             var previous = 0f
@@ -376,18 +468,19 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             // to the mouse for the first portion of it, and the last portion of
             // the previous character.
             for (j in row.indices) {
-                val width = UIRendererDSL.boundsOf(row[j].toString())[4] / 2f
+                val width = boundsOf(row[j].toString())[4] / 2f
 
-                if (mouseX >= x && mouseX <= x + width + previous)
-                    return i
+                if (mouseX >= x && mouseX <= x + width + previous) return i
 
                 x += width + previous
                 previous = width
 
-                i++ // Last character
-                if (j >= row.length - 1)// && mouseX >= width)
-                    return i
+                i++
+                // Check if the last half of the last character
+                // in this row is the closest to the mouse
+                if (j == row.length - 1 && mouseX >= width) return i
             }
+            i++ // Add one for each row because the caret can be at the end of the row
         }
         return -1
     }
@@ -398,17 +491,20 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     open fun getXOffset(index: Int): Float {
         var i = 0
         for (row in cachedText) {
-            if (index < i + row.length)
-                return row.indexOffset(index - i)
-            i += row.length
+            if (index <= i + row.length) return row.indexOffset(index - i)
+            i += row.length + 1
+            if (index == i - 1) return 0f
         }
         return 0f
     }
 
     /**
-     * Returns the y offset of the caret position. Returns 0f if index is out of bounds.
+     * Returns the y offset of the caret position. Returns 0f if [index] is out of bounds.
      */
-    open fun getYOffset(index: Int): Float = getActiveLineIndex(index) * (fontSize + fontSpacing)
+    open fun getYOffset(index: Int): Float {
+        val line = getLine(index)
+        return boundsOf(cachedText[getLine(index)])[1] + line * (fontSize + cachedLineHeight)
+    }
 
     /**
      * Returns true if the [Positions.caretPosition] and [Positions.selectionPosition] aren't equal.
@@ -416,17 +512,21 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     open fun hasSelection() = position!!.caretPosition != position!!.selectionPosition
 
     /**
-     * Returns the index of the given index. Returns the first line if [index] < 0 or [index] >= [lineCount].
+     * Returns the line index of the given index. Returns the first line if the index is out of bounds.
      */
-    open fun getActiveLineIndex(index: Int): Int {
+    open fun getLine(index: Int): Int {
         var j = 0
         for (i in cachedText.indices) {
-            if (index < cachedText[i].length + j)
-                return i
-            j += cachedText[i].length
+            if (index <= cachedText[i].length + j) return i
+            j += cachedText[i].length + 1
         }
         return 0
     }
+
+    /**
+     * Returns the length of [cachedText]
+     */
+    open fun getTextLength() = cachedText.sumOf { it.length + 1 } - 1
 
     /**
      * Returns the position of the ascender line in the current font
@@ -462,34 +562,13 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
 
     protected var fontCache: FontCache? = null
 
-    override fun updateAnimationCache(component: UIComponent<*>) {
+    override fun updateAnimationCache(component: UIComponent<*>) {}
 
-    }
+    override fun clearAnimationCache() {}
 
-    override fun clearAnimationCache() {
+    override fun animate(previous: UIFont?, current: UIFont?, progress: Float, component: UIComponent<*>) {}
 
-    }
-
-    override fun animate(previous: UIFont?, current: UIFont?, progress: Float, component: UIComponent<*>) {
-        fontCache = fontCache ?: FontCache(fontColor, fontSize, fontSpacing, lineBreakWidth, lineHeight)
-        // fontColor
-        // fontSize
-        // fontSpacing
-        // lineBreakWidth
-        // lineHeight
-        fontColor = transition(current?.fontColor ?: fontCache!!.fontColor, previous?.fontColor
-                ?: fontCache!!.fontColor, progress)
-        fontSize = fromProgress(previous?.fontSize ?: fontCache!!.fontSize, current?.fontSize
-                ?: fontCache!!.fontSize, progress)
-    }
-
-    override fun saveState(component: UIComponent<*>, keyframe: UIFont?, retain: Boolean) {
-        if (fontCache == null) throw RuntimeException("WTF")
-        //TODO("Not yet implemented")
-        if (retain) {
-            fontColor = keyframe?.fontColor ?: fontCache!!.fontColor
-        }
-    }
+    override fun saveState(component: UIComponent<*>, keyframe: UIFont?, retain: Boolean) {}
 
     /**
      * Instructs [UIFont] on how to render the text. See the enums for details.
@@ -557,7 +636,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * @author sen
      * @since 6/15/2022
      */
-    class Positions(var selected: Boolean, var caretPosition: Int, var selectionPosition: Int)
+    class Positions(var caretPosition: Int, var selectionPosition: Int)
 
     override fun copy(): UIFont = UIFont().also {
         it.apply(this)
