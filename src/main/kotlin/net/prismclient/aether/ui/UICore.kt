@@ -10,6 +10,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIProvider
+import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -103,13 +104,12 @@ open class UICore(val renderer: UIRenderer) {
     open fun render() {
         renderer {
             beginFrame(width, height, devicePxRatio)
-            if (activeScreen != null) {
+            if (activeScreen != null)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]
                     if (component.visible)
                         component.render()
                 }
-            }
             endFrame()
         }
     }

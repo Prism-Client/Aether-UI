@@ -2,6 +2,7 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.style.UIProvider
@@ -400,13 +401,9 @@ class NanoVGRenderer : UIRenderer() {
         nvgText(ctx, x, y, text)
     }
 
-    private var wrapWidth = 0f
-    private var wrapHeight = 0f
-
     override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float, lines: ArrayList<String>?): Int {
         // TODO: Rewrite text wrapping
         val rows = NVGTextRow.calloc(100)//private val rows = NVGTextRow.create(maxRows)
-        wrapWidth = 0f
 
         // Set the font state
         nvgFontBlur(ctx, 0f)
@@ -420,24 +417,31 @@ class NanoVGRenderer : UIRenderer() {
         val nrows = nvgTextBreakLines(ctx, text, width, rows)
 
         // Get the metrics of the line
-        nvgTextMetrics(ctx, ascender, descender, lineHeight)
         var h = y
+
+        var minx = Float.MAX_VALUE
+        var miny = Float.MAX_VALUE
+        var maxx = 0f
+        var maxy = 0f
 
         // Iterate through the rows
         for (i in 0 until nrows) {
             val row = rows[i]
-            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
-            val w = nnvgText(ctx, x, h, row.start(), row.end()) - x // Render the text
-            wrapWidth = max(wrapWidth, w)
-            h += lineHeight[0] + splitHeight // Increase by the font height plus the split height
+            val text = MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt())
+            lines?.add(text)
+            renderString(text, x, h)
+            minx = bounds[0].coerceAtMost(minx)
+            miny = bounds[1].coerceAtMost(miny)
+            maxx = bounds[2].coerceAtLeast(maxx)
+            maxy = bounds[3].coerceAtLeast(maxy)
+            h += fontSize + splitHeight // Increase by the font height plus the split height
         }
-        wrapHeight = h - y
 
-        nvgTextBoxBounds(ctx, x, y, width, text, bounds)
-
-        bounds[4] = bounds[3] - bounds[0]
-        // Increase the height by the split height times the rows
-        bounds[2] = bounds[2] + (splitHeight * nrows)
+        bounds[0] = minx
+        bounds[1] = miny
+        bounds[2] = maxx
+        bounds[3] = maxy
+        bounds[4] = maxx
 
         rows.free()
         return  nrows

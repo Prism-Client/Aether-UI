@@ -7,6 +7,7 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.bounds
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.boundsOf
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.indexOffset
 import net.prismclient.aether.ui.shape.UIShape
@@ -218,11 +219,10 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             UICore.onMousePressed("$this-SelectionListener") { // TODO: function for bounds
                 val mousePosition = getClosestTextIndex(component.getMouseX(), component.getMouseY())
 
-                if (mousePosition != -1) {
+                if (mousePosition != position!!.caretPosition) {
                     updateCaretPosition(mousePosition)
                     selected = true
                 }
-                println("Caret position: ${mousePosition}")
             }
             UICore.onMouseMove("$this-MoveListener") {
                 if (selected) {
@@ -267,6 +267,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
 
         if (component is UILabel) {
             render(component.text)
+            val bounds = this.textBounds
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
             if (overrideParent && (textBounds[2] - cachedX > component.width || textBounds[3] - cachedY > component.height)) {
@@ -296,8 +297,8 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     cachedText.clear()
                     cachedText.add(0, text)
                     text.render(cachedX, cachedY)
-                    textBounds = bounds()
-                }
+                    setBounds()
+                } // TODO: \n available by default
                 FontRenderType.NEWLINE -> {
                     cachedText.clear()
                     val lines = text.split(newline)
@@ -305,27 +306,26 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     var miny = Float.MAX_VALUE
                     var maxx = 0f
                     var maxy = 0f
-                    var next = 0f
 
                     for (i in lines.indices) {
                         val line = lines[i]
                         cachedText.add(line)
-                        val bound = boundsOf(line)
                         line.render(cachedX, cachedY + i * (cachedLineHeight + fontSize))
                         minx = bounds()[0].coerceAtMost(minx)
                         miny = bounds()[1].coerceAtMost(miny)
                         maxx = bounds()[2].coerceAtLeast(maxx)
                         maxy = bounds()[3].coerceAtLeast(maxy)
-                        next = bounds()[4].coerceAtLeast(next)
                     }
                     textBounds[0] = minx
                     textBounds[1] = miny
                     textBounds[2] = maxx
                     textBounds[3] = maxy
-                    textBounds[4] = next
+                    textBounds[4] = maxx
                 }
                 FontRenderType.WRAP -> {
-                    lineCount = text.render(cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight)
+                    cachedText.clear()
+                    lineCount = renderer.wrapString(text, cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight, cachedText)
+                    setBounds()
                 } // TODO: Clip & Append
                 FontRenderType.CLIP -> {}
                 FontRenderType.APPEND -> {}
@@ -436,7 +436,8 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     }
 
     /**
-     * Returns the closest index of text relative to the [mouseX] and [mouseY].
+     * Returns the closest index of text relative to the [mouseX] and
+     * [mouseY]. If out of bounds, returns the caret position.
      */
     open fun getClosestTextIndex(mouseX: Float, mouseY: Float): Int {
         var yOffset = boundsOf(cachedText[0])[1]
@@ -482,7 +483,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             }
             i++ // Add one for each row because the caret can be at the end of the row
         }
-        return -1
+        return position!!.caretPosition
     }
 
     /**
@@ -558,6 +559,15 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     protected open fun updateFontName() {
         if (isOverridden) return
         fontName = fontFamily + "-" + fontType.name.lowercase() + if (fontStyle == FontStyle.Italic) "-italic" else ""
+    }
+
+    private fun setBounds() {
+        val bounds = bounds()
+        textBounds[0] = bounds[0]
+        textBounds[1] = bounds[1]
+        textBounds[2] = bounds[2]
+        textBounds[3] = bounds[3]
+        textBounds[4] = bounds[4]
     }
 
     protected var fontCache: FontCache? = null
