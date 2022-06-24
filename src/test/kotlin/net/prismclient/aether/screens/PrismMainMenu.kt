@@ -39,8 +39,8 @@ class PrismMainMenu : UIScreen {
             }
 
             style(UIImageSheet(), "logo") {
+                control(UIAlignment.MIDDLELEFT)
                 size(55, 61)
-                y = px(5)
             }
 
             style("title") {
