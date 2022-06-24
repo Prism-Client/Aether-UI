@@ -395,6 +395,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      * Applies the properties of an existing sheet to this
      */
     open fun apply(sheet: UIStyleSheet): UIStyleSheet {
+        this.immutable = immutable
         this.name = sheet.name
 
         this.background = sheet.background?.copy()

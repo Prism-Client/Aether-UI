@@ -9,7 +9,7 @@ import net.prismclient.aether.ui.util.extensions.*
 class TestingScreen : UIScreen {
     override fun build() {
         build {
-            UIFontFamily("Poppins", "/demo/fonts/", "regular", "black", "bold", "light", "thin")
+            UIFontFamily("Poppins", "/demo/fonts/", "regular", "medium","black", "bold", "light", "thin")
             renderer {
                 loadImage("background", "/demo/background.png")
             }

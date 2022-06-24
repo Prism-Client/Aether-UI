@@ -265,7 +265,6 @@ object UIComponentDSL {
 
     /** Other **/
 
-    @JvmOverloads
     inline fun image(imageName: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, style!!), block)
 
     inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, imageLocation, style!!), block)

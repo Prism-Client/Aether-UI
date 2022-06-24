@@ -1,12 +1,10 @@
 package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
-import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
@@ -62,11 +60,11 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
 
     open fun createFramebuffer() {
         if (framebuffer != null) {
-            UIRendererDSL.renderer.deleteContentFBO(framebuffer!!)
+            UIRendererDSL.render.deleteContentFBO(framebuffer!!)
             framebuffer = null
         }
         if (relWidth >= 1f && relHeight >= 1f)
-            framebuffer = UIRendererDSL.renderer.createContentFBO(frameWidth, frameHeight)
+            framebuffer = UIRendererDSL.render.createContentFBO(frameWidth, frameHeight)
     }
 
     open fun updateFramebuffer() {
@@ -120,7 +118,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style),
             if (framebuffer == null) return
             // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
             if (relWidth >= 1f || relHeight >= 1f) {
-                renderer.renderFBO(
+                render.renderFBO(
                         framebuffer!!,
                         relX,
                         relY,

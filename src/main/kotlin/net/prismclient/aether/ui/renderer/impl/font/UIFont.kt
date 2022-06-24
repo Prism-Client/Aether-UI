@@ -635,7 +635,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * @since 5/15/2022
      */
     enum class FontType {
-        Regular, Black, Bold, Light, Thin
+        Regular, Medium, Black, Bold, Light, Thin
     }
 
     /**

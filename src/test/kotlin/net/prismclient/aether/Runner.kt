@@ -2,8 +2,7 @@ package net.prismclient.aether
 
 
 import net.prismclient.aether.screens.ExampleScreen
-import net.prismclient.aether.screens.PrismMainMenu
-import net.prismclient.aether.screens.TestingScreen
+import net.prismclient.aether.screens.PrismLoadingMenu
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -162,7 +161,7 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        UICore.displayScreen(PrismMainMenu())
+        UICore.displayScreen(PrismLoadingMenu())
 //        UICore.displayScreen(ExampleScreen())
 
         while (!glfwWindowShouldClose(window)) {
@@ -175,11 +174,16 @@ object Runner {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
             renderer {
-                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
                 color(-1)
-                renderImage("background", 0f, 0f, UICore.width, UICore.height)
-                endFrame()
+                renderImage("a", 0f, 0f, 100f, 100f)
             }
+
+//            renderer {
+//                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
+//                color(-1)
+//                renderImage("background", 0f, 0f, UICore.width, UICore.height)
+//                endFrame()
+//            }
 
             core!!.render()
 

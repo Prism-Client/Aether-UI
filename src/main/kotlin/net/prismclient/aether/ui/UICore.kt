@@ -545,6 +545,7 @@ open class UICore(val renderer: UIRenderer) {
          * @throws NullPointerException If the components list of this is null
          */
         fun deallocateComponents() {
+            UIProvider.resetStyles()
             instance.components!!.forEach { it.deallocate() }
             deallocationListeners?.forEach { it.value.run() }
             deallocationListeners?.clear()

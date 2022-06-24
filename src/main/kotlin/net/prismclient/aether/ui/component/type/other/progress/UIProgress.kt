@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.type.other.progress
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
  * [UIProgress] is a component which displays the distance between the x and width
@@ -15,8 +16,9 @@ import net.prismclient.aether.ui.component.UIComponent
  */
 class UIProgress @JvmOverloads constructor(var progress: Float = 0f, style: String) : UIComponent<UIProgressSheet>(style) {
     override fun renderComponent() {
-        render {
-            color()
+        renderer {
+            color(style.progressColor)
+            rect(relX, relY, relWidth * progress, relHeight, style.background?.radius)
         }
     }
 }

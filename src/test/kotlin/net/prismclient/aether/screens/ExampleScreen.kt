@@ -26,7 +26,7 @@ import net.prismclient.aether.ui.util.extensions.*
  */
 class ExampleScreen : UIScreen {
     override fun build() {
-        UIFontFamily("Poppins", "/demo/fonts/", "regular", "black", "bold", "light", "thin")
+        UIFontFamily("Poppins", "/demo/fonts/", "regular", "medium", "black", "bold", "light", "thin")
 
         build {
             dependsOn(::TextStyles)
