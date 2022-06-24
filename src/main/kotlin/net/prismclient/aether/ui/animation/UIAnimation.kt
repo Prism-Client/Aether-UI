@@ -6,7 +6,9 @@ import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.inform
 import net.prismclient.aether.ui.util.interfaces.UICopy
+import net.prismclient.aether.ui.util.warn
 import java.util.function.Consumer
 
 /**
@@ -26,33 +28,29 @@ import java.util.function.Consumer
  * will be copied to the new keyframes.
  */
 @Suppress("UNCHECKED_CAST")
-class UIAnimation<T : UIStyleSheet>(
-        var style: T,
-        val name: String,
-        var priority: UIAnimationPriority = UIAnimationPriority.NORMAL
-) : UICopy<UIAnimation<T>> { // TODO: update cache property
+class UIAnimation<T : UIStyleSheet>(var style: T, val name: String, var priority: UIAnimationPriority = UIAnimationPriority.NORMAL) : UICopy<UIAnimation<T>> { // TODO: update cache property
     val lifetime = System.currentTimeMillis()
     val timeline: ArrayList<T> = ArrayList()
 
-    protected lateinit var component: UIComponent<*>
-    protected var activeKeyframe: T? = null
-    protected var nextKeyframe: T? = null
-    protected var nextKeyframeIndex: Int = 0
+    private lateinit var component: UIComponent<*>
+    private var activeKeyframe: T? = null
+    private var nextKeyframe: T? = null
+    private var nextKeyframeIndex: Int = 0
     var onCreationListeners: MutableList<Consumer<UIAnimation<T>>>? = null
     var onCompletionListeners: MutableList<Consumer<UIAnimation<T>>>? = null
 
     var animationLength: Long = 0L
-        protected set
+        private set
     var animating: Boolean = false
-        protected set
+        private set
     var completed: Boolean = false
-        protected set
+        private set
 
     fun start(component: UIComponent<*>) {
         this.component = component
 
         if (timeline.size < 1) {
-            println("Timeline must have at least 1 keyframe to start an animation")
+            warn("Timeline must have at least 1 keyframe to start an animation")
             return
         } else if (timeline.size == 1) {
             timeline.add(timeline[0])
@@ -64,8 +62,7 @@ class UIAnimation<T : UIStyleSheet>(
         completed = false
 
         for (keyframe in timeline) {
-            if (keyframe.ease == null)
-                keyframe.ease = UILinear()
+            if (keyframe.ease == null) keyframe.ease = UILinear()
             animationLength += keyframe.ease!!.duration
         }
 
@@ -99,10 +96,8 @@ class UIAnimation<T : UIStyleSheet>(
      * Invoked on the screen render. The animation is updated here.
      */
     fun update() {
-        if (completed || !animating)
-            return
-        if (!this::component.isInitialized)
-            throw RuntimeException("Component cannot be null for animation")
+        if (completed || !animating) return
+        if (!this::component.isInitialized) throw RuntimeException("Component cannot be null for animation")
 
         if (activeKeyframe == null) {
             activeKeyframe = timeline[0]
@@ -143,7 +138,7 @@ class UIAnimation<T : UIStyleSheet>(
     }
 
     fun forceComplete() {
-        println("Forced animation completion.")
+        inform("Animation was force completed")
         completeAnimation()
     }
 
@@ -174,8 +169,7 @@ class UIAnimation<T : UIStyleSheet>(
         } catch (e: Exception) {
             throw UIComponent.InvalidStyleSheetException("anim-$name-${timeline.size}", null)
         }
-        if (animating)
-            throw RuntimeException("Cannot add keyframe while animating")
+        if (animating) throw RuntimeException("Cannot add keyframe while animating")
         timeline.add(sheet)
         sheet.name = "anim-$name-${timeline.size}"
         sheet.ease = ease
@@ -186,8 +180,7 @@ class UIAnimation<T : UIStyleSheet>(
     }
 
     fun first(event: Consumer<UIAnimation<T>>) {
-        if (onCreationListeners == null)
-            onCreationListeners = mutableListOf()
+        if (onCreationListeners == null) onCreationListeners = mutableListOf()
         onCreationListeners!!.add(event)
     }
 
@@ -195,8 +188,7 @@ class UIAnimation<T : UIStyleSheet>(
      * Adds an event which is invoked when the animation is completed
      */
     fun then(event: Consumer<UIAnimation<T>>) {
-        if (onCompletionListeners == null)
-            onCompletionListeners = mutableListOf()
+        if (onCompletionListeners == null) onCompletionListeners = mutableListOf()
         onCompletionListeners!!.add(event)
     }
 
@@ -206,7 +198,6 @@ class UIAnimation<T : UIStyleSheet>(
 
     override fun copy(): UIAnimation<T> = UIAnimation(style, name, priority).also {
         it.apply(this)
-        for (animation in timeline)
-            it.timeline.add(animation.copy() as T)
+        for (animation in timeline) it.timeline.add(animation.copy() as T)
     }
 }

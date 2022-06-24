@@ -1,11 +1,14 @@
 package net.prismclient.aether.ui.util.extensions
 
+import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.unit.type.UIDependentUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
 import net.prismclient.aether.ui.unit.type.UIRangeUnit
 import net.prismclient.aether.ui.unit.util.UIOperation
+import java.util.function.Supplier
 import net.prismclient.aether.ui.unit.util.UIOperation.*
 
 /**
@@ -50,6 +53,16 @@ const val HEIGHT: Byte = 6
  * The border width of the active component
  */
 const val BORDER: Byte = 7
+
+/**
+ * The width of the screen
+ */
+const val SCREENWIDTH: Byte = 8
+
+/**
+ * The height of the screen
+ */
+const val SCREENHEIGHT: Byte = 9
 
 /** Unit Functions **/
 
@@ -97,7 +110,19 @@ fun unit(value: Number, type: Byte) = UIUnit(value.toFloat(), type)
  */
 fun operation(unit1: UIUnit, unit2: UIUnit, operation: UIOperation) = UIOperationUnit(unit1, unit2, operation)
 
+/**
+ * Creates a [UIUnit] with the type [SCREENWIDTH]
+ */
+fun vw(value: Number) = UIUnit(value.toFloat(), SCREENWIDTH)
+
+/**
+ * Creates a [UIUnit] with the type [SCREENHEIGHT]
+ */
+fun vh(value: Number) = UIUnit(value.toFloat(), SCREENHEIGHT)
+
 fun range(unit: UIUnit, min: UIUnit, max: UIUnit) = UIRangeUnit(unit, min, max)
+
+fun dependentUnit(function: Supplier<Float>) = UIDependentUnit(function)
 
 /** Operator functions **/
 
@@ -135,6 +160,10 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
     if (unit is UIRangeUnit) return calculate(unit.unit, component, width, height, isY)
             .coerceAtLeast(calculate(unit.min, component, width, height, isY))
             .coerceAtMost(calculate(unit.max, component, width, height, isY))
+    if (unit is UIDependentUnit) {
+        unit.value = unit.function.get()
+        return unit.value
+    }
 
     return when (unit.type) {
         PIXELS -> unit.value
@@ -144,6 +173,8 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
         EM -> (component?.style?.font?.fontSize ?: 0f) * unit.value
         WIDTH -> width * unit.value
         HEIGHT -> height * unit.value
+        SCREENWIDTH -> UICore.width
+        SCREENHEIGHT -> UICore.height
         else -> throw RuntimeException("${unit.type} is not considered a unit type.")
     }
 }

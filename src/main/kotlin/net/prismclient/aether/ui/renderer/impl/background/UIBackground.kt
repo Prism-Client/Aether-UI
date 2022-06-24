@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.renderer.impl.background
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
+import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.util.extensions.getAlpha
@@ -36,6 +37,16 @@ open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
         border!!.block()
     }
 
+    @JvmOverloads
+    inline fun border(borderColor: Int = 0, borderWidth: Float = 0f, strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE, block: UIBorder.() -> Unit = {}) {
+        border {
+            this.borderColor = borderColor
+            this.borderWidth = borderWidth
+            this.borderDirection = strokeDirection
+            block()
+        }
+    }
+
     fun radius(radius: Float) {
         this.radius = UIRadius(radius)
     }
@@ -66,7 +77,6 @@ open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
             current?.backgroundColor ?: cachedColor!!,
             progress
         )
-//        println("Progress: $progress, Alpha: ${backgroundColor.getAlpha()}")
         radius?.animate(previous?.radius, current?.radius, progress, component)
         border?.animate(previous?.border, current?.border, progress, component)
     }

@@ -1,4 +1,4 @@
-package net.prismclient.aether
+package net.prismclient.aether.screens
 
 import net.prismclient.aether.dependencies.AnimationStyles
 import net.prismclient.aether.dependencies.ComponentStyles
@@ -8,10 +8,13 @@ import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.input.button.UIImageButton
+import net.prismclient.aether.ui.component.type.input.textfield.UITextField
+import net.prismclient.aether.ui.component.type.input.textfield.UITextFieldSheet
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
@@ -23,22 +26,13 @@ import net.prismclient.aether.ui.util.extensions.*
  */
 class ExampleScreen : UIScreen {
     override fun build() {
-        // To define a font family, you must first create a UIFontFamily object.
-        UIFontFamily("Poppins", "/demo/fonts/", "regular", "black", "bold", "light", "thin")
+        UIFontFamily("Poppins", "/demo/fonts/", "regular", "medium", "black", "bold", "light", "thin")
 
         build {
-            // Dependencies make it easier to organize everything
-            // and reduce boilerplate code. It's a simple interface
-            // which is invoked immediately. You can store styles
-            // and resources there, so they can be reused them late.
             dependsOn(::TextStyles)
             dependsOn(::IconStyles)
             dependsOn(::ComponentStyles)
             dependsOn(::AnimationStyles)
-
-            // The dependencies above are ones that you might use
-            // anywhere. Here is a one specific to this screen:
-            dependsOn(::ExampleScreenStyles)
 
             renderer {
                 loadImage("background", "/demo/background.png")
@@ -104,7 +98,7 @@ class ExampleScreen : UIScreen {
             }
 
             animation(UIStyleSheet(), "crumbHover") {
-                keyframe {  }
+                keyframe { }
                 keyframe(UIQuart(250L)) {
                     background {
                         backgroundColor = asRGBA(0, 0, 0, 0.3f)
@@ -137,7 +131,7 @@ class ExampleScreen : UIScreen {
             }
 
             // Sidebar
-            val c = container("container") {
+            container("container") {
                 style {
                     align(UIAlignment.TOPLEFT)
                     size(px(236f), rel(1f))
@@ -163,7 +157,6 @@ class ExampleScreen : UIScreen {
 
                     p("MENU").style {
                         margin(marginLeft = 24f, marginBottom = 10f)
-                        height = px(16f) // TODO: Font size calculations
                         font {
                             fontColor = asRGBA(191, 189, 193)
                         }
@@ -211,17 +204,16 @@ class ExampleScreen : UIScreen {
                         ignore {
                             p("SOCIAL").style {
                                 margin(20f, 0f, 10f, 24f)
-                                height = px(16f) // TODO: Font size calculations
-                                font(asRGBA(191, 189, 193))
+                                font(fontColor = asRGBA(191, 189, 193))
                             }
                         }
 
-                        button("Messages", "crumb","message", "crumbImage")
+                        button("Messages", "crumb", "message", "crumbImage")
                         button("Friends", "crumb", "friends", "crumbImage")
                         button("Achievements", "crumb", "trophy", "crumbImage")
                         button("Recordings", "crumb", "recording", "crumbImage")
 
-                        this.components.forEach { it.onMousePressed { c -> this.selectComponent(c)} }
+                        this.components.forEach { it.onMousePressed { c -> this.selectComponent(c) } }
                         this.selectComponent(0)
                     }
 
@@ -238,44 +230,79 @@ class ExampleScreen : UIScreen {
                                     borderWidth = 1f
                                 }
                             }
-                            clipContent = true
+                            clipContent = false
                         }
-                        p("Get 3 months of cosmetics for free") {
-                            style {
-                                size(189, 80)
-                                font {
-                                    align(UIAlignment.TOPCENTER)
-                                    y += px(20f)
-                                    textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
-                                    fontRenderType = UIFont.FontRenderType.WRAP
-                                    fontColor = asRGBA(0, 0, 0)
-                                    lineBreakWidth = 189f
-                                    fontSize = 16f
-                                }
+                        p("Get 3 months of cosmetics for free").style {
+                            control(UIAlignment.TOPCENTER)
+                            y = px(20f)
+                            font(fontSize = 16f, fontColor = asRGBA(0, 0, 0), textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
+                                align(UIAlignment.TOPCENTER)
+                                fontRenderType = UIFont.FontRenderType.WRAP
+                                lineBreakWidth = px(189)
                             }
                         }
-                        p("Support Prism's development by unlocking cosmetics.") {
-                            style {
-                                size(179, 80)
-                                font {
-                                    align(UIAlignment.TOPCENTER)
-                                    y += px(60f)
-                                    textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP
-                                    fontRenderType = UIFont.FontRenderType.WRAP
-                                    fontColor = asRGBA(65, 63, 68)
-                                    lineBreakWidth = 179f
-                                    fontSize = 14f
-                                }
+                        p("Support Prism's development by unlocking cosmetics.").style {
+                            control(UIAlignment.TOPCENTER)
+                            y = px(52)
+                            font(fontSize = 14f, fontColor = asRGBA(65, 63, 68), textAlignment = UIRenderer.ALIGNCENTER or UIRenderer.ALIGNTOP) {
+                                align(UIAlignment.TOPCENTER)
+                                fontRenderType = UIFont.FontRenderType.WRAP
+                                lineBreakWidth = px(179)
                             }
                         }
-                        button("GET PREMIUM", "blueButton") {
-                            style {
-                                control(UIAlignment.BOTTOMCENTER)
-                                size(161, 41)
-                                y -= px(10f)
-                            }
+                        button("GET PREMIUM", "blueButton").style {
+                            control(UIAlignment.BOTTOMCENTER)
+                            size(161, 41)
+                            y -= px(10f)
                         }.hover("crumbHover", "crumbLeave")
                     }
+                }
+            }
+
+            val title = h3("SETTINGS").style {
+                position(277f, 30f)
+                font {
+                    align(UIAlignment.MIDDLELEFT)
+                    fontSpacing = fontSize * 0.025f
+                }
+            }
+
+            p("Configure Prism Client's settings to improve and optimize your experience!").style {
+                background(asRGBA(255, 0, 0, 0.3f))
+                size(rel(1f) - px(277 + 448 + 30), px(font!!.fontSize))
+                position(px(277f), dependentUnit value@{
+                    return@value title.y + title.height
+                })
+                font {
+                    overrideParent = false
+                }
+                clipContent = true
+            }
+
+            style(UITextFieldSheet(), "textField") {
+                background(asRGBA(0, 0, 0, 0.1f), radius(8f)) {
+                    border(asRGBA(214, 214, 216), 1f, UIStrokeDirection.INSIDE)
+                }
+                font {
+                    align(UIAlignment.MIDDLELEFT)
+                    x += px(20)
+                    fontFamily = "Poppins"
+                    fontSize = 14f
+                    isSelectable = true
+                    selectionColor = asRGBA(0, 120, 200, 0.3f)
+                    textAlignment = UIRenderer.ALIGNLEFT or UIRenderer.ALIGNMIDDLE
+                }
+                clipContent = false
+            }
+
+            component(UITextField("", "Search for anything...", UITextField.any, "textField")) {
+                style {
+                    control(UIAlignment.TOPRIGHT)
+                    size(448, 39)
+                    x -= px(30); y = px(30)
+                }
+                onTextChanged("textListener") {
+                    //println("This text has been changed to: ${it.text}")
                 }
             }
         }

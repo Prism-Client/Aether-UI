@@ -2,6 +2,7 @@ package net.prismclient.aether
 
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.style.UIProvider
@@ -32,6 +33,7 @@ class NanoVGRenderer : UIRenderer() {
     private val none = NVGColor.create().also { nvgRGBAf(0f, 0f, 0f, 0f, it) }
     private val outlineColor = NVGColor.create()
     private val paint = NVGPaint.create()
+
     override fun beginFrame(width: Float, height: Float, devicePixelRatio: Float) {
         nvgBeginFrame(ctx, width, height, devicePixelRatio)
     }
@@ -288,13 +290,18 @@ class NanoVGRenderer : UIRenderer() {
         val width = intArrayOf(0)
         val height = intArrayOf(0)
         image.buffer = STBImage.stbi_load_from_memory(image.buffer, width, height, intArrayOf(0), 4)
+
         if (image.buffer == null) {
             println("Failed to parse file. Is it corrupted?")
             return image
         }
+
+//        Imagecla.premultiplyAlpha(image.buffer, width[0], height[0], width[0] * 4)
         image.handle = nvgCreateImageRGBA(ctx, width[0], height[0], imageFlags, image.buffer)
         image.width = width[0]
         image.height = height[0]
+
+
 
         image.loaded = true
         registerImage(imageName, image)
@@ -379,8 +386,9 @@ class NanoVGRenderer : UIRenderer() {
     }
 
     private val ascender = floatArrayOf(0f)
-    private val decender = floatArrayOf(0f)
+    private val descender = floatArrayOf(0f)
     private val lineHeight = floatArrayOf(0f)
+    private val bounds = floatArrayOf(0f, 0f, 0f, 0f, 0f)
 
     override fun renderString(text: String, x: Float, y: Float) {
         nvgFontBlur(ctx, 0f)
@@ -389,16 +397,13 @@ class NanoVGRenderer : UIRenderer() {
         nvgTextAlign(ctx, fontAlignment)
         nvgFillColor(ctx, color)
         nvgTextLetterSpacing(ctx, fontSpacing)
+        bounds[4] = nvgTextBounds(ctx, x, y, text, bounds)
         nvgText(ctx, x, y, text)
     }
 
-    private var wrapWidth = 0f
-    private var wrapHeight = 0f
-
-    override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float): Int {
-        // TODO :Rewrite text wrapping
+    override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float, lines: ArrayList<String>?): Int {
+        // TODO: Rewrite text wrapping
         val rows = NVGTextRow.calloc(100)//private val rows = NVGTextRow.create(maxRows)
-        wrapWidth = 0f
 
         // Set the font state
         nvgFontBlur(ctx, 0f)
@@ -412,78 +417,64 @@ class NanoVGRenderer : UIRenderer() {
         val nrows = nvgTextBreakLines(ctx, text, width, rows)
 
         // Get the metrics of the line
-        nvgTextMetrics(ctx, ascender, decender, lineHeight)
         var h = y
+
+        var minx = Float.MAX_VALUE
+        var miny = Float.MAX_VALUE
+        var maxx = 0f
+        var maxy = 0f
 
         // Iterate through the rows
         for (i in 0 until nrows) {
             val row = rows[i]
-            val w = nnvgText(ctx, x, h, row.start(), row.end()) - x // Render the text
-            wrapWidth = max(wrapWidth, w)
-            h += lineHeight[0] + splitHeight // Increase by the font height plus the split height
+            val text = MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt())
+            lines?.add(text)
+            renderString(text, x, h)
+            minx = bounds[0].coerceAtMost(minx)
+            miny = bounds[1].coerceAtMost(miny)
+            maxx = bounds[2].coerceAtLeast(maxx)
+            maxy = bounds[3].coerceAtLeast(maxy)
+            h += fontSize + splitHeight // Increase by the font height plus the split height
         }
-        wrapHeight = h - y
+
+        bounds[0] = minx
+        bounds[1] = miny
+        bounds[2] = maxx
+        bounds[3] = maxy
+        bounds[4] = maxx
 
         rows.free()
-        return nrows
+        return  nrows
     }
 
-    override fun stringWidth(text: String): Float {
-        nvgFontBlur(ctx, 0f)
-        nvgFontFace(ctx, fontName)
-        nvgFontSize(ctx, fontSize)
-        nvgTextAlign(ctx, fontAlignment)
-        nvgFillColor(ctx, none)
-        nvgTextLetterSpacing(ctx, fontSpacing)
-        return nvgText(ctx, 0f, 0f, text)
-    }
+    override fun stringX(): Float = bounds[0]
 
-    override fun stringHeight(text: String): Float {
-        nvgFontBlur(ctx, 0f)
-        nvgFontFace(ctx, fontName)
-        nvgFontSize(ctx, fontSize)
-        nvgTextAlign(ctx, fontAlignment)
-        nvgTextLetterSpacing(ctx, fontSpacing)
-        nvgTextMetrics(ctx, null, null, lineHeight)
-        return lineHeight[0]
-    }
+    override fun stringY(): Float = bounds[1]
+
+    override fun stringWidth(): Float = bounds[2] - bounds[0]
+
+    override fun stringHeight(): Float = bounds[3] - bounds[1]
 
     override fun stringAscender(): Float {
-        nvgFontBlur(ctx, 0f)
-        nvgFontFace(ctx, fontName)
-        nvgFontSize(ctx, fontSize)
-        nvgTextAlign(ctx, fontAlignment)
-        nvgTextLetterSpacing(ctx, fontSpacing)
         nvgTextMetrics(ctx, ascender, null, null)
         return ascender[0]
     }
 
     override fun stringDescender(): Float {
-        nvgFontBlur(ctx, 0f)
-        nvgFontFace(ctx, fontName)
-        nvgFontSize(ctx, fontSize)
-        nvgTextAlign(ctx, fontAlignment)
-        nvgTextLetterSpacing(ctx, fontSpacing)
-        nvgTextMetrics(ctx, null, decender, null)
-        return abs(decender[0])
+        nvgTextMetrics(ctx, null, descender, null)
+        return abs(descender[0])
     }
 
-    override fun wrapWidth(): Float {
-        nvgFontBlur(ctx, 0f)
-        nvgFontFace(ctx, fontName)
-        nvgFontSize(ctx, fontSize)
-        nvgTextAlign(ctx, fontAlignment)
-        nvgTextLetterSpacing(ctx, fontSpacing)
-        return wrapWidth
-    }
+    override fun textBounds(): FloatArray = bounds
 
-    override fun wrapHeight(): Float {
+    override fun boundsOf(text: String): FloatArray {
         nvgFontBlur(ctx, 0f)
         nvgFontFace(ctx, fontName)
         nvgFontSize(ctx, fontSize)
         nvgTextAlign(ctx, fontAlignment)
         nvgTextLetterSpacing(ctx, fontSpacing)
-        return wrapHeight
+        bounds[4] = nvgTextBounds(ctx, 0f, 0f, text, bounds)
+        return bounds
     }
 
     private fun fill() {
@@ -503,21 +494,5 @@ class NanoVGRenderer : UIRenderer() {
         } else {
             fill()
         }
-    }
-
-//    override fun test() {
-//    color(asRGBA(255,0,0, 0.3f))
-//    rect(100f, 100f, 100f, 100f, 10f, 10f, 10f, 10f)
-//    color(asRGBA(0,255,0, 0.3f))
-//    nvgBeginPath(ctx)
-//    nvgRoundedRect(ctx, 90f, 90f, 120f, 120f, 20f)
-//    nvgRoundedRect(ctx, 100f, 100f, 100f, 100f, 10f)
-//    nvgPathWinding(ctx, NVG_HOLE)
-//    nvgFillColor(ctx, color)
-//    nvgFill(ctx)
-//}
-
-    companion object {
-        private const val maxRows = 100 /* Max rows created from [wrapString] */
     }
 }

@@ -1,12 +1,13 @@
 package net.prismclient.aether
 
 
+import net.prismclient.aether.screens.ExampleScreen
+import net.prismclient.aether.screens.PrismLoadingMenu
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
-import net.prismclient.aether.ui.UICore.Properties.updateSize
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
-import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.input.UIKey
+import net.prismclient.aether.ui.util.input.UIModifierKey
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -16,6 +17,7 @@ import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import org.lwjgl.system.Platform
 import kotlin.math.max
+
 
 /**
  * An example runner class with LWJGL 3 & glfw
@@ -33,6 +35,22 @@ object Runner {
     var fps = 0
     var lastSecond = System.currentTimeMillis()
     var core: UICore? = null
+
+    val keymap = HashMap<Int, UIKey>()
+
+    init {
+        // Map the GLFW key mappings to UIKey
+        org.lwjgl.glfw.GLFW::class.java.declaredFields.forEach { field ->
+            if (field.name.startsWith("GLFW_KEY_")) {
+                val fieldName = field.name.removePrefix("GLFW_")
+                UIKey::class.java.enumConstants.forEach {
+                    if (it.name.contentEquals(fieldName)) {
+                        keymap[field.get(null) as Int] = it
+                    }
+                }
+            }
+        }
+    }
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -56,33 +74,70 @@ object Runner {
             throw RuntimeException()
         }
 
-        glfwSetKeyCallback(window) { _: Long, keyCode: Int, _: Int, action: Int, _: Int ->
-            if (keyCode == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-                UICore.displayScreen(ExampleScreen())
-            }
-        }
-
         glfwSetMouseButtonCallback(window) { _: Long, button: Int, action: Int, _: Int ->
-            core!!.mousePressed(button, action == GLFW_RELEASE)
+            core!!.mouseChanged(button, action == GLFW_RELEASE)
         }
-        glfwSetCursorPosCallback(window) { handle: Long, xpos: Double, ypos: Double ->
+        glfwSetCursorPosCallback(window) { _: Long, xpos: Double, ypos: Double ->
             mouseX = xpos
             mouseY = ypos
             core!!.mouseMoved(mouseX.toFloat(), mouseY.toFloat())
         }
 
-        glfwSetWindowContentScaleCallback(window) { handle: Long, xscale: Float, yscale: Float ->
+        glfwSetWindowContentScaleCallback(window) { _: Long, xscale: Float, yscale: Float ->
             contentScaleX = xscale
             contentScaleY = yscale
         }
 
-        glfwSetFramebufferSizeCallback(window) { handle: Long, width: Int, height: Int ->
-            framebufferWidth =width
+        glfwSetFramebufferSizeCallback(window) { _: Long, width: Int, height: Int ->
+            framebufferWidth = width
             framebufferHeight = height
             core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        glfwSetScrollCallback(window) { handle: Long, xscroll: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }
+        glfwSetKeyCallback(window) { _: Long, keyCode: Int, scanCode: Int, action: Int, _: Int ->
+            // Check if the key is null
+            if (glfwGetKeyName(keyCode, scanCode) == null) {
+                if (action == GLFW_PRESS && keyCode == GLFW_KEY_ESCAPE) {
+                    UICore.displayScreen(ExampleScreen())
+                }
+                val isRelease = action == GLFW_RELEASE
+                when (keyCode) {
+                    GLFW_KEY_LEFT_CONTROL -> UICore.updateModifierKey(UIModifierKey.LEFT_CTRL, isRelease)
+                    GLFW_KEY_RIGHT_CONTROL -> UICore.updateModifierKey(UIModifierKey.RIGHT_CTRL, isRelease)
+                    GLFW_KEY_LEFT_SHIFT -> UICore.updateModifierKey(UIModifierKey.LEFT_SHIFT, isRelease)
+                    GLFW_KEY_RIGHT_SHIFT -> UICore.updateModifierKey(UIModifierKey.RIGHT_SHIFT, isRelease)
+                    GLFW_KEY_LEFT_ALT -> UICore.updateModifierKey(UIModifierKey.LEFT_ALT, isRelease)
+                    GLFW_KEY_RIGHT_ALT -> UICore.updateModifierKey(UIModifierKey.RIGHT_ALT, isRelease)
+                    GLFW_KEY_LEFT -> UICore.updateModifierKey(UIModifierKey.ARROW_LEFT, isRelease)
+                    GLFW_KEY_RIGHT -> UICore.updateModifierKey(UIModifierKey.ARROW_RIGHT, isRelease)
+                    GLFW_KEY_UP -> UICore.updateModifierKey(UIModifierKey.ARROW_UP, isRelease)
+                    GLFW_KEY_DOWN -> UICore.updateModifierKey(UIModifierKey.ARROW_DOWN, isRelease)
+                    GLFW_KEY_TAB -> UICore.updateModifierKey(UIModifierKey.TAB, isRelease)
+                    GLFW_KEY_ESCAPE -> UICore.updateModifierKey(UIModifierKey.ESCAPE, isRelease)
+                    GLFW_KEY_ENTER -> UICore.updateModifierKey(UIModifierKey.ENTER, isRelease)
+                    GLFW_KEY_CAPS_LOCK, GLFW_MOD_CAPS_LOCK -> UICore.updateModifierKey(UIModifierKey.CAPS_LOCK, isRelease)
+                    GLFW_KEY_BACKSPACE -> UICore.updateModifierKey(UIModifierKey.BACKSPACE, isRelease)
+                }
+            } else {
+                // glfwSetCharCallback is not invoked while ctrl is held
+                if (UICore.modifierKeys[UIModifierKey.LEFT_CTRL] != true) {
+                    when (glfwGetKeyName(keyCode, scanCode)!!.lowercase()[0]) {
+                        'a' -> UICore.instance.keyPressed('a')
+                        'c' -> UICore.instance.keyPressed('c')
+                        'v' -> UICore.instance.keyPressed('v')
+                        'x' -> UICore.instance.keyPressed('x')
+                        'z' -> UICore.instance.keyPressed('z')
+                        'y' -> UICore.instance.keyPressed('y')
+                    }
+                }
+            }
+        }
+
+        glfwSetCharCallback(window) { window, codepoint ->
+            UICore.instance.keyPressed(Character.toChars(codepoint)[0])
+        }
+
+        glfwSetScrollCallback(window) { _: Long, _: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }
 
         glfwMakeContextCurrent(window)
         GL.createCapabilities()
@@ -106,7 +161,8 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        UICore.displayScreen(ExampleScreen())
+        UICore.displayScreen(PrismLoadingMenu())
+//        UICore.displayScreen(ExampleScreen())
 
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())
@@ -118,11 +174,16 @@ object Runner {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
             renderer {
-                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
                 color(-1)
-                renderImage("background", 0f, 0f, UICore.width, UICore.height)
-                endFrame()
+                renderImage("a", 0f, 0f, 100f, 100f)
             }
+
+//            renderer {
+//                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
+//                color(-1)
+//                renderImage("background", 0f, 0f, UICore.width, UICore.height)
+//                endFrame()
+//            }
 
             core!!.render()
 
@@ -134,4 +195,5 @@ object Runner {
         glfwTerminate()
         glfwSetErrorCallback(null)!!.free()
     }
+
 }

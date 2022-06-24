@@ -7,6 +7,9 @@ import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.style.util.UIFontFamily
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 object UIProvider {
     /**
@@ -14,7 +17,7 @@ object UIProvider {
      */
     private const val MAX_ANIMATION_DURATION = 25000L
 
-    lateinit var renderer: UIRenderer
+    lateinit var render: UIRenderer
 
     val styles = HashMap<String, UIStyleSheet>()
     private val images = HashMap<String, UIImageData>()
@@ -28,8 +31,8 @@ object UIProvider {
      * @param renderer The rendering api used to rendering content onto the screen
      */
     fun initialize(renderer: UIRenderer) {
-        this.renderer = renderer
-        UIRendererDSL.renderer = renderer
+        this.render = renderer
+        UIRendererDSL.render = renderer
     }
 
     fun registerImage(name: String, image: UIImageData) {
@@ -63,6 +66,13 @@ object UIProvider {
         val style = styles[styleName]
                 ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
         return if (original) style else style.copy()
+    }
+
+    /**
+     * Deletes all mutable styles
+     */
+    fun resetStyles() {
+        styles.entries.removeIf { !it.value.immutable }
     }
 
     fun registerAnimation(animation: UIAnimation<*>) {

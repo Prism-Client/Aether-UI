@@ -17,7 +17,6 @@ open class UIListLayout @JvmOverloads constructor(
     var listOrientation: ListOrientation = Forward,
     style: String
 ) : UIContainer<UIContainerSheet>(style) {
-
     override fun updateLayout() {
         var x = if (style.clipContent) 0f else x
         var y = if (style.clipContent) 0f else y

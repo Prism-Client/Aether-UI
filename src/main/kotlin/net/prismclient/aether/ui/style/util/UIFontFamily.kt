@@ -14,6 +14,7 @@ import net.prismclient.aether.ui.style.UIProvider
 class UIFontFamily(
     val familyName: String,
     var regular: UIFontType?,
+    var medium: UIFontType?,
     var black: UIFontType?,
     var bold: UIFontType?,
     var light: UIFontType?,
@@ -28,6 +29,7 @@ class UIFontFamily(
         familyName: String,
         fontLocation: String,
         regular: String,
+        medium: String,
         black: String,
         bold: String,
         light: String,
@@ -35,12 +37,14 @@ class UIFontFamily(
     ) : this(
         familyName,
         if (regular.isNotEmpty()) UIFontType("$familyName-regular", "$familyName-regular-italic") else null,
+        if (medium.isNotEmpty()) UIFontType("$familyName-medium", "$familyName-medium-italic") else null,
         if (black.isNotEmpty()) UIFontType("$familyName-black", "$familyName-black-italic") else null,
         if (bold.isNotEmpty()) UIFontType("$familyName-bold", "$familyName-bold-italic") else null,
         if (light.isNotEmpty()) UIFontType("$familyName-light", "$familyName-light-italic") else null,
         if (thin.isNotEmpty()) UIFontType("$familyName-thin", "$familyName-thin-italic") else null,
     ) {
         this.regular?.load(fontLocation + regular)
+        this.medium?.load(fontLocation + regular)
         this.black?.load(fontLocation + black)
         this.bold?.load(fontLocation + bold)
         this.light?.load(fontLocation + light)
@@ -56,6 +60,7 @@ class UIFontFamily(
      */
     fun load() {
         regular?.attemptLoad()
+        medium?.attemptLoad()
         black?.attemptLoad()
         bold?.attemptLoad()
         light?.attemptLoad()

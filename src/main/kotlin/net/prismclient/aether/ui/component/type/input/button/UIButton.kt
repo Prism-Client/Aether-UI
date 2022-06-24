@@ -12,7 +12,7 @@ import net.prismclient.aether.ui.util.extensions.colorToString
  * @since 5/16/2022
  * @param T The stylesheet (used for inheritance) leave as UIStyleSheet.
  */
-open class UIButton<T : UIStyleSheet>(var text: String, style: String) : UIComponent<T>(style) {
+open class UIButton<T : UIStyleSheet>(open var text: String, style: String) : UIComponent<T>(style) {
     override fun renderComponent() {
         style.font?.render(text)
     }
