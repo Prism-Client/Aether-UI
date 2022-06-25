@@ -322,7 +322,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun assumeLoadImage(name: String, fileLocation: String): UIImageData = when (FilenameUtils.getExtension(fileLocation)) {
-        "png", "jpeg" -> loadImage(name, fileLocation)
+        "png", "jpeg", "jpg" -> loadImage(name, fileLocation)
         "svg" -> loadSvg(name, fileLocation)
         else -> throw UnsupportedOperationException("Unknown file extension: ${
             FilenameUtils.getExtension(fileLocation)

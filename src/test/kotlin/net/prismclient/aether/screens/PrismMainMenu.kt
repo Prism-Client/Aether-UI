@@ -17,7 +17,7 @@ class PrismMainMenu : UIScreen {
     override fun build() {
         build {
             renderer {
-                loadImage("Logo-Tiny", "/prism/icons/Logo-Big.png")
+//                loadImage("Logo-Tiny", "/prism/icons/Logo-Big.png")
                 loadSvg("bag", "/prism/icons/bag.svg")
                 loadSvg("setting", "/prism/icons/setting.svg")
                 loadSvg("world", "/prism/icons/world.svg")
@@ -57,10 +57,10 @@ class PrismMainMenu : UIScreen {
                 y -= px(24)
             }
 
-            image("menu-bg", "/prism/mainmenu/background.png", "background")
+            image("menu-bg", "/prism/mainmenu/1194424.jpg", "background")
 
             container("titleContainer") {
-                image("Logo-Tiny", style = "logo")
+                image("Logo-Big", style = "logo")
                 label("PRISM", "title")
             }
 

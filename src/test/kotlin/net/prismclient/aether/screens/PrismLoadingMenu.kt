@@ -42,7 +42,7 @@ class PrismLoadingMenu : UIScreen {
                 clipContent = false
             }
 
-            image("menu-bg", "/prism/mainmenu/background.png", "background")
+            image("menu-bg", "/prism/mainmenu/1194424.jpg", "background")
             image("Logo-Big", "/prism/icons/Logo-Big.png", "logo").onMousePressed {
                 UICore.displayScreen(PrismMainMenu())
             }

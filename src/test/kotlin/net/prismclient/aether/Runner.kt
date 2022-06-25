@@ -173,11 +173,6 @@ object Runner {
             GL11.glClearColor(0.3f, 0.3f, 0.3f, 0f)
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
-            renderer {
-                color(-1)
-                renderImage("a", 0f, 0f, 100f, 100f)
-            }
-
 //            renderer {
 //                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
 //                color(-1)
