@@ -363,14 +363,9 @@ class NanoVGRenderer : UIRenderer() {
         val img = getImage(imageName)
         var handle = 0
         if (img != null) handle = img.handle
-//        nvgGlobalCompositeBlendFunc(ctx, 770, 771)
         nvgImagePattern(ctx, x, y, width, height, 0f, handle, 1f, paint)
         paint.innerColor(color)
         paint.outerColor(color)
-        if (imageName == "Logo-Big") {
-            nvgGlobalCompositeBlendFuncSeparate(ctx, NVG_ONE, NVG_ZERO, NVG_ZERO, NVG_ZERO)
-//            nvgGlobalCompositeBlendFunc(ctx, GL_CONSTANT_COLOR, GL_CONSTANT_COLOR)
-        }
         nvgBeginPath(ctx)
         nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
         nvgFillPaint(ctx, paint)
@@ -434,9 +429,9 @@ class NanoVGRenderer : UIRenderer() {
         // Iterate through the rows
         for (i in 0 until nrows) {
             val row = rows[i]
-            val text = MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt())
-            lines?.add(text)
-            renderString(text, x, h)
+            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
+            nnvgText(ctx, x, h, row.start(), row.end())
+            nnvgTextBounds(ctx, x, h, row.start(), row.end(), bounds)
             minx = bounds[0].coerceAtMost(minx)
             miny = bounds[1].coerceAtMost(miny)
             maxx = bounds[2].coerceAtLeast(maxx)
