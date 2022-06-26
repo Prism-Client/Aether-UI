@@ -11,6 +11,9 @@ import net.prismclient.aether.ui.screen.UIScreen
  * @author sen
  * @since 5/20/2022
  */
-abstract class UIDependable {
-    abstract fun load()
+interface UIDependable {
+    /**
+     * Invoked on need of styles (essentially immediately)
+     */
+    fun load()
 }
