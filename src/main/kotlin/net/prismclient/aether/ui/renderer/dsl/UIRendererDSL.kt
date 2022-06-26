@@ -16,6 +16,8 @@ import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
+import net.prismclient.aether.ui.util.warn
+import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import java.nio.ByteBuffer
 
@@ -296,7 +298,11 @@ object UIRendererDSL {
 
     @JvmStatic
     @JvmOverloads
-    fun loadSvg(name: String, fileLocation: String, scale: Float = UICore.devicePxRatio) = loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale)
+    fun loadSvg(name: String, fileLocation: String, scale: Float = UICore.devicePxRatio) =
+        loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale).also {
+            if (FilenameUtils.getExtension(fileLocation) != "svg")
+                warn("SVG file extension is not .svg")
+        }
 
     @JvmStatic
     fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = UICore.devicePxRatio): UIImageData {

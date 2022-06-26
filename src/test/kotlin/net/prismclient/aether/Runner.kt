@@ -2,7 +2,8 @@ package net.prismclient.aether
 
 
 import net.prismclient.aether.screens.ExampleScreen
-import net.prismclient.aether.screens.PrismLoadingMenu
+import net.prismclient.aether.screens.prism.PrismGameMenu
+import net.prismclient.aether.screens.prism.PrismLoadingMenu
 import net.prismclient.aether.ui.UICore
 import net.prismclient.aether.ui.UICore.Properties.updateMouse
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -98,7 +99,7 @@ object Runner {
             // Check if the key is null
             if (glfwGetKeyName(keyCode, scanCode) == null) {
                 if (action == GLFW_PRESS && keyCode == GLFW_KEY_ESCAPE) {
-                    UICore.displayScreen(ExampleScreen())
+                    UICore.displayScreen(PrismGameMenu())
                 }
                 val isRelease = action == GLFW_RELEASE
                 when (keyCode) {
@@ -164,6 +165,10 @@ object Runner {
         UICore.displayScreen(PrismLoadingMenu())
 //        UICore.displayScreen(ExampleScreen())
 
+        renderer {
+            loadImage("background", "/prism/background.png")
+        }
+
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())
 
@@ -173,12 +178,12 @@ object Runner {
             GL11.glClearColor(0.3f, 0.3f, 0.3f, 0f)
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
-//            renderer {
-//                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
-//                color(-1)
-//                renderImage("background", 0f, 0f, UICore.width, UICore.height)
-//                endFrame()
-//            }
+            renderer {
+                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
+                color(-1)
+                renderImage("background", 0f, 0f, UICore.width, UICore.height)
+                endFrame()
+            }
 
             core!!.render()
 

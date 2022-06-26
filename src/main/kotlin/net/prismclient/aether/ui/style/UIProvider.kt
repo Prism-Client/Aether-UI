@@ -20,10 +20,10 @@ object UIProvider {
     lateinit var render: UIRenderer
 
     val styles = HashMap<String, UIStyleSheet>()
-    private val images = HashMap<String, UIImageData>()
-    private val fonts = HashMap<String, UIFontFamily>()
-    private val animations = HashMap<String, UIAnimation<*>>()
-    private val activeAnimations = ArrayList<UIAnimation<*>>()
+    val images = HashMap<String, UIImageData>()
+    val fonts = HashMap<String, UIFontFamily>()
+    val animations = HashMap<String, UIAnimation<*>>()
+    val activeAnimations = ArrayList<UIAnimation<*>>()
 
     /**
      * Initializes the UIProvider
@@ -43,6 +43,18 @@ object UIProvider {
 
     fun deleteImage(name: String) =
         images.remove(name)
+
+    /**
+     * Returns the name of the images given the [UIImageData]
+     */
+    fun getImageName(imageData: UIImageData): String? {
+        for (image in images) {
+            if (image.value == imageData) {
+                return image.key
+            }
+        }
+        return null
+    }
 
     /**
      * Adds a [UIFontFamily] into the fonts arraylist. If fonts are loaded by a

@@ -14,7 +14,7 @@ import net.prismclient.aether.ui.util.interfaces.UIDependable
  * An example of [UIDependable] which has component styles setup
  * for a theme so the same styles does not need to be created multiple times
  */
-class ComponentStyles : UIDependable() {
+class ComponentStyles : UIDependable {
     override fun load() {
         /** Button **/
         style(UIStyleSheet(), "btn") {

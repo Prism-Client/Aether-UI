@@ -9,7 +9,7 @@ import net.prismclient.aether.ui.util.extensions.asRGBA
 /**
  * Example of animations as a [UIDependable]
  */
-class AnimationStyles : UIDependable() {
+class AnimationStyles : UIDependable {
     override fun load() {
         animation(UIStyleSheet(), "testAnimation") {
             keyframe(UIQuart(1000L), true) {

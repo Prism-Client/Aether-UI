@@ -18,7 +18,6 @@ import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
-import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.util.extensions.*
 
 /**
@@ -26,7 +25,7 @@ import net.prismclient.aether.ui.util.extensions.*
  */
 class ExampleScreen : UIScreen {
     override fun build() {
-        UIFontFamily("Poppins", "/demo/fonts/", "regular", "medium", "black", "bold", "light", "thin")
+        //UIFontFamily("Poppins", "/demo/fonts/", "regular", "medium", "black", "bold", "light", "thin")
 
         build {
             dependsOn(::TextStyles)
@@ -35,7 +34,7 @@ class ExampleScreen : UIScreen {
             dependsOn(::AnimationStyles)
 
             renderer {
-                loadImage("background", "/demo/background.png")
+                loadImage("background", "/prism/background.png")
                 loadImage("logo", "/demo/logo.png")
             }
 
@@ -82,6 +81,7 @@ class ExampleScreen : UIScreen {
                 margin(marginLeft = 24f)
                 imageColor = asRGBA(65, 63, 68)
             }
+
             style(UIStyleSheet(), "blueButton") {
                 background(asRGBA(87, 164, 255, 0.1f)) {
                     radius(8f)

@@ -6,11 +6,11 @@ import net.prismclient.aether.ui.util.extensions.renderer
 /**
  * An example of using [UIDependable] to load assets
  */
-class IconStyles : UIDependable() {
+class IconStyles : UIDependable {
     override fun load() {
         renderer {
             // Image
-            loadImage("background", "/demo/background.png")
+            loadImage("background", "/prism/background.png")
 
             // Icons
             loadSvg("bag", "/demo/icons/bag.svg")

@@ -31,6 +31,10 @@ class UIImage(name: String, style: String) : UIComponent<UIImageSheet>(style) {
         UIRendererDSL.assumeLoadImage(name, location)
     }
 
+    init {
+        activeImage = UIProvider.getImage(image)
+    }
+
     override fun renderComponent() {
         renderer {
             color(style.imageColor)

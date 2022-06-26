@@ -15,7 +15,7 @@ class UIImageButton(private val imageName: String, private val imageStyle: Strin
 
     override fun initialize() {
         ubuild {
-            image = image(imageName, imageStyle)
+            image = image(imageName, style = imageStyle)
         }
         super.initialize()
     }

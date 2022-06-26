@@ -143,20 +143,6 @@ object UIComponentDSL {
     }
 
     /**
-     * Creates a new [UIStyleSheet], the default of [applyStyle]
-     */
-    inline fun style(name: String, block: UIStyleSheet.() -> Unit) = style(UIStyleSheet(), name, block)
-
-    /**
-     * Creates a new style from the given style sheet.
-     *
-     * @param sheet An instance of whatever style sheet is intended to be created
-     * @param name The name of the style sheet
-     * @param block The DSL block to configure [T]
-     */
-    inline fun <T : UIStyleSheet> style(sheet: T, name: String, block: T.() -> Unit) = net.prismclient.aether.ui.util.extensions.style(sheet, name, block)
-
-    /**
      * Adds a dependable class. To create a dependable class, make a class
      * which extends [UIDependable]. See [UIDependable] doc for more information.
      *
@@ -165,6 +151,15 @@ object UIComponentDSL {
      * @see UIDependable
      */
     inline fun <T : UIDependable> dependsOn(clazz: () -> T) {
+        clazz().load()
+    }
+
+    /**
+     * Alternative to [dependsOn]
+     *
+     * @see dependsOn
+     */
+    inline fun <T : UIDependable> include(clazz: () -> T) {
         clazz().load()
     }
 

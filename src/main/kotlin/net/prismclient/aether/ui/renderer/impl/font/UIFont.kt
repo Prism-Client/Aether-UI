@@ -206,10 +206,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
 
     override fun update(component: UIComponent<*>?) {
         if (ignore) return
-        super.update(component)
-
-        cachedLineBreakWidth = calculate(lineBreakWidth, component!!, component.width, component.height, false)
-        cachedLineHeight = calculate(lineHeight, component, component.width, component.height, false)
+        super.update(component!!)
 
         // Selection handling
         if (isSelectable) {
@@ -282,6 +279,9 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                 ignore = false
             }
         }
+
+        cachedLineBreakWidth = calculate(lineBreakWidth, component, component.width, component.height, false)
+        cachedLineHeight = calculate(lineHeight, component, component.width, component.height, false)
     }
 
     @Deprecated("Use render(text: String) instead", ReplaceWith("render(text: String)"))

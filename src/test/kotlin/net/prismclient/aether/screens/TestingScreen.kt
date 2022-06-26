@@ -11,7 +11,7 @@ class TestingScreen : UIScreen {
         build {
             UIFontFamily("Poppins", "/demo/fonts/", "regular", "medium","black", "bold", "light", "thin")
             renderer {
-                loadImage("background", "/demo/background.png")
+                loadImage("background", "/prism/background.png")
             }
 
             style("style") {
