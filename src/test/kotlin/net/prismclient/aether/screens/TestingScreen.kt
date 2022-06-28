@@ -1,35 +1,35 @@
 package net.prismclient.aether.screens
 
-import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
+import net.prismclient.aether.ui.util.*
+import net.prismclient.aether.ui.util.extensions.descender
+import net.prismclient.aether.ui.util.extensions.plus
 
 class TestingScreen : UIScreen {
     override fun build() {
-        build {
-            UIFontFamily("Poppins", "/demo/fonts/", "regular", "medium","black", "bold", "light", "thin")
-            renderer {
-                loadImage("background", "/demo/background.png")
-            }
-
-            style("style") {
-                font("Poppins", 14f, -1, UIRenderer.ALIGNTOP or UIRenderer.ALIGNLEFT)
-            }
-            label("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris porttitor vehicula ipsum, lacinia lacinia purus maximus eget. Donec sollicitudin elit sed felis pulvinar, a rhoncus risus pellentesque. Integer non fermentum risus, id varius tortor. Donec posuere metus eget lorem egestas, vel accumsan ipsum rutrum. Mauris elementum sapien sit amet ligula pulvinar accumsan. Morbi ac nulla non dolor sagittis commodo quis ut massa. Vivamus non quam vehicula nibh ultricies lacinia ac ut velit. Nam nec viverra felis. Suspendisse potenti. Nulla sed ligula at dolor viverra euismod. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed id elementum risus. Phasellus convallis diam turpis, id mattis massa porttitor eu. Cras at interdum justo. Ut sit amet felis odio.\n" +
-                    "\n" +
-                    "Quisque sit amet nibh aliquet, rhoncus orci vel, vehicula nibh. Pellentesque eget ligula et risus dapibus fermentum sit amet a mi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget arcu placerat, sollicitudin lorem vitae, porttitor diam. Sed ac nisl ut elit aliquam tincidunt. Sed ut mauris venenatis massa faucibus hendrerit nec non odio. Duis id arcu vitae felis vehicula facilisis vel non nibh.", "style").style {
-                position(150f, 150f)
-                background(asRGBA(0, 0, 0, 0.1f))
-                font {
-                    isSelectable = true
-                    fontRenderType = UIFont.FontRenderType.WRAP
-                    lineBreakWidth = px(400)
-                    selectionColor = asRGBA(0, 120, 200, 0.3f)
-                    lineHeight = px(5)
+        UIFontFamily(
+            "Montserrat",
+            "/prism/fonts/montserrat/",
+            "Montserrat-regular",
+            "Montserrat-medium",
+            "Montserrat-black",
+            "Montserrat-bold",
+            "Montserrat-light",
+            "Montserrat-thin"
+        )
+        buildScreen {
+            button("HIIIII").style(UIStyleSheet("")) {
+                control(CENTER)
+                size(400, 40)
+                background(asRGBA(0, 0, 0, 0.3f), radiusOf(8f))
+                font("Montserrat", 20f, textAlignment = middle or center) {
+                    align(CENTER)
+                    y += descender(0.5f)
                 }
-                clipContent = false
             }
         }
     }

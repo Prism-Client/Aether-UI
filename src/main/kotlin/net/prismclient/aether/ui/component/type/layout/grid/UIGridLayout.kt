@@ -2,7 +2,7 @@ package net.prismclient.aether.ui.component.type.layout.grid
 
 class UIGridLayout
 
-//open class UIGridLayoutComponent(style: String) : UIContainer(style) {
+//open class UIGridLayoutComponent(style: String?) : UIContainer(style) {
 //    protected var columns: Array<UIPixel> = arrayOf()
 //    protected var rows: Array<UIPixel> = arrayOf()
 //

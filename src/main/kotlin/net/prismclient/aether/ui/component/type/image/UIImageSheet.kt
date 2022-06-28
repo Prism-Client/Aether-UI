@@ -9,7 +9,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @author sen
  * @since 5/25/2022
  */
-class UIImageSheet : UIStyleSheet() {
+class UIImageSheet(name: String) : UIStyleSheet(name) {
     /**
      * The color of the image. Use -1 (WHITE) for the normal color.
      */
@@ -20,7 +20,7 @@ class UIImageSheet : UIStyleSheet() {
      */
     var imageRadius: UIRadius? = null
 
-    override fun copy() = UIImageSheet().also {
+    override fun copy() = UIImageSheet(name).also {
         it.apply(this)
         it.imageColor = imageColor
         it.imageRadius = imageRadius?.copy()

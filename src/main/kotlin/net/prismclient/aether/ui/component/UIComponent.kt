@@ -1,21 +1,19 @@
 package net.prismclient.aether.ui.component
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.event.input.UIMouseEvent
+import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
-import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
-import net.prismclient.aether.ui.util.input.UIKeyAction
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -39,7 +37,7 @@ import java.util.function.Consumer
  * @since 1.0
  */
 @Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "LeakingThis")
-abstract class UIComponent<T : UIStyleSheet>(style: String) {
+abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /**
      * The style of the component.
      */
@@ -50,13 +48,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      */
     var parent: UIComponent<*>? = null
         set(value) {
-            if (field != null)
-                field!!.childrenCount--
-            if (value != null)
-                value.childrenCount++
+            if (field != null) field!!.childrenCount--
+            if (value != null) value.childrenCount++
             field = value
         }
-    var animation: UIAnimation<*>? = null
+    var animations: HashMap<String, UIAnimation<UIComponent<T>, T>>? = null
 
     /**
      * If true, the position will not update when this component is invoked. Generally this is automatically
@@ -103,27 +99,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      */
     var childrenCount = 0
 
-    /**
-     * The animation for when this component is hovered over
-     *
-     * @see hover
-     */
-    var hoverAnimation: String? = null
-        protected set
-
-    /**
-     * The animation when the mouse leaves the component
-     *
-     * @see hover
-     */
-    var leaveAnimation: String? = null
-        protected set
-
     /** Listeners **/
     /**
      * The listeners for when the component is first initialized. This is only invoked once.
      */
-    var initializationListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+    var initializationListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
 
     /**
@@ -132,20 +112,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      *
      * @see update
      */
-    var updateListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+    var updateListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
 
     /**
      * The listeners for focus/defocus events. The first parameter of the [BiConsumer] is the
      * component and the second is if the component was focused
      */
-    var focusListeners: HashMap<String, BiConsumer<UIComponent<*>, Boolean>>? = null
+    var focusListeners: HashMap<String, BiConsumer<UIComponent<T>, Boolean>>? = null
         protected set
 
     /**
      * The listeners for then the mouse is moved. This is not a bubbling event.
      */
-    var mouseMoveListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+    var mouseMoveListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
 
     /**
@@ -153,14 +133,14 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      *
      * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
      */
-    var mousePressedListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+    var mousePressedListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
 
     /**
      * The listeners for when the mouse is released. Despite being the opposite of
      * [mousePressedListeners], this is NOT a bubbling event.
      */
-    var mouseReleasedListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+    var mouseReleasedListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
 
     /**
@@ -168,14 +148,14 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * is if it passes the check for it being within these bounds and the parent(s) of this. This
      * is not a bubbling event.
      */
-    var mouseEnteredListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+    var mouseEnteredListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
 
     /**
      * The opposite of [mouseEnteredListeners]. Invoked when the mouse leaves this component. This
      * is not a bubbling event.
      */
-    var mouseLeaveListeners: HashMap<String, Consumer<UIComponent<*>>>? = null
+    var mouseLeaveListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
 
     /**
@@ -184,7 +164,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      *
      * @see UIFocusable
      */
-    var keyPressListeners: HashMap<String, BiConsumer<UIComponent<*>, Char>>? = null
+    var keyPressListeners: HashMap<String, BiConsumer<UIComponent<T>, Char>>? = null
         protected set
 
     /**
@@ -194,7 +174,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * @see UIFocusable
      * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
      */
-    var mouseScrollListeners: HashMap<String, BiConsumer<UIComponent<*>, Float>>? = null
+    var mouseScrollListeners: HashMap<String, BiConsumer<UIComponent<T>, Float>>? = null
         protected set
 
     init {
@@ -202,13 +182,19 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     }
 
     /**
-     * Attempts to apply the style to the component.
+     * Attempts to apply the style to the component. If the style is
+     * empty, or null, a NullPointerException will be thrown when the
+     * component is updated. A style must be defined at some point prior
+     * to that invocation.
      *
-     * @throws NullPointerException If the style is not found
+     * To define a style at the component scope see [net.prismclient.aether.ui.util.style]
+     *
      * @throws InvalidStyleSheetException If the style is not a valid style sheet of the given component
      */
-    open fun applyStyle(style: String) {
-        animation = null
+    open fun applyStyle(style: String?) {
+        if (style == null)
+            return
+
         // Attempt to apply the style provided to the component.
         // Throw a InvalidStyleException if the style is not valid.
         try {
@@ -244,6 +230,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * might request for this method to be invoked.
      */
     open fun update() {
+        if (!this::style.isInitialized)
+            throw UninitializedStyleSheetException(this)
+
         calculateBounds()
         // Update the size, then the anchor, and then the position
         updateSize()
@@ -329,12 +318,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Updates the active animation (if applicable)
      */
     open fun updateAnimation() {
-        if (animation != null) {
-            animation!!.update()
-            if (animation!!.completed) {
-                animation = null
-            }
-        }
+
     }
 
     /**
@@ -425,7 +409,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked once on the initialization of the component.
      */
     @JvmOverloads
-    open fun onInitialization(eventName: String = "Default-${initializationListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+    open fun onInitialization(
+        eventName: String = "Default-${initializationListeners?.size ?: 0}", event: Consumer<UIComponent<T>>
+    ): UIComponent<T> {
         initializationListeners = initializationListeners ?: hashMapOf()
         initializationListeners!![eventName] = event
         return this
@@ -437,7 +423,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * the only time that the method is invoked.
      */
     @JvmOverloads
-    open fun onUpdate(eventName: String = "Default-${updateListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+    open fun onUpdate(
+        eventName: String = "Default-${updateListeners?.size ?: 0}", event: Consumer<UIComponent<T>>
+    ): UIComponent<T> {
         updateListeners = updateListeners ?: hashMapOf()
         updateListeners!![eventName] = event
         return this
@@ -448,7 +436,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * and a boolean representing if it was focused or not focused.
      */
     @JvmOverloads
-    open fun onFocus(eventName: String = "Default-${focusListeners?.size ?: 0}", event: BiConsumer<UIComponent<*>, Boolean>): UIComponent<T> {
+    open fun onFocus(
+        eventName: String = "Default-${focusListeners?.size ?: 0}", event: BiConsumer<UIComponent<T>, Boolean>
+    ): UIComponent<T> {
         focusListeners = focusListeners ?: hashMapOf()
         focusListeners!![eventName] = event
         return this
@@ -458,7 +448,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked when the mouse is moved
      */
     @JvmOverloads
-    open fun onMouseMove(eventName: String = "Default-${mouseMoveListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+    open fun onMouseMove(
+        eventName: String = "Default-${mouseMoveListeners?.size ?: 0}", event: Consumer<UIComponent<T>>
+    ): UIComponent<T> {
         mouseMoveListeners = mouseMoveListeners ?: hashMapOf()
         mouseMoveListeners!![eventName] = event
         return this
@@ -468,7 +460,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked when the mouse is pressed. This is a bubbling event.
      */
     @JvmOverloads
-    open fun onMousePressed(eventName: String = "Default-${mousePressedListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+    open fun onMousePressed(
+        eventName: String = "Default-${mousePressedListeners?.size ?: 0}", event: Consumer<UIComponent<T>>
+    ): UIComponent<T> {
         mousePressedListeners = mousePressedListeners ?: hashMapOf()
         mousePressedListeners!![eventName] = event
         return this
@@ -478,7 +472,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked when the mouse is released.
      */
     @JvmOverloads
-    open fun onMouseReleased(eventName: String = "Default-${mouseReleasedListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+    open fun onMouseReleased(
+        eventName: String = "Default-${mouseReleasedListeners?.size ?: 0}", event: Consumer<UIComponent<T>>
+    ): UIComponent<T> {
         mouseReleasedListeners = mouseReleasedListeners ?: hashMapOf()
         mouseReleasedListeners!![eventName] = event
         return this
@@ -488,10 +484,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked when the mouse enters the component's bounding box.
      */
     @JvmOverloads
-    open fun onMouseEnter(eventName: String = "Default-${mouseEnteredListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+    open fun onMouseEnter(
+        eventName: String = "Default-${mouseEnteredListeners?.size ?: 0}", event: Consumer<UIComponent<T>>
+    ): UIComponent<T> {
         mouseEnteredListeners = mouseEnteredListeners ?: hashMapOf()
         mouseEnteredListeners!![eventName] = event
-        allocateHoverListeners()
         return this
     }
 
@@ -499,15 +496,18 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Invoked when the mouse leaves the bounds of the component.
      */
     @JvmOverloads
-    open fun onMouseLeave(eventName: String = "Default-${mouseEnteredListeners?.size ?: 0}", event: Consumer<UIComponent<*>>): UIComponent<T> {
+    open fun onMouseLeave(
+        eventName: String = "Default-${mouseEnteredListeners?.size ?: 0}", event: Consumer<UIComponent<T>>
+    ): UIComponent<T> {
         mouseLeaveListeners = mouseLeaveListeners ?: hashMapOf()
         mouseLeaveListeners!![eventName] = event
-        allocateHoverListeners()
         return this
     }
 
     @JvmOverloads
-    open fun onKeyPress(eventName: String = "Default-${keyPressListeners?.size ?: 0}", event: BiConsumer<UIComponent<*>, Char>): UIComponent<T> {
+    open fun onKeyPress(
+        eventName: String = "Default-${keyPressListeners?.size ?: 0}", event: BiConsumer<UIComponent<T>, Char>
+    ): UIComponent<T> {
         keyPressListeners = keyPressListeners ?: hashMapOf()
         keyPressListeners!![eventName] = event
         return this
@@ -519,79 +519,74 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * @param event The component and the amount scrolled
      */
     @JvmOverloads
-    open fun onMouseScrolled(eventName: String = "Default-${mouseScrollListeners?.size ?: 0}", event: BiConsumer<UIComponent<*>, Float>): UIComponent<T> {
+    open fun onMouseScrolled(
+        eventName: String = "Default-${mouseScrollListeners?.size ?: 0}", event: BiConsumer<UIComponent<T>, Float>
+    ): UIComponent<T> {
         mouseScrollListeners = mouseScrollListeners ?: hashMapOf()
         mouseScrollListeners!![eventName] = event
         return this
     }
 
     /**
-     * Shorthand for loading animations for when the mouse hovers over the component
+     * Stops the animation at whatever point it is at, and moves it to the last position
+     * of the last keyframe, thus making the properties of the component the same as the last.
      */
-    open  fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<*> {
-        this.hoverAnimation = hoverAnimation
-        this.leaveAnimation = leaveAnimation
-        allocateHoverListeners()
-        return this
+    fun completeAnimation() {
+
     }
 
     /**
-     * Adds the hover listeners if necessary
+     * Shorthand for loading animations for when the mouse hovers over the component
      */
-    protected open fun allocateHoverListeners() {
-        if (mouseEnteredListeners == null) {
-            onMouseEnter {
-                UIProvider.dispatchAnimation(it.hoverAnimation, this)
-            }
-        }
+    open fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<T> {
 
-        if (mouseLeaveListeners == null) {
-            onMouseLeave {
-                UIProvider.dispatchAnimation(it.leaveAnimation, this)
-            }
-        }
+        return this
     }
 
     /**
      * Returns the x position of the parent with consideration f it being a [UIFrame]
      */
-    open fun getParentX() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
+    open fun getParentX() =
+        if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
 
     /**
      * Returns the y position of the parent with consideration of it being a [UIFrame]
      */
-    open fun getParentY() = if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
+    open fun getParentY() =
+        if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
 
     /**
      * Returns the width of the component or the window if there is no parent
      */
-    open fun getParentWidth() = if (parent != null) parent!!.width else UICore.width
+    open fun getParentWidth() = if (parent != null) parent!!.width else Aether.width
 
     /**
      * Returns the height of the parent or the window if there is no parent
      */
-    open fun getParentHeight() = if (parent != null) parent!!.height else UICore.height
+    open fun getParentHeight() = if (parent != null) parent!!.height else Aether.height
 
     /**
      * Returns true if the mouse is inside the [relX], [relY], [relWidth], and [relHeight]
      */
-    open fun isMouseInside() = (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
+    open fun isMouseInside() =
+        (getMouseX() >= relX) && (getMouseY() >= relY) && (getMouseX() <= relX + relWidth) && (getMouseY() <= relY + relHeight)
 
     /**
      * Propagates through this, and up to check if the mouse is inside.
      * Returns true if the mouse is inside all the components that nest this.
      */
-    open fun isMouseInsideBounds(): Boolean = if (parent != null && parent!!.style.clipContent && !parent!!.isMouseInsideBounds()) false else isMouseInside()
+    open fun isMouseInsideBounds(): Boolean =
+        if (parent != null && parent!!.style.clipContent && !parent!!.isMouseInsideBounds()) false else isMouseInside()
 
     /**
      * Returns the x position of the mouse with consideration to the parent
      */
-    open fun getMouseX(): Float = UICore.mouseX - getParentXOffset()
+    open fun getMouseX(): Float = Aether.mouseX - getParentXOffset()
 
     /**
      * Returns the y position of the mouse with consideration to the parent
      */
-    open fun getMouseY(): Float = UICore.mouseY - getParentYOffset()
+    open fun getMouseY(): Float = Aether.mouseY - getParentYOffset()
 
     /**
      * Returns the offset of the parent on the x-axis. It incorporates for [UIFrame] and [UIContainer] scroll offsets.
@@ -603,7 +598,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
             return (if (clipContent) {
                 parent!!.relX
-            } else 0f) + parent!!.getParentXOffset() - if (parent is UIContainer<*>) {
+            } else 0f) + parent!!.getParentXOffset() - if (parent is UIContainer) {
                 (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
             } else 0f
         } else 0f
@@ -619,7 +614,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
             val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
             return (if (clipContent) {
                 parent!!.relY
-            } else 0f) + parent!!.getParentYOffset() - if (parent is UIContainer<*>) {
+            } else 0f) + parent!!.getParentYOffset() - if (parent is UIContainer) {
                 (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
             } else 0f
         } else 0f
@@ -628,12 +623,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Shorthand for calculating the x or width of this component
      */
-    protected operator open fun UIUnit?.unaryPlus() = computeUnit(this, false)
+    protected open operator fun UIUnit?.unaryPlus() = computeUnit(this, false)
 
     /**
      * Shorthand for calculation the y or height of this component
      */
-    protected operator open fun UIUnit?.unaryMinus() = computeUnit(this, true)
+    protected open operator fun UIUnit?.unaryMinus() = computeUnit(this, true)
 
     /**
      * Returns the computed version of the given unit based on this and the parent of this
@@ -643,15 +638,15 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
     /**
      * Returns true if this is an instance of [UIFocusable] and is focused
      */
-    open fun isFocused() = if (this is UIFocusable<*>) UICore.focusedComponent == this else false
+    open fun isFocused() = if (this is UIFocusable<*>) Aether.focusedComponent == this else false
 
     /**
      * Focuses this component if applicable
      */
     open fun focus() {
         if (this is UIFocusable<*>) {
-            UICore.focus(this)
-            focusListeners?.forEach { it.value.accept(this, true) }
+            Aether.focus(this)
+            focusListeners?.forEach { it.value.accept(this as UIComponent<T>, true) }
         }
     }
 
@@ -659,9 +654,20 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * Removes the focus from this component
      */
     open fun defocus() {
-        UICore.defocus()
+        Aether.defocus()
         focusListeners?.forEach { it.value.accept(this, false) }
     }
+
+    /**
+     * [UninitializedStyleSheetException] is thrown when the style sheet of
+     * this was not initialized. The solution is to add a valid style sheet
+     * to this component.
+     *
+     * @author sen
+     * @since 1.0
+     */
+    class UninitializedStyleSheetException(component: UIComponent<*>?) :
+        Exception("No stylesheet has been provided to $component")
 
     /**
      * [InvalidStyleSheetException] is thrown when a cast from
@@ -672,7 +678,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String) {
      * is possible that the copy function is not override in the class.
      *
      * @author sen
-     * @since 5/25/2022
+     * @since 1.0
      */
-    class InvalidStyleSheetException(styleName: String, component: UIComponent<*>?) : Exception("Style of name \"$styleName\" is not a valid instance of $component. Is the style sheet passed an instance of the required style sheet for the component? If the style sheet is a custom implementation, please check if you have added the copy method which returns an instance of that style sheet.")
+    class InvalidStyleSheetException(styleName: String, component: UIComponent<*>?) :
+        Exception("Style of name \"$styleName\" is not a valid instance of $component. Is the style sheet passed an instance of the required style sheet for the component? If the style sheet is a custom implementation, please check if you have added the copy method which returns an instance of that style sheet.")
 }

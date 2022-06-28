@@ -4,7 +4,7 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.util.extensions.*
 import java.awt.Color
 
-class UIColorSwatch(style: String) : UIComponent<UIColorSwatchSheet>(style) {
+class UIColorSwatch(style: String?) : UIComponent<UIColorSwatchSheet>(style) {
     var focused = false
     var color = 0
         private set

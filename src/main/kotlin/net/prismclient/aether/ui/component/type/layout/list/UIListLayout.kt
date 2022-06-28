@@ -15,7 +15,7 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 open class UIListLayout @JvmOverloads constructor(
     var listDirection: ListDirection = ListDirection.Vertical,
     var listOrientation: ListOrientation = Forward,
-    style: String
+    style: String?
 ) : UIContainer<UIContainerSheet>(style) {
     override fun updateLayout() {
         var x = if (style.clipContent) 0f else x

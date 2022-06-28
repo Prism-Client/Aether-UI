@@ -1,10 +1,6 @@
 package net.prismclient.aether;
 
-import net.prismclient.aether.ui.component.type.input.button.UIButton;
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL;
 import net.prismclient.aether.ui.screen.UIScreen;
-import net.prismclient.aether.ui.style.UIStyleSheet;
-import net.prismclient.aether.ui.util.extensions.ComponentKt;
 
 /**
  * This is an example of creating a screen with Java instead of Kotlin.
@@ -15,26 +11,26 @@ public class JavaScreen implements UIScreen {
     public void build() {
         // Create the build block (pretty much required)
         // build {}
-        UIComponentDSL.build((dsl) -> {
-            // The best way is to define it as follows and avoid using KFunction, and instead
-            // saving it as a local variable to set the properties (see below).
-            UIButton<UIStyleSheet> button = dsl.button("Text", "btn");
-
-            button.style.size(100, 100);
-
-            // Using KFunction (not suggested)
-            // button(..., ...) {}
-            dsl.button("Other Button", "btn", (otherButton) -> {
-                // style {}
-                ComponentKt.style(otherButton, (style) -> {
-                    style.size(100, 100);
-                    return null;
-                });
-                return null;
-            });
-
-            return null;
-        });
+//        UIComponentDSL.build((dsl) -> {
+//            // The best way is to define it as follows and avoid using KFunction, and instead
+//            // saving it as a local variable to set the properties (see below).
+//            UIButton<UIStyleSheet> button = dsl.button("Text", "btn");
+//
+//            button.style.size(100, 100);
+//
+//            // Using KFunction (not suggested)
+//            // button(..., ...) {}
+//            dsl.button("Other Button", "btn", (otherButton) -> {
+//                // style {}
+//                ComponentKt.style(otherButton, (style) -> {
+//                    style.size(100, 100);
+//                    return null;
+//                });
+//                return null;
+//            });
+//
+//            return null;
+//        });
 
     }
 }

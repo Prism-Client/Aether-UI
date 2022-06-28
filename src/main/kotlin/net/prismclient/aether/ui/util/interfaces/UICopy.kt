@@ -6,10 +6,10 @@ package net.prismclient.aether.ui.util.interfaces
  * @author sen
  * @since 4/26/2022
  */
-interface UICopy<Self> {
+interface UICopy<T> {
     /**
-     * Returns a deep copy; a new instance of [Self], with every property identical
+     * Returns a deep copy; a new instance of [UIComponent<T>], with every property identical
      * to the original, without the original references.
      */
-    fun copy(): Self
+    fun copy(): T
 }

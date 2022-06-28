@@ -1,9 +1,9 @@
 package net.prismclient.aether.ui.animation.ease
 
+import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.animation.ease.UIEaseDirection.*
 import net.prismclient.aether.ui.animation.ease.UIEaseType.*
 import net.prismclient.aether.ui.animation.ease.impl.*
-import net.prismclient.aether.ui.util.interfaces.UICopy
 
 abstract class UIEase(var duration: Long = 1000L, var animationDirection: UIEaseDirection = INOUT) : UICopy<UIEase> {
     var animating: Boolean = false

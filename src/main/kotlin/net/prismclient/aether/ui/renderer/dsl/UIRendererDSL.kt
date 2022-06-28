@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.renderer.dsl
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.BUTT
@@ -16,6 +16,8 @@ import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
+import net.prismclient.aether.ui.util.warn
+import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import java.nio.ByteBuffer
 
@@ -296,10 +298,14 @@ object UIRendererDSL {
 
     @JvmStatic
     @JvmOverloads
-    fun loadSvg(name: String, fileLocation: String, scale: Float = UICore.devicePxRatio) = loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale)
+    fun loadSvg(name: String, fileLocation: String, scale: Float = Aether.devicePxRatio) =
+        loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale).also {
+            if (FilenameUtils.getExtension(fileLocation) != "svg")
+                warn("SVG file extension is not .svg")
+        }
 
     @JvmStatic
-    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = UICore.devicePxRatio): UIImageData {
+    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = Aether.devicePxRatio): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
         return render.loadSVG(name, image, scale)
@@ -322,7 +328,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun assumeLoadImage(name: String, fileLocation: String): UIImageData = when (FilenameUtils.getExtension(fileLocation)) {
-        "png", "jpeg" -> loadImage(name, fileLocation)
+        "png", "jpeg", "jpg" -> loadImage(name, fileLocation)
         "svg" -> loadSvg(name, fileLocation)
         else -> throw UnsupportedOperationException("Unknown file extension: ${
             FilenameUtils.getExtension(fileLocation)

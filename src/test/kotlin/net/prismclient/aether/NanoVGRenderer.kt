@@ -1,22 +1,22 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.style.UIProvider
-import net.prismclient.aether.ui.style.UIProvider.getImage
-import net.prismclient.aether.ui.style.UIProvider.registerImage
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.renderer.UIProvider.getImage
+import net.prismclient.aether.ui.renderer.UIProvider.registerImage
+import net.prismclient.aether.ui.util.extensions.getAlpha
+import net.prismclient.aether.ui.util.extensions.getBlue
+import net.prismclient.aether.ui.util.extensions.getGreen
+import net.prismclient.aether.ui.util.extensions.getRed
 import org.lwjgl.nanovg.*
-import org.lwjgl.nanovg.NanoVG.nvgLinearGradient
 import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.opengl.GL11
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
-import java.lang.Float.max
 import java.nio.ByteBuffer
 import kotlin.math.abs
 
@@ -49,7 +49,7 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
-        val contentScale = UICore.devicePxRatio
+        val contentScale = Aether.devicePxRatio
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
             NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
@@ -369,6 +369,7 @@ class NanoVGRenderer : UIRenderer() {
         nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
         nvgFillPaint(ctx, paint)
         nvgFill(ctx)
+
     }
 
     override fun deleteImage(imageName: String) {
@@ -427,9 +428,9 @@ class NanoVGRenderer : UIRenderer() {
         // Iterate through the rows
         for (i in 0 until nrows) {
             val row = rows[i]
-            val text = MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt())
-            lines?.add(text)
-            renderString(text, x, h)
+            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
+            nnvgText(ctx, x, h, row.start(), row.end())
+            nnvgTextBounds(ctx, x, h, row.start(), row.end(), bounds)
             minx = bounds[0].coerceAtMost(minx)
             miny = bounds[1].coerceAtMost(miny)
             maxx = bounds[2].coerceAtLeast(maxx)

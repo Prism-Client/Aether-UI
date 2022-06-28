@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.style.util
 
-import net.prismclient.aether.ui.style.UIProvider
+import net.prismclient.aether.ui.renderer.UIProvider
 
 /**
  * [UIFontFamily] holds different weighted fonts of the same

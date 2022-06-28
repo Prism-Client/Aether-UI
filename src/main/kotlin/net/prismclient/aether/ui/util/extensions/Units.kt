@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.util.extensions
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
@@ -173,8 +173,8 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
         EM -> (component?.style?.font?.fontSize ?: 0f) * unit.value
         WIDTH -> width * unit.value
         HEIGHT -> height * unit.value
-        SCREENWIDTH -> UICore.width
-        SCREENHEIGHT -> UICore.height
+        SCREENWIDTH -> Aether.width
+        SCREENHEIGHT -> Aether.height
         else -> throw RuntimeException("${unit.type} is not considered a unit type.")
     }
 }

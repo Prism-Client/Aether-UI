@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.component.type.input.textfield
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
@@ -26,7 +26,7 @@ import java.util.function.Consumer
  * @since 6/6/2022
  * @see UITextField.filter Pre-made text filters.
  */
-open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String) : UIButton<UITextFieldSheet>(text, style), UIFocusable<UITextField> {
+open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String?) : UIButton<UITextFieldSheet>(text, style), UIFocusable<UITextField> {
     override var text: String = text
         set(value) {
             field = value
@@ -51,7 +51,7 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
     protected var blink: Boolean = false
 
     init {
-        UICore.onModifierKeyChange(this.toString()) { key, value ->
+        Aether.onModifierKeyChange(this.toString()) { key, value ->
             if (!this.isFocused()) return@onModifierKeyChange
             if (key == UIModifierKey.LEFT_CTRL || key == UIModifierKey.RIGHT_CTRL) isCtrlHeld = !value
             if (value) return@onModifierKeyChange
@@ -75,7 +75,7 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
 
     override fun deallocate() {
         // Deallocate the UICore.onModifierKeyChange listener
-        UICore.modifierKeyListeners.remove(this.toString())
+        Aether.modifierKeyListeners.remove(this.toString())
     }
 
     override fun updateStyle() {

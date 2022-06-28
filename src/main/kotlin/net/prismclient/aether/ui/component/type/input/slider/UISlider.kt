@@ -18,19 +18,16 @@ import kotlin.math.roundToInt
  * @param max The maximum value that the slider should be
  * @param step The value which the slider should step by
  */
-open class UISlider(value: Float, var min: Float, var max: Float, var step: Float, style: String) :
+open class UISlider(value: Float, var min: Float, var max: Float, var step: Float, style: String?) :
     UIComponent<UISliderSheet>(style) {
     var value: Float = value
         set(value) {
             val prev = this.value
             field = ((value / step).roundToInt() * step).coerceAtLeast(min).coerceAtMost(max)
-            if (prev != field)
-                valueListeners?.forEach { it.accept(this) }
+            if (prev != field) valueListeners?.forEach { it.accept(this) }
         }
 
-    protected var normalizedValue = (value / (max - min))
-        .coerceAtLeast(0f)
-        .coerceAtMost(1f)
+    protected var normalizedValue = (value / (max - min)).coerceAtLeast(0f).coerceAtMost(1f)
     protected var offsetX = 0f
     protected var selected = false
 
@@ -42,18 +39,7 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
         style.sliderControl.render()
     }
 
-    override fun mouseMoved(mouseX: Float, mouseY: Float) {
-        super.mouseMoved(mouseX, mouseY)
-//        if (selected) { // I got lazy
-//            normalizedValue =
-//                (((UICore__.mouseX - offsetX - style.sliderControl.cachedX)) / (relWidth - style.sliderControl.cachedWidth))
-//                    .coerceAtLeast(0f)
-//                    .coerceAtMost(1f)
-//            updateSlider()
-//        }
-    }
-
-//    override fun mousePressed(mouseX: Float, mouseY: Float) {
+    //    override fun mousePressed(mouseX: Float, mouseY: Float) {
 //        super.mousePressed(mouseX, mouseY)
 //
 //        if (isWithinBounds(
@@ -86,10 +72,8 @@ open class UISlider(value: Float, var min: Float, var max: Float, var step: Floa
      */
     @JvmOverloads
     fun onValueChanged(acceptImmediately: Boolean = false, event: Consumer<UISlider>) {
-        if (valueListeners == null)
-            valueListeners = mutableListOf()
+        if (valueListeners == null) valueListeners = mutableListOf()
         valueListeners!!.add(event)
-        if (acceptImmediately)
-            event.accept(this)
+        if (acceptImmediately) event.accept(this)
     }
 }

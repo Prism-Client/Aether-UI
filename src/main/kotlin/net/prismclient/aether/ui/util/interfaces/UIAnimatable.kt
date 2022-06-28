@@ -4,7 +4,7 @@ import net.prismclient.aether.ui.component.UIComponent
 
 /**
  * [UIAnimatable] is an interface which all renderable object must inherit
- * to properly animate itself on screen.
+ * to properly animate itUIComponent<T> on screen.
  *
  * @author sen.
  * @since 5/27/2022
@@ -37,7 +37,7 @@ interface UIAnimatable<T> {
      * 50 * 0.5 = 25, 50 + 25 = 75; thus, the output should be 75.
      *
      * If at any point [previous] or [current] is null, then the output should be the initial
-     * value of this. To do this, it might be needed to have a cached instance of self and initialize
+     * value of this. To do this, it might be needed to have a cached instance of UIComponent<T> and initialize
      * it if it is not initialized when this method is invoked
      *
      * In essence, this function should produce the output of the two of [T] based on [progress].

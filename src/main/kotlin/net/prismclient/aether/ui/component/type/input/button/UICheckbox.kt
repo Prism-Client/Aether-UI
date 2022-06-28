@@ -9,7 +9,7 @@ open class UICheckbox(
     var selectedImageName: String = "checkbox",
     var deselectedImageName: String = "",
     var imageStyle: String,
-    style: String
+    style: String?
 ) : UISelectableButton<UIStyleSheet>(checked, "", style) {
     lateinit var selectedImage: UIImage
     lateinit var deselectedImage: UIImage

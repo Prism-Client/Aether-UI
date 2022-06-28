@@ -11,12 +11,12 @@ import net.prismclient.aether.ui.util.interfaces.UIFocusable
  * [UIContainer] is the superclass for all layouts. It introduces scrollbars
  * into the component, so content outside the frame can be viewed.
  *
- * [UIContainer] itself can also be created with [UIContainerSheet] as the sheet.
+ * [UIContainer] itUIComponent<T> can also be created with [UIContainerSheet] as the sheet.
  *
  * @author sen
  * @since 5/12/2022
  */
-open class UIContainer<T : UIContainerSheet>(style: String) : UIFrame<T>(style), UIFocusable<UIContainer<T>> {
+open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style), UIFocusable<UIContainer<T>> {
     /**
      * How sensitive the scrolling will be
      */

@@ -26,9 +26,16 @@ import net.prismclient.aether.ui.util.extensions.renderer
  *
  * @see UIContainer
  */
-abstract class UIFrame<T : UIFrameSheet>(style: String) : UIComponent<T>(style), UILayout {
+abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style), UILayout {
     val components = ArrayList<UIComponent<*>>()
-    protected var framebuffer: UIContentFBO? = null
+
+    // TODO: Update UIFrame
+
+    /**
+     *
+     */
+    var framebuffer: UIContentFBO? = null
+        protected set
 
     var frameWidth: Float = 0f
         protected set

@@ -57,6 +57,18 @@ class UIGradientBackground : UIBackground() {
         }
     }
 
+    override fun copy(): UIGradientBackground = UIGradientBackground().also {
+        it.backgroundColor = backgroundColor
+        it.radius = radius?.copy()
+        it.border = border?.copy()
+        it.gradientStartColor = gradientStartColor
+        it.gradientEndColor = gradientEndColor
+        it.gradientX = gradientX?.copy()
+        it.gradientY = gradientY?.copy()
+        it.gradientWidth = gradientWidth?.copy()
+        it.gradientHeight = gradientHeight?.copy()
+    }
+
     // TODO: GradientType
 //    enum class GradientType {
 //        LINEAR,
