@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.renderer.impl.font
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
@@ -213,7 +213,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             // Allocate, and add listeners for when the mouse is moved, pressed and released
             position = Positions(0, 0)
             val pos = position!!
-            UICore.onMousePressed("$this-SelectionListener") { // TODO: function for bounds
+            Aether.onMousePressed("$this-SelectionListener") { // TODO: function for bounds
                 val mousePosition = getClosestTextIndex(component.getMouseX(), component.getMouseY())
 
                 if (mousePosition != position!!.caretPosition) {
@@ -221,18 +221,18 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     selected = true
                 }
             }
-            UICore.onMouseMove("$this-MoveListener") {
+            Aether.onMouseMove("$this-MoveListener") {
                 if (selected) {
                     select(getClosestTextIndex(component.getMouseX(), component.getMouseY()), pos.selectionPosition)
                 }
             }
-            UICore.onMousePressed("$this-DeselectionListener") {
+            Aether.onMousePressed("$this-DeselectionListener") {
                 if (component.getMouseY() <= cachedY + textBounds[1] && component.getMouseY() <= cachedY + textBounds[1] + fontSize) {
                     deselect()
                 }
             }
-            UICore.onMouseReleased("$this-DeselectionListener") { selected = false }
-            UICore.onModifierKeyChange("$this-ModifierListener") { key, value ->
+            Aether.onMouseReleased("$this-DeselectionListener") { selected = false }
+            Aether.onModifierKeyChange("$this-ModifierListener") { key, value ->
                 if (key == UIModifierKey.LEFT_SHIFT || key == UIModifierKey.RIGHT_SHIFT) isShiftHeld = !value
                 if (value) return@onModifierKeyChange
                 when (key) {
@@ -249,17 +249,17 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     else -> {} // TODO: Up and down keys
                 }
             }
-            UICore.onDeallocation("$this-DeallocationListener") {
+            Aether.onDeallocation("$this-DeallocationListener") {
                 // Deallocate all previous event calls
-                UICore.mousePressedListeners?.remove("$this-MoveListener")
-                UICore.mousePressedListeners?.remove("$this-DeselectionListener")
-                UICore.mousePressedListeners?.remove("$this-DeselectionListener")
+                Aether.mousePressedListeners?.remove("$this-MoveListener")
+                Aether.mousePressedListeners?.remove("$this-DeselectionListener")
+                Aether.mousePressedListeners?.remove("$this-DeselectionListener")
             }
         } else {
             // Deallocate and remove the listener if it is not selectable
             position = null
             component.mousePressedListeners?.remove("UIFontSelectionListener")
-            UICore.mousePressedListeners?.remove("$this-DeselectionListener")
+            Aether.mousePressedListeners?.remove("$this-DeselectionListener")
         }
 
         if (component is UILabel) {
