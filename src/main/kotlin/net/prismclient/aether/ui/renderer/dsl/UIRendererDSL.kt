@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.renderer.dsl
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.UIRenderer.Properties.BUTT
@@ -298,14 +298,14 @@ object UIRendererDSL {
 
     @JvmStatic
     @JvmOverloads
-    fun loadSvg(name: String, fileLocation: String, scale: Float = UICore.devicePxRatio) =
+    fun loadSvg(name: String, fileLocation: String, scale: Float = Aether.devicePxRatio) =
         loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale).also {
             if (FilenameUtils.getExtension(fileLocation) != "svg")
                 warn("SVG file extension is not .svg")
         }
 
     @JvmStatic
-    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = UICore.devicePxRatio): UIImageData {
+    fun loadSvg(name: String, buffer: ByteBuffer, scale: Float = Aether.devicePxRatio): UIImageData {
         val image = UIImageData()
         image.buffer = buffer
         return render.loadSVG(name, image, scale)

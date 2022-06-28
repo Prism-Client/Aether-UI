@@ -12,7 +12,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @see UIScrollbar
  * @see Overflow
  */
-open class UIContainerSheet : UIFrameSheet() {
+open class UIContainerSheet(name: String) : UIFrameSheet(name) {
     /**
      * Describes when to introduce the scrollbar
      *
@@ -65,8 +65,29 @@ open class UIContainerSheet : UIFrameSheet() {
         Auto
     }
 
-    override fun copy(): UIContainerSheet = UIContainerSheet().also {
+    override fun apply(sheet: UIStyleSheet): UIContainerSheet {
+        this.name = sheet.name
+
+        this.background = sheet.background?.copy()
+        this.font = sheet.font?.copy()
+
+        this.x = sheet.x?.copy()
+        this.y = sheet.y?.copy()
+        this.width = sheet.width?.copy()
+        this.height = sheet.height?.copy()
+
+        this.padding = sheet.padding?.copy()
+        this.margin = sheet.margin?.copy()
+        this.anchor = sheet.anchor?.copy()
+        this.clipContent = sheet.clipContent
+
+        return this
+    }
+
+    override fun copy(): UIContainerSheet = UIContainerSheet(name).also {
         it.apply(this)
+        it.frameWidth = frameWidth?.copy()
+        it.frameHeight = frameHeight?.copy()
 
         it.overflowX = overflowX
         it.overflowY = overflowY

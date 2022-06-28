@@ -2,10 +2,11 @@ package net.prismclient.aether
 
 
 import net.prismclient.aether.screens.ExampleScreen
+import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.screens.prism.PrismGameMenu
 import net.prismclient.aether.screens.prism.PrismLoadingMenu
-import net.prismclient.aether.ui.UICore
-import net.prismclient.aether.ui.UICore.Properties.updateMouse
+import net.prismclient.aether.ui.Aether
+import net.prismclient.aether.ui.Aether.Properties.updateMouse
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIModifierKey
@@ -35,7 +36,7 @@ object Runner {
     var actualFps = 0
     var fps = 0
     var lastSecond = System.currentTimeMillis()
-    var core: UICore? = null
+    var core: Aether? = null
 
     val keymap = HashMap<Int, UIKey>()
 
@@ -99,43 +100,43 @@ object Runner {
             // Check if the key is null
             if (glfwGetKeyName(keyCode, scanCode) == null) {
                 if (action == GLFW_PRESS && keyCode == GLFW_KEY_ESCAPE) {
-                    UICore.displayScreen(PrismGameMenu())
+                    Aether.displayScreen(PrismGameMenu())
                 }
                 val isRelease = action == GLFW_RELEASE
                 when (keyCode) {
-                    GLFW_KEY_LEFT_CONTROL -> UICore.updateModifierKey(UIModifierKey.LEFT_CTRL, isRelease)
-                    GLFW_KEY_RIGHT_CONTROL -> UICore.updateModifierKey(UIModifierKey.RIGHT_CTRL, isRelease)
-                    GLFW_KEY_LEFT_SHIFT -> UICore.updateModifierKey(UIModifierKey.LEFT_SHIFT, isRelease)
-                    GLFW_KEY_RIGHT_SHIFT -> UICore.updateModifierKey(UIModifierKey.RIGHT_SHIFT, isRelease)
-                    GLFW_KEY_LEFT_ALT -> UICore.updateModifierKey(UIModifierKey.LEFT_ALT, isRelease)
-                    GLFW_KEY_RIGHT_ALT -> UICore.updateModifierKey(UIModifierKey.RIGHT_ALT, isRelease)
-                    GLFW_KEY_LEFT -> UICore.updateModifierKey(UIModifierKey.ARROW_LEFT, isRelease)
-                    GLFW_KEY_RIGHT -> UICore.updateModifierKey(UIModifierKey.ARROW_RIGHT, isRelease)
-                    GLFW_KEY_UP -> UICore.updateModifierKey(UIModifierKey.ARROW_UP, isRelease)
-                    GLFW_KEY_DOWN -> UICore.updateModifierKey(UIModifierKey.ARROW_DOWN, isRelease)
-                    GLFW_KEY_TAB -> UICore.updateModifierKey(UIModifierKey.TAB, isRelease)
-                    GLFW_KEY_ESCAPE -> UICore.updateModifierKey(UIModifierKey.ESCAPE, isRelease)
-                    GLFW_KEY_ENTER -> UICore.updateModifierKey(UIModifierKey.ENTER, isRelease)
-                    GLFW_KEY_CAPS_LOCK, GLFW_MOD_CAPS_LOCK -> UICore.updateModifierKey(UIModifierKey.CAPS_LOCK, isRelease)
-                    GLFW_KEY_BACKSPACE -> UICore.updateModifierKey(UIModifierKey.BACKSPACE, isRelease)
+                    GLFW_KEY_LEFT_CONTROL -> Aether.updateModifierKey(UIModifierKey.LEFT_CTRL, isRelease)
+                    GLFW_KEY_RIGHT_CONTROL -> Aether.updateModifierKey(UIModifierKey.RIGHT_CTRL, isRelease)
+                    GLFW_KEY_LEFT_SHIFT -> Aether.updateModifierKey(UIModifierKey.LEFT_SHIFT, isRelease)
+                    GLFW_KEY_RIGHT_SHIFT -> Aether.updateModifierKey(UIModifierKey.RIGHT_SHIFT, isRelease)
+                    GLFW_KEY_LEFT_ALT -> Aether.updateModifierKey(UIModifierKey.LEFT_ALT, isRelease)
+                    GLFW_KEY_RIGHT_ALT -> Aether.updateModifierKey(UIModifierKey.RIGHT_ALT, isRelease)
+                    GLFW_KEY_LEFT -> Aether.updateModifierKey(UIModifierKey.ARROW_LEFT, isRelease)
+                    GLFW_KEY_RIGHT -> Aether.updateModifierKey(UIModifierKey.ARROW_RIGHT, isRelease)
+                    GLFW_KEY_UP -> Aether.updateModifierKey(UIModifierKey.ARROW_UP, isRelease)
+                    GLFW_KEY_DOWN -> Aether.updateModifierKey(UIModifierKey.ARROW_DOWN, isRelease)
+                    GLFW_KEY_TAB -> Aether.updateModifierKey(UIModifierKey.TAB, isRelease)
+                    GLFW_KEY_ESCAPE -> Aether.updateModifierKey(UIModifierKey.ESCAPE, isRelease)
+                    GLFW_KEY_ENTER -> Aether.updateModifierKey(UIModifierKey.ENTER, isRelease)
+                    GLFW_KEY_CAPS_LOCK, GLFW_MOD_CAPS_LOCK -> Aether.updateModifierKey(UIModifierKey.CAPS_LOCK, isRelease)
+                    GLFW_KEY_BACKSPACE -> Aether.updateModifierKey(UIModifierKey.BACKSPACE, isRelease)
                 }
             } else {
                 // glfwSetCharCallback is not invoked while ctrl is held
-                if (UICore.modifierKeys[UIModifierKey.LEFT_CTRL] != true) {
+                if (Aether.modifierKeys[UIModifierKey.LEFT_CTRL] != true) {
                     when (glfwGetKeyName(keyCode, scanCode)!!.lowercase()[0]) {
-                        'a' -> UICore.instance.keyPressed('a')
-                        'c' -> UICore.instance.keyPressed('c')
-                        'v' -> UICore.instance.keyPressed('v')
-                        'x' -> UICore.instance.keyPressed('x')
-                        'z' -> UICore.instance.keyPressed('z')
-                        'y' -> UICore.instance.keyPressed('y')
+                        'a' -> Aether.instance.keyPressed('a')
+                        'c' -> Aether.instance.keyPressed('c')
+                        'v' -> Aether.instance.keyPressed('v')
+                        'x' -> Aether.instance.keyPressed('x')
+                        'z' -> Aether.instance.keyPressed('z')
+                        'y' -> Aether.instance.keyPressed('y')
                     }
                 }
             }
         }
 
         glfwSetCharCallback(window) { window, codepoint ->
-            UICore.instance.keyPressed(Character.toChars(codepoint)[0])
+            Aether.instance.keyPressed(Character.toChars(codepoint)[0])
         }
 
         glfwSetScrollCallback(window) { _: Long, _: Double, yscroll: Double -> core!!.mouseScrolled(yscroll.toFloat()) }
@@ -145,7 +146,7 @@ object Runner {
         glfwSetTime(0.0)
         glfwSwapInterval(0)
 
-        core = UICore(NanoVGRenderer())
+        core = Aether(NanoVGRenderer())
 
         MemoryStack.stackPush().use {
             val fw = it.mallocInt(1)
@@ -162,8 +163,11 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        UICore.displayScreen(PrismLoadingMenu())
-//        UICore.displayScreen(ExampleScreen())
+        if (args[0] == "--debug") {
+            Aether.displayScreen(TestingScreen())
+        } else {
+            Aether.displayScreen(PrismLoadingMenu())
+        }
 
         renderer {
             loadImage("background", "/prism/background.png")
@@ -179,9 +183,9 @@ object Runner {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
             renderer {
-                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, UICore.devicePxRatio)
+                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, Aether.devicePxRatio)
                 color(-1)
-                renderImage("background", 0f, 0f, UICore.width, UICore.height)
+                renderImage("background", 0f, 0f, Aether.width, Aether.height)
                 endFrame()
             }
 

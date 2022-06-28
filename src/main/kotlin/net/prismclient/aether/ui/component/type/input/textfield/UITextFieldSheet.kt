@@ -14,7 +14,7 @@ import net.prismclient.aether.ui.util.extensions.rel
  * @author sen
  * @since 5/11/2022
  */
-class UITextFieldSheet : UIStyleSheet() {
+class UITextFieldSheet(name: String) : UIStyleSheet(name) {
     /**
      * The caret shape which is drawn to display the caret.
      */
@@ -41,7 +41,7 @@ class UITextFieldSheet : UIStyleSheet() {
         block.invoke(caret)
     }
 
-    override fun copy(): UITextFieldSheet = UITextFieldSheet().also {
+    override fun copy(): UITextFieldSheet = UITextFieldSheet(name).also {
         it.apply(this)
         it.caret = caret.copy()
         it.blinkRate = blinkRate

@@ -9,8 +9,7 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.style.UIProvider
-import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -24,7 +23,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
- * [UICore] is the core of the Aether UI. It is responsible for managing the entirety
+ * [Aether] is the core of the Aether UI. It is responsible for managing the entirety
  * of the library. It controls and manages what to do with input and rendering. It holds
  * what would be the equivalent of the components within a UIScreen. Most functions within
  * this class should be invoked to properly render and handle input. See the docs for more
@@ -42,7 +41,7 @@ import kotlin.collections.HashMap
  * @see <a href="https://aether.prismclient.net/getting-started">UICore documentation</a>
  * @see UIProvider
  */
-open class UICore(val renderer: UIRenderer) {
+open class Aether(val renderer: UIRenderer) {
     /**
      * All components that are not nested within a frame
      *
@@ -80,7 +79,6 @@ open class UICore(val renderer: UIRenderer) {
         updateListeners?.forEach { it.value.run() }
         components?.forEach { it.update() }
         frames?.forEach { it.update() }
-        UIProvider.updateAnimationCache()
     }
 
     /**
@@ -117,7 +115,7 @@ open class UICore(val renderer: UIRenderer) {
     /**
      * Invoked when the mouse is moved. Invokes all components regardless of their
      * eligibility to be focused or bubbled. The [Properties.mouseX] and [Properties.mouseY]
-     * properties can be found in [UICore.Properties]
+     * properties can be found in [Aether.Properties]
      */
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
@@ -132,7 +130,7 @@ open class UICore(val renderer: UIRenderer) {
      * respectively. [isRelease] should be true when the button is released
      *
      * This is a propagating event when [isRelease] is false so the most inner component will
-     * have itself invoked, and it will go up from there.
+     * have itUIComponent<T> invoked, and it will go up from there.
      *
      * @see mouseScrolled
      */
@@ -224,7 +222,7 @@ open class UICore(val renderer: UIRenderer) {
     }
 
     /**
-     * The companion object of [UICore]. It contains properties useful to components
+     * The companion object of [Aether]. It contains properties useful to components
      * such as the width and height of the window. It also has utility functions such
      * as de-focusing the focused component and adding listeners to input.
      */
@@ -232,7 +230,7 @@ open class UICore(val renderer: UIRenderer) {
         @JvmStatic var debug: Boolean = true
 
         @JvmStatic
-        lateinit var instance: UICore
+        lateinit var instance: Aether
             protected set
 
         @JvmStatic

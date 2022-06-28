@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.renderer.dsl
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.component.controller.impl.selection.UISelectableController
@@ -16,6 +16,7 @@ import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.interfaces.UIDependable
+import net.prismclient.aether.ui.util.create
 import java.util.*
 
 /**
@@ -72,7 +73,7 @@ object UIComponentDSL {
     private fun insertComponent(component: UIComponent<*>) {
         if (activeComponent != null) component.parent = activeComponent
         if (components == null || frames == null) return
-        if (component is UIFrame<*>) {
+        if (component is UIFrame) {
             frames!!.add(component)
         }
         if (activeFrame != null) {
@@ -99,7 +100,7 @@ object UIComponentDSL {
 
         // If the component is an instance of UIFrame<*>, add
         // it as the active frame, and to the frame stack
-        if (component is UIFrame<*>) {
+        if (component is UIFrame) {
             activeFrame = component
             frameStack!!.add(component)
         } else {
@@ -114,7 +115,7 @@ object UIComponentDSL {
     fun popComponent(component: UIComponent<*>) {
         withinComponentInit = false
         if (components == null || frames == null) return
-        if (component is UIFrame<*>) {
+        if (component is UIFrame) {
             if (frameStack!!.size != 0) {
                 frameStack!!.pop()
                 activeFrame = if (frameStack!!.size > 0) {
@@ -199,7 +200,7 @@ object UIComponentDSL {
         control(controller)
         controller.block()
         control(null)
-        UICore.instance.controllers!!.add(controller)
+        Aether.instance.controllers!!.add(controller)
     }
 
     /**
@@ -225,7 +226,7 @@ object UIComponentDSL {
 
     /** Label Components **/
     @JvmOverloads
-    inline fun text(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) = component(UILabel(text, style!!), block)
+    inline fun text(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) = component(UILabel(text, style), block)
 
     @JvmOverloads
     inline fun label(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) = text(text, style, block)
@@ -244,32 +245,32 @@ object UIComponentDSL {
 
     /** Button **/
     @JvmOverloads
-    inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) = component(UIButton(text, style!!), block)
+    inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) = component(UIButton(text, style), block)
 
     @JvmOverloads
     inline fun button(text: String, style: String? = activeStyle, imageName: String, imagesStyle: String, block: UIImageButton.() -> Unit = {}) =
-        component(UIImageButton(imageName, imagesStyle, text, style!!), block)
+        component(UIImageButton(imageName, imagesStyle, text, style), block)
 
     inline fun checkbox(checked: Boolean = false, selectedImageName: String = "checkbox", imageStyle: String, style: String? = null, block: UICheckbox.() -> Unit) = checkbox(checked, selectedImageName, "", imageStyle, style, block)
 
-    inline fun checkbox(checked: Boolean = false, selectedImageName: String = "checkbox", deselectedImageName: String = "", imageStyle: String, style: String? = activeStyle, block: UICheckbox.() -> Unit) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style!!), block)
+    inline fun checkbox(checked: Boolean = false, selectedImageName: String = "checkbox", deselectedImageName: String = "", imageStyle: String, style: String? = activeStyle, block: UICheckbox.() -> Unit) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style), block)
 
     /** Input **/
     @JvmOverloads
-    inline fun slider(value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}) = component(UISlider(value, min, max, step, style!!), block)
+    inline fun slider(value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}) = component(UISlider(value, min, max, step, style), block)
 
     /** Other **/
 
-    inline fun image(imageName: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, style!!), block)
+    inline fun image(imageName: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, style), block)
 
-    inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, imageLocation, style!!), block)
+    inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, imageLocation, style), block)
 
     /** Layout **/
     @JvmOverloads
-    inline fun container(style: String? = activeStyle, block: UIContainer<UIContainerSheet>.() -> Unit) = component(UIContainer(style!!), block)
+    inline fun container(style: String? = activeStyle, block: UIContainer<UIContainerSheet>.() -> Unit) = component(UIContainer(style), block)
 
     @JvmOverloads
-    inline fun list(listDirection: UIListLayout.ListDirection, listOrientation: UIListLayout.ListOrientation, style: String? = activeStyle, block: UIListLayout.() -> Unit) = component(UIListLayout(listDirection, listOrientation, style!!), block)
+    inline fun list(listDirection: UIListLayout.ListDirection, listOrientation: UIListLayout.ListOrientation, style: String? = activeStyle, block: UIListLayout.() -> Unit) = component(UIListLayout(listDirection, listOrientation, style), block)
 
     /**
      * Returns an ArrayList of components created
@@ -285,20 +286,4 @@ object UIComponentDSL {
      * Returns true if the Component DSL builder is active
      */
     fun isActive() = components != null
-
-
-
-    /**
-     * Creates a DSL block for creating components. When started and completed, the stacks will be allocated/cleared
-     *
-     * @see ubuild
-     */
-    @JvmStatic
-    inline fun build(block: UIComponentDSL.() -> Unit) = net.prismclient.aether.ui.util.extensions.create(block)
-
-    /**
-     * Unsafe version of [build]. Does not allocate/deallocate the stacks, thus nothing will be reset
-     */
-    @JvmStatic
-    inline fun ubuild(block: UIComponentDSL.() -> Unit) = UIComponentDSL.block()
 }

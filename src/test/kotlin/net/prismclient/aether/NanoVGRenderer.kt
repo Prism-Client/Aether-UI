@@ -1,12 +1,12 @@
 package net.prismclient.aether
 
-import net.prismclient.aether.ui.UICore
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.style.UIProvider
-import net.prismclient.aether.ui.style.UIProvider.getImage
-import net.prismclient.aether.ui.style.UIProvider.registerImage
+import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.renderer.UIProvider.getImage
+import net.prismclient.aether.ui.renderer.UIProvider.registerImage
 import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.extensions.getBlue
 import net.prismclient.aether.ui.util.extensions.getGreen
@@ -14,7 +14,6 @@ import net.prismclient.aether.ui.util.extensions.getRed
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL14.GL_CONSTANT_COLOR
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
@@ -50,7 +49,7 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
-        val contentScale = UICore.devicePxRatio
+        val contentScale = Aether.devicePxRatio
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
             NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY

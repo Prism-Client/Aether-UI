@@ -1,15 +1,11 @@
-package net.prismclient.aether.ui.style
+package net.prismclient.aether.ui.renderer
 
-import net.prismclient.aether.ui.UICore
-import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 object UIProvider {
     /**
@@ -22,8 +18,6 @@ object UIProvider {
     val styles = HashMap<String, UIStyleSheet>()
     val images = HashMap<String, UIImageData>()
     val fonts = HashMap<String, UIFontFamily>()
-    val animations = HashMap<String, UIAnimation<*>>()
-    val activeAnimations = ArrayList<UIAnimation<*>>()
 
     /**
      * Initializes the UIProvider
@@ -31,7 +25,7 @@ object UIProvider {
      * @param renderer The rendering api used to rendering content onto the screen
      */
     fun initialize(renderer: UIRenderer) {
-        this.render = renderer
+        render = renderer
         UIRendererDSL.render = renderer
     }
 
@@ -76,7 +70,7 @@ object UIProvider {
     @JvmOverloads
     fun getStyle(styleName: String, original: Boolean = false): UIStyleSheet {
         val style = styles[styleName]
-                ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
+            ?: throw NullPointerException("Style of $styleName was not found. Have you created it yet?")
         return if (original) style else style.copy()
     }
 
@@ -84,47 +78,13 @@ object UIProvider {
      * Deletes all mutable styles
      */
     fun resetStyles() {
-        styles.entries.removeIf { !it.value.immutable }
-    }
-
-    fun registerAnimation(animation: UIAnimation<*>) {
-        animations[animation.name] = animation
-    }
-
-    // TODO: Priorities
-    fun dispatchAnimation(animationName: String?, component: UIComponent<*>) {
-        if (animationName == null || animationName.isEmpty()) return
-        val animation = animations[animationName]
-                ?: throw NullPointerException("Animation of $animationName was not found. Have you created it yet?")
-        component.animation = animations[animationName]!!.copy()
-        component.animation!!.start(component)
-        activeAnimations.add(component.animation!!)
-    }
-
-    fun completeAnimation(animation: UIAnimation<*>) {
-        activeAnimations.remove(animation)
-    }
-
-    fun updateAnimationCache() {
-        for (i in 0 until activeAnimations.size)
-            activeAnimations[i].updateCache()
-    }
-
-    fun updateAnimations() {
-        val time = System.nanoTime()
-        for (i in 0 until activeAnimations.size) {
-            if (i >= activeAnimations.size) break
-            val animation = activeAnimations[i]
-            if (animation.lifetime > System.currentTimeMillis() + MAX_ANIMATION_DURATION) {
-                animation.forceComplete()
-            }
-            activeAnimations[i].update()
-        }
+        styles.entries.removeIf { !it.value.immutableStyle }
     }
 
     /**
-     * Returns a list of [UIComponent] with the parent of the provided [self]
+     * Returns a list of [UIComponent] with the parent of the provided [UIComponent<T>]
      */
-    fun getChildrenOf(self: UIComponent<*>): List<UIComponent<*>> = UICore.instance.components?.filter { it.parent == self }?.toList()
+    fun getChildrenOf(component: UIComponent<*>): List<UIComponent<*>> =
+        Aether.instance.components?.filter { it.parent == component }?.toList()
             ?: mutableListOf()
 }

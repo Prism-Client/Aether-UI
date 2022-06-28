@@ -3,7 +3,7 @@ package net.prismclient.aether.ui.component.type.image
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
-import net.prismclient.aether.ui.style.UIProvider
+import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
@@ -13,7 +13,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 5/20/2022
  */
-class UIImage(name: String, style: String) : UIComponent<UIImageSheet>(style) {
+class UIImage(name: String, style: String?) : UIComponent<UIImageSheet>(style) {
     var image: String = name
         set(value) {
             field = value
@@ -24,7 +24,7 @@ class UIImage(name: String, style: String) : UIComponent<UIImageSheet>(style) {
     /**
      * Loads am image or svg from the specified location with a given name
      */
-    constructor(name: String, location: String, style: String) : this(
+    constructor(name: String, location: String, style: String?) : this(
         name,
         style
     ) {

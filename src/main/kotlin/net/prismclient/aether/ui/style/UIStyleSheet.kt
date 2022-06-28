@@ -1,7 +1,5 @@
 package net.prismclient.aether.ui.style
 
-import net.prismclient.aether.ui.animation.ease.UIEase
-import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
@@ -13,9 +11,7 @@ import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.type.UIRelativeUnit
 import net.prismclient.aether.ui.util.extensions.RELATIVE
-import net.prismclient.aether.ui.util.extensions.fromProgress
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.rel
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
@@ -39,13 +35,11 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md">Styles</s>
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md#creating-styles">How to create styles</a>
  */
-open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
-    var name: String = ""
-
+open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     /**
      * When true, the property will not be cleared when the screen is closed
      */
-    var immutable: Boolean = false
+    var immutableStyle: Boolean = false
 
     open var x: UIUnit? = null
     open var y: UIUnit? = null
@@ -75,25 +69,61 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      */
     var clipContent = true
 
-    /**
-     * The [UIEase] associated with the keyframe. Leave null if the [UIStyleSheet] is not an animation sheet.
-     */
-    var ease: UIEase? = null
+    override fun updateAnimationCache(component: UIComponent<*>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun clearAnimationCache() {
+        TODO("Not yet implemented")
+    }
+
+    override fun saveState(component: UIComponent<*>, keyframe: UIStyleSheet?, retain: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun animate(previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float, component: UIComponent<*>) {
+        TODO("Not yet implemented")
+    }
+
+    /** Shorthands **/
 
     /**
-     * The result of an animation. Leave null if the [UIStyleSheet] is not an animation sheet.
+     * Shorthand for setting the position and size as pixels.
      */
-    var animationResult: UIAnimationResult? = null
+    fun plot(x: Float, y: Float, width: Float, height: Float) {
+        position(x, y)
+        size(width, height)
+    }
 
+    /**
+     * Shorthand for setting the position and size as units.
+     */
+    fun plot(x: UIUnit, y: UIUnit, width: UIUnit, height: UIUnit) {
+        position(x, y)
+        size(width, height)
+    }
+
+    /**
+     * Positions the component at the given [x], and [y] value as pixels.
+     */
     fun position(x: Number, y: Number) = position(px(x), px(y))
 
+    /**
+     * Positions the component at the given [x], and [y] values as the given units.
+     */
     fun position(x: UIUnit, y: UIUnit) {
         this.x = x
         this.y = y
     }
 
+    /**
+     * Sizes the component with the given [width], and height as pixels.
+     */
     fun size(width: Number, height: Number) = size(px(width), px(height))
 
+    /**
+     * Sizes the component with the given [width], and height as the given units.
+     */
     fun size(width: UIUnit, height: UIUnit) {
         this.width = width
         this.height = height
@@ -129,6 +159,9 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         anchor(anchorAlignment)
     }
 
+    /**
+     * Anchors the component to the given [alignment].
+     */
     fun anchor(alignment: UIAlignment) {
         anchor = anchor ?: UIAnchorPoint()
         anchor!!.x = anchor!!.x ?: px(0)
@@ -208,9 +241,14 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         padding!!.block()
     }
 
-
+    /**
+     * Sets the padding to the given [value] as pixels.
+     */
     fun padding(value: Float) = padding(value, value, value, value)
 
+    /**
+     * Sets the padding to the given [unit] as the unit.
+     */
     fun padding(unit: UIUnit) = padding(unit, unit, unit, unit)
 
     fun padding(paddingTop: Float = 0f, paddingRight: Float = 0f, paddingBottom: Float = 0f, paddingLeft: Float = 0f) =
@@ -265,144 +303,17 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         this.marginLeft = marginLeft
     }
 
-    override fun copy(): UIStyleSheet = UIStyleSheet().apply(this)
-
-    protected var initialValue: UIStyleSheet.InitialValues? = null
-
-    override fun updateAnimationCache(component: UIComponent<*>) {
-        if (initialValue != null) {
-            initialValue!!.x = component.x
-            initialValue!!.y = component.y
-            initialValue!!.width = component.width
-            initialValue!!.height = component.height
-        }
-
-        anchor?.updateAnimationCache(component)
-        padding?.updateAnimationCache(component)
-        margin?.updateAnimationCache(component)
-        background?.updateAnimationCache(component)
-        font?.updateAnimationCache(component)
-    }
-
-    override fun clearAnimationCache() {
-        initialValue = null
-        anchor?.clearAnimationCache()
-        padding?.clearAnimationCache()
-        margin?.clearAnimationCache()
-        background?.clearAnimationCache()
-        font?.clearAnimationCache()
-    }
-
-    override fun animate(previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float, component: UIComponent<*>) {
-        initialValue = initialValue
-            ?: InitialValues(
-                component.computeUnit(x, false),
-                component.computeUnit(y, true),
-                component.computeUnit(width, false),
-                component.computeUnit(height, true),
-                component.style.background?.copy(),
-                component.style.font?.copy()
-            )
-
-        // Check if any of the keyframes have non allocated classes
-        // if they aren't allocated, create them.
-        if (previous?.background != null || current?.background != null)
-            background {}
-        if (previous?.font != null || current?.font != null)
-            font {}
-        if (previous?.padding != null || current?.padding != null)
-            padding {}
-        if (previous?.margin != null || current?.margin != null)
-            margin {}
-        if (previous?.anchor != null || current?.anchor != null)
-            anchor = anchor ?: UIAnchorPoint()
-
-        // Calculate Bounds
-        padding?.animate(previous?.padding, current?.padding, progress, component)
-        margin?.animate(previous?.margin, current?.margin, progress, component)
-
-        // Update Size
-        component.width = fromProgress(component.width(current?.width), component.width(previous?.width), progress)
-        component.height = fromProgress(component.height(current?.height), component.height(previous?.height), progress)
-
-        // Update the Anchor
-        anchor?.animate(previous?.anchor, current?.anchor, progress, component)
-
-        // Update Position
-        if (!component.overridden) {
-            component.x = fromProgress(component.x(previous?.x), component.x(current?.x), progress)
-            component.y = fromProgress(component.y(previous?.y), component.y(current?.y), progress)
-
-            component.x += component.marginLeft - component.anchorX + component.getParentX()
-            component.y += component.marginTop - component.anchorY + component.getParentY()
-        }
-
-        // Update bounds
-        component.updateBounds()
-
-        // Update background and font
-        background?.animate(previous?.background, current?.background, progress, component)
-        font?.animate(previous?.font, current?.font, progress, component)
-    }
-
-    override fun saveState(component: UIComponent<*>, keyframe: UIStyleSheet?, retain: Boolean) {
-        anchor?.saveState(component, keyframe?.anchor, retain)
-
-        padding?.saveState(component, keyframe?.padding, retain)
-        margin?.saveState(component, keyframe?.margin, retain)
-        background?.saveState(component, keyframe?.background, retain)
-        font?.saveState(component, keyframe?.font, retain)
-
-        if (retain) {
-            if (keyframe?.x != null)
-                x = keyframe.x
-            if (keyframe?.y != null)
-                y = keyframe.y
-            if (keyframe?.width != null)
-                width = keyframe.width
-            if (keyframe?.height != null)
-                height = keyframe.height
-        }
-
-        component.update()
-    }
-
-    fun UIComponent<*>.x(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
-        initialValue!!.x
-    } else {
-        this.getParentX()
-    } + this.computeUnit(unit, false)
-
-    fun UIComponent<*>.y(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
-        initialValue!!.y
-    } else {
-        this.getParentY()
-    } + this.computeUnit(unit, true)
-
-    fun UIComponent<*>.width(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
-        initialValue!!.width
-    } else {
-        0f
-    } + this.computeUnit(unit, false)
-
-    fun UIComponent<*>.height(unit: UIUnit?): Float = if (unit == null || unit is UIRelativeUnit) {
-        initialValue!!.height
-    } else {
-        0f
-    } + this.computeUnit(unit, true)
+    override fun copy(): UIStyleSheet = UIStyleSheet(name).apply(this)
 
     /**
      * Applies the properties of an existing sheet to this
      */
     open fun apply(sheet: UIStyleSheet): UIStyleSheet {
-        this.immutable = immutable
+        this.immutableStyle = sheet.immutableStyle
         this.name = sheet.name
 
         this.background = sheet.background?.copy()
         this.font = sheet.font?.copy()
-
-        this.ease = sheet.ease?.copy()
-        this.animationResult = sheet.animationResult
 
         this.x = sheet.x?.copy()
         this.y = sheet.y?.copy()
@@ -416,16 +327,4 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
 
         return this
     }
-
-    /**
-     * Used to store the initial values of an animation
-     */
-    protected inner class InitialValues(
-        var x: Float,
-        var y: Float,
-        var width: Float,
-        var height: Float,
-        val background: UIBackground?,
-        val font: UIFont?
-    )
 }

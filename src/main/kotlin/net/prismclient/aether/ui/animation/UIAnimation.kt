@@ -2,202 +2,169 @@ package net.prismclient.aether.ui.animation
 
 import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.ease.impl.UILinear
-import net.prismclient.aether.ui.animation.util.UIAnimationResult
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.style.UIProvider
 import net.prismclient.aether.ui.style.UIStyleSheet
-import net.prismclient.aether.ui.util.inform
 import net.prismclient.aether.ui.util.interfaces.UICopy
-import net.prismclient.aether.ui.util.warn
-import java.util.function.Consumer
 
 /**
- * [UIAnimation] has a sequence of [UIStyleSheet] and other data pertaining to the Animation
- * (such as easing). An animation consists of at least two keyframes.
- * For example if you set a keyframe at 0, and at 100, and set the
- * keyframe at 100 to a Quad Ease, the and the position from (0,0) -> (100, 0)
- * the component will animate with a quadratic ease from the property difference.
- * In essence, the following keyframe defines the ease properties.
+ * [UIAnimation] is the core handler for all animations. The animation is created
+ * with a set of keyframes, nd when the component is in need of this animation the
+ * animation is copied and given to the component. From there, the component is updated
+ * and the properties of the style sheet and some properties of the component are updated.
  *
- * If there is only one keyframe, then a blank keyframe will be inserted into the first index
+ * The ease of the next keyframe dictates the speed (ease) of the animation. If a singular
+ * keyframe is given, the animation will automatically allocate a default animation before
+ * the keyframe.
+ *
+ * When ran, a copy of this is assigned to the component. Everything except the actual keyframes
+ * are copied. If any styles are changed at that point, it will change the original animation keyframes.
  *
  * @author sen
- * @since 3/5/2022
+ * @since 1.0
  *
- * @param style An instance of [T], a [UIStyleSheet] which is copied to create new keyframes. Any properties set to it
- * will be copied to the new keyframes.
+ * @param style The style sheet of the component. The style should be completely new, with no styles changed.
  */
-@Suppress("UNCHECKED_CAST")
-class UIAnimation<T : UIStyleSheet>(var style: T, val name: String, var priority: UIAnimationPriority = UIAnimationPriority.NORMAL) : UICopy<UIAnimation<T>> { // TODO: update cache property
-    val lifetime = System.currentTimeMillis()
-    val timeline: ArrayList<T> = ArrayList()
-
-    private lateinit var component: UIComponent<*>
-    private var activeKeyframe: T? = null
-    private var nextKeyframe: T? = null
-    private var nextKeyframeIndex: Int = 0
-    var onCreationListeners: MutableList<Consumer<UIAnimation<T>>>? = null
-    var onCompletionListeners: MutableList<Consumer<UIAnimation<T>>>? = null
-
-    var animationLength: Long = 0L
-        private set
-    var animating: Boolean = false
-        private set
-    var completed: Boolean = false
+class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UIAnimation<C, S>> {
+    /**
+     * The component that this animation is attached to
+     */
+    lateinit var component: C
         private set
 
-    fun start(component: UIComponent<*>) {
+    /**
+     * The keyframes of the animation where the ease and
+     * properties of the keyframe are held within [keyframes].
+     */
+    var keyframes: ArrayList<Keyframe> = arrayListOf()
+        private set
+
+    var activeKeyframe: Keyframe? = null
+        private set
+    var nextKeyframe: Keyframe?  = null
+        private set
+
+    var isAnimating = false
+        private set
+
+    var isCompleted = false
+        private set
+
+    /**
+     * The time when the animation is first started
+     */
+    var startTime = 0L
+
+    /**
+     * Starts the animation with the given [component].
+     */
+    fun start(component: C) {
         this.component = component
 
-        if (timeline.size < 1) {
-            warn("Timeline must have at least 1 keyframe to start an animation")
-            return
-        } else if (timeline.size == 1) {
-            timeline.add(timeline[0])
-            timeline[0] = style.copy() as T
+        if (keyframes.isEmpty()) throw IllegalStateException("No keyframes were added to the animation.")
+        if (keyframes.size == 1) {
+            keyframes.add(keyframes.first())
+            keyframes[0] = Keyframe(UILinear(1000L), style.copy() as S, true)
         }
 
-        animationLength = 0L
-        animating = true
-        completed = false
+        // Load the keyframes
+        activeKeyframe = keyframes.first()
+        nextKeyframe = keyframes[1]
 
-        for (keyframe in timeline) {
-            if (keyframe.ease == null) keyframe.ease = UILinear()
-            animationLength += keyframe.ease!!.duration
-        }
-
-        onCreationListeners?.forEach { it.accept(this) }
+        startTime = System.currentTimeMillis()
     }
 
+    /**
+     * Temporarily pauses the animation at the active keyframe time.
+     *
+     * @see resume
+     */
     fun pause() {
-        TODO("Pausing of animations have not yet been implemented")
+
     }
 
+    /**
+     * Resumes the animation at the active keyframe time caused by [pause].
+     *
+     * @see pause
+     */
+    fun resume() {
+
+    }
+
+    /**
+     * Stops the animations at the given point.
+     *
+     * @see complete
+     */
     fun stop() {
-        TODO("Stopping of animations have not yet been implemented")
+
     }
 
     /**
-     * Updates the animation cache on the offhand chance that the window is resized during
-     * the animation
+     * Stops the animation and sets the properties of the component to the ending of the last keyframe.
+     *
+     * @see stop
      */
-    fun updateCache() {
-        component.style.updateAnimationCache(component)
+    fun complete() {
+
     }
 
     /**
-     * Clears the animation cache. It is automatically invoked when the animation is completed.
-     */
-    fun clearCache() {
-        component.style.clearAnimationCache()
-    }
-
-    /**
-     * Invoked on the screen render. The animation is updated here.
+     * Invoked whenever properties are updated (every frame).
      */
     fun update() {
-        if (completed || !animating) return
-        if (!this::component.isInitialized) throw RuntimeException("Component cannot be null for animation")
-
-        if (activeKeyframe == null) {
-            activeKeyframe = timeline[0]
-            nextKeyframe = timeline[1]
-            nextKeyframe!!.ease!!.start()
-            nextKeyframeIndex = 1
-        }
-
-        if (nextKeyframe == null) {
-            return
-        } else {
-            // If current animation past the current time
-            if (nextKeyframe!!.ease!!.endTime <= System.currentTimeMillis()) {
-                if (timeline.size > ++nextKeyframeIndex) {
-                    swapKeyframe(timeline[nextKeyframeIndex])
-                } else {
-                    // Next keyframe is null, so finish the animation
-                    completeAnimation()
-                    return
-                }
+        if (isCompleted) return
+        if (activeKeyframe == null || nextKeyframe == null) complete()
+        if (activeKeyframe!!.ease.finished) {
+            incrementKeyframe()
+            if (activeKeyframe == null || nextKeyframe == null) {
+                complete()
+                return
             }
         }
-        component.update()
-        component.style.animate(activeKeyframe, nextKeyframe, nextKeyframe!!.ease!!.getValue().toFloat(), component)
-        component.updateBounds()
-        component.updateStyle()
-    }
 
-    fun swapKeyframe(next: T) {
-        activeKeyframe = nextKeyframe
-        nextKeyframe = next
-        nextKeyframe!!.ease!!.start()
-        saveState(activeKeyframe!!)
-    }
 
-    fun saveState(keyframe: T) {
-        component.style.saveState(component, keyframe, (keyframe.animationResult != UIAnimationResult.Reset))
-    }
-
-    fun forceComplete() {
-        inform("Animation was force completed")
-        completeAnimation()
-    }
-
-    fun completeAnimation() {
-        completed = true
-        animating = false
-
-        saveState(timeline[timeline.size - 1])
-
-        // Clear the cache after the state has been saved (if it needs to be saved)
-        clearCache()
-
-        UIProvider.completeAnimation(this)
-
-        // Invoke the listeners that the animation has been completed
-        onCompletionListeners?.forEach { it.accept(this) }
     }
 
     /**
-     * Creates a keyframe at the specified position (0.0-100.0)
+     * Creates a keyframe with the given [ease], and properties from [block]
+     */
+    fun keyframe(ease: UIEase = UILinear(1000L), block: S.() -> Unit) {
+        val style = this.style.copy() as S
+        style.block()
+        keyframe(ease, style)
+    }
+
+    /**
+     * An alternative to [keyframe] mainly for Java, which accepts an [ease] and a style sheet of [S].
      *
-     * @param block The [UIStyleSheet] that adjusts the component's properties.
+     * @param ease The ease of the keyframe.
+     * @param style The style of the keyframe.
+     * @param relative When true, the properties prior to the keyframe are used when the value is 0 or null.
      */
-    inline fun keyframe(ease: UIEase = UILinear(1000L), keep: Boolean = true, block: T.() -> Unit): T {
-        val sheet: T
-        try {
-            sheet = style.copy() as T
-        } catch (e: Exception) {
-            throw UIComponent.InvalidStyleSheetException("anim-$name-${timeline.size}", null)
-        }
-        if (animating) throw RuntimeException("Cannot add keyframe while animating")
-        timeline.add(sheet)
-        sheet.name = "anim-$name-${timeline.size}"
-        sheet.ease = ease
-        sheet.animationResult = if (keep) UIAnimationResult.Retain else UIAnimationResult.Reset
-        sheet.block()
-
-        return sheet
+    @JvmOverloads
+    fun keyframe(ease: UIEase, style: S, relative: Boolean = false) {
+        keyframes.add(Keyframe(ease, style, relative))
     }
 
-    fun first(event: Consumer<UIAnimation<T>>) {
-        if (onCreationListeners == null) onCreationListeners = mutableListOf()
-        onCreationListeners!!.add(event)
+    private fun incrementKeyframe() {
+        if (activeKeyframe == null || nextKeyframe == null) return
+        if (activeKeyframe!!.ease.finished) {
+            activeKeyframe = nextKeyframe
+            nextKeyframe = keyframes.getOrNull(keyframes.indexOf(activeKeyframe) + 1)
+        }
+    }
+
+    override fun copy(): UIAnimation<C, S> = UIAnimation<C, S>(style).also {
+        // To save memory, avoid creating copies of the style sheet. Instead,
+        // only copy the ease and pass the reference of the style sheet in a
+        // new keyframe and populate the copy of this.
+        for (keyframe in keyframes)
+            it.keyframes.add(Keyframe(keyframe.ease.copy(), keyframe.style, keyframe.relative))
     }
 
     /**
-     * Adds an event which is invoked when the animation is completed
+     * [Keyframe] is an inner class which holds the ease and style of a keyframe.
      */
-    fun then(event: Consumer<UIAnimation<T>>) {
-        if (onCompletionListeners == null) onCompletionListeners = mutableListOf()
-        onCompletionListeners!!.add(event)
-    }
-
-    protected fun apply(animation: UIAnimation<T>) {
-        this.onCompletionListeners = animation.onCompletionListeners
-    }
-
-    override fun copy(): UIAnimation<T> = UIAnimation(style, name, priority).also {
-        it.apply(this)
-        for (animation in timeline) it.timeline.add(animation.copy() as T)
-    }
+    inner class Keyframe(val ease: UIEase, val style: S, val relative: Boolean)
 }
