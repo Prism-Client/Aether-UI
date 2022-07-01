@@ -90,7 +90,7 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
     /**
      * Shorthand for setting the position and size as pixels.
      */
-    fun plot(x: Float, y: Float, width: Float, height: Float) {
+    fun plot(x: Number, y: Number, width: Number, height: Number) {
         position(x, y)
         size(width, height)
     }

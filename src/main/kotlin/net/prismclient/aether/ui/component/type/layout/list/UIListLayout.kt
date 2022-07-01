@@ -1,8 +1,8 @@
 package net.prismclient.aether.ui.component.type.layout.list
 
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrientation.Backwards
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrientation.Forward
+import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrder.Backwards
+import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrder.Forward
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 
 /**
@@ -14,14 +14,14 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
  */
 open class UIListLayout @JvmOverloads constructor(
     var listDirection: ListDirection = ListDirection.Vertical,
-    var listOrientation: ListOrientation = Forward,
+    var listOrder: ListOrder = Forward,
     style: String?
 ) : UIContainer<UIContainerSheet>(style) {
     override fun updateLayout() {
         var x = if (style.clipContent) 0f else x
         var y = if (style.clipContent) 0f else y
 
-        if (listOrientation == Forward) {
+        if (listOrder == Forward) {
             for (i in 0 until components.size) {
                 val component = components[i]
 
@@ -84,7 +84,7 @@ open class UIListLayout @JvmOverloads constructor(
      * it is [Backwards], the last component is ordered first, and the first
      * component is ordered last.
      */
-    enum class ListOrientation {
+    enum class ListOrder {
         /**
          * The default, orders the list as the first component first, and the last component last
          */

@@ -1,15 +1,6 @@
 package net.prismclient.aether.screens.prism
 
-import net.prismclient.aether.ui.Aether
-import net.prismclient.aether.ui.component.type.image.UIImageSheet
-import net.prismclient.aether.ui.component.type.other.progress.UIProgress
-import net.prismclient.aether.ui.component.type.other.progress.UIProgressSheet
-import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.style.util.UIFontFamily
-import net.prismclient.aether.ui.util.extensions.*
 
 class PrismLoadingMenu : UIScreen {
     override fun build() {

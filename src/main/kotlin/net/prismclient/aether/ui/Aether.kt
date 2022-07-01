@@ -462,11 +462,7 @@ open class Aether(val renderer: UIRenderer) {
             instance.components = ArrayList()
             instance.frames = ArrayList()
             instance.controllers = ArrayList()
-
             screen.build()
-            instance.frames = UIComponentDSL.getFrames()
-            instance.components = UIComponentDSL.get()
-            UIComponentDSL.finalize()
             instance.update(width, height, devicePxRatio)
         }
 

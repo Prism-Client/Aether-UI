@@ -1,7 +1,6 @@
 package net.prismclient.aether
 
 
-import net.prismclient.aether.screens.ExampleScreen
 import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.screens.prism.PrismGameMenu
 import net.prismclient.aether.screens.prism.PrismLoadingMenu

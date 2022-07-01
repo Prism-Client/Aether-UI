@@ -3,287 +3,268 @@ package net.prismclient.aether.ui.renderer.dsl
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
-import net.prismclient.aether.ui.component.controller.impl.selection.UISelectableController
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.input.button.UICheckbox
-import net.prismclient.aether.ui.component.type.input.button.UIImageButton
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL.activeStyle
 import net.prismclient.aether.ui.style.UIStyleSheet
-import net.prismclient.aether.ui.util.interfaces.UIDependable
-import net.prismclient.aether.ui.util.create
 import java.util.*
 
 /**
- * [UIComponentDSL] is a DSL builder for defining components on the screen. Components should be implemented this way
+ * [UIComponentDSL] is a DSL builder for creating components. It has presets for components
+ * and removes the need to manually create blocks for styles and components. Components and
+ * Stacks are considered "push/pop-able" properties; multiple of itself, whilst the style and
+ * controller properties can only be one property, or null.
+ *
+ * All component functions expect a style, else the style of [activeStyle] will be applied to it.
  *
  * @author sen
- * @since 12/5/2022
+ * @since 1.0
  */
 object UIComponentDSL {
-    private var components: ArrayList<UIComponent<*>>? = null
-    private var frames: ArrayList<UIFrame<*>>? = null
-    private var componentStack: Stack<UIComponent<*>>? = null
-    private var frameStack: Stack<UIFrame<*>>? = null
-    private var styleStack: Stack<String>? = null
-    private var activeComponent: UIComponent<*>? = null
-    private var activeFrame: UIFrame<*>? = null
-    var activeController: UIController<*>? = null
-    var activeStyle: String? = null
-        private set
-    var withinComponentInit = false
-        private set
-    var ignore = false
-
-    // TODO: Validate component styles
+    /**
+     * The components which are automatically added/removed to support nesting
+     */
+    var componentStack: Stack<UIComponent<*>>? = null
 
     /**
-     * Must be invoked before calling any other functions or a NPE might be thrown
+     * The frames which are automatically added/removed to support nesting
      */
-    fun create() {
-        components = ArrayList()
-        frames = ArrayList()
+    var frameStack: Stack<UIFrame<*>>? = null
+
+    var activeController: UIController<*>? = null
+    var activeStyle: String? = null
+
+    /**
+     * If true, the component will not be added to the [activeController] (if applicable).
+     *
+     * @see ignore
+     */
+    var ignoreController: Boolean = false
+
+    /**
+     * Allocates the stacks. Must be invoked prior to defining any components to avoid an exception.
+     *
+     * @see complete
+     */
+    fun begin() {
         componentStack = Stack()
         frameStack = Stack()
-        styleStack = Stack()
     }
 
     /**
-     * Frees any resources after creating the components.
+     * Clears any references to any variables within this class.
+     *
+     * @see begin
      */
-    fun finalize() {
-        components = null
-        frames = null
+    fun complete() {
         componentStack = null
         frameStack = null
-        styleStack = null
-        activeComponent = null
-        activeFrame = null
+
         activeStyle = null
     }
 
     /**
-     * Inserts the component into the active frame or the components array.
+     * Updates the active component and / or frame as well as the stacks pertaining to those properties.
      */
-    private fun insertComponent(component: UIComponent<*>) {
-        if (activeComponent != null) component.parent = activeComponent
-        if (components == null || frames == null) return
-        if (component is UIFrame) {
-            frames!!.add(component)
-        }
-        if (activeFrame != null) {
-            if (activeComponent == null) {
-                component.parent = activeFrame
-            }
-            activeFrame!!.addComponent(component)
-        } else {
-            components!!.add(component)
-        }
+    fun updateState(component: UIComponent<*>) {
+        check()
+        if (component is UIFrame) frameStack!!.push(component)
+        else componentStack!!.push(component)
     }
 
     /**
-     * Adds the component to the stack and / or array. Called
-     * by the inner methods of this class.
+     * Restores the state based on the component. The component given is expected to be
+     * the active component or the active frame; the most recently pushed component.
+     */
+    fun restoreState(component: UIComponent<*>) {
+        check()
+        // Restore the frame if the component is the frame
+        if (component is UIFrame) {
+            if (frameStack!!.isNotEmpty()) frameStack!!.pop()
+            return
+        }
+        if (componentStack!!.isNotEmpty()) componentStack!!.pop()
+    }
+
+    /**
+     * Applies any properties pertaining to state and updates the state to the component's needs.
      */
     fun pushComponent(component: UIComponent<*>) {
-        if (activeController != null && !withinComponentInit && !ignore) {
-            activeController!!.addComponent(component)
-        }
-        withinComponentInit = true
-
-        insertComponent(component)
-
-        // If the component is an instance of UIFrame<*>, add
-        // it as the active frame, and to the frame stack
-        if (component is UIFrame) {
-            activeFrame = component
-            frameStack!!.add(component)
-        } else {
-            componentStack!!.push(component)
-            activeComponent = component
-        }
+        check()
+        val activeComponent = getActiveComponent()
+        val activeFrame = getActiveFrame()
+        if (activeComponent != null)
+            component.parent = activeComponent
+        else if (activeFrame != null)
+            activeFrame.addComponent(component)
+        else Aether.instance.components!!.add(component)
+        if (component is UIFrame) Aether.instance.frames!!.add(component)
+        if (activeController != null && !ignoreController) activeController!!.addComponent(component)
+        updateState(component)
     }
 
     /**
-     * Removes the component as the active component / frame.
+     * Restores the state to the previous component, or null.
      */
     fun popComponent(component: UIComponent<*>) {
-        withinComponentInit = false
-        if (components == null || frames == null) return
-        if (component is UIFrame) {
-            if (frameStack!!.size != 0) {
-                frameStack!!.pop()
-                activeFrame = if (frameStack!!.size > 0) {
-                    frameStack!!.peek()
-                } else null
-            }
-        }
-        if (activeComponent != null)
-            componentStack!!.pop()
-        activeComponent = if (!componentStack!!.isEmpty()) componentStack!!.peek() else null
-    }
-
-    /** Style **/
-    fun applyStyle(name: String) {
-        activeStyle = name
+        check()
+        restoreState(component)
     }
 
     /**
-     * Creates a DSL block for a style. When finished, the previous style is restored.
-     */
-    inline fun applyStyle(name: String, block: UIComponentDSL.() -> Unit) {
-        val cachedStyle = activeStyle
-        applyStyle(name)
-        block.invoke(this)
-        cachedStyle?.run { applyStyle(this) }
-    }
-
-    /**
-     * Adds a dependable class. To create a dependable class, make a class
-     * which extends [UIDependable]. See [UIDependable] doc for more information.
+     * Creates DSL block for the provided component, [T] where it is inserted into the stack,
+     * invokes the block, and to initialize function of the component, and popped.
      *
-     * Use this class as: `dependsOn(::ClassName)`
-     *
-     * @see UIDependable
-     */
-    inline fun <T : UIDependable> dependsOn(clazz: () -> T) {
-        clazz().load()
-    }
-
-    /**
-     * Alternative to [dependsOn]
-     *
-     * @see dependsOn
-     */
-    inline fun <T : UIDependable> include(clazz: () -> T) {
-        clazz().load()
-    }
-
-    /**
-     * Java alternative to [dependsOn]. An instance of [UIDependable] must be passed.
-     *
-     * @see dependsOn
-     */
-    fun dependsOn(clazz: UIDependable) {
-        clazz.load()
-    }
-
-    /**
-     * A method to handle the creation of [UIController]
-     */
-    fun control(controller: UIController<*>?) {
-        activeController = controller
-    }
-
-    /**
-     * Anything within the block ignores being added to the active controller.
-     */
-    inline fun ignore(block: UIComponentDSL.() -> Unit) {
-        ignore = true
-        block.invoke(this)
-        ignore = false
-    }
-
-    /**
-     * Creates a controller block
-     *
-     * @param C The controller class
-     * @param T The component for the controller class
-     * @see UIController
-     */
-    inline fun <C : UIController<T>, T : UIComponent<*>> controller(controller: C, block: C.() -> Unit) {
-        control(controller)
-        controller.block()
-        control(null)
-        Aether.instance.controllers!!.add(controller)
-    }
-
-    /**
-     * Creates a selectable controller. This allows for one active component at a time.
-     *
-     * @param T The filter for the component. The given value, and it's subclasses are the only valid type.
-     */
-    inline fun <T : UIComponent<*>> selectable(block: UISelectableController<T>.() -> Unit) = controller(UISelectableController(), block)
-
-    /** Components **/
-
-    /**
-     * Creates a new component [T] with [block] as the
-     * DSL. Automatically pushes and pops the component
+     * @return T The component
      */
     inline fun <T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
         pushComponent(component)
-        component.also(block)
+        component.block()
         component.initialize()
         popComponent(component)
         return component
     }
 
-    /** Label Components **/
-    @JvmOverloads
-    inline fun text(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) = component(UILabel(text, style), block)
-
-    @JvmOverloads
-    inline fun label(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) = text(text, style, block)
-
-    @JvmOverloads
-    inline fun h1(text: String, block: UILabel.() -> Unit = {}) = text(text, "h1", block)
-
-    @JvmOverloads
-    inline fun h2(text: String, block: UILabel.() -> Unit = {}) = text(text, "h2", block)
-
-    @JvmOverloads
-    inline fun h3(text: String, block: UILabel.() -> Unit = {}) = text(text, "h3", block)
-
-    @JvmOverloads
-    inline fun p(text: String, block: UILabel.() -> Unit = {}) = text(text, "p", block)
-
-    /** Button **/
-    @JvmOverloads
-    inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) = component(UIButton(text, style), block)
-
-    @JvmOverloads
-    inline fun button(text: String, style: String? = activeStyle, imageName: String, imagesStyle: String, block: UIImageButton.() -> Unit = {}) =
-        component(UIImageButton(imageName, imagesStyle, text, style), block)
-
-    inline fun checkbox(checked: Boolean = false, selectedImageName: String = "checkbox", imageStyle: String, style: String? = null, block: UICheckbox.() -> Unit) = checkbox(checked, selectedImageName, "", imageStyle, style, block)
-
-    inline fun checkbox(checked: Boolean = false, selectedImageName: String = "checkbox", deselectedImageName: String = "", imageStyle: String, style: String? = activeStyle, block: UICheckbox.() -> Unit) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style), block)
-
-    /** Input **/
-    @JvmOverloads
-    inline fun slider(value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}) = component(UISlider(value, min, max, step, style), block)
-
-    /** Other **/
-
-    inline fun image(imageName: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, style), block)
-
-    inline fun image(imageName: String, imageLocation: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) = component(UIImage(imageName, imageLocation, style), block)
-
-    /** Layout **/
-    @JvmOverloads
-    inline fun container(style: String? = activeStyle, block: UIContainer<UIContainerSheet>.() -> Unit) = component(UIContainer(style), block)
-
-    @JvmOverloads
-    inline fun list(listDirection: UIListLayout.ListDirection, listOrientation: UIListLayout.ListOrientation, style: String? = activeStyle, block: UIListLayout.() -> Unit) = component(UIListLayout(listDirection, listOrientation, style), block)
+    /**
+     * Sets the active controller to the given [controller] and accepts the block which applies the
+     * controller to all the components within it. If the component within the [block] is not an
+     * instance of [T], a message will be printed.
+     *
+     * @see ignore
+     */
+    inline fun <T : UIComponent<*>> controller(
+        controller: UIController<T>,
+        block: UIController<T>.() -> Unit
+    ): UIController<T> {
+        Aether.instance.controllers!!.add(controller)
+        activeController = controller
+        controller.block()
+        activeController = null
+        return controller
+    }
 
     /**
-     * Returns an ArrayList of components created
+     * Creates a block where the [activeController] is ignored.
      */
-    fun get(): ArrayList<UIComponent<*>> = components!!
+    inline fun ignore(block: UIComponentDSL.() -> Unit): UIComponentDSL {
+        ignoreController = true
+        block(this)
+        ignoreController = false
+        return this
+    }
 
     /**
-     * Returns an ArrayList of frames created
+     * Creates a block where the style is set to the given value.
      */
-    fun getFrames(): ArrayList<UIFrame<*>> = frames!!
+    inline fun style(styleName: String, block: UIComponentDSL.() -> Unit) {
+        // Technically this function supports nesting, soooooo the documentation
+        // is "technically" wrong but whatever. In the case of controllers, it
+        // doesn't actually make sense to have the ability to nest them.
+        val previousStyle = activeStyle
+        activeStyle = styleName
+        block(this)
+        block.invoke(this)
+        activeStyle = previousStyle
+    }
+
+    private fun getActiveComponent(): UIComponent<*>? =
+        if (componentStack.isNullOrEmpty()) null else componentStack!!.peek()
+
+    private fun getActiveFrame(): UIFrame<*>? = if (frameStack.isNullOrEmpty()) null else frameStack!!.peek()
 
     /**
-     * Returns true if the Component DSL builder is active
+     * Throws an exception if the properties have not been initialized.
      */
-    fun isActive() = components != null
+    private fun check() {
+        if (componentStack == null || frameStack == null) throw UninitializedPropertyAccessException()
+    }
+
+    /* Components */
+
+    /**
+     * Creates a [UILabel] with the provided [text].
+     *
+     * @see label
+     */
+    @JvmOverloads
+    inline fun text(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) =
+        component(UILabel(text, style), block)
+
+    /**
+     * An alternative to [text]. Creates a [UILabel] with the provided [text].
+     *
+     * @see text
+     */
+    @JvmOverloads
+    inline fun label(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) =
+        component(UILabel(text, style), block)
+
+    /**
+     * Creates a [UIButton] with the provided [text], like a label.
+     */
+    inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) =
+        component(UIButton(text, style), block)
+
+    /**
+     * Creates a [UICheckbox] from the given [selectedImageName], [deselectedImageName] and [imageStyle].
+     */
+    @JvmOverloads
+    inline fun checkbox(
+        checked: Boolean = false,
+        selectedImageName: String = "checkbox",
+        deselectedImageName: String = "",
+        imageStyle: String,
+        style: String? = activeStyle,
+        block: UICheckbox.() -> Unit
+    ) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style), block)
+
+    /**
+     * Creates a [UISlider] with the [value] as the value of the slider, [min] as the minimum
+     * value, [max] as the maximum value, and [step] as the distance to step by.
+     */
+    @JvmOverloads
+    inline fun slider(
+        value: Float,
+        min: Float,
+        max: Float,
+        step: Float,
+        style: String? = activeStyle,
+        block: UISlider.() -> Unit = {}
+    ) =
+        component(UISlider(value, min, max, step, style), block)
+
+    /**
+     * Creates a [UIImage] with the [imageName] as the image to be rendered.
+     */
+    @JvmOverloads
+    inline fun image(imageName: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) =
+        component(UIImage(imageName, style), block)
+
+    /**
+     * Creates a [UIContainer]. Anything within the block will be added to the component list within this.
+     */
+    @JvmOverloads
+    inline fun container(style: String? = activeStyle, block: UIContainer<UIContainerSheet>.() -> Unit = {}) =
+        component(UIContainer(style), block)
+
+    /**
+     * Creates a [UIListLayout] with the given [listDirection], which defines the direction that it
+     * lays out in (vertical or horizontal), and the given [listOrder] defining which direction
+     * the list is ordered in.
+     */
+    @JvmOverloads
+    inline fun list(
+        listDirection: UIListLayout.ListDirection,
+        listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
+        style: String? = activeStyle,
+        block: UIListLayout.() -> Unit = {}
+    ) =
+        component(UIListLayout(listDirection, listOrder, style), block)
 }

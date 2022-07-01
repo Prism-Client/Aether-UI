@@ -17,7 +17,6 @@ import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
 import net.prismclient.aether.ui.util.warn
-import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import java.nio.ByteBuffer
 
