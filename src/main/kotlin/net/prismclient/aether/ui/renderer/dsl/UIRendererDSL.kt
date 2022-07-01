@@ -153,7 +153,8 @@ object UIRendererDSL {
      * Renders a string with a line break when the length of the string exceeds the width cap
      */
     @JvmStatic
-    fun String.render(x: Float, y: Float, width: Float, splitHeight: Float) = render.wrapString(this, x, y, width, splitHeight, null)
+    fun String.render(x: Float, y: Float, width: Float, splitHeight: Float) =
+        render.wrapString(this, x, y, width, splitHeight, null)
 
     /**
      * Renders a string until the given width, where then the string is
@@ -168,7 +169,13 @@ object UIRendererDSL {
      */
     @JvmStatic
     @JvmOverloads
-    fun String.render(x: Float, y: Float, width: Float, appendedString: String? = null, ignoreLastSpace: Boolean = true): Float {
+    fun String.render(
+        x: Float,
+        y: Float,
+        width: Float,
+        appendedString: String? = null,
+        ignoreLastSpace: Boolean = true
+    ): Float {
         if (width >= this.width()) {
             this.render(x, y)
             return this.width()
@@ -277,16 +284,28 @@ object UIRendererDSL {
     /** Image **/
     @JvmStatic
     @JvmOverloads
-    fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) = renderImage(imageName, x, y, width, height, radius, radius, radius, radius)
+    fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) =
+        renderImage(imageName, x, y, width, height, radius, radius, radius, radius)
 
     @JvmStatic
-    fun renderImage(imageName: String, x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) = render.renderImage(imageName, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+    fun renderImage(
+        imageName: String,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) = render.renderImage(imageName, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
 
     // TODO: Maybe something like loadAll(type: String, fileLocation: String)
     // loadAll("svg", "/aether/svgs/")
 
     @JvmStatic
-    fun loadImage(name: String, fileLocation: String, flags: Int = MIPMAP or REPEATX or REPEATY) = loadImage(name, fileLocation.toByteBuffer(), flags)
+    fun loadImage(name: String, fileLocation: String, flags: Int = MIPMAP or REPEATX or REPEATY) =
+        loadImage(name, fileLocation.toByteBuffer(), flags)
 
     @JvmStatic
     fun loadImage(name: String, buffer: ByteBuffer, flags: Int): UIImageData {
@@ -299,8 +318,7 @@ object UIRendererDSL {
     @JvmOverloads
     fun loadSvg(name: String, fileLocation: String, scale: Float = Aether.devicePxRatio) =
         loadSvg(name, fileLocation.toTerminatingByteBuffer(), scale).also {
-            if (FilenameUtils.getExtension(fileLocation) != "svg")
-                warn("SVG file extension is not .svg")
+            if (FilenameUtils.getExtension(fileLocation) != "svg") warn("SVG file extension is not .svg")
         }
 
     @JvmStatic
@@ -313,7 +331,11 @@ object UIRendererDSL {
     /** Asset Loading **/
     @JvmStatic
     @JvmOverloads
-    fun loadAsset(name: String, fileLocation: String, fileExtension: String = FilenameUtils.getExtension(fileLocation)) {
+    fun loadAsset(
+        name: String,
+        fileLocation: String,
+        fileExtension: String = FilenameUtils.getExtension(fileLocation)
+    ) {
         when (fileExtension) {
             "ttf" -> loadFont(name, fileLocation)
             "png", "jpeg" -> loadImage(name, fileLocation)
@@ -326,25 +348,55 @@ object UIRendererDSL {
      * Loads an image or svg from the provided file location.
      */
     @JvmStatic
-    fun assumeLoadImage(name: String, fileLocation: String): UIImageData = when (FilenameUtils.getExtension(fileLocation)) {
-        "png", "jpeg", "jpg" -> loadImage(name, fileLocation)
-        "svg" -> loadSvg(name, fileLocation)
-        else -> throw UnsupportedOperationException("Unknown file extension: ${
-            FilenameUtils.getExtension(fileLocation)
-        }")
-    }
+    fun assumeLoadImage(name: String, fileLocation: String): UIImageData =
+        when (FilenameUtils.getExtension(fileLocation)) {
+            "png", "jpeg", "jpg" -> loadImage(name, fileLocation)
+            "svg" -> loadSvg(name, fileLocation)
+            else -> throw UnsupportedOperationException(
+                "Unknown file extension: ${
+                    FilenameUtils.getExtension(fileLocation)
+                }"
+            )
+        }
 
     /** Shapes **/
     @JvmStatic
     @JvmOverloads
-    fun rect(x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) = rect(x, y, width, height, radius, radius, radius, radius)
+    fun rect(x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) =
+        rect(x, y, width, height, radius, radius, radius, radius)
 
     @JvmStatic
-    fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(x, y, width, height, radius?.topLeft
-            ?: 0f, radius?.topRight ?: 0f, radius?.bottomRight ?: 0f, radius?.bottomRight ?: 0f)
+    fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(
+        x,
+        y,
+        width,
+        height,
+        radius?.topLeft ?: 0f,
+        radius?.topRight ?: 0f,
+        radius?.bottomRight ?: 0f,
+        radius?.bottomRight ?: 0f
+    )
 
     @JvmStatic
-    fun rect(x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float) = render.rect(x + pos, y + pos, width + siz, height + siz, topLeft + halfsw, topRight + halfsw, bottomRight + halfsw, bottomLeft + halfsw)
+    fun rect(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) = render.rect(
+        x + pos,
+        y + pos,
+        width + siz,
+        height + siz,
+        topLeft + halfsw,
+        topRight + halfsw,
+        bottomRight + halfsw,
+        bottomLeft + halfsw
+    )
 
     /**
      * Must be placed inside a [line] block
@@ -385,6 +437,21 @@ object UIRendererDSL {
 
     @JvmStatic
     fun scissor(x: Float, y: Float, width: Float, height: Float) = render.scissor(x, y, width, height)
+
+    @JvmStatic
+    fun renderFBO(fbo: UIContentFBO, x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
+        render.renderFBO(
+            fbo,
+            x,
+            y,
+            width,
+            height,
+            radius?.topLeft ?: 0f,
+            radius?.topRight ?: 0f,
+            radius?.bottomRight ?: 0f,
+            radius?.bottomLeft ?: 0f
+        )
+    }
 
     @JvmStatic
     fun stroke(strokeWidth: Float, strokeDirection: UIStrokeDirection) {
@@ -456,7 +523,12 @@ object UIRendererDSL {
     }
 
     @JvmStatic
-    inline fun stroke(strokeColor: Int, strokeWidth: Float, strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE, block: UIRendererDSL.() -> Unit) {
+    inline fun stroke(
+        strokeColor: Int,
+        strokeWidth: Float,
+        strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE,
+        block: UIRendererDSL.() -> Unit
+    ) {
         render.stroke(strokeWidth, strokeColor)
         stroke(strokeWidth, strokeDirection)
         this.block()
@@ -480,7 +552,14 @@ object UIRendererDSL {
      * @param lineJoin Accepts MITER, ROUND, BEVEL
      */
     @JvmStatic
-    inline fun line(x: Float, y: Float, lineCap: Int = BUTT, lineJoin: Int = MITER, lineWidth: Float = 1f, block: UIRendererDSL.() -> Unit) {
+    inline fun line(
+        x: Float,
+        y: Float,
+        lineCap: Int = BUTT,
+        lineJoin: Int = MITER,
+        lineWidth: Float = 1f,
+        block: UIRendererDSL.() -> Unit
+    ) {
         render.startLine(x, y, lineCap, lineJoin, lineWidth)
         this.block()
         render.finishLine()

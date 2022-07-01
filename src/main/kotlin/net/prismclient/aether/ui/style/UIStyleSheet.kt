@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.style
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.defaults.UIDefaults
@@ -31,6 +32,10 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * Some components might explicitly state it wants a specific type of
  * [UIStyleSheet]. In that case, that required type of [UIStyleSheet]
  * must be created in order for the [UIComponent] to function properly.
+ *
+ * When creating a style sheet a copy method must be explicitly created to ensure no errors
+ * are thrown when used. If the style sheet is intended on being inheritable, the apply method
+ * should also be overridden. See [UIFrameSheet] for an example.
  *
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md">Styles</s>
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md#creating-styles">How to create styles</a>

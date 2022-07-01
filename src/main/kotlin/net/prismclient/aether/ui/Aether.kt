@@ -7,7 +7,6 @@ import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -245,7 +244,7 @@ open class Aether(val renderer: UIRenderer) {
          * @see tryFocus
          */
         @JvmStatic
-        var focusedComponent: UIFocusable<*>? = null
+        var focusedComponent: UIFocusable? = null
             protected set
 
         /**
@@ -470,7 +469,7 @@ open class Aether(val renderer: UIRenderer) {
          * Focuses the component. Please use [UIComponent.focus] instead.
          */
         @JvmStatic
-        fun focus(component: UIFocusable<*>) {
+        fun focus(component: UIFocusable) {
             // Check if the given value is a valid instance of UIComponent
             try {
                 component as UIComponent<*>

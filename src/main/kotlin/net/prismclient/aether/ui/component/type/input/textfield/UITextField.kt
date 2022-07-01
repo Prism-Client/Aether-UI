@@ -26,7 +26,7 @@ import java.util.function.Consumer
  * @since 6/6/2022
  * @see UITextField.filter Pre-made text filters.
  */
-open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String?) : UIButton<UITextFieldSheet>(text, style), UIFocusable<UITextField> {
+open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String?) : UIButton<UITextFieldSheet>(text, style), UIFocusable {
     override var text: String = text
         set(value) {
             field = value

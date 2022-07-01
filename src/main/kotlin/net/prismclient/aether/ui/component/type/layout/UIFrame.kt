@@ -1,161 +1,161 @@
 package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.util.interfaces.UILayout
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
+import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
+import net.prismclient.aether.ui.util.warn
 
 /**
- * [UIFrame] is a "viewport" for components. The window holds a list of
- * children which are rendered. It is the superclass for components like
- * layouts, such as a list, or grid layout. If you are looking for simply
- * a window that does not control the layout of its components, take a look
- * at [UIContainer].
+ * [UIFrame] in a single word is a "viewport," or frame, which holds a list of
+ * components within it. It is the superclass of all layouts, and has support
+ * for advanced features such as shaders. Behind the scenes, it uses am FBO to
+ * render the content (unless disabled) via [UIContentFBO].
  *
- * [UIFrame] works by rendering all the content to an FBO if content clipping is
- * enabled. If disabled, everything is rendered when the render method for this
- * component is invoked.
- *
- * Because of how [UIFrame] is designed, more custom rendering features can be applied
- * (such as shaders), by extending the class and applying your own code.
+ * When using an FBO certain opportunities arrive as the frames can be cached; thus
+ * removing most of the overhead when rendering the frame. By default, the optimizations
+ * are applied, and can be disabled by [UIFrameSheet.optimizeRenderer].
  *
  * @author sen
- * @since 5/12/2022
- *
- * @see UIContainer
+ * @since 1.0
  */
-abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style), UILayout {
-    val components = ArrayList<UIComponent<*>>()
-
-    // TODO: Update UIFrame
+abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style), UIFocusable {
+    /**
+     * The components of this frame.
+     */
+    val components: ArrayList<UIComponent<*>> = arrayListOf()
 
     /**
-     *
+     * The FBO of this frame. It is allocated if [UIFrameSheet.useFBO] is true.
      */
-    var framebuffer: UIContentFBO? = null
+    var fbo: UIContentFBO? = null
         protected set
 
-    var frameWidth: Float = 0f
-        protected set
-    var frameHeight: Float = 0f
+    /**
+     * If the frame is using an FBO, it isn't necessary to render every frame, as
+     * components within it is not always updated every frame. This flag is used to
+     * inform the frame that it needs to be updated because of a change in one of the
+     * components.
+     */
+    var requiresUpdate: Boolean = true
         protected set
 
-    override fun addComponent(component: UIComponent<*>) {
+    /**
+     * An internal clock to update the frame at least once per second
+     */
+    protected var lastUpdate: Long = System.currentTimeMillis()
+
+    override fun update() {
+        super.update()
+        components.forEach { it.update() }
+        updateFBO()
+    }
+
+    /**
+     * Creates/Updates the FBO of this frame if necessary. It is invoked after the
+     * frame has been updated, but prior to the first render.
+     */
+    open fun updateFBO() {
+        if (style.useFBO)
+            fbo = UIRendererDSL.render.createContentFBO(relWidth, relHeight)
+    }
+
+    /**
+     * Adds the given component to [components] and sets the parent to this.
+     */
+    open fun addComponent(component: UIComponent<*>) {
         components.add(component)
         component.parent = this
     }
 
-    override fun removeComponent(component: UIComponent<*>) {
-        components.remove(component)
-        component.parent = null
+    /**
+     * Removes the given component from [components] and sets the parent to null.
+     */
+    open fun removeComponent(component: UIComponent<*>) {
+        if (!components.remove(component))
+            warn("Failed to remove $component, as it was not found within the list.")
+        else
+            component.parent = null
     }
 
-    override fun update() {
-        super.update()
-        updateFramebuffer()
-        components.forEach(UIComponent<*>::update)
-        updateLayout()
-    }
-
-    open fun updateFrame() {
-        updateFramebuffer()
-        components.forEach(UIComponent<*>::update)
-        updateLayout()
-    }
-
-    open fun createFramebuffer() {
-        if (framebuffer != null) {
-            UIRendererDSL.render.deleteContentFBO(framebuffer!!)
-            framebuffer = null
-        }
-        if (relWidth >= 1f && relHeight >= 1f)
-            framebuffer = UIRendererDSL.render.createContentFBO(frameWidth, frameHeight)
-    }
-
-    open fun updateFramebuffer() {
-        frameWidth = +style.frameWidth
-        frameHeight = -style.frameHeight
-        if (style.clipContent) {
-            if (framebuffer == null || frameWidth != framebuffer!!.width || frameHeight != framebuffer!!.height) {
-                createFramebuffer()
-            }
-        }
-    }
-
+    /**
+     * Renders the components within this frame.
+     */
     open fun renderContent() {
-        if (!style.clipContent)
-            return
-        updateAnimation()
-        if (framebuffer != null)
-            createFramebuffer()
-        // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
-        if (relWidth < 1f || relHeight < 1f)
-            return
-        renderer {
-            renderContent(framebuffer!!) {
-                components.forEach(UIComponent<*>::render)
+        if (style.useFBO) {
+            if (requiresUpdate || !style.optimizeRenderer) {
+                if (fbo == null) updateFBO()
+                UIRendererDSL.renderContent(fbo!!) {
+                    components.forEach(UIComponent<*>::render)
+                }
+                requiresUpdate = false
             }
         }
     }
+
 
     override fun render() {
-        // Remove updating animation as animations are updated when the content is rendered
-        if (!style.clipContent)
-            updateAnimation()
+        if (lastUpdate + 1000L < System.currentTimeMillis()) {
+            requestUpdate()
+            lastUpdate = System.currentTimeMillis()
+        }
         style.background?.render()
-        renderer {
-            if (!style.clipContent) {
-                renderComponent()
-                return
-            }
-            scissor(relX, relY, relWidth, relHeight) {
-                renderComponent()
-            }
+        renderComponent()
+        if (style.useFBO) {
+            UIRendererDSL.renderFBO(fbo!!, relX, relY, relWidth, relHeight, style.background?.radius)
         }
     }
 
     override fun renderComponent() {
-        if (!style.clipContent) {
-            components.forEach(UIComponent<*>::render)
-            return
+        if (style.useFBO) {
+            UIRendererDSL.renderFBO(fbo!!, relX, relY, relWidth, relHeight, style.background?.radius)
+        } else {
+            if (style.clipContent)
+                UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
+                    components.forEach(UIComponent<*>::render)
+                }
+            else components.forEach(UIComponent<*>::render)
         }
-        renderer {
-            if (framebuffer == null) return
-            // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
-            if (relWidth >= 1f || relHeight >= 1f) {
-                render.renderFBO(
-                        framebuffer!!,
-                        relX,
-                        relY,
-                        frameWidth,
-                        frameHeight,
-                        style.background?.radius?.topLeft ?: 0f,
-                        style.background?.radius?.topRight ?: 0f,
-                        style.background?.radius?.bottomRight ?: 0f,
-                        style.background?.radius?.bottomLeft ?: 0f
-                )
-            }
-        }
+    }
+
+    override fun requestUpdate() {
+        requiresUpdate = true
+        super.requestUpdate()
     }
 
     override fun deallocate() {
         components.forEach { it.deallocate() }
     }
 
-    override fun mouseReleased(mouseX: Float, mouseY: Float) {
-        super.mouseReleased(mouseX, mouseY)
-        components.forEach { it.mouseReleased(mouseX + relX, mouseY + relY) }
-    }
-
     override fun mouseMoved(mouseX: Float, mouseY: Float) {
         super.mouseMoved(mouseX, mouseY)
         components.forEach { it.mouseMoved(mouseX, mouseY) }
+        if (this.isMouseInsideBounds()) requestUpdate()
+    }
+
+    override fun mousePressed(event: UIMouseEvent) {
+        super.mousePressed(event)
+        requestUpdate()
+    }
+
+    override fun mouseReleased(mouseX: Float, mouseY: Float) {
+        super.mouseReleased(mouseX, mouseY)
+        components.forEach { it.mouseReleased(mouseX + relX, mouseY + relY) }
+        requestUpdate()
+    }
+
+    override fun keyPressed(character: Char) {
+        super.keyPressed(character)
+        keyPressListeners?.forEach { it.value.accept(this, character) }
+        requestUpdate()
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
         components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
+        requestUpdate()
     }
 }
