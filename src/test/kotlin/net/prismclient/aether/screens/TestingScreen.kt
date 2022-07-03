@@ -2,6 +2,7 @@ package net.prismclient.aether.screens
 
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
+import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
@@ -36,19 +37,21 @@ class TestingScreen : UIScreen {
                 font("Montserrat", 16f, -1)
             }
 
-            component(UIAutoLayout(null)) {
+            component(UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)) {
                 componentAlignment = UIAlignment.MIDDLELEFT
+                horizontalResizing = UIAutoLayout.ResizingMode.Hug
+                verticalResizing = UIAutoLayout.ResizingMode.Hug
+                componentSpacing = px(10)
+                layoutPadding = paddingOf(0, 10, 0, 10)
 
                 image("cog").style(UIImageSheet("")) {
                     size(24, 24)
                 }
                 label("Settings").style(UIStyleSheet("")) {
-                    background(asRGBA(1f, 0f, 0f, 0.3f))
-                    font("Montserrat", 16f, -1, left or middle)
+                    font("Montserrat", 16f, -1, left or top)
                     clipContent = false
                 }
             }.style(UIContainerSheet("")) {
-                size(172, 32)
                 position(100, 100)
                 background(asRGBA(59, 145, 255), radiusOf(9f))
             }

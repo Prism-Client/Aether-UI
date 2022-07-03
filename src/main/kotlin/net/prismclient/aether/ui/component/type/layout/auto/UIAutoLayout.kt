@@ -2,10 +2,9 @@ package net.prismclient.aether.ui.component.type.layout.auto
 
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.unit.UIUnit
-
-import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 
 /**
  * [UIAutoLayout] is a layout which is designed to mimic the behavior of Figma's auto
@@ -16,7 +15,10 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
  * @author sen
  * @since 1.1
  */
-class UIAutoLayout(style: String?) : UIListLayout(ListDirection.Vertical, ListOrder.Forward, style) {
+class UIAutoLayout @JvmOverloads constructor(
+    listDirection: UIListLayout.ListDirection = ListDirection.Horizontal,
+    style: String?
+) : UIListLayout(listDirection, ListOrder.Forward, style) {
     /**
      * Defines how the width should be sized. [ResizingMode.Hug] resizes based on the components and
      * the padding and spacing properties, and [ResizingMode.Fixed] acts like a normal component.
@@ -51,7 +53,7 @@ class UIAutoLayout(style: String?) : UIListLayout(ListDirection.Vertical, ListOr
     /**
      * The direction to align the components within the layout.
      */
-    var componentAlignment: UIAlignment = UIAlignment.TOPLEFT
+    var componentAlignment: UIAlignment = TOPLEFT
 
     /**
      * The spacing between the individual components
@@ -59,48 +61,77 @@ class UIAutoLayout(style: String?) : UIListLayout(ListDirection.Vertical, ListOr
     var componentSpacing: UIUnit? = null
 
     override fun updateLayout() {
-        println(relX)
-        var x = x + getParentX() + +layoutPadding?.paddingLeft
-        var y = y + getParentY() + -layoutPadding?.paddingTop + when (componentAlignment) {
-            TOPLEFT -> 0f
-            MIDDLELEFT -> height / 2f
-            BOTTOMLEFT -> height
-            else -> 0f
-        }
+        if (components.isEmpty()) return
+
+        // Calculate the padding and spacing
+        val top = -layoutPadding?.paddingTop
+        val right = +layoutPadding?.paddingRight
+        val bottom = -layoutPadding?.paddingBottom
+        val left = +layoutPadding?.paddingLeft
+        val spacing = if (listDirection == ListDirection.Horizontal) +componentSpacing else -componentSpacing
+
+        // Calculate the width of the layout
         var w = 0f
-        var h = 0f // if auto = the entire row of alignment is ussed
-        val layoutSpacing = if (spacingMode == SpacingMode.SpaceBetween) {
-            var spacing = 0f
-            for (i in components.indices)
-                spacing += if (listDirection == ListDirection.Vertical) {
-                    components[i].relWidth
-                } else {
-                    components[i].relHeight
-                }
-            spacing / (components.size - 1).coerceAtLeast(1)
-        } else {
-            if (listDirection == ListDirection.Vertical) +componentSpacing else -componentSpacing
-        }
+        var h = 0f
 
         for (i in components.indices) {
-            val component = components[i]
-            component.style.anchor(componentAlignment)
-
-            component.x = x + w
-            component.y = y + h
-            component.updateBounds()
-
-            if (listDirection == ListDirection.Vertical)
-                w += layoutSpacing + component.relWidth
-            else
-                h += layoutSpacing + component.relHeight
+            if (horizontalResizing == ResizingMode.Hug) {
+                w = if (listDirection == ListDirection.Horizontal) {
+                    w + components[i].relWidth + if (i < components.size - 1) spacing else 0f
+                } else {
+                    components[i].relWidth.coerceAtLeast(w)
+                }
+            }
+            if (verticalResizing == ResizingMode.Hug) {
+                h = if (listDirection == ListDirection.Vertical) {
+                    h + components[i].relHeight + if (i < components.size - 1) spacing else 0f
+                } else {
+                    components[i].relHeight.coerceAtLeast(h)
+                }
+            }
         }
 
+        // Adjust the width and/or height of the component based on the calculated
+        // size, and ensure that the size is at least the size prior to this.
         if (horizontalResizing == ResizingMode.Hug)
-            width = w.coerceAtLeast(width)
+            width = (w + left + right).coerceAtLeast(width)
         if (verticalResizing == ResizingMode.Hug)
-            height = h.coerceAtLeast(height)
+            height = (h + top + bottom).coerceAtLeast(height)
+
+        // Update the bounds of this
+        updateAnchorPoint()
         updateBounds()
+        updateStyle()
+
+        // Calculate the initial position based on the alignment
+        var x = this.x + getParentX() + left
+        var y = this.y + getParentY() + top
+
+        println(listDirection)
+
+        for (c in components) {
+            if (listDirection == ListDirection.Horizontal) {
+                c.x = x
+                c.y = y + when (componentAlignment) {
+                    TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
+                    MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - c.height - top - bottom) / 2f
+                    BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - c.height - left - right)
+                    else -> 0f
+                }
+                x += c.width + spacing
+            } else if (listDirection == ListDirection.Vertical) {
+                println("hi")
+                c.x = x + when (componentAlignment) {
+                    TOPLEFT, MIDDLELEFT, BOTTOMLEFT -> 0f
+                    TOPCENTER, CENTER, BOTTOMCENTER -> (width - c.width - left - right) / 2f
+                    TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - c.width - left - right)
+                    else -> 0f
+                }
+                c.y = y
+                y += c.height + spacing
+            }
+            c.updateBounds()
+        }
     }
 
     /**

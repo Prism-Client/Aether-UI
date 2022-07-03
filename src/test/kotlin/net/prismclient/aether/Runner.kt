@@ -162,7 +162,7 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        if (args[0] == "--debug") {
+        if (args.isNotEmpty() && args[0] == "--debug") {
             Aether.displayScreen(TestingScreen())
         } else {
             Aether.displayScreen(PrismLoadingMenu())

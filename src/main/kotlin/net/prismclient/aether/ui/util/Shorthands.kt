@@ -3,8 +3,11 @@ package net.prismclient.aether.ui.util
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
+import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 
 /** Font Alignments **/
@@ -48,6 +51,27 @@ fun radiusOf(radius: Number) = radiusOf(radius, radius, radius, radius)
  */
 fun radiusOf(topLeft: Number, topRight: Number, bottomRight: Number, bottomLeft: Number): UIRadius =
     UIRadius(topLeft.toFloat(), topRight.toFloat(), bottomRight.toFloat(), bottomLeft.toFloat())
+
+/**
+ * Creates a [UIPadding] with a pixel unit of [padding].
+ */
+fun paddingOf(padding: Number) = paddingOf(padding, padding, padding, padding)
+
+/**
+ * Creates a [UIPadding] from four pixel units.
+ */
+fun paddingOf(top: Number, right: Number, bottom: Number, left: Number): UIPadding =
+    paddingOf(px(top), px(right), px(bottom), px(left))
+
+/**
+ * Creates a [UIPadding] given four [UIUnit]s.
+ */
+fun paddingOf(top: UIUnit, right: UIUnit, bottom: UIUnit, left: UIUnit): UIPadding = UIPadding().also {
+    it.paddingTop = top
+    it.paddingRight = right
+    it.paddingBottom = bottom
+    it.paddingLeft = left
+}
 
 /**
  * Creates a DSL block for creating components. When started and completed, the stacks will be allocated/cleared
