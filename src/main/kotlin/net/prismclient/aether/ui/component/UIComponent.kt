@@ -192,7 +192,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * @throws InvalidStyleSheetException If the style is not a valid style sheet of the given component
      */
     open fun applyStyle(style: String?) {
-        if (style == null)
+        if (style.isNullOrEmpty())
             return
 
         // Attempt to apply the style provided to the component.

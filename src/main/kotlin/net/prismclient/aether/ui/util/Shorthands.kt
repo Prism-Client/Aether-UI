@@ -20,6 +20,11 @@ const val bottom = 32
 const val baseline = 64
 
 /**
+ * Creates a DSL block from the given [obj] of type [T].
+ */
+inline fun <T> blockFrom(obj: T, block: T.() -> Unit) = obj.block()
+
+/**
  * Registers a style sheet for the given style, [S].
  */
 inline fun <S : UIStyleSheet> styleOf(style: S, block: S.() -> Unit) {
@@ -37,10 +42,18 @@ inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(style: S, block: S.() 
     UIComponentDSL.updateState(this)
     if (style.name.isEmpty()) style.name = "Gen-$this"
     styleOf(style, block)
-    this.applyStyle("Gen-$this")
+    this.applyStyle(style.name)
     UIComponentDSL.restoreState(this)
 }
 
+/**
+ * Creates a style [block] on a [UIComponent] of the style sheet [S].
+ */
+inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(block: S.() -> Unit): C = apply {
+    UIComponentDSL.updateState(this)
+    this.style.block()
+    UIComponentDSL.restoreState(this)
+}
 /**
  * Returns a [UIRadius] with the given radius.
  */

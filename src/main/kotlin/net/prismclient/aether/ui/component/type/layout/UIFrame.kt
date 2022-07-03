@@ -19,6 +19,10 @@ import net.prismclient.aether.ui.util.warn
  * removing most of the overhead when rendering the frame. By default, the optimizations
  * are applied, and can be disabled by [UIFrameSheet.optimizeRenderer].
  *
+ * Despite the possible optimizations that can occur when using [UIFrameSheet.useFBO], it is
+ * suggested to use them in moderation. They take up quite a bit of memory; thus, limiting them
+ * to only large frames which hold a large collections of components is the best option.
+ *
  * @author sen
  * @since 1.0
  */

@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.component.type.layout.auto
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.UIProvider
@@ -19,7 +20,10 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * to manually declare it each time. The properties of this are copied excluding the [components].
  * The style is referenced from [UIProvider], so changes made directly to the style of this component
  * via the style block, or any other way will not be applied to the copied version of the component.
- * Furthermore, the parent property of [UIComponent] is ignored.
+ * Furthermore, the parent property of [UIComponent] is ignored. Furthermore, it is suggested NOT to use
+ * the [UIFrameSheet.useFBO] as it can take up an unnecessarily large amount of memory, it is instead
+ * suggested to simply contain the layouts within another container with the property enabled if an FBO
+ * is desired to be used.
  *
  * @author sen
  * @since 1.1
@@ -115,6 +119,19 @@ class UIAutoLayout @JvmOverloads constructor(
         var y = this.y + getParentY() + top
 
         // Update the other direction's alignment
+        if (listDirection == ListDirection.Horizontal) {
+            x += when (componentAlignment) {
+                TOPCENTER, CENTER, BOTTOMCENTER -> (width - (w + left + right)) / 2f
+                TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - (w + left + right))
+                else -> 0f
+            }
+        } else if (listDirection == ListDirection.Vertical) {
+            y += when (componentAlignment) {
+                MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - (h + top + bottom)) / 2f
+                BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - (h + top + bottom))
+                else -> 0f
+            }
+        }
 
         for (c in components) {
             if (listDirection == ListDirection.Horizontal) {

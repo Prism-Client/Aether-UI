@@ -9,11 +9,13 @@ import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.input.button.UICheckbox
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL.activeStyle
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.interfaces.UIDependable
 import java.util.*
 
 /**
@@ -31,14 +33,18 @@ object UIComponentDSL {
     /**
      * The components which are automatically added/removed to support nesting
      */
+    @JvmStatic
     var componentStack: Stack<UIComponent<*>>? = null
 
     /**
      * The frames which are automatically added/removed to support nesting
      */
+    @JvmStatic
     var frameStack: Stack<UIFrame<*>>? = null
 
+    @JvmStatic
     var activeController: UIController<*>? = null
+    @JvmStatic
     var activeStyle: String? = null
 
     /**
@@ -46,6 +52,7 @@ object UIComponentDSL {
      *
      * @see ignore
      */
+    @JvmStatic
     var ignoreController: Boolean = false
 
     /**
@@ -53,6 +60,7 @@ object UIComponentDSL {
      *
      * @see complete
      */
+    @JvmStatic
     fun begin() {
         componentStack = Stack()
         frameStack = Stack()
@@ -63,6 +71,7 @@ object UIComponentDSL {
      *
      * @see begin
      */
+    @JvmStatic
     fun complete() {
         componentStack = null
         frameStack = null
@@ -73,16 +82,15 @@ object UIComponentDSL {
     /**
      * Updates the active component and / or frame as well as the stacks pertaining to those properties.
      */
+    @JvmStatic
     fun updateState(component: UIComponent<*>) {
         check()
         if (component is UIFrame) frameStack!!.push(component)
         else componentStack!!.push(component)
     }
 
-    /**
-     * Restores the state based on the component. The component given is expected to be
-     * the active component or the active frame; the most recently pushed component.
-     */
+
+    @JvmStatic
     fun restoreState(component: UIComponent<*>) {
         check()
         // Restore the frame if the component is the frame
@@ -96,6 +104,7 @@ object UIComponentDSL {
     /**
      * Applies any properties pertaining to state and updates the state to the component's needs.
      */
+    @JvmStatic
     fun pushComponent(component: UIComponent<*>) {
         check()
         val activeComponent = getActiveComponent()
@@ -113,6 +122,7 @@ object UIComponentDSL {
     /**
      * Restores the state to the previous component, or null.
      */
+    @JvmStatic
     fun popComponent(component: UIComponent<*>) {
         check()
         restoreState(component)
@@ -172,6 +182,13 @@ object UIComponentDSL {
         block(this)
         block.invoke(this)
         activeStyle = previousStyle
+    }
+
+    /**
+     * Loads the [dependable].
+     */
+    fun include(dependable: UIDependable) {
+        dependable.load()
     }
 
     private fun getActiveComponent(): UIComponent<*>? =
@@ -267,4 +284,10 @@ object UIComponentDSL {
         block: UIListLayout.() -> Unit = {}
     ) =
         component(UIListLayout(listDirection, listOrder, style), block)
+
+    /**
+     * Creates a copy of the given layout and creates a normal block of [UIAutoLayout] where
+     * components can be defined.
+     */
+    inline fun autoLayout(layout: UIAutoLayout, block: UIAutoLayout.() -> Unit) = component(layout.copy(), block)
 }

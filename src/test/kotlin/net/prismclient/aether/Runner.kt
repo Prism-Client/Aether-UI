@@ -1,6 +1,7 @@
 package net.prismclient.aether
 
 
+import examples.AutoLayouts
 import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.screens.prism.PrismGameMenu
 import net.prismclient.aether.screens.prism.PrismLoadingMenu
@@ -165,7 +166,7 @@ object Runner {
         if (args.isNotEmpty() && args[0] == "--debug") {
             Aether.displayScreen(TestingScreen())
         } else {
-            Aether.displayScreen(PrismLoadingMenu())
+            Aether.displayScreen(AutoLayouts())
         }
 
         renderer {
@@ -181,12 +182,12 @@ object Runner {
             GL11.glClearColor(0.3f, 0.3f, 0.3f, 0f)
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
-            renderer {
-                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, Aether.devicePxRatio)
-                color(-1)
-                renderImage("background", 0f, 0f, Aether.width, Aether.height)
-                endFrame()
-            }
+//            renderer {
+//                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, Aether.devicePxRatio)
+//                color(-1)
+//                renderImage("background", 0f, 0f, Aether.width, Aether.height)
+//                endFrame()
+//            }
 
             core!!.render()
 

@@ -38,11 +38,11 @@ class TestingScreen : UIScreen {
             }
 
             component(UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)) {
-                componentAlignment = UIAlignment.MIDDLELEFT
+                componentAlignment = UIAlignment.TOPCENTER
                 horizontalResizing = UIAutoLayout.ResizingMode.Hug
                 verticalResizing = UIAutoLayout.ResizingMode.Hug
                 componentSpacing = px(10)
-                layoutPadding = paddingOf(0, 10, 0, 10)
+                layoutPadding = paddingOf(10)
 
                 image("cog").style(UIImageSheet("")) {
                     size(24, 24)

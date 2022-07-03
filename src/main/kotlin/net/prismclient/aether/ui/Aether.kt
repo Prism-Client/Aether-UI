@@ -9,6 +9,7 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -86,7 +87,7 @@ open class Aether(val renderer: UIRenderer) {
     open fun renderFrames() {
         renderer {
             frames?.forEach {
-                if (it.visible) {
+                if (it.visible && it.requiresUpdate && it.style.useFBO) {
                     beginFrame(width, height, devicePxRatio)
                     it.renderContent()
                     endFrame()
@@ -100,7 +101,7 @@ open class Aether(val renderer: UIRenderer) {
      */
     open fun render() {
         renderer {
-            beginFrame(width, height, devicePxRatio)
+            beginFrame(width, height, 1f)
             if (activeScreen != null)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]
