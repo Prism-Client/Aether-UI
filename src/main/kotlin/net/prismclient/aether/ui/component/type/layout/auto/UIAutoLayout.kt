@@ -1,10 +1,13 @@
 package net.prismclient.aether.ui.component.type.layout.auto
 
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
+import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.interfaces.UICopy
 
 /**
  * [UIAutoLayout] is a layout which is designed to mimic the behavior of Figma's auto
@@ -12,13 +15,19 @@ import net.prismclient.aether.ui.unit.UIUnit
  * direction, however, depending on the properties, it also will resize based on the
  * components within it. The property [UIListLayout.listOrder] is unused.
  *
+ * Due to how this class may be used many times, a copy method is provided to avoid the need
+ * to manually declare it each time. The properties of this are copied excluding the [components].
+ * The style is referenced from [UIProvider], so changes made directly to the style of this component
+ * via the style block, or any other way will not be applied to the copied version of the component.
+ * Furthermore, the parent property of [UIComponent] is ignored.
+ *
  * @author sen
  * @since 1.1
  */
 class UIAutoLayout @JvmOverloads constructor(
     listDirection: UIListLayout.ListDirection = ListDirection.Horizontal,
     style: String?
-) : UIListLayout(listDirection, ListOrder.Forward, style) {
+) : UIListLayout(listDirection, ListOrder.Forward, style), UICopy<UIAutoLayout> {
     /**
      * Defines how the width should be sized. [ResizingMode.Hug] resizes based on the components and
      * the padding and spacing properties, and [ResizingMode.Fixed] acts like a normal component.
@@ -98,16 +107,14 @@ class UIAutoLayout @JvmOverloads constructor(
         if (verticalResizing == ResizingMode.Hug)
             height = (h + top + bottom).coerceAtLeast(height)
 
-        // Update the bounds of this
-        updateAnchorPoint()
-        updateBounds()
-        updateStyle()
+        // Update the bounds, anchor, and style of this
+        this.updateNecessary()
 
         // Calculate the initial position based on the alignment
         var x = this.x + getParentX() + left
         var y = this.y + getParentY() + top
 
-        println(listDirection)
+        // Update the other direction's alignment
 
         for (c in components) {
             if (listDirection == ListDirection.Horizontal) {
@@ -120,7 +127,6 @@ class UIAutoLayout @JvmOverloads constructor(
                 }
                 x += c.width + spacing
             } else if (listDirection == ListDirection.Vertical) {
-                println("hi")
                 c.x = x + when (componentAlignment) {
                     TOPLEFT, MIDDLELEFT, BOTTOMLEFT -> 0f
                     TOPCENTER, CENTER, BOTTOMCENTER -> (width - c.width - left - right) / 2f
@@ -130,8 +136,30 @@ class UIAutoLayout @JvmOverloads constructor(
                 c.y = y
                 y += c.height + spacing
             }
-            c.updateBounds()
+            c.updateNecessary()
         }
+    }
+
+    /**
+     * Copy the properties of this layout to a new one (excluding components).
+     */
+    override fun copy(): UIAutoLayout = UIAutoLayout(listDirection, style.name).also {
+        // UIAutoLayout properties
+        it.horizontalResizing = horizontalResizing
+        it.verticalResizing = verticalResizing
+        it.spacingMode = spacingMode
+        it.layoutPadding = layoutPadding?.copy()
+        it.componentAlignment = componentAlignment
+        it.componentSpacing = componentSpacing
+
+        // UIListLayout properties
+        it.listOrder = listOrder
+
+        // UIContainer properties
+        it.scrollSensitivity = scrollSensitivity
+
+        // UIComponent
+        it.visible = visible
     }
 
     /**

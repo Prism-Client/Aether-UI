@@ -7,11 +7,16 @@ import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
  * [UIContainer] is the default implementation for [UIFrame]. It introduces
- * scrollbars which automatically resize to content being added/removed.
+ * scrollbars which automatically resize to content being added/removed. It is
+ * considered to be a [UIFocusable], so when the mouse is scrolled within the
+ * container the focused component will become this.
+ *
+ *
  *
  * @author sen
  * @since 5/12/2022
@@ -104,6 +109,16 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
     override fun render() {
         super.render()
         renderScrollbar()
+    }
+
+    /**
+     * Updates the necessary properties of the given component when updating
+     * the layout.
+     */
+    protected fun UIComponent<*>.updateNecessary() {
+        this.updateBounds()
+        this.updateAnchorPoint()
+        this.updateStyle()
     }
 
     override fun mousePressed(event: UIMouseEvent) {
