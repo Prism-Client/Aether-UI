@@ -8,6 +8,7 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.interfaces.UICopy
 
 /**
@@ -68,11 +69,6 @@ class UIAutoLayout @JvmOverloads constructor(
      */
     var componentAlignment: UIAlignment = TOPLEFT
 
-    /**
-     * The spacing between the individual components
-     */
-    var componentSpacing: UIUnit? = null
-
     override fun updateLayout() {
         if (components.isEmpty()) return
 
@@ -111,8 +107,10 @@ class UIAutoLayout @JvmOverloads constructor(
         if (verticalResizing == ResizingMode.Hug)
             height = (h + top + bottom).coerceAtLeast(height)
 
-        // Update the bounds, anchor, and style of this
-        this.updateNecessary()
+        // Update the anchor, and style of this
+        updateBounds()
+        updateAnchorPoint()
+        updateStyle()
 
         // Calculate the initial position based on the alignment
         var x = this.x + getParentX() + left
@@ -134,6 +132,7 @@ class UIAutoLayout @JvmOverloads constructor(
         }
 
         for (c in components) {
+            c.overridden = true
             if (listDirection == ListDirection.Horizontal) {
                 c.x = x
                 c.y = y + when (componentAlignment) {
@@ -153,8 +152,13 @@ class UIAutoLayout @JvmOverloads constructor(
                 c.y = y
                 y += c.height + spacing
             }
-            c.updateNecessary()
+            c.update()
         }
+    }
+
+    override fun requestUpdate() {
+        super.requestUpdate()
+        update()
     }
 
     /**
@@ -167,10 +171,9 @@ class UIAutoLayout @JvmOverloads constructor(
         it.spacingMode = spacingMode
         it.layoutPadding = layoutPadding?.copy()
         it.componentAlignment = componentAlignment
-        it.componentSpacing = componentSpacing
 
         // UIListLayout properties
-        it.listOrder = listOrder
+        it.componentSpacing = componentSpacing?.copy()
 
         // UIContainer properties
         it.scrollSensitivity = scrollSensitivity

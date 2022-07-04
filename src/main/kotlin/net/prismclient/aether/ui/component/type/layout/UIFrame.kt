@@ -73,7 +73,6 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
     open fun addComponent(component: UIComponent<*>) {
         components.add(component)
         component.parent = this
-        component.overridden = true
     }
 
     /**
@@ -84,7 +83,6 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
             warn("Failed to remove $component, as it was not found within the list.")
         else {
             component.parent = null
-            component.overridden = false
         }
     }
 

@@ -72,7 +72,7 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
     /**
      * When true, any content within the component will be clipped
      */
-    var clipContent = true
+    var clipContent = false
 
     override fun updateAnimationCache(component: UIComponent<*>) {
         TODO("Not yet implemented")

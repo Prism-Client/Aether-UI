@@ -1,6 +1,8 @@
 package examples
 
 import examples.deps.Generic
+import net.prismclient.aether.ui.component.type.UILabel
+import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
@@ -10,6 +12,8 @@ import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.util.*
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.px
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Auto Layouts are a neat feature which is designed to mimic the auto layout
@@ -34,10 +38,13 @@ class AutoLayouts : UIScreen {
 
             // There are two (suggested) ways to declare Auto Layouts. If intend
             // to use auto layout, once (uncommon), you can simply declare the
-            // layout using `UIComponentDSL.component()`
+            // layout using `UIComponentDSL.component()
+
+            /*
             component(UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)) {
-                // Define properties of the layout, and components...
-            }.style(UIContainerSheet("")) {} // Added to make sure the code doesn't complain
+                 Define properties of the layout, and components...
+            }
+            */
 
             // Generally you will need to reuse the same layout so instead
             // define the layout as a variable instead.
@@ -46,8 +53,8 @@ class AutoLayouts : UIScreen {
             val layout = UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)
                 .style(UIContainerSheet(("someStyle"))) {
                     // Declare the style inline, as we only use it once
-                    position(100, 100)
                     background(asRGBA(59, 145, 255), radiusOf(9f))
+                    padding = paddingOf(10)
                 }
 
             // Create a DSL block using this shorthand
@@ -72,26 +79,33 @@ class AutoLayouts : UIScreen {
             }
 
             // To use this, invoke the UIComponentDSL.autoLayout() function!
-            autoLayout(layout) {
-                // Define your components here!
-                image("ui", "icon24x")
-                text("User Interface", "generic-font")
-            }
+            list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrder.Forward) {
+                componentSpacing = px(10)
 
-            autoLayout(layout) {
-                // Define your components here!
-                image("ui", "icon24x")
-                text("Some more user interface!!!!", "generic-font")
-            }.style {
-                position(100, 144 + 10)
-            }
+                autoLayout(layout) {
+                    // Define your components here!
+                    image("ui", "icon24x")
+                    text("User Interface", "generic-font")
+                }.style {
+                    margin {
+                        marginTop = px(25)
+                    }
+                }
 
-            autoLayout(layout) {
-                // Define your components here!
-                text("Reversed icons???", "generic-font")
-                image("ui", "icon24x")
-            }.style {
-                position(100, 100 + 44 + 44 + 10 + 10)
+                val asd = autoLayout(layout) {
+                    // Define your components here!
+                    image("ui", "icon24x")
+                    text("Some more user interface!!!!", "generic-font")
+                }
+
+                autoLayout(layout) {
+                    // Define your components here!
+                    text("Reversed icons???", "generic-font")
+                    image("ui", "icon24x")
+                }
+            }.style(UIContainerSheet("autoLayoutList")) {
+                size(400, 500)
+//                background(asRGBA(0.95f, 0.95f, 0.95f, 1f), radiusOf(9f))
             }
         }
     }

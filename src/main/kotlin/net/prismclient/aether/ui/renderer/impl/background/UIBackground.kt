@@ -6,6 +6,7 @@ import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
+import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -23,6 +24,15 @@ open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
     var backgroundColor = UIDefaults.instance.backgroundColor
     var radius: UIRadius? = null
     var border: UIBorder? = null
+
+    override fun update(component: UIComponent<*>?) {
+        // Reflect the rel units instead of the inner values
+        this.component = component
+        cachedX = (component?.relX ?: 0f) + calculate(x, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
+        cachedY = (component?.relY ?: 0f) + calculate(y, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
+        cachedWidth = calculate(width, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
+        cachedHeight = calculate(height, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
+    }
 
     override fun render() {
         renderer {

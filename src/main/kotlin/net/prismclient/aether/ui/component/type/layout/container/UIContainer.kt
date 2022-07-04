@@ -111,16 +111,6 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
         renderScrollbar()
     }
 
-    /**
-     * Updates the necessary properties of the given component when updating
-     * the layout.
-     */
-    protected fun UIComponent<*>.updateNecessary() {
-        this.updateBounds()
-        this.updateAnchorPoint()
-        this.updateStyle()
-    }
-
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
         if (style.verticalScrollbar.mousePressed() || style.horizontalScrollbar.mousePressed()) focus()

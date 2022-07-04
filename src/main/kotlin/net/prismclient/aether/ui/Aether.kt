@@ -101,7 +101,7 @@ open class Aether(val renderer: UIRenderer) {
      */
     open fun render() {
         renderer {
-            beginFrame(width, height, 1f)
+            beginFrame(width, height, devicePxRatio)
             if (activeScreen != null)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]

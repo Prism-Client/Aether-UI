@@ -301,7 +301,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     open fun updateBounds() {
         relX = x - paddingLeft
         relY = y - paddingTop
-
         relWidth = width + paddingLeft + paddingRight
         relHeight = height + paddingTop + paddingBottom
     }
@@ -319,7 +318,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      */
     open fun updateAnimation() {
         // TODO
-        requestUpdate()
     }
 
     /**

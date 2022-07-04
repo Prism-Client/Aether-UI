@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrd
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrder.Forward
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
+import net.prismclient.aether.ui.unit.UIUnit
 
 /**
  * [UIListLayout] is a layout class which stacks components in a Given
@@ -18,9 +19,15 @@ open class UIListLayout @JvmOverloads constructor(
     var listOrder: ListOrder = Forward,
     style: String?
 ) : UIContainer<UIContainerSheet>(style) {
+    /**
+     * The spacing between each component in the layout.
+     */
+    var componentSpacing: UIUnit? = null
+
     override fun updateLayout() {
         var x = if (style.clipContent) 0f else x + getParentX()
         var y = if (style.clipContent) 0f else y + getParentY()
+        val spacing = if (listDirection == ListDirection.Horizontal) +componentSpacing else -componentSpacing
 
         if (listOrder == Forward) {
             for (i in 0 until components.size) {
@@ -32,12 +39,14 @@ open class UIListLayout @JvmOverloads constructor(
                 if (component.parent != this)
                     continue
 
+                component.overridden = true
+
                 if (listDirection == ListDirection.Vertical) {
                     component.y = y + component.marginTop
-                    y += component.relHeight + component.marginTop + component.marginBottom
+                    y += component.relHeight + component.marginTop + component.marginBottom + spacing
                 } else if (listDirection == ListDirection.Horizontal) {
                     component.x = x + component.marginLeft
-                    x += component.relWidth + component.marginLeft + component.marginRight
+                    x += component.relWidth + component.marginLeft + component.marginRight + spacing
                 }
             }
         } else {
@@ -47,12 +56,14 @@ open class UIListLayout @JvmOverloads constructor(
                 if (component.parent != this)
                     continue
 
+                component.overridden = true
+
                 if (listDirection == ListDirection.Vertical) {
                     component.y = y + component.marginTop
-                    y += component.relHeight + component.marginTop + component.marginBottom
+                    y += component.relHeight + component.marginTop + component.marginBottom - spacing
                 } else if (listDirection == ListDirection.Horizontal) {
                     component.x = x + component.marginLeft
-                    x += component.relWidth + component.marginLeft + component.marginRight
+                    x += component.relWidth + component.marginLeft + component.marginRight - spacing
                 }
             }
         }
