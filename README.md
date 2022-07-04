@@ -25,6 +25,28 @@ dependencies {
 
 </details>
 
+<details>
+
+<summary>Maven</summary>
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+ </repositories>
+<dependencies>
+    <dependency>
+        <groupId>com.github.Prism-Client</groupId>
+        <artifactId>Aether-UI</artifactId>
+        <version>production-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+```
+</details>
+
+
 # Development
 
 The project board can be found [here](https://trello.com/b/g4Nvdykx/aether)
