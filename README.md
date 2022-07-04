@@ -7,6 +7,21 @@
 
 Ready to get started? [Check out the docs!](https://aether.prismclient.net/)
 
+# Including the project
+
+<details>
+<summary>Gradle</summary>
+```groovy
+repositories {
+  maven { url "https://jitpack.io" }
+}
+
+dependencies {
+  implementation "com.github.Prism-Client:Aether-UI:Tag"
+}
+```
+</details>
+
 # Development
 
 The project board can be found [here](https://trello.com/b/g4Nvdykx/aether)
