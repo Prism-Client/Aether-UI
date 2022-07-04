@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-  implementation "com.github.Prism-Client:Aether-UI:Tag"
+  implementation "com.github.Prism-Client:Aether-UI:Production"
 }
 ```
 
