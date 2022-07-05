@@ -109,11 +109,6 @@ class AutoLayouts : UIScreen {
                 size(400, 500)
                 // There is no background, as the background was not defined
             }
-
-            dependentUnit {
-
-                return@dependentUnit 0f
-            }
         }
     }
 }
