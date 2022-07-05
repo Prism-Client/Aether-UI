@@ -40,7 +40,7 @@ dependencies {
     <dependency>
         <groupId>com.github.Prism-Client</groupId>
         <artifactId>Aether-UI</artifactId>
-        <version>production-SNAPSHOT</version>
+        <version>Release</version>
     </dependency>
 </dependencies>
 ```
