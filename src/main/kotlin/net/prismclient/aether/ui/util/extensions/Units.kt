@@ -120,8 +120,14 @@ fun vw(value: Number) = UIUnit(value.toFloat(), SCREENWIDTH)
  */
 fun vh(value: Number) = UIUnit(value.toFloat(), SCREENHEIGHT)
 
+/**
+ * Creates a [unit] which does not subceed the value of [min] and exceed the value of [max]
+ */
 fun range(unit: UIUnit, min: UIUnit, max: UIUnit) = UIRangeUnit(unit, min, max)
 
+/**
+ * Creates a dependable unit which expects a supplier, which calculates the value.
+ */
 fun dependentUnit(function: Supplier<Float>) = UIDependentUnit(function)
 
 /** Operator functions **/

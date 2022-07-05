@@ -11,6 +11,7 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.util.*
 import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.util.extensions.dependentUnit
 import net.prismclient.aether.ui.util.extensions.px
 import java.util.*
 import kotlin.collections.ArrayList
@@ -54,7 +55,6 @@ class AutoLayouts : UIScreen {
                 .style(UIContainerSheet(("someStyle"))) {
                     // Declare the style inline, as we only use it once
                     background(asRGBA(59, 145, 255), radiusOf(9f))
-                    padding = paddingOf(10)
                 }
 
             // Create a DSL block using this shorthand
@@ -78,34 +78,41 @@ class AutoLayouts : UIScreen {
                 layoutPadding = paddingOf(10)
             }
 
-            // To use this, invoke the UIComponentDSL.autoLayout() function!
+            // Let's make a vertical list, so we can better see what is happening!
+            // This simply stacks the components vertically.
             list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrder.Forward) {
-                componentSpacing = px(10)
+                componentSpacing = px(10) // With a spacing of 10px
 
                 autoLayout(layout) {
                     // Define your components here!
                     image("ui", "icon24x")
                     text("User Interface", "generic-font")
-                }.style {
+                }.style { // Create a style block so we can add a 25px margin at the top
                     margin {
                         marginTop = px(25)
                     }
                 }
 
-                val asd = autoLayout(layout) {
-                    // Define your components here!
+                // Add another
+                autoLayout(layout) {
                     image("ui", "icon24x")
                     text("Some more user interface!!!!", "generic-font")
                 }
 
+                // Sure, why not another!
                 autoLayout(layout) {
-                    // Define your components here!
                     text("Reversed icons???", "generic-font")
                     image("ui", "icon24x")
                 }
             }.style(UIContainerSheet("autoLayoutList")) {
+                // Make the size of this vertical layout
                 size(400, 500)
-//                background(asRGBA(0.95f, 0.95f, 0.95f, 1f), radiusOf(9f))
+                // There is no background, as the background was not defined
+            }
+
+            dependentUnit {
+
+                return@dependentUnit 0f
             }
         }
     }
