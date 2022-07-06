@@ -68,7 +68,9 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
 
         // Load the keyframes
         activeKeyframe = keyframes.first()
-        nextKeyframe = keyframes[1]
+        nextKeyframe = keyframes[1].also {
+            it.ease.start()
+        }
 
         startTime = System.currentTimeMillis()
     }
@@ -106,6 +108,7 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
      * @see stop
      */
     fun complete() {
+        isCompleted = true
 
     }
 
@@ -115,7 +118,7 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
     fun update() {
         if (isCompleted) return
         if (activeKeyframe == null || nextKeyframe == null) complete()
-        if (activeKeyframe!!.ease.finished) {
+        if (nextKeyframe!!.ease.finished) {
             incrementKeyframe()
             if (activeKeyframe == null || nextKeyframe == null) {
                 complete()
@@ -123,7 +126,7 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
             }
         }
 
-
+        component.style.animate(activeKeyframe!!.style, nextKeyframe!!.style, nextKeyframe!!.ease.getValue().toFloat(), this)
     }
 
     /**

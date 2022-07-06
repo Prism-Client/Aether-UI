@@ -1,11 +1,19 @@
 package net.prismclient.aether.ui.util.extensions
 
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.unit.util.*
 
 /**
- * Returns true if the unit is not a valid default unit type
+ * Calculates the position from the starting [UIUnit] to the ending [UIUnit]. The axis
+ * to calculate the units on can be specified with [isY]
  */
-fun UIUnit?.isIrregular() = if (this != null)
-    (this.type == PIXELS || this.type == RELATIVE || this.type == EM || this.type == BORDER || this.type == ASCENDER || this.type == ASCENDER)
-else false
+fun UIUnit?.animateTo(next: UIUnit?, progress: Float, isY: Boolean): Float {
+    return 0f
+}
+
+/**
+ * Returns the color based on the mixing of the initial color, [this], and the
+ * ending [color] based on the [progress].
+ */
+fun Int?.colorTo(color: Int, progress: Float): Int {
+    return 0
+}
