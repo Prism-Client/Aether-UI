@@ -37,19 +37,4 @@ interface UIAnimatable<T> {
      * @see clearAnimationCache
      */
     fun animate(animation: UIAnimation<*, *>, previous: T?, current: T?, progress: Float)
-
-    /**
-     * Invoked when the state of the animation is changed, generally on a keyframe swap. If the property
-     * of the given keyframe is to retain, the properties of [T] should be applied to this.
-     *
-     * @see UIAnimation.component
-     */
-    fun saveState(animation: UIAnimation<*, *>, keyframe: T?, retain: Boolean)
-
-    /**
-     * Clears any saved data for this animation.
-     *
-     * @see UIAnimation.component
-     */
-    fun clearState(animation: UIAnimation<*, *>)
 }

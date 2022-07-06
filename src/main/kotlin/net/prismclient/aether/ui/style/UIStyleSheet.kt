@@ -75,80 +75,13 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
      */
     var clipContent = false
 
-    /**
-     * If there is only one active animation, the variable will be used instead.
-     */
-    var activeCache: Cache? = null
-
-    /**
-     * The cache of the active animation(s). If there is a singular animation, [activeAnimation] is used.
-     */
-    var animationCache: HashMap<UIAnimation<*, *>, Cache>? = null
-
     override fun animate(
         animation: UIAnimation<*, *>, previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float
     ) {
-        val cache = if (activeCache != null) activeCache!! else animationCache?.get(animation)!!
         val component = animation.component
 
         component.x = previous.
     }
-
-    override fun saveState(animation: UIAnimation<*, *>, keyframe: UIStyleSheet?, retain: Boolean) {
-        val component = animation.component
-
-        // Create a new keyframe and save it to the cache
-        // with the properties of the style at this time
-        val cache = Cache(x, y, width, height, background, font, padding, margin, anchor, clipContent, null)
-
-        if (activeCache != null || animationCache != null) {
-            // Allocate the cache if necessary
-            animationCache = animationCache ?: hashMapOf()
-
-            // Add the activeCache to the animation cache and
-            // delete the animation and activeCache reference
-            animationCache!![activeCache!!.animation!!] = activeCache!!
-            activeCache!!.animation = null
-            activeCache = null
-            animationCache!![animation] = cache
-        } else {
-            activeCache = cache
-            cache.animation = animation
-        }
-    }
-
-    override fun clearState(animation: UIAnimation<*, *>) {
-        // Remove the cached item from the animation cache. If the animation
-        // cache is not allocated remove it from the activeCache as there is
-        // only 1 active animations at the time of removal
-        if (animationCache != null) {
-            animationCache!!.remove(animation)
-            if (animationCache!!.isEmpty())
-                animationCache = null
-        } else activeCache = null
-    }
-
-    /**
-     * [Cache], as the name suggests, caches the state of a keyframe for an animation. At any point
-     * the cache may be referenced to choose how to "interpolate" the state, or to finalize the state
-     * of a previous keyframe.
-     *
-     * @author sen
-     * @since 1.1
-     */
-    open class Cache(
-        val x: UIUnit?,
-        val y: UIUnit?,
-        val width: UIUnit?,
-        val height: UIUnit?,
-        val background: UIBackground?,
-        val font: UIFont?,
-        val padding: UIPadding?,
-        val margin: UIMargin?,
-        val anchor: UIAnchorPoint?,
-        val clipContent: Boolean,
-        var animation: UIAnimation<*, *>?
-    )
 
     /** Shorthands **/
 
