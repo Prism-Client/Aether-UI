@@ -9,10 +9,7 @@ import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.util.*
-import net.prismclient.aether.ui.util.extensions.asRGBA
-import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.rel
-import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.extensions.*
 
 class TestingScreen : UIScreen {
     override fun build() {
@@ -33,8 +30,8 @@ class TestingScreen : UIScreen {
 
             styleOf(UIStyleSheet("someComponent")) {
                 size(100, 40)
-                background(asRGBA(0f, 0f, 0f, 0.3f))
-                font("Montserrat", 16f, -1)
+                background(colorOf(asRGBA(0f, 0f, 0f, 0.3f)))
+                font("Montserrat", px(16f), colorOf(-1))
             }
 
             component(UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)) {
@@ -48,12 +45,12 @@ class TestingScreen : UIScreen {
                     size(24, 24)
                 }
                 label("Settings").style(UIStyleSheet("")) {
-                    font("Montserrat", 16f, -1, left or top)
+                    font("Montserrat", px(16f), colorOf(-1), left or top)
                     clipContent = false
                 }
             }.style(UIContainerSheet("")) {
                 position(100, 100)
-                background(asRGBA(59, 145, 255), radiusOf(9f))
+                background(colorOf(asRGBA(59, 145, 255)), radiusOf(9f))
             }
 
 //

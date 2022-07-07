@@ -13,6 +13,7 @@ import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
+import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.extensions.toTerminatingByteBuffer
@@ -85,6 +86,12 @@ object UIRendererDSL {
     }
 
     /**
+     * Sets the color to the given [UIColor].
+     */
+    @JvmStatic
+    fun color(color: UIColor?) = color(color?.rgba ?: 0)
+
+    /**
      * Sets the color to the given RGBA values with all ints except the alpha as a float
      */
     @JvmStatic
@@ -107,7 +114,7 @@ object UIRendererDSL {
     @JvmStatic
     fun font(font: UIFont) {
         color(font.fontColor)
-        font(font.fontName, font.fontSize, font.textAlignment, font.fontSpacing)
+        font(font.fontName, font.cachedFontSize, font.textAlignment, font.cachedFontSpacing)
     }
 
     /**

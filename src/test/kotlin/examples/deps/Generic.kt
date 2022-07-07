@@ -4,6 +4,8 @@ import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
+import net.prismclient.aether.ui.util.extensions.colorOf
+import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.left
@@ -57,7 +59,7 @@ class Generic : UIDependable {
             // FontSize -> 16f
             // FontColor -> -1 = asRGBA(255, 255, 255) (aka white)
             // TextAlignment -> How the text aligns relative to the screen using bit shifting
-            font("Montserrat", 16f, -1, left or top)
+            font("Montserrat", px(16f), colorOf(-1), left or top)
 
             // The above was a shorthand for
             font {

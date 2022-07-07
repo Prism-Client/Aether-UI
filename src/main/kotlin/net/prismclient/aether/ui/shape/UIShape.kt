@@ -1,8 +1,11 @@
 package net.prismclient.aether.ui.shape
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.calculate
+import net.prismclient.aether.ui.util.extensions.lerp
+import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
 
 /**
@@ -13,7 +16,7 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * @author sen
  * @since 5/4/2022
  */
-abstract class UIShape : UIObject(), UICopy<UIShape> {
+abstract class UIShape<T : UIShape<T>> : UIObject(), UICopy<T>, UIAnimatable<T> {
     var x: UIUnit? = null
     var y: UIUnit? = null
     var width: UIUnit? = null
@@ -36,7 +39,21 @@ abstract class UIShape : UIObject(), UICopy<UIShape> {
         cachedHeight = calculate(height, component, component?.width ?: 0f, component?.height ?: 0f, true)
     }
 
-    open fun apply(shape: UIShape): UIShape {
+    override fun animate(animation: UIAnimation<*, *>, previous: T?, current: T?, progress: Float) {
+        cachedX = previous?.x.lerp(current?.x, animation.component, progress, false)
+        cachedY = previous?.y.lerp(current?.y, animation.component, progress, true)
+        cachedWidth = previous?.width.lerp(current?.width, animation.component, progress, false)
+        cachedHeight = previous?.height.lerp(current?.height, animation.component, progress, true)
+    }
+
+    override fun save(animation: UIAnimation<*, *>, keyframe: T?) {
+        x = keyframe?.x ?: x
+        y = keyframe?.y ?: y
+        width = keyframe?.width ?: width
+        height = keyframe?.height ?: height
+    }
+
+    open fun apply(shape: UIShape<T>): UIShape<T> {
         x = shape.x?.copy()
         y = shape.y?.copy()
         width = shape.width?.copy()

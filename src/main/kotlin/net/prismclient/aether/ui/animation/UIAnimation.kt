@@ -126,7 +126,7 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
             }
         }
 
-        component.style.animate(activeKeyframe!!.style, nextKeyframe!!.style, nextKeyframe!!.ease.getValue().toFloat(), this)
+        component.style.animate(this, activeKeyframe!!.style, nextKeyframe!!.style, nextKeyframe!!.ease.getValue().toFloat())
     }
 
     /**

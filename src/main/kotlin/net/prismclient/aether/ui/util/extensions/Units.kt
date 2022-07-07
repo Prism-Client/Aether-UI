@@ -176,7 +176,7 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
         RELATIVE -> (if (isY) height else width) * unit.value
         ASCENDER -> (component?.style?.font?.getAscend() ?: 0f) * unit.value
         DESCENDER -> (component?.style?.font?.getDescend() ?: 0f) * unit.value
-        EM -> (component?.style?.font?.fontSize ?: 0f) * unit.value
+        EM -> (component?.style?.font?.cachedFontSize ?: 0f) * unit.value
         WIDTH -> width * unit.value
         HEIGHT -> height * unit.value
         SCREENWIDTH -> Aether.width

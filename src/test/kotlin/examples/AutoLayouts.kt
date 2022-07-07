@@ -1,8 +1,6 @@
 package examples
 
 import examples.deps.Generic
-import net.prismclient.aether.ui.component.type.UILabel
-import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
@@ -11,10 +9,8 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.util.*
 import net.prismclient.aether.ui.util.extensions.asRGBA
-import net.prismclient.aether.ui.util.extensions.dependentUnit
+import net.prismclient.aether.ui.util.extensions.colorOf
 import net.prismclient.aether.ui.util.extensions.px
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Auto Layouts are a neat feature which is designed to mimic the auto layout
@@ -51,11 +47,11 @@ class AutoLayouts : UIScreen {
             // define the layout as a variable instead.
 
             // ListDirection -> Vertical or Horizontal
-            val layout = UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)
-                .style(UIContainerSheet(("someStyle"))) {
-                    // Declare the style inline, as we only use it once
-                    background(asRGBA(59, 145, 255), radiusOf(9f))
-                }
+            val layout =
+                UIAutoLayout(UIListLayout.ListDirection.Horizontal, null).style(UIContainerSheet(("someStyle"))) {
+                        // Declare the style inline, as we only use it once
+                        background(colorOf(asRGBA(59, 145, 255)), radiusOf(9f))
+                    }
 
             // Create a DSL block using this shorthand
             blockFrom(layout) {

@@ -1,16 +1,13 @@
 package net.prismclient.aether.ui.renderer.impl.background
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
-import net.prismclient.aether.ui.util.extensions.calculate
-import net.prismclient.aether.ui.util.extensions.getAlpha
-import net.prismclient.aether.ui.util.interfaces.UICopy
-import net.prismclient.aether.ui.util.extensions.renderer
-import net.prismclient.aether.ui.util.extensions.transition
+import net.prismclient.aether.ui.util.UIColor
+import net.prismclient.aether.ui.util.extensions.*
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
 /**
@@ -20,8 +17,8 @@ import net.prismclient.aether.ui.util.interfaces.UIAnimatable
  * @author sen
  * @since 4/26/2022
  */
-open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
-    var backgroundColor = UIDefaults.instance.backgroundColor
+open class UIBackground : UIShape<UIBackground>(), UIAnimatable<UIBackground> {
+    var backgroundColor: UIColor? = null
     var radius: UIRadius? = null
     var border: UIBorder? = null
 
@@ -48,7 +45,7 @@ open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
     }
 
     @JvmOverloads
-    inline fun border(borderColor: Int = 0, borderWidth: Float = 0f, strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE, block: UIBorder.() -> Unit = {}) {
+    inline fun border(borderColor: UIColor? = null, borderWidth: Float = 0f, strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE, block: UIBorder.() -> Unit = {}) {
         border {
             this.borderColor = borderColor
             this.borderWidth = borderWidth
@@ -61,47 +58,37 @@ open class UIBackground : UIShape(), UIAnimatable<UIBackground> {
         this.radius = UIRadius(radius)
     }
 
-    protected var cachedColor: Int? = null
-
-    override fun updateAnimationCache(component: UIComponent<*>) {
-        border?.updateAnimationCache(component)
-        radius?.updateAnimationCache(component)
-    }
-
-    override fun clearAnimationCache() {
-        cachedColor = null
-        radius?.clearAnimationCache()
-        border?.clearAnimationCache()
-    }
-
-    override fun animate(previous: UIBackground?, current: UIBackground?, progress: Float, component: UIComponent<*>) {
-        cachedColor = cachedColor ?: backgroundColor
-
-        if (previous?.radius != null || current?.radius != null)
-            radius = radius ?: UIRadius()
-        if (previous?.border != null || current?.border != null)
-            border = border ?: UIBorder()
-
-        backgroundColor = transition(
-            previous?.backgroundColor ?: cachedColor!!,
-            current?.backgroundColor ?: cachedColor!!,
-            progress
-        )
-        radius?.animate(previous?.radius, current?.radius, progress, component)
-        border?.animate(previous?.border, current?.border, progress, component)
-    }
-
-    override fun saveState(component: UIComponent<*>, keyframe: UIBackground?, retain: Boolean) {
-        if (!retain) {
-            backgroundColor = cachedColor!!
+    override fun animate(
+        animation: UIAnimation<*, *>,
+        previous: UIBackground?,
+        current: UIBackground?,
+        progress: Float
+    ) {
+        if (previous?.backgroundColor != null || current?.radius != null) {
+            backgroundColor = backgroundColor ?: UIColor(0)
+            backgroundColor!!.rgba = previous?.backgroundColor.mix(current?.backgroundColor, progress)
         }
-        radius?.saveState(component, keyframe?.radius, retain)
-        border?.saveState(component, keyframe?.border, retain)
+        if (previous?.radius != null || current?.radius != null) {
+            radius = radius ?: UIRadius()
+            radius!!.animate(animation, previous?.radius, current?.radius, progress)
+        }
+        if (previous?.border != null || current?.border != null) {
+            border = border ?: UIBorder()
+            border!!.animate(animation, previous?.border, current?.border, progress)
+        }
+    }
+
+    override fun save(animation: UIAnimation<*, *>, keyframe: UIBackground?) {
+        backgroundColor = keyframe?.backgroundColor ?: backgroundColor
+        radius = keyframe?.radius ?: radius
+        border = keyframe?.border ?: border
     }
 
     override fun copy(): UIBackground = UIBackground().also {
-        it.backgroundColor = backgroundColor
+        it.backgroundColor = backgroundColor?.copy()
         it.radius = radius?.copy()
         it.border = border?.copy()
     }
+
+    override fun toString(): String = "UIBackground(backgroundColor=$backgroundColor, radius=$radius, border=$border)"
 }

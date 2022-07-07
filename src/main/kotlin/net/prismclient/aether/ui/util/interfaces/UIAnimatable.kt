@@ -1,7 +1,6 @@
 package net.prismclient.aether.ui.util.interfaces
 
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.component.UIComponent
 
 /**
  * [UIAnimatable] is an interface which all renderable object must inherit
@@ -37,4 +36,9 @@ interface UIAnimatable<T> {
      * @see clearAnimationCache
      */
     fun animate(animation: UIAnimation<*, *>, previous: T?, current: T?, progress: Float)
+
+    /**
+     * Applies all properties of the given keyframe which are not considered null to this.
+     */
+    fun save(animation: UIAnimation<*, *>, keyframe: T?)
 }
