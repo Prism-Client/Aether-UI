@@ -164,7 +164,14 @@ class NanoVGRenderer : UIRenderer() {
             nvgShapeAntiAlias(ctx, false)
         }
         nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+//        if (stroke) {
+//            if (stroke)
+//        } else {
+//            nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+//            fill()
+//        }
         check()
+        nvgShapeAntiAlias(ctx, true)
     }
 
     override fun startLine(x: Float, y: Float, lineCap: Int, lineJoin: Int, lineWidth: Float) {

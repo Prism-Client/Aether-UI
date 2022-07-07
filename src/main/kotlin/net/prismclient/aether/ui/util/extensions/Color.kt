@@ -1,5 +1,7 @@
 package net.prismclient.aether.ui.util.extensions
 
+import net.prismclient.aether.ui.util.UIColor
+
 /**
  * Returns the red color of the given [Int]
  *
@@ -66,6 +68,7 @@ fun Float.limit(): Float = this.coerceAtMost(1f).coerceAtLeast(0f)
  * Creates a new color from two provided values based on the progress between each value.
  */
 fun transition(color1: Int, color2: Int, progress: Float): Int {
+    println(progress)
     val red1 = color1 shr 16 and 0xFF
     val green1 = color1 shr 8 and 0xFF
     val blue1 = color1 and 0xFF
@@ -81,8 +84,26 @@ fun transition(color1: Int, color2: Int, progress: Float): Int {
     return red shl 16 or (green shl 8) or blue or (alpha shl 24)
 }
 
-
 /**
  * Returns a string of the RGBA values
  */
-fun Int.colorToString() = "RGBA(${this.getRed()}, ${this.getGreen()}, ${this.getBlue()}, ${this.getAlpha()})"
+fun Int.toColorString() = "RGBA(${this.getRed()}, ${this.getGreen()}, ${this.getBlue()}, ${this.getAlpha()})"
+
+/**
+ * Creates a [UIColor] from the given RGBA Int.
+ *
+ * @see asRGBA
+ */
+fun colorOf(value: Int) = UIColor(value)
+
+/**
+ * Creates a [UIColor] from a [hue], [saturation], and [brightness].
+ */
+fun colorOf(hue: Float, saturation: Float, brightness: Float) = UIColor(hue, saturation, brightness)
+
+/**
+ * Equivalent of [colorOf]: creates a [UIColor] from the Int.
+ *
+ * @see asRGBA
+ */
+fun Int.asColor() = colorOf(this)

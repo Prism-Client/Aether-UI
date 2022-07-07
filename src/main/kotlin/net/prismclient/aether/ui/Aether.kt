@@ -7,9 +7,9 @@ import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -87,7 +87,7 @@ open class Aether(val renderer: UIRenderer) {
     open fun renderFrames() {
         renderer {
             frames?.forEach {
-                if (it.visible) {
+                if (it.visible && it.requiresUpdate && it.style.useFBO) {
                     beginFrame(width, height, devicePxRatio)
                     it.renderContent()
                     endFrame()
@@ -245,7 +245,7 @@ open class Aether(val renderer: UIRenderer) {
          * @see tryFocus
          */
         @JvmStatic
-        var focusedComponent: UIFocusable<*>? = null
+        var focusedComponent: UIFocusable? = null
             protected set
 
         /**
@@ -462,19 +462,29 @@ open class Aether(val renderer: UIRenderer) {
             instance.components = ArrayList()
             instance.frames = ArrayList()
             instance.controllers = ArrayList()
-
             screen.build()
-            instance.frames = UIComponentDSL.getFrames()
-            instance.components = UIComponentDSL.get()
-            UIComponentDSL.finalize()
             instance.update(width, height, devicePxRatio)
+        }
+
+        /**
+         * Deallocates everything necessary and removes the active screen.
+         */
+        @JvmStatic
+        fun closeScreen() {
+            if (activeScreen != null) {
+                deallocateComponents()
+                activeScreen = null
+                instance.components = null
+                instance.frames = null
+                instance.controllers = null
+            }
         }
 
         /**
          * Focuses the component. Please use [UIComponent.focus] instead.
          */
         @JvmStatic
-        fun focus(component: UIFocusable<*>) {
+        fun focus(component: UIFocusable) {
             // Check if the given value is a valid instance of UIComponent
             try {
                 component as UIComponent<*>

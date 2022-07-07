@@ -1,10 +1,12 @@
 package net.prismclient.aether.ui.style.util
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.fromProgress
+import net.prismclient.aether.ui.util.extensions.lerp
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
@@ -26,40 +28,26 @@ class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
         net.prismclient.aether.ui.util.extensions.align(alignment, x!!, y!!)
     }
 
+    override fun animate(
+        animation: UIAnimation<*>,
+        previous: UIAnchorPoint?,
+        current: UIAnchorPoint?,
+        progress: Float
+    ) {
+        val component = animation.component
+        component.anchorX = current?.x?.lerp(previous?.x, component, progress, false) ?: component.anchorX
+        component.anchorY = current?.y?.lerp(previous?.y, component, progress, false) ?: component.anchorY
+    }
+
+    override fun save(animation: UIAnimation<*>, keyframe: UIAnchorPoint?) {
+        x = keyframe?.x ?: x?.copy()
+        y = keyframe?.y ?: y?.copy()
+    }
+
     fun copy(): UIAnchorPoint = UIAnchorPoint().also {
         it.x = x?.copy()
         it.y = y?.copy()
     }
 
-    private var anchorCache: AnchorCache? = null
-
-    override fun updateAnimationCache(component: UIComponent<*>) {
-        // TODO: Anchor point cache updating
-    }
-
-    override fun clearAnimationCache() {
-        anchorCache = null
-    }
-
-    override fun animate(previous: UIAnchorPoint?, current: UIAnchorPoint?, progress: Float, component: UIComponent<*>) {
-        anchorCache = anchorCache ?: AnchorCache(component.anchorX, component.anchorY)
-
-        component.anchorX = fromProgress(
-            if (current?.x != null) calculate(current.x, component, component.width, component.height, false) else anchorCache!!.x,
-            if (previous?.x != null) calculate(previous.x, component, component.width, component.height, false) else anchorCache!!.x,
-            progress
-        )
-
-        component.anchorY = fromProgress(
-            if (current?.y != null) calculate(current.y, component, component.width, component.height, true) else anchorCache!!.y,
-            if (previous?.y != null) calculate(previous.x, component, component.width, component.height, true) else anchorCache!!.y,
-            progress
-        )
-    }
-
-    override fun saveState(component: UIComponent<*>, keyframe: UIAnchorPoint?, retain: Boolean) {
-        // TODO: Save state anchor point
-    }
-
-    private inner class AnchorCache(var x: Float, var y: Float)
+    override fun toString(): String = "UIAnchorPoint(x=$x, y=$y)"
 }

@@ -2,7 +2,7 @@ package net.prismclient.aether.ui.component.type.input.button
 
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.style.UIStyleSheet
-import net.prismclient.aether.ui.util.ubuild
+import net.prismclient.aether.ui.util.ucreate
 
 /**
  * Like [UIButton], but with an image, or icon.
@@ -14,7 +14,7 @@ class UIImageButton(private val imageName: String, private val imageStyle: Strin
     lateinit var image: UIImage
 
     override fun initialize() {
-        ubuild {
+        ucreate {
             image = image(imageName, style = imageStyle)
         }
         super.initialize()

@@ -1,10 +1,10 @@
 package net.prismclient.aether.ui.renderer.impl.font
 
 import net.prismclient.aether.ui.Aether
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.bounds
@@ -13,6 +13,7 @@ import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.indexOffset
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.*
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
@@ -36,13 +37,15 @@ import java.util.regex.Pattern
  * text, the length of each line is increased by 1 because of the ability to have the caret
  * at the end of a selection.
  *
- * Note: Properties width, and height are ignored.
+ * Note: Properties width, and height are ignored. The [fontRenderType] property is null for
+ * animations however if a string is attempted to be rendered while it is null, it is
+ * automatically set to [FontRenderType.NORMAL].
  *
  * @author sen
  * @since 4/26/2022
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class UIFont : UIShape(), UIAnimatable<UIFont> {
+open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
     protected val newline: Pattern = Pattern.compile("\\r?\\n|\\r")
 
     /**
@@ -54,25 +57,25 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     var overrideParent: Boolean = true
 
     /**
-     * Instructs [UIFont] how to render text.
+     * Instructs [UIFont] how to render text. The default value is [FontRenderType.NORMAL].
      *
      * @see FontRenderType
      * @see appendedString
      */
-    var fontRenderType: FontRenderType = FontRenderType.NORMAL
+    var fontRenderType: FontRenderType? = null
 
     /**
      * The alignment of the text
      *
      * @see UIRenderer Text Alignment
      */
-    var textAlignment = UIDefaults.instance.textAlignment
+    var textAlignment = 0
 
     /**
      * Read-only property set by  [fontStyle], [fontType] and [fontFamily]. If when the font was loaded had a
      * special name, use [overwriteFontName] to set it to that font name.
      */
-    var fontName: String = UIDefaults.instance.fontName
+    var fontName: String = ""
         protected set
 
     /**
@@ -80,17 +83,20 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      *
      * @see FontStyle
      */
-    var fontStyle = UIDefaults.instance.fontStyle
+    var fontStyle: FontStyle? = null
         set(value) {
             field = value; updateFontName()
         }
 
-    var fontColor = UIDefaults.instance.fontColor
+    /**
+     * The color of this font, represent in [UIColor].
+     */
+    var fontColor: UIColor? = null
 
     /**
      * The name of the font family.
      */
-    var fontFamily = UIDefaults.instance.fontFamily
+    var fontFamily = ""
         set(value) {
             field = value; updateFontName()
         }
@@ -98,19 +104,21 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     /**
      * Specifies the font type e.g. Regular, Bold, Thin etc..
      *
+     * Default is [FontType.Regular]
+     *
      * @see FontType
      */
-    var fontType = UIDefaults.instance.fontType
+    var fontType: FontType? = null
         set(value) {
             field = value; updateFontName()
         }
 
-    var fontSize = UIDefaults.instance.fontSize
+    var fontSize: UIUnit? = null
 
     /**
      * The spacing between each character.
      */
-    var fontSpacing = UIDefaults.instance.fontSpacing
+    var fontSpacing: UIUnit? = null
 
     /**
      * If the [fontRenderType] is WRAP, the text will wrap at the given width.
@@ -140,7 +148,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     /**
      * The color of the selection if [isSelectable]
      */
-    var selectionColor = 0
+    var selectionColor: UIColor? = null
 
     /**
      * The amount of lines in the text. 1 by default if it is a single line render type
@@ -186,11 +194,18 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      */
     protected var ignore = false
 
+    var cachedFontSize: Float = 0f
+        protected set
+    var cachedFontSpacing: Float = 0f
+        protected set
     var cachedLineBreakWidth: Float = 0f
         protected set
     var cachedLineHeight: Float = 0f
         protected set
 
+    /**
+     * An internal variable which holds the text in lines split if necessary.
+     */
     var cachedText: ArrayList<String> = arrayListOf()
         protected set
     protected var isShiftHeld = false
@@ -207,6 +222,9 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     override fun update(component: UIComponent<*>?) {
         if (ignore) return
         super.update(component!!)
+
+        cachedFontSize = calculate(fontSize, component, component.width, component.height, false)
+        cachedFontSpacing = calculate(fontSpacing, component, component.width, component.height, false)
 
         // Selection handling
         if (isSelectable) {
@@ -227,7 +245,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                 }
             }
             Aether.onMousePressed("$this-DeselectionListener") {
-                if (component.getMouseY() <= cachedY + textBounds[1] && component.getMouseY() <= cachedY + textBounds[1] + fontSize) {
+                if (component.getMouseY() <= cachedY + textBounds[1] && component.getMouseY() <= cachedY + textBounds[1] + cachedFontSize) {
                     deselect()
                 }
             }
@@ -263,8 +281,8 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         }
 
         if (component is UILabel) {
+            ignore = true
             render(component.text)
-            val bounds = this.textBounds
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
             if (overrideParent && (textBounds[2] - cachedX > component.width || textBounds[3] - cachedY > component.height)) {
@@ -274,10 +292,9 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                 component.updateAnchorPoint()
                 component.updatePosition()
                 component.updateBounds()
-                ignore = true
                 component.updateStyle()
-                ignore = false
             }
+            ignore = false
         }
 
         cachedLineBreakWidth = calculate(lineBreakWidth, component, component.width, component.height, false)
@@ -288,10 +305,12 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
     override fun render() = throw IllegalStateException("Use render(text: String) instead")
 
     open fun render(text: String) {
+        fontRenderType = fontRenderType ?: FontRenderType.NORMAL
         // TODO: Multiline
         lineCount = 1
         renderer {
             font(this@UIFont)
+            if (ignore) color(0)
             when (fontRenderType) {
                 FontRenderType.NORMAL -> {
                     cachedText.clear()
@@ -310,7 +329,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     for (i in lines.indices) {
                         val line = lines[i]
                         cachedText.add(line)
-                        line.render(cachedX, cachedY + i * (cachedLineHeight + fontSize))
+                        line.render(cachedX, cachedY + i * (cachedLineHeight + cachedFontSize))
                         minx = bounds()[0].coerceAtMost(minx)
                         miny = bounds()[1].coerceAtMost(miny)
                         maxx = bounds()[2].coerceAtLeast(maxx)
@@ -329,6 +348,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                 } // TODO: Clip & Append
                 FontRenderType.CLIP -> {}
                 FontRenderType.APPEND -> {}
+                else -> {}
             }
         }
         renderSelection()
@@ -346,7 +366,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
 
                 if (caretLine == selectionLine) {
                     val caretX = getXOffset(position!!.caretPosition)
-                    rect(cachedX + caretX, cachedY + getYOffset(position!!.caretPosition), getXOffset(position!!.selectionPosition) - caretX, fontSize)
+                    rect(cachedX + caretX, cachedY + getYOffset(position!!.caretPosition), getXOffset(position!!.selectionPosition) - caretX, cachedFontSize)
                 } else {
                     val larger = max(position!!.caretPosition, position!!.selectionPosition)
                     val smaller = min(position!!.caretPosition, position!!.selectionPosition)
@@ -358,21 +378,21 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
                     val smallerY = getYOffset(smaller)
 
                     // Start selection
-                    rect(cachedX + smallerX, cachedY + smallerY, smallBounds[4] + smallBounds[0] - smallerX, fontSize)
+                    rect(cachedX + smallerX, cachedY + smallerY, smallBounds[4] + smallBounds[0] - smallerX, cachedFontSize)
 
-                    var y = cachedY + ((fontSize + cachedLineHeight) * (smallerLine + 1)) - boundsOf(cachedText[0])[1]
+                    var y = cachedY + ((cachedFontSize + cachedLineHeight) * (smallerLine + 1)) - boundsOf(cachedText[0])[1]
 
                     // Fully selected lines
                     for (i in smallerLine + 1 until (largerLine - smallerLine) + smallerLine) {
                         val bounds = boundsOf(cachedText[i])
                         rect(cachedX + bounds[0],  bounds[1] + y, bounds[4], bounds[3] - bounds[1])
-                        y += cachedLineHeight + fontSize
+                        y += cachedLineHeight + cachedFontSize
                     }
 
                     val bounds = boundsOf(cachedText[largerLine])
 
                     // End selection
-                    rect(cachedX + bounds[0], bounds[1] + y, getXOffset(larger) - bounds[0], fontSize)
+                    rect(cachedX + bounds[0], bounds[1] + y, getXOffset(larger) - bounds[0], cachedFontSize)
                 }
             }
         }
@@ -446,10 +466,10 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
             val rowBounds = boundsOf(row)
             val y = cachedY + yOffset
 
-            yOffset += fontSize + cachedLineHeight
+            yOffset += cachedFontSize + cachedLineHeight
 
             // Row check
-            if (mouseY < y || mouseY > y + fontSize + cachedLineHeight) {
+            if (mouseY < y || mouseY > y + cachedFontSize + cachedLineHeight) {
                 // Caret can be at the end spot
                 i += row.length + 1
                 continue
@@ -504,7 +524,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      */
     open fun getYOffset(index: Int): Float {
         val line = getLine(index)
-        return boundsOf(cachedText[getLine(index)])[1] + line * (fontSize + cachedLineHeight)
+        return boundsOf(cachedText[getLine(index)])[1] + line * (cachedFontSize + cachedLineHeight)
     }
 
     /**
@@ -558,7 +578,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      */
     protected open fun updateFontName() {
         if (isOverridden) return
-        fontName = fontFamily + "-" + fontType.name.lowercase() + if (fontStyle == FontStyle.Italic) "-italic" else ""
+        fontName = fontFamily + "-" + (fontType?.name?.lowercase() ?: "regular") + if (fontStyle == FontStyle.Italic) "-italic" else ""
     }
 
     private fun setBounds() {
@@ -570,21 +590,40 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         textBounds[4] = bounds[4]
     }
 
-    protected var fontCache: FontCache? = null
+    override fun animate(animation: UIAnimation<*>, previous: UIFont?, current: UIFont?, progress: Float) {
+        super.animate(animation, previous, current, progress)
+        fontColor?.rgba = previous?.fontColor.mix(current?.fontColor, progress)
+        cachedFontSize = previous?.fontSize.lerp(current?.fontSize, animation.component, progress, false)
+        cachedLineBreakWidth = previous?.lineBreakWidth.lerp(current?.lineBreakWidth, animation.component, progress, false)
+        cachedLineHeight = previous?.lineHeight.lerp(current?.lineHeight, animation.component, progress, true)
+        selectionColor?.rgba = previous?.selectionColor.mix(current?.selectionColor, progress)
+    }
 
-    override fun updateAnimationCache(component: UIComponent<*>) {}
-
-    override fun clearAnimationCache() {}
-
-    override fun animate(previous: UIFont?, current: UIFont?, progress: Float, component: UIComponent<*>) {}
-
-    override fun saveState(component: UIComponent<*>, keyframe: UIFont?, retain: Boolean) {}
+    override fun save(animation: UIAnimation<*>, keyframe: UIFont?) {
+        super.save(animation, keyframe)
+        overrideParent = keyframe?.overrideParent ?: overrideParent
+        fontRenderType = keyframe?.fontRenderType ?: fontRenderType
+        textAlignment = keyframe?.textAlignment ?: textAlignment
+        fontName = keyframe?.fontName ?: fontName
+        fontStyle = keyframe?.fontStyle ?: fontStyle
+        fontColor = keyframe?.fontColor ?: fontColor?.copy()
+        fontStyle = keyframe?.fontStyle ?: fontStyle
+        fontFamily = keyframe?.fontFamily ?: fontFamily
+        fontType = keyframe?.fontType ?: fontType
+        fontSize = keyframe?.fontSize ?: fontSize?.copy()
+        fontSpacing = keyframe?.fontSpacing ?: fontSpacing?.copy()
+        lineBreakWidth = keyframe?.lineBreakWidth ?: lineBreakWidth?.copy()
+        lineHeight = keyframe?.lineHeight ?: lineHeight?.copy()
+        appendedString = keyframe?.appendedString ?: appendedString
+        isSelectable = keyframe?.isSelectable ?: isSelectable
+        selectionColor = keyframe?.selectionColor ?: selectionColor
+    }
 
     /**
      * Instructs [UIFont] on how to render the text. See the enums for details.
      *
      * @author sen
-     * @since 5/15/2022
+     * @since 1.0
      */
     enum class FontRenderType {
         /**
@@ -622,7 +661,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * The style of the font: Normal or Italic
      *
      * @author sen
-     * @since 5/15/2022
+     * @since 1.0
      */
     enum class FontStyle {
         Normal, Italic
@@ -632,7 +671,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * The type of the font: Regular, Bold, Thin etc..
      *
      * @author sen
-     * @since 5/15/2022
+     * @since 1.0
      */
     enum class FontType {
         Regular, Medium, Black, Bold, Light, Thin
@@ -644,7 +683,7 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
      * also holds the ending point if a selection in the font is active.
      *
      * @author sen
-     * @since 6/15/2022
+     * @since 1.0
      */
     class Positions(var caretPosition: Int, var selectionPosition: Int)
 
@@ -656,18 +695,16 @@ open class UIFont : UIShape(), UIAnimatable<UIFont> {
         it.textAlignment = textAlignment
         it.fontStyle = fontStyle
         it.fontType = fontType
-        it.fontColor = fontColor
+        it.fontColor = fontColor?.copy()
         it.fontFamily = fontFamily
-        it.fontSize = fontSize
-        it.fontSpacing = fontSpacing
-        it.lineBreakWidth = lineBreakWidth
-        it.lineHeight = lineHeight
+        it.fontSize = fontSize?.copy()
+        it.fontSpacing = fontSpacing?.copy()
+        it.lineBreakWidth = lineBreakWidth?.copy()
+        it.lineHeight = lineHeight?.copy()
         it.appendedString = appendedString
         it.isSelectable = isSelectable
         it.selectionColor = selectionColor
 
         if (isOverridden) it.overwriteFontName(fontName)
     }
-
-    protected inner class FontCache(var fontColor: Int, var fontSize: Float, var fontSpacing: Float, var lineBreakWidth: UIUnit?, var lineHeight: UIUnit?)
 }

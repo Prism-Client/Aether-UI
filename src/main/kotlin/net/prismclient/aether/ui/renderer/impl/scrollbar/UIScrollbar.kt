@@ -7,12 +7,13 @@ import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIColoredShape
+import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.limit
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 
-class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
+class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
     var border: UIBorder? = null
     var radius: UIRadius? = null
 
@@ -154,7 +155,7 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape() {
      * Shorthand for adding a color, and radius (optional) for the background to this [UIScrollbar]
      */
     @JvmOverloads
-    inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
+    inline fun background(color: UIColor? = null, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /**

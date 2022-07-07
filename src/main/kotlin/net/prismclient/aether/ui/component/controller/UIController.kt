@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.controller
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.util.warn
 
 /**
  * [UIController] is a transparent system that monitors and controls
@@ -30,7 +31,7 @@ abstract class UIController<T : UIComponent<*>> {
         try {
             components.add(component as T)
         } catch (_: Exception) {
-            throw ClassCastException("Failed to cast component to the type of this container. Make sure you're passing the right type of component.")
+            warn("Failed to cast component to the type of this container. Make sure you're passing the right type of component.")
         }
         return this
     }
@@ -45,7 +46,7 @@ abstract class UIController<T : UIComponent<*>> {
         try {
             components.remove(component as T)
         } catch (_: Exception) {
-            throw ClassCastException("Failed to cast component to the type of this container. Make sure you're passing the right type of component.")
+            warn("Failed to cast component to the type of this container. Make sure you're passing the right type of component.")
         }
         return this
     }

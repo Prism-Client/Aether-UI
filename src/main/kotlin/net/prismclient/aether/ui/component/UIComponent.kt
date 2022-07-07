@@ -52,7 +52,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
             if (value != null) value.childrenCount++
             field = value
         }
-    var animations: HashMap<String, UIAnimation<UIComponent<T>, T>>? = null
+    var animations: HashMap<String, UIAnimation<T>>? = null
 
     /**
      * If true, the position will not update when this component is invoked. Generally this is automatically
@@ -192,7 +192,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * @throws InvalidStyleSheetException If the style is not a valid style sheet of the given component
      */
     open fun applyStyle(style: String?) {
-        if (style == null)
+        if (style.isNullOrEmpty())
             return
 
         // Attempt to apply the style provided to the component.
@@ -301,7 +301,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     open fun updateBounds() {
         relX = x - paddingLeft
         relY = y - paddingTop
-
         relWidth = width + paddingLeft + paddingRight
         relHeight = height + paddingTop + paddingBottom
     }
@@ -318,7 +317,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * Updates the active animation (if applicable)
      */
     open fun updateAnimation() {
-
+        if (animations != null) {
+            animations!!.forEach { it.value.update() }
+            animations!!.entries.removeIf { it.value.isCompleted }
+            if (animations!!.isEmpty())
+                animations = null
+        }
     }
 
     /**
@@ -356,6 +360,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
                 mouseEntered()
                 wasInside = true
             }
+            requestUpdate()
         } else if (wasInside) {
             mouseLeft()
             wasInside = false
@@ -363,6 +368,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
         mouseMoveListeners?.forEach { it.value.accept(this) }
     }
 
+    /**
+     * Invoked when the mouse is pressed. This is a bubbling event.
+     */
     open fun mousePressed(event: UIMouseEvent) {
         mousePressedListeners?.forEach { it.value.accept(this) }
         if (parent != null && !event.canceled) {
@@ -371,6 +379,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
         }
     }
 
+    /**
+     * Invoked when the mouse is released.
+     */
     open fun mouseReleased(mouseX: Float, mouseY: Float) {
         mouseReleasedListeners?.forEach { it.value.accept(this) }
     }
@@ -387,6 +398,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      */
     protected open fun mouseLeft() {
         mouseLeaveListeners?.forEach { it.value.accept(this) }
+        requestUpdate()
     }
 
     /**
@@ -528,22 +540,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     }
 
     /**
-     * Stops the animation at whatever point it is at, and moves it to the last position
-     * of the last keyframe, thus making the properties of the component the same as the last.
-     */
-    fun completeAnimation() {
-
-    }
-
-    /**
-     * Shorthand for loading animations for when the mouse hovers over the component
-     */
-    open fun hover(hoverAnimation: String, leaveAnimation: String): UIComponent<T> {
-
-        return this
-    }
-
-    /**
      * Returns the x position of the parent with consideration f it being a [UIFrame]
      */
     open fun getParentX() =
@@ -638,15 +634,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /**
      * Returns true if this is an instance of [UIFocusable] and is focused
      */
-    open fun isFocused() = if (this is UIFocusable<*>) Aether.focusedComponent == this else false
+    open fun isFocused() = if (this is UIFocusable) Aether.focusedComponent == this else false
 
     /**
      * Focuses this component if applicable
      */
     open fun focus() {
-        if (this is UIFocusable<*>) {
+        if (this is UIFocusable) {
             Aether.focus(this)
             focusListeners?.forEach { it.value.accept(this as UIComponent<T>, true) }
+            requestUpdate()
         }
     }
 
@@ -656,6 +653,13 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     open fun defocus() {
         Aether.defocus()
         focusListeners?.forEach { it.value.accept(this, false) }
+    }
+
+    /**
+     * Requests the frame of this to be redrawn.
+     */
+    open fun requestUpdate() {
+        if (parent != null) parent!!.requestUpdate()
     }
 
     /**

@@ -1,7 +1,9 @@
 package net.prismclient.aether.ui.renderer.impl.property
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.util.extensions.fromProgress
+import net.prismclient.aether.ui.util.extensions.lerp
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
 
@@ -9,7 +11,7 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * [UIRadius] represents a shape with 4 customizable corner radii
  *
  * @author sen
- * @since 4/26/2022
+ * @since 1.0
  */
 class UIRadius(
     var topLeft: Float = 0f,
@@ -30,23 +32,18 @@ class UIRadius(
 
     private var cachedRadius: UIRadius? = null
 
-    override fun updateAnimationCache(component: UIComponent<*>) {}
-
-    override fun clearAnimationCache() {
-        cachedRadius = null
+    override fun animate(animation: UIAnimation<*>, previous: UIRadius?, current: UIRadius?, progress: Float) {
+        topLeft = lerp(previous?.topLeft ?: topLeft, current?.topLeft ?: topLeft, progress)
+        topRight = lerp(previous?.topRight ?: topRight, current?.topRight ?: topRight, progress)
+        bottomRight = lerp(previous?.bottomRight ?: bottomRight, current?.bottomRight ?: bottomRight, progress)
+        bottomLeft = lerp(previous?.bottomLeft ?: bottomLeft, current?.bottomLeft ?: bottomLeft, progress)
     }
 
-    override fun animate(previous: UIRadius?, current: UIRadius?, progress: Float, component: UIComponent<*>) {
-        cachedRadius = cachedRadius ?: copy()
-        
-        topLeft = fromProgress(current?.topLeft ?: cachedRadius!!.topLeft, previous?.topLeft ?: cachedRadius!!.topLeft, progress)
-        topRight = fromProgress(current?.topRight ?: cachedRadius!!.topRight, previous?.topRight ?: cachedRadius!!.topRight, progress)
-        bottomRight = fromProgress(current?.bottomRight ?: cachedRadius!!.bottomRight, previous?.bottomRight ?: cachedRadius!!.bottomRight, progress)
-        bottomLeft = fromProgress(current?.bottomLeft ?: cachedRadius!!.bottomLeft, previous?.bottomLeft ?: cachedRadius!!.bottomLeft, progress)
-    }
-
-    override fun saveState(component: UIComponent<*>, keyframe: UIRadius?, retain: Boolean) {
-
+    override fun save(animation: UIAnimation<*>, keyframe: UIRadius?) {
+        topLeft = keyframe?.topLeft ?: topLeft
+        topRight = keyframe?.topRight ?: topRight
+        bottomRight = keyframe?.bottomRight ?: bottomRight
+        bottomLeft = keyframe?.bottomLeft ?: bottomLeft
     }
 
     override fun toString(): String {

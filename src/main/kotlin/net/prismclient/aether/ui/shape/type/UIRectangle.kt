@@ -11,7 +11,7 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 5/13/2022
  */
-open class UIRectangle : UIColoredShape() {
+open class UIRectangle : UIColoredShape<UIRectangle>() {
     var radius: UIRadius? = null
 
     override fun render() {
@@ -21,7 +21,7 @@ open class UIRectangle : UIColoredShape() {
         }
     }
 
-    override fun copy(): UIShape = UIRectangle().also {
+    override fun copy(): UIRectangle = UIRectangle().also {
         it.apply(this)
         it.radius = radius?.copy()
     }

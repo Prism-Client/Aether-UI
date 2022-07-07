@@ -1,9 +1,10 @@
 package net.prismclient.aether.ui.style
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
-import net.prismclient.aether.ui.defaults.UIDefaults
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
@@ -11,7 +12,9 @@ import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.RELATIVE
+import net.prismclient.aether.ui.util.extensions.lerp
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.rel
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
@@ -32,12 +35,16 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * [UIStyleSheet]. In that case, that required type of [UIStyleSheet]
  * must be created in order for the [UIComponent] to function properly.
  *
+ * When creating a style sheet a copy method must be explicitly created to ensure no errors
+ * are thrown when used. If the style sheet is intended on being inheritable, the apply method
+ * should also be overridden. See [UIFrameSheet] for an example.
+ *
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md">Styles</s>
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md#creating-styles">How to create styles</a>
  */
-open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
+open class UIStyleSheet @JvmOverloads constructor(var name: String = "") : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     /**
-     * When true, the property will not be cleared when the screen is closed
+     * When true, the property will not be cleared when Aether cleans up styles.
      */
     var immutableStyle: Boolean = false
 
@@ -67,22 +74,55 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
     /**
      * When true, any content within the component will be clipped
      */
-    var clipContent = true
+    var clipContent = false
 
-    override fun updateAnimationCache(component: UIComponent<*>) {
-        TODO("Not yet implemented")
+    override fun animate(
+        animation: UIAnimation<*>, previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float
+    ) {
+        val component = animation.component
+
+        component.x = previous?.x.lerp(current?.x, component, x, progress, false)
+        component.y = previous?.y.lerp(current?.y, component, y, progress, true)
+        component.width = previous?.width.lerp(current?.width, component, width, progress, false)
+        component.height = previous?.height.lerp(current?.height, component, height, progress, true)
+
+        if (previous?.background != null || current?.background != null) {
+            background = background ?: UIBackground()
+            background!!.animate(animation, previous?.background, current?.background, progress)
+        }
+        if (previous?.font != null || current?.font != null) {
+            font = font ?: UIFont()
+            font!!.animate(animation, previous?.font, current?.font, progress)
+        }
+        if (previous?.padding != null || current?.padding != null) {
+            padding = padding ?: UIPadding()
+            padding!!.animate(animation, previous?.padding, current?.padding, progress)
+        }
+        if (previous?.margin != null || current?.margin != null) {
+            margin = margin ?: UIMargin()
+            margin!!.animate(animation, previous?.margin, current?.margin, progress)
+        }
+        if (previous?.anchor != null || current?.anchor != null) {
+            anchor = anchor ?: UIAnchorPoint()
+            anchor!!.animate(animation, previous?.anchor, current?.anchor, progress)
+        }
+        component.x += component.getParentX() + component.marginLeft - component.anchorX
+        component.y += component.getParentY() + component.marginTop - component.anchorY
+        component.updateBounds()
+        component.updateStyle()
     }
 
-    override fun clearAnimationCache() {
-        TODO("Not yet implemented")
-    }
+    override fun save(animation: UIAnimation<*>, keyframe: UIStyleSheet?) {
+        x = keyframe?.x ?: x
+        y = keyframe?.y ?: y
+        width = keyframe?.width ?: width
+        height = keyframe?.height ?: height
 
-    override fun saveState(component: UIComponent<*>, keyframe: UIStyleSheet?, retain: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun animate(previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float, component: UIComponent<*>) {
-        TODO("Not yet implemented")
+        background?.save(animation, keyframe?.background)
+        font?.save(animation, keyframe?.font)
+        padding?.save(animation, keyframe?.padding)
+        margin?.save(animation, keyframe?.margin)
+        anchor?.save(animation, keyframe?.anchor)
     }
 
     /** Shorthands **/
@@ -90,7 +130,7 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
     /**
      * Shorthand for setting the position and size as pixels.
      */
-    fun plot(x: Float, y: Float, width: Float, height: Float) {
+    fun plot(x: Number, y: Number, width: Number, height: Number) {
         position(x, y)
         size(width, height)
     }
@@ -198,7 +238,7 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
      * Sets the color of the background
      */
     @JvmOverloads
-    inline fun background(color: Int, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
+    inline fun background(color: UIColor, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /** Font **/
@@ -216,12 +256,12 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
      */
     @JvmOverloads
     inline fun font(
-            fontFamily: String = font?.fontFamily ?: UIDefaults.instance.fontFamily,
-            fontSize: Float = font?.fontSize ?: UIDefaults.instance.fontSize,
-            fontColor: Int = font?.fontColor ?: UIDefaults.instance.fontColor,
-            textAlignment: Int = font?.textAlignment ?: UIDefaults.instance.textAlignment,
-            fontType: UIFont.FontType = font?.fontType ?: UIDefaults.instance.fontType,
-            block: UIFont.() -> Unit = {}
+        fontFamily: String = font?.fontFamily ?: "",
+        fontSize: UIUnit? = font?.fontSize,
+        fontColor: UIColor? = font?.fontColor,
+        textAlignment: Int = font?.textAlignment ?: 0,
+        fontType: UIFont.FontType? = font?.fontType,
+        block: UIFont.() -> Unit = {}
     ) = font {
         this.fontSize = fontSize
         this.fontColor = fontColor

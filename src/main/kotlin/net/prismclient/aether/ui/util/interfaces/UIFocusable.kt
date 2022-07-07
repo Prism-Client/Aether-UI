@@ -11,4 +11,4 @@ import net.prismclient.aether.ui.component.UIComponent
  * @since 6/1/2022
  * @param T The type of component which is focusable.
  */
-interface UIFocusable<T : UIComponent<*>>
+interface UIFocusable

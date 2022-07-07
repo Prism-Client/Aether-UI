@@ -66,6 +66,9 @@ open class UIContainerSheet(name: String) : UIFrameSheet(name) {
     }
 
     override fun apply(sheet: UIStyleSheet): UIContainerSheet {
+        // Override the default apply function because
+        // this is an inheritable class.
+        this.immutableStyle = sheet.immutableStyle
         this.name = sheet.name
 
         this.background = sheet.background?.copy()
@@ -81,18 +84,18 @@ open class UIContainerSheet(name: String) : UIFrameSheet(name) {
         this.anchor = sheet.anchor?.copy()
         this.clipContent = sheet.clipContent
 
+        // Frame properties
+        if (sheet is UIContainerSheet) {
+            this.useFBO = sheet.useFBO
+            this.optimizeRenderer = sheet.optimizeRenderer
+            this.overflowX = sheet.overflowX
+            this.overflowY = sheet.overflowY
+            this.verticalScrollbar = sheet.verticalScrollbar.copy()
+            this.horizontalScrollbar = sheet.horizontalScrollbar.copy()
+        }
+
         return this
     }
 
-    override fun copy(): UIContainerSheet = UIContainerSheet(name).also {
-        it.apply(this)
-        it.frameWidth = frameWidth?.copy()
-        it.frameHeight = frameHeight?.copy()
-
-        it.overflowX = overflowX
-        it.overflowY = overflowY
-
-        it.verticalScrollbar = verticalScrollbar.copy()
-        it.horizontalScrollbar = horizontalScrollbar.copy()
-    }
+    override fun copy(): UIContainerSheet = UIContainerSheet(name).apply(this)
 }

@@ -1,31 +1,31 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.component.util.interfaces.UILayout
+import net.prismclient.aether.ui.event.input.UIMouseEvent
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
- * [UIContainer] is the superclass for all layouts. It introduces scrollbars
- * into the component, so content outside the frame can be viewed.
+ * [UIContainer] is the default implementation for [UIFrame]. It introduces
+ * scrollbars which automatically resize to content being added/removed. It is
+ * considered to be a [UIFocusable], so when the mouse is scrolled within the
+ * container the focused component will become this.
  *
- * [UIContainer] itUIComponent<T> can also be created with [UIContainerSheet] as the sheet.
+ *
  *
  * @author sen
  * @since 5/12/2022
  */
-open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style), UIFocusable<UIContainer<T>> {
+open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style), UIFocusable, UILayout {
     /**
      * How sensitive the scrolling will be
      */
     var scrollSensitivity: Float = 10f
-
-    var verticalScrollbarSelected = false
-        protected set
-    var horizontalScrollbarSelected = false
-        protected set
 
     /**
      * The expanded width determined by components that leave the component bounds
@@ -39,10 +39,9 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
     var expandedHeight = 0f
         protected set
 
-    override fun updateLayout() {}
-
     override fun update() {
         super.update()
+        updateLayout()
 
         // Calculate the distance of the components
         // and find the largest of them on both axes
@@ -64,6 +63,8 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
         updateScrollbar()
     }
 
+    override fun updateLayout() {}
+
     open fun updateScrollbar() {
         style.verticalScrollbar.update(this)
         style.horizontalScrollbar.update(this)
@@ -75,55 +76,44 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
     }
 
     override fun renderContent() {
-        if (!style.clipContent)
-            return
-        updateAnimation()
-        updateFramebuffer()
-        // If frame size is less than or equal to 0 skip render, as FBO couldn't be created
-        if (relWidth < 1f || relHeight < 1f)
-            return
-        renderer {
-            renderContent(framebuffer!!) {
+        if (style.useFBO) {
+            if (requiresUpdate || !style.optimizeRenderer) {
+                if (fbo == null) updateFBO()
+                UIRendererDSL.translate(
+                    -(style.horizontalScrollbar.value * expandedWidth),
+                    -(style.verticalScrollbar.value * expandedHeight)
+                ) {
+                    renderContent(fbo!!) {
+                        components.forEach(UIComponent<*>::render)
+                    }
+                }
+                requiresUpdate = false
+            }
+        }
+    }
+
+    override fun renderComponent() {
+        // Translations for FBOs are handled above
+        if (!style.useFBO) {
+            renderer {
                 translate(
                     -(style.horizontalScrollbar.value * expandedWidth),
                     -(style.verticalScrollbar.value * expandedHeight)
                 ) {
-                    components.forEach(UIComponent<*>::render)
+                    super.renderComponent()
                 }
             }
         }
     }
 
     override fun render() {
-        // Overwrite the UIFrame renderer to apply the translations
-        // and update the FBO if needed
-        if (!style.clipContent)
-            updateAnimation()
-        style.background?.render()
-        renderer {
-            if (!style.clipContent) {
-                translate(
-                    -(style.horizontalScrollbar.value * expandedWidth),
-                    -(style.verticalScrollbar.value * expandedHeight)
-                ) {
-                    renderComponent()
-                }
-            } else {
-                scissor(relX, relY, relWidth, relHeight) {
-                    renderComponent()
-                }
-            }
-        }
+        super.render()
         renderScrollbar()
     }
 
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
-        verticalScrollbarSelected = style.verticalScrollbar.mousePressed()
-        horizontalScrollbarSelected = style.horizontalScrollbar.mousePressed()
-
-        if (verticalScrollbarSelected || horizontalScrollbarSelected)
-            focus()
+        if (style.verticalScrollbar.mousePressed() || style.horizontalScrollbar.mousePressed()) focus()
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
@@ -145,10 +135,10 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
-        super.mouseScrolled(mouseX, mouseY, scrollAmount)
         if (isFocused()) {
             style.verticalScrollbar.value -= ((scrollAmount * scrollSensitivity) / style.verticalScrollbar.cachedHeight)
             mouseMoved(mouseX, mouseY)
         }
+        super.mouseScrolled(mouseX, mouseY, scrollAmount)
     }
 }

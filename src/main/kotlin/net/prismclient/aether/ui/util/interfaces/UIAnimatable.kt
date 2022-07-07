@@ -1,6 +1,6 @@
 package net.prismclient.aether.ui.util.interfaces
 
-import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.animation.UIAnimation
 
 /**
  * [UIAnimatable] is an interface which all renderable object must inherit
@@ -13,19 +13,6 @@ import net.prismclient.aether.ui.component.UIComponent
  * @param T The object of this
  */
 interface UIAnimatable<T> {
-    /**
-     * On the offhand chance that the window is resized while the animation is in progress, it
-     * might be necessary to update any cached values. This method is invoked when that rare case
-     * happens.
-     */
-    fun updateAnimationCache(component: UIComponent<*>)
-
-    /**
-     * When the animation is completed the cached data is useless, so this method is invoked
-     * so that you can safely clear that data.
-     */
-    fun clearAnimationCache()
-
     /**
      * This function is a crucial function for animating renderable objects. Given
      * two classes of [T] (this), all properties within this should be set to the
@@ -48,11 +35,10 @@ interface UIAnimatable<T> {
      * @see updateAnimationCache
      * @see clearAnimationCache
      */
-    fun animate(previous: T?, current: T?, progress: Float, component: UIComponent<*>)
+    fun animate(animation: UIAnimation<*>, previous: T?, current: T?, progress: Float)
 
     /**
-     * Invoked when the animation with this keyframe is updated. If the parameter [saveState]
-     * is true, then [component] should be the value, else the cached value should be the value
+     * Applies all properties of the given keyframe which are not considered null to this.
      */
-    fun saveState(component: UIComponent<*>, keyframe: T?, retain: Boolean)
+    fun save(animation: UIAnimation<*>, keyframe: T?)
 }

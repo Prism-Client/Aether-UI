@@ -120,8 +120,14 @@ fun vw(value: Number) = UIUnit(value.toFloat(), SCREENWIDTH)
  */
 fun vh(value: Number) = UIUnit(value.toFloat(), SCREENHEIGHT)
 
+/**
+ * Creates a [unit] which does not subceed the value of [min] and exceed the value of [max]
+ */
 fun range(unit: UIUnit, min: UIUnit, max: UIUnit) = UIRangeUnit(unit, min, max)
 
+/**
+ * Creates a dependable unit which expects a supplier, which calculates the value.
+ */
 fun dependentUnit(function: Supplier<Float>) = UIDependentUnit(function)
 
 /** Operator functions **/
@@ -170,7 +176,7 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
         RELATIVE -> (if (isY) height else width) * unit.value
         ASCENDER -> (component?.style?.font?.getAscend() ?: 0f) * unit.value
         DESCENDER -> (component?.style?.font?.getDescend() ?: 0f) * unit.value
-        EM -> (component?.style?.font?.fontSize ?: 0f) * unit.value
+        EM -> (component?.style?.font?.cachedFontSize ?: 0f) * unit.value
         WIDTH -> width * unit.value
         HEIGHT -> height * unit.value
         SCREENWIDTH -> Aether.width
