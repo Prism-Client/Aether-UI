@@ -10,6 +10,7 @@ import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.bounds
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.boundsOf
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.indexOffset
+import net.prismclient.aether.ui.renderer.impl.font.UIFont.FontRenderType
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
@@ -221,7 +222,12 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
 
     override fun update(component: UIComponent<*>?) {
         if (ignore) return
-        super.update(component!!)
+
+        this.component = component!!
+        cachedX = component.x + calculate(x, component, component.width, component.height, false) - component.anchorX
+        cachedY = component.y + calculate(y, component, component.width, component.height, true) - component.anchorY
+        cachedWidth = calculate(width, component, component.width, component.height, false)
+        cachedHeight = calculate(height, component, component.width, component.height, true)
 
         cachedFontSize = calculate(fontSize, component, component.width, component.height, false)
         cachedFontSpacing = calculate(fontSpacing, component, component.width, component.height, false)
@@ -255,12 +261,20 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                 if (value) return@onModifierKeyChange
                 when (key) {
                     UIModifierKey.ARROW_LEFT -> {
-                        if (hasSelection() && !isShiftHeld) updateCaretPosition(min(pos.caretPosition, pos.selectionPosition))
+                        if (hasSelection() && !isShiftHeld) updateCaretPosition(
+                            min(
+                                pos.caretPosition, pos.selectionPosition
+                            )
+                        )
                         else if (isShiftHeld) select(getPreviousPosition(pos.caretPosition), pos.selectionPosition)
                         else updateCaretPosition(getPreviousPosition(pos.caretPosition))
                     }
                     UIModifierKey.ARROW_RIGHT -> {
-                        if (hasSelection() && !isShiftHeld) updateCaretPosition(max(pos.caretPosition, pos.selectionPosition))
+                        if (hasSelection() && !isShiftHeld) updateCaretPosition(
+                            max(
+                                pos.caretPosition, pos.selectionPosition
+                            )
+                        )
                         else if (isShiftHeld) select(getNextPosition(pos.caretPosition), pos.selectionPosition)
                         else updateCaretPosition(getNextPosition(pos.caretPosition))
                     }
@@ -293,6 +307,8 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                 component.updatePosition()
                 component.updateBounds()
                 component.updateStyle()
+                cachedX -= component.anchorX
+                cachedY -= component.anchorY
             }
             ignore = false
         }
@@ -343,7 +359,8 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                 }
                 FontRenderType.WRAP -> {
                     cachedText.clear()
-                    lineCount = render.wrapString(text, cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight, cachedText)
+                    lineCount =
+                        render.wrapString(text, cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight, cachedText)
                     setBounds()
                 } // TODO: Clip & Append
                 FontRenderType.CLIP -> {}
@@ -366,7 +383,12 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
 
                 if (caretLine == selectionLine) {
                     val caretX = getXOffset(position!!.caretPosition)
-                    rect(cachedX + caretX, cachedY + getYOffset(position!!.caretPosition), getXOffset(position!!.selectionPosition) - caretX, cachedFontSize)
+                    rect(
+                        cachedX + caretX,
+                        cachedY + getYOffset(position!!.caretPosition),
+                        getXOffset(position!!.selectionPosition) - caretX,
+                        cachedFontSize
+                    )
                 } else {
                     val larger = max(position!!.caretPosition, position!!.selectionPosition)
                     val smaller = min(position!!.caretPosition, position!!.selectionPosition)
@@ -378,14 +400,20 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                     val smallerY = getYOffset(smaller)
 
                     // Start selection
-                    rect(cachedX + smallerX, cachedY + smallerY, smallBounds[4] + smallBounds[0] - smallerX, cachedFontSize)
+                    rect(
+                        cachedX + smallerX,
+                        cachedY + smallerY,
+                        smallBounds[4] + smallBounds[0] - smallerX,
+                        cachedFontSize
+                    )
 
-                    var y = cachedY + ((cachedFontSize + cachedLineHeight) * (smallerLine + 1)) - boundsOf(cachedText[0])[1]
+                    var y =
+                        cachedY + ((cachedFontSize + cachedLineHeight) * (smallerLine + 1)) - boundsOf(cachedText[0])[1]
 
                     // Fully selected lines
                     for (i in smallerLine + 1 until (largerLine - smallerLine) + smallerLine) {
                         val bounds = boundsOf(cachedText[i])
-                        rect(cachedX + bounds[0],  bounds[1] + y, bounds[4], bounds[3] - bounds[1])
+                        rect(cachedX + bounds[0], bounds[1] + y, bounds[4], bounds[3] - bounds[1])
                         y += cachedLineHeight + cachedFontSize
                     }
 
@@ -578,7 +606,8 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
      */
     protected open fun updateFontName() {
         if (isOverridden) return
-        fontName = fontFamily + "-" + (fontType?.name?.lowercase() ?: "regular") + if (fontStyle == FontStyle.Italic) "-italic" else ""
+        fontName = fontFamily + "-" + (fontType?.name?.lowercase()
+            ?: "regular") + if (fontStyle == FontStyle.Italic) "-italic" else ""
     }
 
     private fun setBounds() {
@@ -594,7 +623,8 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
         super.animate(animation, previous, current, progress)
         fontColor?.rgba = previous?.fontColor.mix(current?.fontColor, progress)
         cachedFontSize = previous?.fontSize.lerp(current?.fontSize, animation.component, progress, false)
-        cachedLineBreakWidth = previous?.lineBreakWidth.lerp(current?.lineBreakWidth, animation.component, progress, false)
+        cachedLineBreakWidth =
+            previous?.lineBreakWidth.lerp(current?.lineBreakWidth, animation.component, progress, false)
         cachedLineHeight = previous?.lineHeight.lerp(current?.lineHeight, animation.component, progress, true)
         selectionColor?.rgba = previous?.selectionColor.mix(current?.selectionColor, progress)
     }

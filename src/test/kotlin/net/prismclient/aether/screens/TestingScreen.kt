@@ -18,13 +18,10 @@ class TestingScreen : UIScreen {
             include(Generic())
 
             container {
-                button("Hi").style(UIStyleSheet("")) {
-                    background(colorOf(asRGBA(255, 0, 0, 0.3f)))
-                }
                 label("Hello world!").style(UIStyleSheet("")) {
-                    position(0, 0)
+                    control(UIAlignment.CENTER)
                     font("Montserrat", px(24f), colorOf(-1), left or top)
-                    size(100, 100)
+                    background(colorOf(asRGBA(1f, 0f, 0f, 0.3f)))
                 }
             }.style(UIContainerSheet("")) {
                 control(UIAlignment.CENTER)
