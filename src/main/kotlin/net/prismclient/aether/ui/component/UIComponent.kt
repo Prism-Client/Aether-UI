@@ -540,16 +540,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     }
 
     /**
-     * Returns the x position of the parent with consideration f it being a [UIFrame]
+     * Returns the x position of the parent with consideration of it being a [UIFrame]
      */
     open fun getParentX() =
-        if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.x else 0f
+        if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).useFBO) 0f else parent!!.x else 0f
 
     /**
      * Returns the y position of the parent with consideration of it being a [UIFrame]
      */
     open fun getParentY() =
-        if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).clipContent) 0f else parent!!.y else 0f
+        if (parent != null) if (parent is UIFrame && ((parent as UIFrame).style as UIFrameSheet).useFBO) 0f else parent!!.y else 0f
 
     /**
      * Returns the width of the component or the window if there is no parent
