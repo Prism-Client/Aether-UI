@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.util
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
@@ -27,10 +28,20 @@ inline fun <T> blockFrom(obj: T, block: T.() -> Unit) = obj.block()
 /**
  * Registers a style sheet for the given style, [S].
  */
-inline fun <S : UIStyleSheet> styleOf(style: S, block: S.() -> Unit) {
+inline fun <S : UIStyleSheet> style(style: S, block: S.() -> Unit) {
     style.block()
     UIProvider.registerStyle(style)
 }
+
+/**
+ * Registers a style sheet for the given style, [S]. Alternative to [style].
+ *
+ * @see style
+ */
+inline fun <S : UIStyleSheet> styleOf(style: S, block: S.() -> Unit) = style(style, block)
+
+@JvmName("styleExtension")
+inline fun <S : UIStyleSheet> S.style(block: S.() -> Unit) = style(this, block)
 
 /**
  * Registers a style sheet in the component scope. This is used when no style is provided
@@ -106,3 +117,16 @@ inline fun ucreate(block: UIComponentDSL.() -> Unit) = UIComponentDSL.block()
  * Loads the [dependable].
  */
 fun include(dependable: UIDependable) = dependable.load()
+
+/**
+ * Creates an animation where the component is [C], the style of that component is [S], the animation
+ * name is [animationName], and an instance of the component's style is passed as [style]. A block is
+ * given to add the keyframes and modify other properties of the [UIAnimation]. The animation is
+ * automatically registered under the name given.
+ */
+inline fun <C : UIComponent<S>, S : UIStyleSheet> C.animationOf(animationName: String, style: S, block: UIAnimation<C, S>.() -> Unit): UIAnimation<C, S> {
+    val animation = UIAnimation<C, S>(animationName, style)
+    animation.block()
+    UIProvider.registerAnimation(animationName, animation)
+    return animation
+}
