@@ -42,7 +42,7 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md">Styles</s>
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md#creating-styles">How to create styles</a>
  */
-open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
+open class UIStyleSheet @JvmOverloads constructor(var name: String = "") : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     /**
      * When true, the property will not be cleared when Aether cleans up styles.
      */
@@ -77,19 +77,14 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
     var clipContent = false
 
     override fun animate(
-        animation: UIAnimation<*, *>,
-        previous: UIStyleSheet?,
-        current: UIStyleSheet?,
-        progress: Float
+        animation: UIAnimation<*>, previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float
     ) {
         val component = animation.component
 
-        component.x = previous?.x.lerp(current?.x, component, progress, false)
-        component.y = previous?.y.lerp(current?.y, component, progress, true)
-        component.width = previous?.width.lerp(current?.width, component, progress, false)
-        component.height = previous?.height.lerp(current?.height, component, progress, true)
-
-        component.updateSize()
+        component.x = previous?.x.lerp(current?.x, component, x, progress, false)
+        component.y = previous?.y.lerp(current?.y, component, y, progress, true)
+        component.width = previous?.width.lerp(current?.width, component, width, progress, false)
+        component.height = previous?.height.lerp(current?.height, component, height, progress, true)
 
         if (previous?.background != null || current?.background != null) {
             background = background ?: UIBackground()
@@ -111,11 +106,13 @@ open class UIStyleSheet(var name: String) : UICopy<UIStyleSheet>, UIAnimatable<U
             anchor = anchor ?: UIAnchorPoint()
             anchor!!.animate(animation, previous?.anchor, current?.anchor, progress)
         }
+        component.x += component.getParentX() + component.marginLeft - component.anchorX
+        component.y += component.getParentY() + component.marginTop - component.anchorY
         component.updateBounds()
         component.updateStyle()
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: UIStyleSheet?) {
+    override fun save(animation: UIAnimation<*>, keyframe: UIStyleSheet?) {
         x = keyframe?.x ?: x
         y = keyframe?.y ?: y
         width = keyframe?.width ?: width

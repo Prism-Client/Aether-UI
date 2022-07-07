@@ -39,18 +39,18 @@ abstract class UIShape<T : UIShape<T>> : UIObject(), UICopy<T>, UIAnimatable<T> 
         cachedHeight = calculate(height, component, component?.width ?: 0f, component?.height ?: 0f, true)
     }
 
-    override fun animate(animation: UIAnimation<*, *>, previous: T?, current: T?, progress: Float) {
+    override fun animate(animation: UIAnimation<*>, previous: T?, current: T?, progress: Float) {
         cachedX = previous?.x.lerp(current?.x, animation.component, progress, false)
         cachedY = previous?.y.lerp(current?.y, animation.component, progress, true)
         cachedWidth = previous?.width.lerp(current?.width, animation.component, progress, false)
         cachedHeight = previous?.height.lerp(current?.height, animation.component, progress, true)
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: T?) {
-        x = keyframe?.x ?: x
-        y = keyframe?.y ?: y
-        width = keyframe?.width ?: width
-        height = keyframe?.height ?: height
+    override fun save(animation: UIAnimation<*>, keyframe: T?) {
+        x = keyframe?.x ?: x?.copy()
+        y = keyframe?.y ?: y?.copy()
+        width = keyframe?.width ?: width?.copy()
+        height = keyframe?.height ?: height?.copy()
     }
 
     open fun apply(shape: UIShape<T>): UIShape<T> {

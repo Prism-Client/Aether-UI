@@ -52,7 +52,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
             if (value != null) value.childrenCount++
             field = value
         }
-    var animations: HashMap<String, UIAnimation<UIComponent<T>, T>>? = null
+    var animations: HashMap<String, UIAnimation<T>>? = null
 
     /**
      * If true, the position will not update when this component is invoked. Generally this is automatically
@@ -317,7 +317,12 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * Updates the active animation (if applicable)
      */
     open fun updateAnimation() {
-        // TODO
+        if (animations != null) {
+            animations!!.forEach { it.value.update() }
+            animations!!.entries.removeIf { it.value.isCompleted }
+            if (animations!!.isEmpty())
+                animations = null
+        }
     }
 
     /**

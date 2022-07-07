@@ -17,13 +17,22 @@ import net.prismclient.aether.ui.util.interfaces.UIAnimatable
  * @since 1.0
  */
 class UIBorder : UIShape<UIBorder>(), UIAnimatable<UIBorder> {
-    var borderWidth = 0f
+    var borderWidth: UIUnit? = null
     var borderColor: UIColor? = null
     var borderDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE
 
+    var cachedBorderWidth = 0f
+    var isAnimating = false
+
+    override fun update(component: UIComponent<*>?) {
+        super.update(component)
+        if (!isAnimating)
+            cachedBorderWidth = component!!.computeUnit(borderWidth, false)
+    }
+
     fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
         renderer {
-            stroke(borderColor?.rgba ?: 0, borderWidth, borderDirection) {
+            stroke(borderColor?.rgba ?: 0, cachedBorderWidth, borderDirection) {
                 rect(x, y, width, height, radius)
             }
         }
@@ -34,27 +43,29 @@ class UIBorder : UIShape<UIBorder>(), UIAnimatable<UIBorder> {
         throw RuntimeException("Should not be invoked")
     }
 
-    override fun animate(animation: UIAnimation<*, *>, previous: UIBorder?, current: UIBorder?, progress: Float) {
-        borderWidth = (previous?.borderWidth ?: 0f).lerp(current?.borderWidth ?: 0f, progress)
-        borderColor?.rgba = previous?.borderColor.mix(current?.borderColor, progress)
-        if (progress > 0.5f) {
-            if (previous?.borderDirection != current?.borderDirection)
-                borderDirection = current?.borderDirection ?: previous?.borderDirection ?: borderDirection
-        }
+    override fun animate(animation: UIAnimation<*>, previous: UIBorder?, current: UIBorder?, progress: Float) {
+        isAnimating = true
+        cachedBorderWidth = previous?.borderWidth.lerp(current?.borderWidth, component!!, borderWidth, progress, false)
+//        if (previous?.borderColor != null || current?.borderColor != null) {
+//            borderColor = borderColor ?: UIColor(0)
+//            borderColor!!.rgba = previous?.borderColor.mix(current?.borderColor, borderColor!!, progress)
+//        }
+        borderColor?.rgba = transition(previous?.borderColor?.rgba ?: borderColor!!.rgba, current?.borderColor?.rgba ?: borderColor!!.rgba, progress)
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: UIBorder?) {
-        borderWidth = keyframe?.borderWidth ?: borderWidth
-        borderColor = keyframe?.borderColor ?: borderColor
+    override fun save(animation: UIAnimation<*>, keyframe: UIBorder?) {
+        borderWidth = keyframe?.borderWidth?.copy() ?: borderWidth
+        borderColor = keyframe?.borderColor?.copy() ?: borderColor
         borderDirection = keyframe?.borderDirection ?: borderDirection
+        isAnimating = false
     }
 
     override fun copy(): UIBorder = UIBorder().also {
-        it.borderWidth = borderWidth
+        it.borderWidth = borderWidth?.copy()
         it.borderColor = borderColor?.copy()
         it.borderDirection = borderDirection
     }
 
-    override fun toString(): String =
-        "UIBorder(borderWidth=$borderWidth, borderColor=$borderColor, borderDirection=$borderDirection)"
+//    override fun toString(): String =
+//        "UIBorder(borderWidth=$borderWidth, borderColor=$borderColor, borderDirection=$borderDirection)"
 }

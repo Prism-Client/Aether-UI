@@ -164,6 +164,12 @@ class NanoVGRenderer : UIRenderer() {
             nvgShapeAntiAlias(ctx, false)
         }
         nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+//        if (stroke) {
+//            if (stroke)
+//        } else {
+//            nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+//            fill()
+//        }
         check()
         nvgShapeAntiAlias(ctx, true)
     }

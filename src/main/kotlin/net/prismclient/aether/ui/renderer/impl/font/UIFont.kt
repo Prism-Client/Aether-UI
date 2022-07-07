@@ -281,8 +281,8 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
         }
 
         if (component is UILabel) {
+            ignore = true
             render(component.text)
-            val bounds = this.textBounds
             // Updates the component to ensure that the width, and
             // height are at least the size of the text rendered
             if (overrideParent && (textBounds[2] - cachedX > component.width || textBounds[3] - cachedY > component.height)) {
@@ -292,10 +292,9 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                 component.updateAnchorPoint()
                 component.updatePosition()
                 component.updateBounds()
-                ignore = true
                 component.updateStyle()
-                ignore = false
             }
+            ignore = false
         }
 
         cachedLineBreakWidth = calculate(lineBreakWidth, component, component.width, component.height, false)
@@ -311,6 +310,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
         lineCount = 1
         renderer {
             font(this@UIFont)
+            if (ignore) color(0)
             when (fontRenderType) {
                 FontRenderType.NORMAL -> {
                     cachedText.clear()
@@ -590,7 +590,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
         textBounds[4] = bounds[4]
     }
 
-    override fun animate(animation: UIAnimation<*, *>, previous: UIFont?, current: UIFont?, progress: Float) {
+    override fun animate(animation: UIAnimation<*>, previous: UIFont?, current: UIFont?, progress: Float) {
         super.animate(animation, previous, current, progress)
         fontColor?.rgba = previous?.fontColor.mix(current?.fontColor, progress)
         cachedFontSize = previous?.fontSize.lerp(current?.fontSize, animation.component, progress, false)
@@ -599,21 +599,21 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
         selectionColor?.rgba = previous?.selectionColor.mix(current?.selectionColor, progress)
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: UIFont?) {
+    override fun save(animation: UIAnimation<*>, keyframe: UIFont?) {
         super.save(animation, keyframe)
         overrideParent = keyframe?.overrideParent ?: overrideParent
         fontRenderType = keyframe?.fontRenderType ?: fontRenderType
         textAlignment = keyframe?.textAlignment ?: textAlignment
         fontName = keyframe?.fontName ?: fontName
         fontStyle = keyframe?.fontStyle ?: fontStyle
-        fontColor = keyframe?.fontColor ?: fontColor
+        fontColor = keyframe?.fontColor ?: fontColor?.copy()
         fontStyle = keyframe?.fontStyle ?: fontStyle
         fontFamily = keyframe?.fontFamily ?: fontFamily
         fontType = keyframe?.fontType ?: fontType
-        fontSize = keyframe?.fontSize ?: fontSize
-        fontSpacing = keyframe?.fontSpacing ?: fontSpacing
-        lineBreakWidth = keyframe?.lineBreakWidth ?: lineBreakWidth
-        lineHeight = keyframe?.lineHeight ?: lineHeight
+        fontSize = keyframe?.fontSize ?: fontSize?.copy()
+        fontSpacing = keyframe?.fontSpacing ?: fontSpacing?.copy()
+        lineBreakWidth = keyframe?.lineBreakWidth ?: lineBreakWidth?.copy()
+        lineHeight = keyframe?.lineHeight ?: lineHeight?.copy()
         appendedString = keyframe?.appendedString ?: appendedString
         isSelectable = keyframe?.isSelectable ?: isSelectable
         selectionColor = keyframe?.selectionColor ?: selectionColor

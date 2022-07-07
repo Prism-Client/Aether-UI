@@ -49,8 +49,5 @@ open class UIFrameSheet(name: String) : UIStyleSheet(name) {
         return this
     }
 
-    override fun copy(): UIFrameSheet {
-        println("aa")
-        return UIFrameSheet(name).apply(this)
-    }
+    override fun copy(): UIFrameSheet = UIFrameSheet(name).apply(this)
 }

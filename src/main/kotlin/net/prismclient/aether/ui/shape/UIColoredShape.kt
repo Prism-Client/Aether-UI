@@ -13,14 +13,14 @@ import net.prismclient.aether.ui.util.extensions.mix
 abstract class UIColoredShape<T : UIColoredShape<T>> : UIShape<T>() {
     var color: UIColor? = null
 
-    override fun animate(animation: UIAnimation<*, *>, previous: T?, current: T?, progress: Float) {
+    override fun animate(animation: UIAnimation<*>, previous: T?, current: T?, progress: Float) {
         super.animate(animation, previous, current, progress)
         color?.rgba = previous?.color.mix(current?.color, progress)
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: T?) {
+    override fun save(animation: UIAnimation<*>, keyframe: T?) {
         super.save(animation, keyframe)
-        color = keyframe?.color ?: color
+        color = keyframe?.color ?: color?.copy()
     }
 
     override fun apply(shape: UIShape<T>): UIColoredShape<T> {

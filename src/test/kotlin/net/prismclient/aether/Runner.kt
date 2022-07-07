@@ -1,10 +1,10 @@
 package net.prismclient.aether
 
 
+import examples.Animations
 import examples.AutoLayouts
 import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.screens.prism.PrismGameMenu
-import net.prismclient.aether.screens.prism.PrismLoadingMenu
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
 import net.prismclient.aether.ui.util.extensions.renderer
@@ -100,7 +100,7 @@ object Runner {
             // Check if the key is null
             if (glfwGetKeyName(keyCode, scanCode) == null) {
                 if (action == GLFW_PRESS && keyCode == GLFW_KEY_ESCAPE) {
-                    Aether.displayScreen(PrismGameMenu())
+                    createScreen(args)
                 }
                 val isRelease = action == GLFW_RELEASE
                 when (keyCode) {
@@ -144,7 +144,7 @@ object Runner {
         glfwMakeContextCurrent(window)
         GL.createCapabilities()
         glfwSetTime(0.0)
-        glfwSwapInterval(0)
+        glfwSwapInterval(1)
 
         core = Aether(NanoVGRenderer())
 
@@ -163,11 +163,7 @@ object Runner {
             core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
         }
 
-        if (args.isNotEmpty() && args[0] == "--debug") {
-            Aether.displayScreen(TestingScreen())
-        } else {
-            Aether.displayScreen(AutoLayouts())
-        }
+        createScreen(args)
 
         renderer {
             loadImage("background", "/prism/background.png")
@@ -200,4 +196,12 @@ object Runner {
         glfwSetErrorCallback(null)!!.free()
     }
 
+    fun createScreen(args: Array<String>) {
+        if (args.isNotEmpty()) when (args[0]) {
+            "--testing" ->  Aether.displayScreen(TestingScreen())
+            "--auto-layouts" -> Aether.displayScreen(AutoLayouts())
+            "--animations" -> Aether.displayScreen(Animations())
+        }
+        else Aether.displayScreen(PrismGameMenu())
+    }
 }

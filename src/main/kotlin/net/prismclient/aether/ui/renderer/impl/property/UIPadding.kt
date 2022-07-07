@@ -20,7 +20,7 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
     var paddingBottom: UIUnit? = null
     var paddingLeft: UIUnit? = null
 
-    override fun animate(animation: UIAnimation<*, *>, previous: UIPadding?, current: UIPadding?, progress: Float) {
+    override fun animate(animation: UIAnimation<*>, previous: UIPadding?, current: UIPadding?, progress: Float) {
         val component = animation.component
         component.paddingTop = previous?.paddingTop?.lerp(current?.paddingTop, component, progress, true) ?: component.paddingTop
         component.paddingRight = previous?.paddingRight?.lerp(current?.paddingRight, component, progress, true) ?: component.paddingRight
@@ -28,7 +28,7 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
         component.paddingLeft = previous?.paddingLeft?.lerp(current?.paddingLeft, component, progress, true) ?: component.paddingLeft
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: UIPadding?) {
+    override fun save(animation: UIAnimation<*>, keyframe: UIPadding?) {
         paddingTop = keyframe?.paddingTop ?: paddingTop
         paddingRight = keyframe?.paddingRight ?: paddingRight
         paddingBottom = keyframe?.paddingBottom ?: paddingBottom

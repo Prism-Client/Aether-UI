@@ -1,12 +1,20 @@
 package net.prismclient.aether.ui.renderer
 
 import net.prismclient.aether.ui.Aether
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 
+/**
+ * [UIProvider] handles style sheets, images, fonts, and animations, a.k.a. resources
+ * which the rest of engine rely on.
+ *
+ * @author sen
+ * @since 1.0
+ */
 object UIProvider {
     /**
      * The maximum time in milliseconds that an animation can live.
@@ -18,6 +26,7 @@ object UIProvider {
     val styles = HashMap<String, UIStyleSheet>()
     val images = HashMap<String, UIImageData>()
     val fonts = HashMap<String, UIFontFamily>()
+    val animations = HashMap<String, UIAnimation<*>>()
 
     /**
      * Initializes the UIProvider
@@ -35,8 +44,7 @@ object UIProvider {
 
     fun getImage(name: String) = images[name]
 
-    fun deleteImage(name: String) =
-        images.remove(name)
+    fun deleteImage(name: String) = images.remove(name)
 
     /**
      * Returns the name of the images given the [UIImageData]
@@ -81,10 +89,18 @@ object UIProvider {
         styles.entries.removeIf { !it.value.immutableStyle }
     }
 
+    fun registerAnimation(animationName: String, animation: UIAnimation<*>) {
+        animations[animationName] = animation
+    }
+
+    fun <S : UIStyleSheet> dispatchAnimation(animationName: String, component: UIComponent<S>) {
+        val animation: UIAnimation<S> = animations[animationName]?.copy() as UIAnimation<S>
+        animation.start(component)
+    }
+
     /**
      * Returns a list of [UIComponent] with the parent of the provided [UIComponent<T>]
      */
     fun getChildrenOf(component: UIComponent<*>): List<UIComponent<*>> =
-        Aether.instance.components?.filter { it.parent == component }?.toList()
-            ?: mutableListOf()
+        Aether.instance.components?.filter { it.parent == component }?.toList() ?: mutableListOf()
 }

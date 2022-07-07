@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.animation.ease.impl.UILinear
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.interfaces.UICopy
+import java.util.function.Consumer
 
 /**
  * [UIAnimation] is the core handler for all animations. The animation is created
@@ -18,17 +19,18 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  *
  * When ran, a copy of this is assigned to the component. Everything except the actual keyframes
  * are copied. If any styles are changed at that point, it will change the original animation keyframes.
+ * The same is applied to listeners. They are not copied.
  *
  * @author sen
  * @since 1.0
  *
  * @param style The style sheet of the component. The style should be completely new, with no styles changed.
  */
-class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UIAnimation<C, S>> {
+class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIAnimation<S>> {
     /**
      * The component that this animation is attached to
      */
-    lateinit var component: C
+    lateinit var component: UIComponent<S>
         private set
 
     /**
@@ -40,13 +42,15 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
 
     var activeKeyframe: Keyframe? = null
         private set
-    var nextKeyframe: Keyframe?  = null
+    var nextKeyframe: Keyframe? = null
         private set
 
     var isAnimating = false
         private set
-
     var isCompleted = false
+        private set
+
+    var completionListeners: HashMap<String, Consumer<UIAnimation<S>>>? = null
         private set
 
     /**
@@ -55,10 +59,18 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
     var startTime = 0L
 
     /**
+     * A private variable which stores the active ease when using [repeat].
+     */
+    var activeEase: UIEase? = null
+
+    /**
      * Starts the animation with the given [component].
      */
-    fun start(component: C) {
+    fun start(component: UIComponent<S>) {
         this.component = component
+
+        component.animations = component.animations ?: hashMapOf()
+        component.animations!![name] = this
 
         if (keyframes.isEmpty()) throw IllegalStateException("No keyframes were added to the animation.")
         if (keyframes.size == 1) {
@@ -109,7 +121,7 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
      */
     fun complete() {
         isCompleted = true
-
+        completionListeners?.forEach { it.value.accept(this) }
     }
 
     /**
@@ -126,16 +138,31 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
             }
         }
 
-        component.style.animate(this, activeKeyframe!!.style, nextKeyframe!!.style, nextKeyframe!!.ease.getValue().toFloat())
+        component.style.animate(
+            this,
+            activeKeyframe!!.style,
+            nextKeyframe!!.style,
+            nextKeyframe!!.ease.getValue().toFloat()
+        )
+    }
+
+    /**
+     * Saves the state of the [activeKeyframe]. It applies all used properties to the component.
+     */
+    fun save() {
+        if (activeKeyframe != null) {
+            component.style.save(this, activeKeyframe!!.style)
+        }
     }
 
     /**
      * Creates a keyframe with the given [ease], and properties from [block]
      */
-    fun keyframe(ease: UIEase = UILinear(1000L), block: S.() -> Unit) {
+    inline fun keyframe(ease: UIEase? = null, block: S.() -> Unit = {}) {
         val style = this.style.copy() as S
         style.block()
-        keyframe(ease, style)
+        // Ease -> activeEase -> UILinear if null.
+        keyframe(ease ?: activeEase?.copy() ?: UILinear(1000L), style)
     }
 
     /**
@@ -150,20 +177,54 @@ class UIAnimation<C : UIComponent<S>, S : UIStyleSheet>(val style: S): UICopy<UI
         keyframes.add(Keyframe(ease, style, relative))
     }
 
+    /**
+     * Shorthand for creating a keyframe.
+     *
+     * @see keyframe
+     */
+    inline fun kf(ease: UIEase? = null, block: S.() -> Unit = {}) = keyframe(ease, block)
+
+    /**
+     * An alternative to [keyframe], where the ease is created then this is applied.
+     *
+     * @see keyframe
+     */
+    inline infix fun UIEase.to(block: S.() -> Unit) = keyframe(this, block)
+
+    /**
+     * Applies the ease to each keyframe within this animation.
+     */
+    inline infix fun UIEase.repeat(block: UIAnimation<S>.() -> Unit) {
+        activeEase = this
+        block()
+    }
+
     private fun incrementKeyframe() {
         if (activeKeyframe == null || nextKeyframe == null) return
-        if (activeKeyframe!!.ease.finished) {
+        if (nextKeyframe!!.ease.finished) {
             activeKeyframe = nextKeyframe
             nextKeyframe = keyframes.getOrNull(keyframes.indexOf(activeKeyframe) + 1)
+            nextKeyframe?.ease?.start()
+            save()
         }
     }
 
-    override fun copy(): UIAnimation<C, S> = UIAnimation<C, S>(style).also {
+    /**
+     * Adds a listener which is invoked when the animation is completed
+     */
+    @JvmOverloads
+    fun onCompletion(name: String = "Default-${completionListeners?.size ?: 0}", listener: Consumer<UIAnimation<S>>) {
+        completionListeners = completionListeners ?: hashMapOf()
+        completionListeners!![name] = listener
+    }
+
+    override fun copy(): UIAnimation<S> = UIAnimation(name, style).also {
         // To save memory, avoid creating copies of the style sheet. Instead,
         // only copy the ease and pass the reference of the style sheet in a
         // new keyframe and populate the copy of this.
         for (keyframe in keyframes)
             it.keyframes.add(Keyframe(keyframe.ease.copy(), keyframe.style, keyframe.relative))
+        it.completionListeners = completionListeners
     }
 
     /**

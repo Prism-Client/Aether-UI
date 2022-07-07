@@ -32,14 +32,14 @@ class UIRadius(
 
     private var cachedRadius: UIRadius? = null
 
-    override fun animate(animation: UIAnimation<*, *>, previous: UIRadius?, current: UIRadius?, progress: Float) {
-        topLeft = previous?.topLeft?.lerp(progress, current?.topLeft ?: 0f) ?: topLeft
-        topRight = previous?.topRight?.lerp(progress, current?.topRight ?: 0f) ?: topRight
-        bottomRight = previous?.bottomRight?.lerp(progress, current?.bottomRight ?: 0f) ?: bottomRight
-        bottomLeft = previous?.bottomLeft?.lerp(progress, current?.bottomLeft ?: 0f) ?: bottomLeft
+    override fun animate(animation: UIAnimation<*>, previous: UIRadius?, current: UIRadius?, progress: Float) {
+        topLeft = lerp(previous?.topLeft ?: topLeft, current?.topLeft ?: topLeft, progress)
+        topRight = lerp(previous?.topRight ?: topRight, current?.topRight ?: topRight, progress)
+        bottomRight = lerp(previous?.bottomRight ?: bottomRight, current?.bottomRight ?: bottomRight, progress)
+        bottomLeft = lerp(previous?.bottomLeft ?: bottomLeft, current?.bottomLeft ?: bottomLeft, progress)
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: UIRadius?) {
+    override fun save(animation: UIAnimation<*>, keyframe: UIRadius?) {
         topLeft = keyframe?.topLeft ?: topLeft
         topRight = keyframe?.topRight ?: topRight
         bottomRight = keyframe?.bottomRight ?: bottomRight

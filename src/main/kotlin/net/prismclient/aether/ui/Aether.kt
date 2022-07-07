@@ -467,6 +467,20 @@ open class Aether(val renderer: UIRenderer) {
         }
 
         /**
+         * Deallocates everything necessary and removes the active screen.
+         */
+        @JvmStatic
+        fun closeScreen() {
+            if (activeScreen != null) {
+                deallocateComponents()
+                activeScreen = null
+                instance.components = null
+                instance.frames = null
+                instance.controllers = null
+            }
+        }
+
+        /**
          * Focuses the component. Please use [UIComponent.focus] instead.
          */
         @JvmStatic

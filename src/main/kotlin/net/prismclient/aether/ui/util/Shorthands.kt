@@ -124,8 +124,8 @@ fun include(dependable: UIDependable) = dependable.load()
  * given to add the keyframes and modify other properties of the [UIAnimation]. The animation is
  * automatically registered under the name given.
  */
-inline fun <C : UIComponent<S>, S : UIStyleSheet> C.animationOf(animationName: String, style: S, block: UIAnimation<C, S>.() -> Unit): UIAnimation<C, S> {
-    val animation = UIAnimation<C, S>(animationName, style)
+fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block: UIAnimation<S>.() -> Unit): UIAnimation<S> {
+    val animation = UIAnimation<S>(animationName, style)
     animation.block()
     UIProvider.registerAnimation(animationName, animation)
     return animation

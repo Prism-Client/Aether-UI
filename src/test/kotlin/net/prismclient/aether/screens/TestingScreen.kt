@@ -53,6 +53,14 @@ class TestingScreen : UIScreen {
                 background(colorOf(asRGBA(59, 145, 255)), radiusOf(9f))
             }
 
+            container {
+
+            }.style(UIContainerSheet("")) {
+                control(UIAlignment.CENTER)
+                size(400f, 400f)
+                background(asRGBA(0, 0, 0, 0.3f), radiusOf(8f))
+            }
+
 //
 //            container().style(UIContainerSheet("")) {
 //                control(UIAlignment.CENTER)

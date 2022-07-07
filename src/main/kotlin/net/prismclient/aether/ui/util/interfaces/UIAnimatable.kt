@@ -35,10 +35,10 @@ interface UIAnimatable<T> {
      * @see updateAnimationCache
      * @see clearAnimationCache
      */
-    fun animate(animation: UIAnimation<*, *>, previous: T?, current: T?, progress: Float)
+    fun animate(animation: UIAnimation<*>, previous: T?, current: T?, progress: Float)
 
     /**
      * Applies all properties of the given keyframe which are not considered null to this.
      */
-    fun save(animation: UIAnimation<*, *>, keyframe: T?)
+    fun save(animation: UIAnimation<*>, keyframe: T?)
 }

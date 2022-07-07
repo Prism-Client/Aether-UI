@@ -29,7 +29,7 @@ class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
     }
 
     override fun animate(
-        animation: UIAnimation<*, *>,
+        animation: UIAnimation<*>,
         previous: UIAnchorPoint?,
         current: UIAnchorPoint?,
         progress: Float
@@ -39,9 +39,9 @@ class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
         component.anchorY = current?.y?.lerp(previous?.y, component, progress, false) ?: component.anchorY
     }
 
-    override fun save(animation: UIAnimation<*, *>, keyframe: UIAnchorPoint?) {
-        x = keyframe?.x ?: x
-        y = keyframe?.y ?: y
+    override fun save(animation: UIAnimation<*>, keyframe: UIAnchorPoint?) {
+        x = keyframe?.x ?: x?.copy()
+        y = keyframe?.y ?: y?.copy()
     }
 
     fun copy(): UIAnchorPoint = UIAnchorPoint().also {
