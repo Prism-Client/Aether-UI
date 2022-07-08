@@ -1,16 +1,13 @@
 package net.prismclient.aether
 
 import net.prismclient.aether.ui.Aether
-import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.image.UIImageData
-import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIProvider.getImage
 import net.prismclient.aether.ui.renderer.UIProvider.registerImage
-import net.prismclient.aether.ui.util.extensions.getAlpha
-import net.prismclient.aether.ui.util.extensions.getBlue
-import net.prismclient.aether.ui.util.extensions.getGreen
-import net.prismclient.aether.ui.util.extensions.getRed
+import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.other.UIContentFBO
+import net.prismclient.aether.ui.util.extensions.*
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.opengl.GL11
@@ -44,23 +41,23 @@ class NanoVGRenderer : UIRenderer() {
 
     override fun color(color: Int) {
         super.color(color)
-        nvgRGBA(color.getRed().toByte(), color.getGreen().toByte(), color.getBlue().toByte(), color.getAlpha().toByte(), this.color)
+        nvgRGBA(
+            color.getRed().toByte(),
+            color.getGreen().toByte(),
+            color.getBlue().toByte(),
+            color.getAlpha().toByte(),
+            this.color
+        )
     }
 
     override fun createContentFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
         val contentScale = Aether.devicePxRatio
         val framebuffer = NanoVGGL3.nvgluCreateFramebuffer(
-            ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
-            NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
+            ctx, (width * contentScale).toInt(), (height * contentScale).toInt(), NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
-            framebuffer.fbo(),
-            width * contentScale,
-            height * contentScale,
-            width,
-            height,
-            contentScale
+            framebuffer.fbo(), width * contentScale, height * contentScale, width, height, contentScale
         )
         fbos[fbo] = framebuffer
         return fbo
@@ -164,34 +161,42 @@ class NanoVGRenderer : UIRenderer() {
             nvgShapeAntiAlias(ctx, false)
         }
         nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-//        if (stroke) {
-//            if (stroke)
-//        } else {
-//            nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-//            fill()
-//        }
+        if (stroke) {
+            if (stroke) nvgPathWinding(ctx, NVG_HOLE)
+        } else {
+            nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+            fill()
+        }
         check()
         nvgShapeAntiAlias(ctx, true)
     }
 
+    override fun beginPath() = nvgBeginPath(ctx)
+
     override fun startLine(x: Float, y: Float, lineCap: Int, lineJoin: Int, lineWidth: Float) {
-        nvgBeginPath(ctx)
+        beginPath()
         nvgLineCap(ctx, lineCap)
         nvgLineJoin(ctx, lineJoin)
         nvgStrokeWidth(ctx, lineWidth)
         nvgMoveTo(ctx, x, y)
     }
 
-    override fun line(x: Float, y: Float) =
-        nvgLineTo(ctx, x, y)
+    override fun line(x: Float, y: Float) = nvgLineTo(ctx, x, y)
 
     override fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) =
         nvgBezierTo(ctx, x, y, x1, y1, x2, y2)
+
+    override fun arc(x: Float, y: Float, radius: Float, startingAngle: Float, endingAngle: Float, arcDirection: Int) =
+        nvgArc(ctx, x, y, radius, startingAngle, endingAngle, arcDirection)
+
+    override fun arcTo(x: Float, y: Float, x1: Float, y1: Float, radius: Float) = nvgArcTo(ctx, x, y, x1, y1, radius)
 
     override fun finishLine() {
         nvgStrokeColor(ctx, color)
         nvgStroke(ctx)
     }
+
+    override fun closePath() = nvgClosePath(ctx)
 
     override fun linearGradient(
         x: Float,
@@ -205,24 +210,22 @@ class NanoVGRenderer : UIRenderer() {
         gradientHeight: Float,
         color1: Int,
         color2: Int
-    ) {
-        linearGradient(
-            x,
-            y,
-            width,
-            height,
-            radius,
-            radius,
-            radius,
-            radius,
-            gradientX,
-            gradientY,
-            gradientWidth,
-            gradientHeight,
-            color1,
-            color2
-        )
-    }
+    ) = linearGradient(
+        x,
+        y,
+        width,
+        height,
+        radius,
+        radius,
+        radius,
+        radius,
+        gradientX,
+        gradientY,
+        gradientWidth,
+        gradientHeight,
+        color1,
+        color2
+    )
 
     override fun linearGradient(
         x: Float,
@@ -334,19 +337,11 @@ class NanoVGRenderer : UIRenderer() {
         val h = (img.height() * scale).toInt()
         val rast = MemoryUtil.memAlloc(w * h * 4)
         NanoSVG.nsvgRasterize(
-            rasterizer,
-            img, 0f, 0f,
-            scale,
-            rast, w, h,
-            w * 4
+            rasterizer, img, 0f, 0f, scale, rast, w, h, w * 4
         )
         NanoSVG.nsvgDeleteRasterizer(rasterizer)
         image.handle = nvgCreateImageRGBA(
-            ctx,
-            w,
-            h,
-            NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY or NVG_IMAGE_GENERATE_MIPMAPS,
-            rast
+            ctx, w, h, NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY or NVG_IMAGE_GENERATE_MIPMAPS, rast
         )
         image.width = w
         image.height = h
@@ -409,7 +404,9 @@ class NanoVGRenderer : UIRenderer() {
         nvgText(ctx, x, y, text)
     }
 
-    override fun wrapString(text: String, x: Float, y: Float, width: Float, splitHeight: Float, lines: ArrayList<String>?): Int {
+    override fun wrapString(
+        text: String, x: Float, y: Float, width: Float, splitHeight: Float, lines: ArrayList<String>?
+    ): Int {
         // TODO: Rewrite text wrapping
         val rows = NVGTextRow.calloc(100)//private val rows = NVGTextRow.create(maxRows)
 
@@ -452,7 +449,7 @@ class NanoVGRenderer : UIRenderer() {
         bounds[4] = maxx
 
         rows.free()
-        return  nrows
+        return nrows
     }
 
     override fun stringX(): Float = bounds[0]
@@ -502,5 +499,24 @@ class NanoVGRenderer : UIRenderer() {
         } else {
             fill()
         }
+    }
+
+    override fun test() {
+        var x = 10f
+        var y = 10f
+        var width = 100f
+        var height = 100f
+        var radius = 10f
+        var thickness = 1f
+        color(asRGBA(0, 0, 0))
+//        rect(x, y, width, height, radius, radius, radius, radius)
+
+        color(asRGBA(255, 255, 255))
+
+        nvgBeginPath(ctx)
+        nvgRoundedRect(ctx, x - thickness / 2f, y - thickness / 2f, width + thickness, height + thickness, radius)
+        nvgStrokeWidth(ctx, thickness + 0.5f)
+        nvgStrokeColor(ctx, color)
+        nvgStroke(ctx)
     }
 }

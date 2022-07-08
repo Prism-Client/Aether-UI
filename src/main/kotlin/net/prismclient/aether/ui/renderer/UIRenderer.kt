@@ -71,7 +71,13 @@ abstract class UIRenderer {
         const val SQUARE = 2
         const val BEVEL = 3
         const val MITER = 4
+
+        /* Direction */
+        const val CCW = 1
+        const val CW = 2
     }
+
+    abstract fun test()
 
     /**
      * Called when the frame is started
@@ -271,13 +277,41 @@ abstract class UIRenderer {
     abstract fun triangle(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float)
 
     /** Line **/
+    abstract fun beginPath()
+
     abstract fun startLine(x: Float, y: Float, lineCap: Int, lineJoin: Int, lineWidth: Float)
 
     abstract fun line(x: Float, y: Float)
 
     abstract fun bezier(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float)
 
+
+    /**
+     * Creates an arc with the center x and y coordinates as [x], and [y], the radius, as [radius], and the
+     * [startingAngle], and [endingAngle] in radians.
+     */
+    abstract fun arc(x: Float, y: Float, radius: Float, startingAngle: Float, endingAngle: Float, arcDirection: Int)
+
+    /**
+     * Cretes an arc based on two coordinates
+     *
+     * @param x First x coordinate
+     * @param y First y coordinate
+     * @param x1 Second x coordinate
+     * @param y1 Second y coordinate
+     * @param radius The radius, in radians
+     */
+    abstract fun arcTo(x: Float, y: Float, x1: Float, y1: Float, radius: Float)
+
+    /**
+     * Completes and draws the line
+     */
     abstract fun finishLine()
+
+    /**
+     * Closes the path.
+     */
+    abstract fun closePath()
 
     /**
      * Renders a rounded rectangle linear gradient

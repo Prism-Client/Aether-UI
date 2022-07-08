@@ -9,7 +9,8 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.renderer.UIProvider
-import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
+import net.prismclient.aether.ui.util.blockFrom
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -108,6 +109,9 @@ open class Aether(val renderer: UIRenderer) {
                     if (component.visible)
                         component.render()
                 }
+
+                renderer.test()
+
                 endFrame()
             }
         }
