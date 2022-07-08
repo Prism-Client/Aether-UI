@@ -7,8 +7,6 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
-import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.interfaces.UICopy
 
 /**
@@ -30,7 +28,7 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * @since 1.1
  */
 class UIAutoLayout @JvmOverloads constructor(
-    listDirection: UIListLayout.ListDirection = ListDirection.Horizontal,
+    listDirection: ListDirection = ListDirection.Horizontal,
     style: String?
 ) : UIListLayout(listDirection, ListOrder.Forward, style), UICopy<UIAutoLayout> {
     /**
@@ -107,9 +105,11 @@ class UIAutoLayout @JvmOverloads constructor(
         if (verticalResizing == ResizingMode.Hug)
             height = (h + top + bottom).coerceAtLeast(height)
 
-        // Update the anchor, and style of this
-        updateBounds()
+        // Update
+        calculateBounds()
         updateAnchorPoint()
+        updatePosition()
+        updateBounds()
         updateStyle()
 
         // Calculate the initial position based on the alignment
