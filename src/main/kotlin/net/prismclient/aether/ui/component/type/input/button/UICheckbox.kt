@@ -1,7 +1,7 @@
 package net.prismclient.aether.ui.component.type.input.button
 
 import net.prismclient.aether.ui.component.type.image.UIImage
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
+import net.prismclient.aether.ui.dsl.UIComponentDSL
 import net.prismclient.aether.ui.style.UIStyleSheet
 
 open class UICheckbox(

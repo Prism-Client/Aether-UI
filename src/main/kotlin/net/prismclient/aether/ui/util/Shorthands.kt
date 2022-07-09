@@ -2,8 +2,9 @@ package net.prismclient.aether.ui.util
 
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.dsl.UIComponentDSL
 import net.prismclient.aether.ui.renderer.UIProvider
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
+import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIStyleSheet
@@ -19,6 +20,16 @@ const val top = 8
 const val middle = 16
 const val bottom = 32
 const val baseline = 64
+
+/**
+ * Image flags
+ */
+const val GENERATE_MIPMAPS = 1
+const val REPEATX = 2
+const val REPEATY = 4
+const val FLIPY = 8
+const val PREMULTIPLIED = 16
+const val NEAREST = 32
 
 /**
  * Creates a DSL block from the given [obj] of type [T].
@@ -95,6 +106,27 @@ fun paddingOf(top: UIUnit, right: UIUnit, bottom: UIUnit, left: UIUnit): UIPaddi
     it.paddingRight = right
     it.paddingBottom = bottom
     it.paddingLeft = left
+}
+
+/**
+ * Creates a [UIMargin] with a pixel unit of [margin].
+ */
+fun marginOf(margin: Number) = marginOf(margin, margin, margin, margin)
+
+/**
+ * Creates a [UIMargin] from four pixel units.
+ */
+fun marginOf(top: Number, right: Number, bottom: Number, left: Number): UIMargin =
+    marginOf(px(top), px(right), px(bottom), px(left))
+
+/**
+ * Creates a [UIMargin] given four [UIUnit]s.
+ */
+fun marginOf(top: UIUnit, right: UIUnit, bottom: UIUnit, left: UIUnit): UIMargin = UIMargin().also {
+    it.marginTop = top
+    it.marginRight = right
+    it.marginBottom = bottom
+    it.marginLeft = left
 }
 
 /**

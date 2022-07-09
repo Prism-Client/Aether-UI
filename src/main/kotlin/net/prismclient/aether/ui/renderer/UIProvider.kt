@@ -3,7 +3,7 @@ package net.prismclient.aether.ui.renderer
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
+import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
@@ -35,7 +35,6 @@ object UIProvider {
      */
     fun initialize(renderer: UIRenderer) {
         render = renderer
-        UIRendererDSL.render = renderer
     }
 
     fun registerImage(name: String, image: UIImageData) {

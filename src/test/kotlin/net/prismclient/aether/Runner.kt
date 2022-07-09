@@ -7,6 +7,7 @@ import net.prismclient.aether.screens.TestingScreen
 import net.prismclient.aether.screens.prism.PrismGameMenu
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
+import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIModifierKey
@@ -165,9 +166,7 @@ object Runner {
 
         createScreen(args)
 
-        renderer {
-            loadImage("background", "/prism/background.png")
-        }
+        UIAssetDSL.image("background", "/prism/background.png")
 
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())

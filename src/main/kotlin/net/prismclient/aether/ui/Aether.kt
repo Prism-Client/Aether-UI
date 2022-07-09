@@ -6,9 +6,11 @@ import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.util.blockFrom
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
@@ -85,15 +87,15 @@ open class Aether(val renderer: UIRenderer) {
      * This must be invoked before the rendering of the screen. It updates all active frames.
      */
     open fun renderFrames() {
-        renderer {
-            frames?.forEach {
-                if (it.visible && it.requiresUpdate && it.style.useFBO) {
-                    beginFrame(width, height, devicePxRatio)
-                    it.renderContent()
-                    endFrame()
-                }
-            }
-        }
+//        renderer {
+//            frames?.forEach {
+//                if (it.visible && it.requiresUpdate && it.style.useFBO) {
+//                    beginFrame(width, height, devicePxRatio)
+//                    it.renderContent()
+//                    endFrame()
+//                }
+//            }
+//        }
     }
 
     /**
@@ -108,6 +110,7 @@ open class Aether(val renderer: UIRenderer) {
                     if (component.visible)
                         component.render()
                 }
+
                 endFrame()
             }
         }

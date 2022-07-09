@@ -2,7 +2,6 @@ package net.prismclient.aether.ui.renderer.impl.border
 
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.unit.UIUnit
@@ -32,9 +31,10 @@ class UIBorder : UIShape<UIBorder>(), UIAnimatable<UIBorder> {
 
     fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
         renderer {
-            stroke(borderColor?.rgba ?: 0, cachedBorderWidth, borderDirection) {
-                rect(x, y, width, height, radius)
-            }
+            // TODO: Implement border rendering
+//            stroke(borderColor?.rgba ?: 0, cachedBorderWidth, borderDirection) {
+//                rect(x, y, width, height, radius)
+//            }
         }
     }
 

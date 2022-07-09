@@ -1,16 +1,6 @@
 package net.prismclient.aether.screens.prism
 
-import net.prismclient.aether.ui.component.type.image.UIImageSheet
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
-import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNMIDDLE
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNRIGHT
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNTOP
-import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.util.extensions.*
-import net.prismclient.aether.ui.util.radiusOf
 
 class PrismMainMenu : UIScreen {
     override fun build() {

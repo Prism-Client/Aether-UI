@@ -1,4 +1,4 @@
-package net.prismclient.aether.ui.renderer.dsl
+package net.prismclient.aether.ui.dsl
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
@@ -13,7 +13,7 @@ import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL.activeStyle
+import net.prismclient.aether.ui.dsl.UIComponentDSL.activeStyle
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import java.util.*
