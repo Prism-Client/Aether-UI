@@ -113,8 +113,8 @@ class UIAutoLayout @JvmOverloads constructor(
         updateStyle()
 
         // Calculate the initial position based on the alignment
-        var x = this.x + getParentX() + left
-        var y = this.y + getParentY() + top
+        var x = this.x + left
+        var y = this.y + top
 
         // Update the other direction's alignment
         if (listDirection == ListDirection.Horizontal) {
