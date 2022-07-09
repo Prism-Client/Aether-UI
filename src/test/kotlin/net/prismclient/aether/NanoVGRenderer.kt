@@ -250,7 +250,7 @@ class NanoVGRenderer : UIRenderer {
 
     override fun fontAscender(): Float = ascender[0]
 
-    override fun fontDescender(): Float = descender[0]
+    override fun fontDescender(): Float = -descender[0]
 
     override fun rect(
         x: Float,

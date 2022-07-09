@@ -582,7 +582,10 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
      * Returns the position of the ascender line in the current font
      */
     open fun getAscend(): Float {
-        UIRendererDSL.font(this)
+        renderer {
+            font(this@UIFont)
+            "abc".fontBounds()
+        }
         return UIRendererDSL.fontAscender()
     }
 
@@ -590,7 +593,10 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
      * Returns the position of the descender line in the current font
      */
     open fun getDescend(): Float {
-        UIRendererDSL.font(this)
+        renderer {
+            font(this@UIFont)
+            "abc".fontBounds()
+        }
         return UIRendererDSL.fontDescender()
     }
 

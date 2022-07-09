@@ -154,5 +154,19 @@ object UIPathDSL {
     fun imagePattern(imageHandle: Int, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float) =
         renderer.imagePattern(imageHandle, x, y, width, height, angle, alpha)
 
-    // TODO: Add graident and docs
+    /**
+     * Creates a linear gradient for the active path with the [x] and [y] as the
+     * starting point and the [x2] and [y2] as the ending point.
+     */
+    fun linearGradient(x: Float, y: Float, x2: Float, y2: Float, startColor: Int, endColor: Int) =
+        renderer.linearGradient(x, y, x2, y2, startColor, endColor)
+
+    /**
+     * Creates a radial gradient for the active path.
+     *
+     * @param x The x-axis coordinate of the center of the circle.
+     * @param y The y-axis coordinate of the center of the circle.
+     */
+    fun radialGradient(x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int) =
+        renderer.radialGradient(x, y, innerRadius, outerRadius, startColor, endColor)
 }

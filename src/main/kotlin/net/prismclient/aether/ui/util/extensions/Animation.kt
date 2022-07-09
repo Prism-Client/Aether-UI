@@ -44,6 +44,8 @@ fun Int.mix(color: Int, progress: Float): Int = transition(this, color, progress
  */
 fun UIColor?.mix(color: UIColor?, progress: Float): Int = (this?.rgba ?: 0).mix(color?.rgba ?: 0, progress)
 
+// TODO: Mix function with HSV instead of RGB
+
 fun UIColor?.mix(color: UIColor?, default: UIColor, progress: Float): Int =
     (this?.rgba ?: default.rgba).mix(color?.rgba ?: default.rgba, progress)
 
