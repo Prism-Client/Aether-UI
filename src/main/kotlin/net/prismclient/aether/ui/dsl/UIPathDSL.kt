@@ -133,6 +133,13 @@ object UIPathDSL {
     ) = renderer.arc(x, y, radius, startAngle, endAngle, windingOrder)
 
     /**
+     * Renders a rectangle with a single radius value.
+     */
+    @JvmOverloads
+    fun rect(x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) =
+        rect(x, y, width, height, radius, radius, radius, radius)
+
+    /**
      * Creates a varying rounded rectangle shaped sub-path.
      */
     fun rect(
@@ -169,4 +176,25 @@ object UIPathDSL {
      */
     fun radialGradient(x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int) =
         renderer.radialGradient(x, y, innerRadius, outerRadius, startColor, endColor)
+
+    /**
+     * Sets the current path to a hole path where every odd path fills as a hole. For example
+     * if you have a rectangle and a circle is drawn within it right after the rectangle, the
+     * circle will cut into the rectangle and there will be a hole where the circle was. The
+     * next path will return to solid/stroke unless explicitly stated to be a hole path.
+     *
+     * The calls would look like:
+     *
+     *      path {
+     *          rect(...)
+     *          circle(...) // Somewhere within the rectangle call above
+     *      }.fillPath() // Fill path or something
+     *
+     * @see <a href="https://github.com/memononen/nanovg#understanding-composite-paths">See NanoVG Composite paths</a>
+     */
+    inline fun hole(block: UIPathDSL.() -> Unit): UIPathDSL {
+        block()
+        renderer.pathHole(true)
+        return this
+    }
 }

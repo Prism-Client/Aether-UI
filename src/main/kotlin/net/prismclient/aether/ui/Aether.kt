@@ -10,7 +10,6 @@ import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.renderer.UIProvider
-import net.prismclient.aether.ui.util.blockFrom
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
@@ -87,15 +86,15 @@ open class Aether(val renderer: UIRenderer) {
      * This must be invoked before the rendering of the screen. It updates all active frames.
      */
     open fun renderFrames() {
-//        renderer {
-//            frames?.forEach {
-//                if (it.visible && it.requiresUpdate && it.style.useFBO) {
-//                    beginFrame(width, height, devicePxRatio)
-//                    it.renderContent()
-//                    endFrame()
-//                }
-//            }
-//        }
+        renderer {
+            frames?.forEach {
+                if (it.visible && it.requiresUpdate && it.style.useFBO) {
+                    beginFrame(width, height, devicePxRatio)
+                    it.renderContent()
+                    endFrame()
+                }
+            }
+        }
     }
 
     /**
@@ -105,15 +104,39 @@ open class Aether(val renderer: UIRenderer) {
         renderer {
             if (activeScreen != null) {
                 beginFrame(width, height, devicePxRatio)
-                for (i in 0 until components!!.size) {
-                    val component = components!![i]
-                    if (component.visible)
-                        component.render()
-                }
+//                for (i in 0 until components!!.size) {
+//                    val component = components!![i]
+//                    if (component.visible)
+//                        component.render()
+//                }
+
+                var x = 50f
+                val y = 50f
+                val w = 100f
+                val h = 100f
+                val stroke = 10f
+
+                color(-1)
+                rect(x, y, w, h)
 
                 path {
+                    hole {
+                        rect(x, y, w, h)
+                        rect(x + stroke, y + stroke, w - stroke - stroke, h - stroke - stroke)
+                    }
+                }.fillPath(asRGBA(255, 0, 0))
 
-                }.fillPath(-1)
+                x += 150f
+
+                color(asRGBA(1f, 1f, 1f, 0.5f))
+                rect(x, y, w, h)
+
+                path {
+                    hole {
+                        rect(x - stroke / 2f, y - stroke / 2f, w + stroke, h + stroke)
+//                        rect(x + stroke / 2f, y + stroke / 2f, w - stroke, h - stroke)
+                    }
+                }.fillPath(asRGBA(0, 255, 0))
 
                 endFrame()
             }
