@@ -1,8 +1,8 @@
 package net.prismclient.aether.ui.renderer
 
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import java.nio.ByteBuffer
-import javax.swing.GroupLayout.Alignment
 
 /**
  * [UIRenderer] wraps all the render calls into this class. An implementation of this must
@@ -52,7 +52,9 @@ interface UIRenderer {
     fun reset()
 
     /**
-     * Sets the active color to this [color].
+     * Sets the active fill color to this [color]. Alternative to [fillColor].
+     *
+     * @see fillColor
      */
     fun color(color: Int)
 
@@ -81,25 +83,47 @@ interface UIRenderer {
      */
     fun useAntialiasing(antialiasing: Boolean)
 
+    /** FBO **/
+
+    fun createFBO(width: Float, height: Float): UIContentFBO
+
+    fun deleteFBO(fbo: UIContentFBO)
+
+    fun bindFBO(fbo: UIContentFBO)
+
+    fun unbindFBO()
+
     /** Asset Loading **/
-    fun createImage(imageData: UIImageData)
+    /**
+     * Creates an image from the given [data] registered to the [imageName].
+     *
+     * @return The created image.
+     */
+    fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData
 
     fun deleteImage(imageData: UIImageData)
 
-    fun createImageFromHandle(handle: Int)
+    /**
+     * Creates a svg from the given [svgName] and [data].
+     *
+     * @return The created image (svg).
+     */
+    fun createSvg(svgName: String, data: ByteBuffer?, scale: Float): UIImageData
 
-    fun deleteImageFromHandle(handle: Int)
+    // TODO: Create image from handle
+//    fun createImageFromHandle(handle: Int, imageWidth: Int, imageHeight: Int)
+
+//    fun deleteImageFromHandle(handle: Int)
 
     /**
      * Creates a font from the given [fontData], with the name [fontName].
      *
      * @return Returns if the font was successfully created.
      */
-    fun createFont(fontName: String, fontData: ByteBuffer): Boolean
+    fun createFont(fontName: String, fontData: ByteBuffer?): Boolean
 
     /** Image **/
-    fun imagePattern(imageData: UIImageData, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float)
-
+    fun imagePattern(imageHandle: Int, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float)
 
     /** Font **/
 
@@ -113,12 +137,20 @@ interface UIRenderer {
      */
     fun fontSize(size: Float)
 
-    fun alignment(alignment: Int)
+    fun fontAlignment(alignment: Int)
 
     /**
      * Spaces the text by the given [spacing].
      */
     fun fontSpacing(spacing: Float)
+
+    /**
+     * Renders the [text] based on the [x], and [y] position and all the states
+     *
+     * @see fontSize
+     * @see fontSpacing
+     */
+    fun renderText(text: String, x: Float, y: Float)
 
     /**
      * Returns an array of five floats representing the most recently rendered text.
@@ -132,20 +164,23 @@ interface UIRenderer {
     fun fontBounds(): FloatArray
 
     /**
-     * Returns the bounds of the given [text].
+     * Returns the bounds of the given [text] at (0, 0). Overrides the most recent draw
+     * call, so [fontAscender] and [fontDescender] will return the value of this instead of the
+     * most recent draw call.
      *
      * @see fontBounds
      */
     fun fontBounds(text: String): FloatArray
 
     /**
-     * Renders the [text] based on the [x], and [y] position and all the states
-     *
-     * @see fontSize
-     * @see fontSpacing
+     * Returns the ascender of the most recently font draw call.
      */
-    fun renderText(text: String, x: Float, y: Float)
+    fun fontAscender(): Float
 
+    /**
+     * Returns the descender of the most recently font draw call.
+     */
+    fun fontDescender(): Float
 
     /** General Shapes **/
 
@@ -182,9 +217,33 @@ interface UIRenderer {
     fun fill()
 
     /**
+     * Fills the active path with the active paint.
+     */
+    fun fillPaint()
+
+    /**
+     * Sets the fill color to the given value
+     *
+     * @see color
+     */
+    fun fillColor(color: Int)
+
+    /**
      * "Strokes" the active path
      */
     fun stroke()
+
+    /**
+     * "Strokes" the active path with the active paint.
+     */
+    fun strokePaint()
+
+    /**
+     * Sets the stroke width to the given [size].
+     */
+    fun strokeWidth(size: Float)
+
+    fun strokeColor(color: Int)
 
     /**
      * Changes the path winding to the given [WindingOrder]
@@ -235,7 +294,7 @@ interface UIRenderer {
      * @see degToRad
      * @see radToDeg
      */
-    fun arc(x: Float, y: Float, radius: Float, angle: Float, startAngle: Float, endAngle: Float, windingOrder: WindingOrder)
+    fun arc(x: Float, y: Float, radius: Float, startAngle: Float, endAngle: Float, windingOrder: WindingOrder)
 
     /**
      * @param x The first point x-axis coordinate.
@@ -247,11 +306,6 @@ interface UIRenderer {
      * @see radToDeg
      */
     fun arcTo(x: Float, y: Float, x1: Float, y1: Float, radius: Float)
-
-    /**
-     * Sets the stroke width to the given [size].
-     */
-    fun strokeWidth(size: Float)
 
     /**
      * Sets the line cap to the given [cap].
@@ -268,6 +322,32 @@ interface UIRenderer {
     fun lineJoin(join: LineJoin)
 
     /** Gradients **/
+
+    /**
+     * Creates a linear gradient for the active path with the [x] and [y] as the
+     * starting point and the [x2] and [y2] as the ending point.
+     */
+    fun linearGradient(x: Float, y: Float, x2: Float, y2: Float, startColor: Int, endColor: Int)
+
+    /**
+     * Creates a radial gradient for the active path.
+     *
+     * @param x The x-axis coordinate of the center of the circle.
+     * @param y The y-axis coordinate of the center of the circle.
+     */
+    fun radialGradient(x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int)
+
+    /** Paint **/
+
+    /**
+     * Creates a new paint.
+     */
+    fun allocPaint()
+
+    /**
+     * Removes the active paint allocated from a gradient or image
+     */
+    fun deallocatePaint()
 
     /** Util **/
 

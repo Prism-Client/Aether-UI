@@ -1,9 +1,10 @@
 package net.prismclient.aether.ui.component.type.layout
 
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
+import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
@@ -64,7 +65,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      */
     open fun updateFBO() {
         if (style.useFBO)
-            fbo = UIRendererDSL.render.createContentFBO(relWidth, relHeight)
+            fbo = Aether.instance.renderer.createFBO(relWidth, relHeight)
     }
 
     /**
@@ -93,8 +94,12 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
         if (style.useFBO) {
             if (requiresUpdate || !style.optimizeRenderer) {
                 if (fbo == null) updateFBO()
-                UIRendererDSL.renderContent(fbo!!) {
+                renderer {
+                    renderer.bindFBO(fbo!!)
+                    beginFrame(fbo!!.width, fbo!!.height, fbo!!.contentScale)
                     components.forEach(UIComponent<*>::render)
+                    endFrame()
+                    Aether.instance.renderer.unbindFBO()
                 }
                 requiresUpdate = false
             }
@@ -110,13 +115,13 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
         style.background?.render()
         renderComponent()
         if (style.useFBO) {
-            UIRendererDSL.renderFBO(fbo!!, relX, relY, relWidth, relHeight, style.background?.radius)
+            renderFBO()
         }
     }
 
     override fun renderComponent() {
         if (style.useFBO) {
-            UIRendererDSL.renderFBO(fbo!!, relX, relY, relWidth, relHeight, style.background?.radius)
+            renderFBO()
         } else {
             if (style.clipContent)
                 UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
@@ -162,5 +167,14 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
         components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
         requestUpdate()
+    }
+
+    protected fun renderFBO() {
+        renderer {
+            path {
+                renderer.imagePattern(fbo!!.id,  relX, relY, relWidth, relHeight, 0f, 1f)
+                rect(relX, relY, relWidth, relHeight)
+            }.fillPaint()
+        }
     }
 }

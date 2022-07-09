@@ -6,10 +6,9 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.bounds
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.boundsOf
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.indexOffset
+import net.prismclient.aether.ui.dsl.UIRendererDSL
+import net.prismclient.aether.ui.dsl.UIRendererDSL.fontBounds
+import net.prismclient.aether.ui.dsl.UIRendererDSL.indexOffset
 import net.prismclient.aether.ui.renderer.impl.font.UIFont.FontRenderType
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.UIStyleSheet
@@ -334,6 +333,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                     text.render(cachedX, cachedY)
                     setBounds()
                 } // TODO: \n available by default
+                // TODO: Add back multiline support
                 FontRenderType.NEWLINE -> {
                     cachedText.clear()
                     val lines = text.split(newline)
@@ -346,10 +346,10 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                         val line = lines[i]
                         cachedText.add(line)
                         line.render(cachedX, cachedY + i * (cachedLineHeight + cachedFontSize))
-                        minx = bounds()[0].coerceAtMost(minx)
-                        miny = bounds()[1].coerceAtMost(miny)
-                        maxx = bounds()[2].coerceAtLeast(maxx)
-                        maxy = bounds()[3].coerceAtLeast(maxy)
+                        minx = fontBounds()[0].coerceAtMost(minx)
+                        miny = fontBounds()[1].coerceAtMost(miny)
+                        maxx = fontBounds()[2].coerceAtLeast(maxx)
+                        maxy = fontBounds()[3].coerceAtLeast(maxy)
                     }
                     textBounds[0] = minx
                     textBounds[1] = miny
@@ -358,10 +358,11 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                     textBounds[4] = maxx
                 }
                 FontRenderType.WRAP -> {
-                    cachedText.clear()
-                    lineCount =
-                        render.wrapString(text, cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight, cachedText)
-                    setBounds()
+                    // TODO: Wrap strin grendereruing
+//                    cachedText.clear()
+//                    lineCount =
+//                        render.wrapString(text, cachedX, cachedY, cachedLineBreakWidth, cachedLineHeight, cachedText)
+//                    setBounds()
                 } // TODO: Clip & Append
                 FontRenderType.CLIP -> {}
                 FontRenderType.APPEND -> {}
@@ -395,7 +396,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                     val largerLine = getLine(larger)
                     val smallerLine = getLine(smaller)
 
-                    val smallBounds = boundsOf(cachedText[smallerLine])
+                    val smallBounds = cachedText[smallerLine].fontBounds()
                     val smallerX = getXOffset(smaller)
                     val smallerY = getYOffset(smaller)
 
@@ -408,16 +409,16 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
                     )
 
                     var y =
-                        cachedY + ((cachedFontSize + cachedLineHeight) * (smallerLine + 1)) - boundsOf(cachedText[0])[1]
+                        cachedY + ((cachedFontSize + cachedLineHeight) * (smallerLine + 1)) - cachedText[0].fontBounds()[1]
 
                     // Fully selected lines
                     for (i in smallerLine + 1 until (largerLine - smallerLine) + smallerLine) {
-                        val bounds = boundsOf(cachedText[i])
+                        val bounds = cachedText[i].fontBounds()
                         rect(cachedX + bounds[0], bounds[1] + y, bounds[4], bounds[3] - bounds[1])
                         y += cachedLineHeight + cachedFontSize
                     }
 
-                    val bounds = boundsOf(cachedText[largerLine])
+                    val bounds = cachedText[largerLine].fontBounds()
 
                     // End selection
                     rect(cachedX + bounds[0], bounds[1] + y, getXOffset(larger) - bounds[0], cachedFontSize)
@@ -488,10 +489,10 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
      * [mouseY]. If out of bounds, returns the caret position.
      */
     open fun getClosestTextIndex(mouseX: Float, mouseY: Float): Int {
-        var yOffset = boundsOf(cachedText[0])[1]
+        var yOffset = cachedText[0].fontBounds()[1]
         var i = 0
         for (row in cachedText) {
-            val rowBounds = boundsOf(row)
+            val rowBounds = row.fontBounds()
             val y = cachedY + yOffset
 
             yOffset += cachedFontSize + cachedLineHeight
@@ -517,7 +518,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
             // to the mouse for the first portion of it, and the last portion of
             // the previous character.
             for (j in row.indices) {
-                val width = boundsOf(row[j].toString())[4] / 2f
+                val width = row[j].toString().fontBounds()[4] / 2f
 
                 if (mouseX >= x && mouseX <= x + width + previous) return i
 
@@ -552,7 +553,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
      */
     open fun getYOffset(index: Int): Float {
         val line = getLine(index)
-        return boundsOf(cachedText[getLine(index)])[1] + line * (cachedFontSize + cachedLineHeight)
+        return cachedText[getLine(index)].fontBounds()[1] + line * (cachedFontSize + cachedLineHeight)
     }
 
     /**
@@ -582,7 +583,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
      */
     open fun getAscend(): Float {
         UIRendererDSL.font(this)
-        return UIRendererDSL.ascender()
+        return UIRendererDSL.fontAscender()
     }
 
     /**
@@ -590,7 +591,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
      */
     open fun getDescend(): Float {
         UIRendererDSL.font(this)
-        return UIRendererDSL.descender()
+        return UIRendererDSL.fontDescender()
     }
 
     /**
@@ -611,7 +612,7 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
     }
 
     private fun setBounds() {
-        val bounds = bounds()
+        val bounds = fontBounds()
         textBounds[0] = bounds[0]
         textBounds[1] = bounds[1]
         textBounds[2] = bounds[2]

@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.style.util
 
+import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.util.extensions.nullableByteBuffer
 import java.nio.ByteBuffer
@@ -31,10 +32,10 @@ class UIFontType(val normal: String = "", val italic: String = "") {
         this.italicBuffer = italicBuffer
 
         if (normalBuffer != null) {
-            UIProvider.render.loadFont(normal, normalBuffer)
+            UIAssetDSL.font(normal, normalBuffer)
         }
         if (italicBuffer != null) {
-            UIProvider.render.loadFont(italic, italicBuffer)
+            UIAssetDSL.font(italic, italicBuffer)
             hasItalic = true
         }
         if (normalBuffer != null || italicBuffer != null) loaded = true

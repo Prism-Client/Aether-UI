@@ -5,9 +5,8 @@ import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL
+import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.renderer
-import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
@@ -83,9 +82,7 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
                     -(style.horizontalScrollbar.value * expandedWidth),
                     -(style.verticalScrollbar.value * expandedHeight)
                 ) {
-                    renderContent(fbo!!) {
-                        components.forEach(UIComponent<*>::render)
-                    }
+                    renderFBO()
                 }
                 requiresUpdate = false
             }

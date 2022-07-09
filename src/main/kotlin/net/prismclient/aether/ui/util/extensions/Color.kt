@@ -85,7 +85,7 @@ fun transition(color1: Int, color2: Int, progress: Float): Int {
 }
 
 /**
- * Returns a string of the RGBA values
+ * Returns a string of the RGBA values with the format RGBA($r, $g, $b, $a)
  */
 fun Int.toColorString() = "RGBA(${this.getRed()}, ${this.getGreen()}, ${this.getBlue()}, ${this.getAlpha()})"
 
@@ -95,6 +95,16 @@ fun Int.toColorString() = "RGBA(${this.getRed()}, ${this.getGreen()}, ${this.get
  * @see asRGBA
  */
 fun colorOf(value: Int) = UIColor(value)
+
+/**
+ * Creates a color from the given RGBA int values. 0 to 255.
+ */
+fun colorOf(r: Int, g: Int, b: Int, a: Int = 255) = UIColor(asRGBA(r, g, b, a))
+
+/**
+ * Creates a color from the given RGBA float values. 0 to 1.
+ */
+fun colorOf(r: Float, g: Float, b: Float, a: Float = 1f) = UIColor(asRGBA(r, g, b, a))
 
 /**
  * Creates a [UIColor] from a [hue], [saturation], and [brightness].

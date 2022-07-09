@@ -1,12 +1,12 @@
 package examples.deps
 
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
-import net.prismclient.aether.ui.renderer.dsl.UIComponentDSL
+import net.prismclient.aether.ui.dsl.UIAssetDSL
+import net.prismclient.aether.ui.dsl.UIComponentDSL
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
 import net.prismclient.aether.ui.util.extensions.colorOf
 import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.left
 import net.prismclient.aether.ui.util.styleOf
@@ -38,15 +38,13 @@ class Generic : UIDependable {
             "Montserrat-thin"
         )
 
-        // Load some assets into memory. Intended to support mainly JPEG, PNG, and SVG
-        renderer {
-            // Either explicitly state the type
-            // Reference the image with the name "ui"
-            loadSvg("ui", "/prism/icons/navbar/ui.svg")
-            // loadImage()
-            // or let Aether figure it out
-            // assumeLoadImage()
-        }
+        // Load some assets into memory. Aether is intended to support mainly JPEG, PNG, and SVG.
+        // Either explicitly state the type
+        // Reference the image with the name "ui"
+        UIAssetDSL.svg("ui", "/prism/icons/navbar/ui.svg")
+        // loadImage()
+        // or let Aether figure it out
+        // assumeLoadImage()
 
         // A 24x24 icon
         styleOf(UIImageSheet("icon24x")) {

@@ -38,22 +38,7 @@ class UIGradientBackground : UIBackground() {
 
     override fun render() {
         renderer {
-            render.linearGradient(
-                cachedX,
-                cachedY,
-                cachedWidth,
-                cachedHeight,
-                radius?.topLeft ?: 0f,
-                radius?.topRight ?: 0f,
-                radius?.bottomRight ?: 0f,
-                radius?.bottomLeft ?: 0f,
-                gradientXCache,
-                gradientYCache,
-                gradientWidthCache,
-                gradientHeightCache,
-                gradientStartColor,
-                gradientEndColor
-            )
+            TODO("Gradient suport")
         }
     }
 

@@ -3,11 +3,8 @@ package net.prismclient.aether.ui.component.type.input.textfield
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNCENTER
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNLEFT
-import net.prismclient.aether.ui.renderer.UIRenderer.Properties.ALIGNRIGHT
-import net.prismclient.aether.ui.renderer.dsl.UIRendererDSL.boundsOf
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
+import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.util.warn
@@ -98,20 +95,22 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
             placeholder ?: ""
         }); font.fontColor = color
 
-        val bounds = boundsOf(text.substring(0, getCaretPosition()))
+        renderer {
+            val bounds = text.substring(0, getCaretPosition()).fontBounds()
 
-        style.caret.offsetX = font.cachedX - x + when {
-            (font.textAlignment and ALIGNLEFT) != 0 -> bounds[4]
-            (font.textAlignment and ALIGNCENTER) != 0 -> bounds[4]
-            (font.textAlignment and ALIGNRIGHT) != 0 -> -bounds[4]
-            else -> 0f
-        }
-        //style.caret.offsetY = font.cachedY + boundsOf(style.font!!.cachedText)[1] - y
+//        style.caret.offsetX = font.cachedX - x + when {
+//            (font.textAlignment and ALIGNLEFT) != 0 -> bounds[4]
+//            (font.textAlignment and ALIGNCENTER) != 0 -> bounds[4]
+//            (font.textAlignment and ALIGNRIGHT) != 0 -> -bounds[4]
+//            else -> 0f
+//        }
+            //style.caret.offsetY = font.cachedY + boundsOf(style.font!!.cachedText)[1] - y
 
-        if (blink && isFocused()) style.caret.render()
-        if (timeSinceLastBlink + style.blinkRate <= System.currentTimeMillis()) {
-            blink = !blink
-            timeSinceLastBlink = System.currentTimeMillis()
+            if (blink && isFocused()) style.caret.render()
+            if (timeSinceLastBlink + style.blinkRate <= System.currentTimeMillis()) {
+                blink = !blink
+                timeSinceLastBlink = System.currentTimeMillis()
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 package net.prismclient.aether.dependencies
 
+import net.prismclient.aether.ui.dsl.UIAssetDSL
+import net.prismclient.aether.ui.util.blockFrom
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.extensions.renderer
 
@@ -8,20 +10,20 @@ import net.prismclient.aether.ui.util.extensions.renderer
  */
 class IconStyles : UIDependable {
     override fun load() {
-        renderer {
+        blockFrom(UIAssetDSL) {
             // Image
-            loadImage("background", "/prism/background.png")
+            image("background", "/prism/background.png")
 
             // Icons
-            loadSvg("bag", "/demo/icons/bag.svg")
-            loadSvg("book", "/demo/icons/book.svg")
-            loadSvg("note", "/demo/icons/note.svg")
-            loadSvg("profile", "/demo/icons/profile.svg")
-            loadSvg("setting", "/demo/icons/setting.svg")
-            loadSvg("message", "/demo/icons/message.svg")
-            loadSvg("friends", "/demo/icons/friends.svg")
-            loadSvg("trophy", "/demo/icons/trophy.svg")
-            loadSvg("recording", "/demo/icons/recording.svg")
+            image("bag", "/demo/icons/bag.svg")
+            image("book", "/demo/icons/book.svg")
+            image("note", "/demo/icons/note.svg")
+            image("profile", "/demo/icons/profile.svg")
+            image("setting", "/demo/icons/setting.svg")
+            image("message", "/demo/icons/message.svg")
+            image("friends", "/demo/icons/friends.svg")
+            image("trophy", "/demo/icons/trophy.svg")
+            image("recording", "/demo/icons/recording.svg")
         }
     }
 }
