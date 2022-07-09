@@ -183,11 +183,12 @@ object UIRendererDSL {
     }
 
     /**
-     * Supplies a [block] to create a new path within. The path will be automatically opened and closed.
+     * Creates a new path and invokes the code within the [block]. To automatically close the path
+     * set [closePath] to true. Closing the path makes a line to the initial starting point.
      *
-     * @param closePath When true, the path will be closed automatically.
+     * @param closePath Closes the path if true.
      */
-    inline fun path(closePath: Boolean = true, block: UIPathDSL.() -> Unit): UIPathDSL {
+    inline fun path(closePath: Boolean = false, block: UIPathDSL.() -> Unit): UIPathDSL {
         UIPathDSL.beginPath()
         UIPathDSL.block()
         if (closePath) UIPathDSL.closePath()

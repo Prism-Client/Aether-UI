@@ -111,6 +111,10 @@ open class Aether(val renderer: UIRenderer) {
                         component.render()
                 }
 
+                path {
+
+                }.fillPath(-1)
+
                 endFrame()
             }
         }
