@@ -103,9 +103,7 @@ object UIRendererDSL {
      * Renders the given string at the given position
      */
     fun String.render(x: Float, y: Float) {
-        path {
-            renderer.renderText(this@render, x, y)
-        }.fillPath()
+        renderer.renderText(this@render, x, y)
     }
 
     /**
@@ -171,12 +169,39 @@ object UIRendererDSL {
                 hole {
                     when (activeStrokeDirection) {
                         UIStrokeDirection.CENTER -> {
-                            rect(x - stroke / 2f, y - stroke / 2f, width + stroke, height + stroke, topLeft, topRight, bottomRight, bottomLeft)
-                            rect(x + stroke / 2f, y + stroke / 2f, width - stroke, height - stroke, topLeft, topRight, bottomRight, bottomLeft)
+                            rect(
+                                x - stroke / 2f,
+                                y - stroke / 2f,
+                                width + stroke,
+                                height + stroke,
+                                topLeft,
+                                topRight,
+                                bottomRight,
+                                bottomLeft
+                            )
+                            rect(
+                                x + stroke / 2f,
+                                y + stroke / 2f,
+                                width - stroke,
+                                height - stroke,
+                                topLeft,
+                                topRight,
+                                bottomRight,
+                                bottomLeft
+                            )
                         }
                         UIStrokeDirection.INSIDE -> {
                             rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-                            rect(x + stroke, y + stroke, width - stroke - stroke, height - stroke - stroke, topLeft, topRight, bottomRight, bottomLeft)
+                            rect(
+                                x + stroke,
+                                y + stroke,
+                                width - stroke - stroke,
+                                height - stroke - stroke,
+                                topLeft,
+                                topRight,
+                                bottomRight,
+                                bottomLeft
+                            )
                         }
                         UIStrokeDirection.OUTSIDE -> {
                             rect(
@@ -184,7 +209,10 @@ object UIRendererDSL {
                                 y - stroke,
                                 width + (stroke * 2),
                                 height + (stroke * 2),
-                                topLeft, topRight, bottomRight, bottomLeft
+                                topLeft,
+                                topRight,
+                                bottomRight,
+                                bottomLeft
                             )
                             rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
                         }
@@ -212,9 +240,12 @@ object UIRendererDSL {
             imagePattern(
                 (UIProvider.getImage(imageName)
                     ?: throw NullPointerException("No image as found with the name $imageName")).handle,
-                x, y,
-                width, height,
-                0f, 1f
+                x,
+                y,
+                width,
+                height,
+                0f,
+                1f
             )
             rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
         }.fillPaint()
@@ -291,10 +322,7 @@ object UIRendererDSL {
      * @see StrokeDirection
      */
     inline fun stroke(
-        strokeWidth: Float,
-        strokeColor: Int,
-        strokeDirection: UIStrokeDirection,
-        block: Block<UIRendererDSL>
+        strokeWidth: Float, strokeColor: Int, strokeDirection: UIStrokeDirection, block: Block<UIRendererDSL>
     ): UIRendererDSL {
         activeStrokeWidth = strokeWidth
         activeStrokeColor = strokeColor
