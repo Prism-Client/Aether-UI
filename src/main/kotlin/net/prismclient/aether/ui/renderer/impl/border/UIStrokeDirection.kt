@@ -6,6 +6,7 @@ package net.prismclient.aether.ui.renderer.impl.border
  * shape, and inside is the inside of the shape.
  *
  * @author sen
+ * @since 1.2
  */
 enum class UIStrokeDirection {
     CENTER, OUTSIDE, INSIDE

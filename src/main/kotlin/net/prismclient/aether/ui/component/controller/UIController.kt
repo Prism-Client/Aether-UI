@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.controller
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.warn
 
 /**
@@ -9,7 +10,7 @@ import net.prismclient.aether.ui.util.warn
  * and controls their state based on a given input.
  *
  * @author sen
- * @since 6/3/2022
+ * @since 1.0
  */
 abstract class UIController<T : UIComponent<*>> {
     /**
@@ -27,13 +28,8 @@ abstract class UIController<T : UIComponent<*>> {
      * @param component The [UIComponent] to be added.
      * @return The [UIController] instance.
      */
-    open fun addComponent(component: UIComponent<*>): UIController<T> {
-        try {
-            components.add(component as T)
-        } catch (_: Exception) {
-            warn("Failed to cast component to the type of this container. Make sure you're passing the right type of component.")
-        }
-        return this
+    open fun addComponent(component: UIComponent<*>) {
+        components.add(component as T)
     }
 
     /**
@@ -42,12 +38,7 @@ abstract class UIController<T : UIComponent<*>> {
      * @param component The [UIComponent] to be removed.
      * @return The [UIController] instance.
      */
-    open fun removeComponent(component: UIComponent<*>): UIController<T> {
-        try {
-            components.remove(component as T)
-        } catch (_: Exception) {
-            warn("Failed to cast component to the type of this container. Make sure you're passing the right type of component.")
-        }
-        return this
+    open fun removeComponent(component: UIComponent<*>) {
+        components.add(component as T)
     }
 }

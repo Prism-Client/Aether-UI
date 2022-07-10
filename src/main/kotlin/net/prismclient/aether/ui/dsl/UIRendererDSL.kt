@@ -1,11 +1,12 @@
 package net.prismclient.aether.ui.dsl
 
 import net.prismclient.aether.ui.Aether
-import net.prismclient.aether.ui.dsl.UIPathDSL.hole
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.UIColor
 
 /**
@@ -17,6 +18,7 @@ import net.prismclient.aether.ui.util.UIColor
  * @since 1.0
  */
 object UIRendererDSL {
+
     val renderer
         get() = Aether.instance.renderer
 
@@ -32,17 +34,21 @@ object UIRendererDSL {
 
     /**
      * The active stroke width set with [stroke]. This does not reflect the renderer's stroke width
-     * directly. This is set with [stroke].
-     *
+     * directly.
      */
     var activeStrokeWidth: Float = 0f
+
+    /**
+     * The color of the active stroke set with [stroke].
+     */
+    var activeStrokeColor: Int = 0
 
     /**
      * The active stroke direction set with [stroke].
      *
      * @see stroke
      */
-    var activeStrokeDirection: StrokeDirection = StrokeDirection.CENTER
+    var activeStrokeDirection: UIStrokeDirection = UIStrokeDirection.CENTER
 
     /**
      * Informs the renderer to prepare to render a frame of the given size.
@@ -160,20 +166,31 @@ object UIRendererDSL {
             rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
         }.fillPath()
         if (isStroke) {
+            val stroke = activeStrokeWidth
             path {
                 hole {
-//                    when (activeStrokeDirection) {
-//                        StrokeDirection.CENTER -> {
-////                            rect()
-//                        }
-//                        StrokeDirection.INSIDE -> {}
-//                        StrokeDirection.OUTSIDE -> {
-                            renderer.rect(x - activeStrokeWidth, y - activeStrokeWidth, width + activeStrokeWidth, height + activeStrokeWidth, topLeft, topRight, bottomRight, bottomLeft)
-                            renderer.rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-//                        }
-//                    }
+                    when (activeStrokeDirection) {
+                        UIStrokeDirection.CENTER -> {
+                            rect(x - stroke / 2f, y - stroke / 2f, width + stroke, height + stroke, topLeft, topRight, bottomRight, bottomLeft)
+                            rect(x + stroke / 2f, y + stroke / 2f, width - stroke, height - stroke, topLeft, topRight, bottomRight, bottomLeft)
+                        }
+                        UIStrokeDirection.INSIDE -> {
+                            rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+                            rect(x + stroke, y + stroke, width - stroke - stroke, height - stroke - stroke, topLeft, topRight, bottomRight, bottomLeft)
+                        }
+                        UIStrokeDirection.OUTSIDE -> {
+                            rect(
+                                x - stroke,
+                                y - stroke,
+                                width + (stroke * 2),
+                                height + (stroke * 2),
+                                topLeft, topRight, bottomRight, bottomLeft
+                            )
+                            rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+                        }
+                    }
                 }
-            }.fillPath()
+            }.fillPath(activeStrokeColor)
         }
     }
 
@@ -252,7 +269,7 @@ object UIRendererDSL {
     /**
      * Saves the state (and automatically restores it) and translates the [block] by the given [x] and [y] values.
      */
-    inline fun translate(x: Float, y: Float, block: UIRendererDSL.() -> Unit): UIRendererDSL = save {
+    inline fun translate(x: Float, y: Float, block: Block<UIRendererDSL>): UIRendererDSL = save {
         renderer.translate(x, y)
         block()
     }
@@ -262,7 +279,7 @@ object UIRendererDSL {
      * Scissors (clips) any content that exceeds the give bounds.
      */
     inline fun scissor(
-        x: Float, y: Float, width: Float, height: Float, block: UIRendererDSL.() -> Unit
+        x: Float, y: Float, width: Float, height: Float, block: Block<UIRendererDSL>
     ): UIRendererDSL = save {
         renderer.scissor(x, y, width, height)
         block()
@@ -273,24 +290,18 @@ object UIRendererDSL {
      *
      * @see StrokeDirection
      */
-    inline fun stroke(strokeWidth: Float, strokeDirection: StrokeDirection, block: UIRendererDSL.() -> Unit): UIRendererDSL {
+    inline fun stroke(
+        strokeWidth: Float,
+        strokeColor: Int,
+        strokeDirection: UIStrokeDirection,
+        block: Block<UIRendererDSL>
+    ): UIRendererDSL {
         activeStrokeWidth = strokeWidth
+        activeStrokeColor = strokeColor
         activeStrokeDirection = strokeDirection
         isStroke = true
         block()
         isStroke = false
         return this
-    }
-
-    /**
-     * The direction to align a stroke via a [stroke] block.
-     *
-     * @since 1.2
-     * @author sen
-     */
-    enum class StrokeDirection {
-        CENTER,
-        INSIDE,
-        OUTSIDE
     }
 }

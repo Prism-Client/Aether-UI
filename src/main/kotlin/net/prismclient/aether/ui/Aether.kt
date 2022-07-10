@@ -104,40 +104,11 @@ open class Aether(val renderer: UIRenderer) {
         renderer {
             if (activeScreen != null) {
                 beginFrame(width, height, devicePxRatio)
-//                for (i in 0 until components!!.size) {
-//                    val component = components!![i]
-//                    if (component.visible)
-//                        component.render()
-//                }
-
-                var x = 50f
-                val y = 50f
-                val w = 100f
-                val h = 100f
-                val stroke = 10f
-
-                color(-1)
-                rect(x, y, w, h)
-
-                path {
-                    hole {
-                        rect(x, y, w, h)
-                        rect(x + stroke, y + stroke, w - stroke - stroke, h - stroke - stroke)
-                    }
-                }.fillPath(asRGBA(255, 0, 0))
-
-                x += 150f
-
-                color(asRGBA(1f, 1f, 1f, 0.5f))
-                rect(x, y, w, h)
-
-                path {
-                    hole {
-                        rect(x - stroke / 2f, y - stroke / 2f, w + stroke, h + stroke)
-//                        rect(x + stroke / 2f, y + stroke / 2f, w - stroke, h - stroke)
-                    }
-                }.fillPath(asRGBA(0, 255, 0))
-
+                for (i in 0 until components!!.size) {
+                    val component = components!![i]
+                    if (component.visible)
+                        component.render()
+                }
                 endFrame()
             }
         }
@@ -146,7 +117,7 @@ open class Aether(val renderer: UIRenderer) {
     /**
      * Invoked when the mouse is moved. Invokes all components regardless of their
      * eligibility to be focused or bubbled. The [Properties.mouseX] and [Properties.mouseY]
-     * properties can be found in [Aether.Properties]
+     * properties can be found in [Aether.Properties].
      */
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)

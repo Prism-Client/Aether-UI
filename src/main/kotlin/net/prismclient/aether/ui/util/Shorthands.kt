@@ -162,3 +162,9 @@ fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block: UIAni
     UIProvider.registerAnimation(animationName, animation)
     return animation
 }
+
+/**
+ * Type alias for a function which has a receiver of [T] and accepts, and returns
+ * nothing. The block is intended to apply properties to the receiver [T].
+ */
+typealias Block<T> = T.() -> Unit

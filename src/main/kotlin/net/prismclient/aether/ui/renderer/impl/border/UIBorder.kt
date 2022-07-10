@@ -31,10 +31,9 @@ class UIBorder : UIShape<UIBorder>(), UIAnimatable<UIBorder> {
 
     fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
         renderer {
-            // TODO: Implement border rendering
-//            stroke(borderColor?.rgba ?: 0, cachedBorderWidth, borderDirection) {
-//                rect(x, y, width, height, radius)
-//            }
+            stroke(cachedBorderWidth, borderColor?.rgba ?: 0, borderDirection) {
+                rect(x, y, width, height, radius)
+            }
         }
     }
 

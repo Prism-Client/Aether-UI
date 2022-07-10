@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.component.controller.impl.selection
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
+import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.function.Consumer
 
 /**
@@ -11,7 +12,7 @@ import java.util.function.Consumer
  * selected at a time, like a radio .
  *
  * @author sen
- * @since 6/3/2022
+ * @since 1.0
  * @param T The type of component you want to control. Leave T as UIComponent<*> to allow any component to be selected.
  */
 class UISelectableController<T : UIComponent<*>> : UIController<T>() {
@@ -45,12 +46,7 @@ class UISelectableController<T : UIComponent<*>> : UIController<T>() {
     /**
      * Selects the given component and notifies all the other component to deselect
      */
-    fun selectComponent(component: UIComponent<*>) {
-        try {
-            selectedComponent = component as T
-        } catch (_: Exception) {
-            throw ClassCastException("Failed to cast $component to the current type of this controller. Make sure you're passing in the correct type of component.")
-        }
+    fun selectComponent(component: T) {
         // Invoke the selected action on the selected component
         selectedComponentAction?.accept(component)
 
