@@ -101,7 +101,7 @@ interface UIRenderer {
      */
     fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData
 
-    fun deleteImage(imageData: UIImageData)
+    fun deleteImage(imageData: String)
 
     /**
      * Creates a svg from the given [svgName] and [data].
@@ -110,10 +110,10 @@ interface UIRenderer {
      */
     fun createSvg(svgName: String, data: ByteBuffer?, scale: Float): UIImageData
 
-    // TODO: Create image from handle
-//    fun createImageFromHandle(handle: Int, imageWidth: Int, imageHeight: Int)
-
-//    fun deleteImageFromHandle(handle: Int)
+    /**
+     * Creates an image from an existing OpenGL image.
+     */
+    fun createImageFromHandle(imageName: String, handle: Int, imageWidth: Int, imageHeight: Int): UIImageData
 
     /**
      * Creates a font from the given [fontData], with the name [fontName].
@@ -246,9 +246,11 @@ interface UIRenderer {
     fun strokeColor(color: Int)
 
     /**
-     * Changes the path winding to the given [WindingOrder]
+     * When enabled the odd sub-path fills as a hole to the previous path. For example, if
+     * a rectangle is drawn, and a circle is drawn within it after, the circle will make a
+     * hole within the rectangle where it was.
      */
-    fun pathWinding(winding: WindingOrder)
+    fun pathHole(value: Boolean)
 
     /**
      * Creates a new sub-path with the given [x], and [y].

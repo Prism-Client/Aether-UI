@@ -10,7 +10,6 @@ import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.renderer.UIProvider
-import net.prismclient.aether.ui.util.blockFrom
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
@@ -87,15 +86,15 @@ open class Aether(val renderer: UIRenderer) {
      * This must be invoked before the rendering of the screen. It updates all active frames.
      */
     open fun renderFrames() {
-//        renderer {
-//            frames?.forEach {
-//                if (it.visible && it.requiresUpdate && it.style.useFBO) {
-//                    beginFrame(width, height, devicePxRatio)
-//                    it.renderContent()
-//                    endFrame()
-//                }
-//            }
-//        }
+        renderer {
+            frames?.forEach {
+                if (it.visible && it.requiresUpdate && it.style.useFBO) {
+                    beginFrame(width, height, devicePxRatio)
+                    it.renderContent()
+                    endFrame()
+                }
+            }
+        }
     }
 
     /**
@@ -110,7 +109,6 @@ open class Aether(val renderer: UIRenderer) {
                     if (component.visible)
                         component.render()
                 }
-
                 endFrame()
             }
         }
@@ -119,7 +117,7 @@ open class Aether(val renderer: UIRenderer) {
     /**
      * Invoked when the mouse is moved. Invokes all components regardless of their
      * eligibility to be focused or bubbled. The [Properties.mouseX] and [Properties.mouseY]
-     * properties can be found in [Aether.Properties]
+     * properties can be found in [Aether.Properties].
      */
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)

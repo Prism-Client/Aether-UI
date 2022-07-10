@@ -3,11 +3,11 @@ package net.prismclient.aether.ui.dsl
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
+import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.UIColor
-import net.prismclient.aether.ui.util.extensions.asRGBA
-import net.prismclient.aether.ui.util.extensions.toColorString
 
 /**
  * [UIRendererDSL] wraps the [UIRenderer] class to minimize the amount of calls
@@ -18,11 +18,37 @@ import net.prismclient.aether.ui.util.extensions.toColorString
  * @since 1.0
  */
 object UIRendererDSL {
+
     val renderer
         get() = Aether.instance.renderer
 
     var color: Int = 0
         private set
+
+    /**
+     * Informs the [UIRendererDSL] that the active calls are a stroke. This is set with [stroke].
+     *
+     * @see stroke
+     */
+    var isStroke: Boolean = false
+
+    /**
+     * The active stroke width set with [stroke]. This does not reflect the renderer's stroke width
+     * directly.
+     */
+    var activeStrokeWidth: Float = 0f
+
+    /**
+     * The color of the active stroke set with [stroke].
+     */
+    var activeStrokeColor: Int = 0
+
+    /**
+     * The active stroke direction set with [stroke].
+     *
+     * @see stroke
+     */
+    var activeStrokeDirection: UIStrokeDirection = UIStrokeDirection.CENTER
 
     /**
      * Informs the renderer to prepare to render a frame of the given size.
@@ -56,14 +82,21 @@ object UIRendererDSL {
     // -- Font -- //
 
     /**
+     * Applies the given font values to the active context.
+     */
+    fun font(fontFace: String, fontSize: Float, fontAlign: Int, fontSpacing: Float) {
+        renderer.fontFace(fontFace)
+        renderer.fontSize(fontSize)
+        renderer.fontAlignment(fontAlign)
+        renderer.fontSpacing(fontSpacing)
+    }
+
+    /**
      * Applies the property of the given [font] to the active context.
      */
     fun font(font: UIFont) {
         color(font.fontColor)
-        renderer.fontFace(font.fontName)
-        renderer.fontSize(font.cachedFontSize)
-        renderer.fontSpacing(font.cachedFontSpacing)
-        renderer.fontAlignment(font.textAlignment)
+        font(font.fontName, font.cachedFontSize, font.textAlignment, font.cachedFontSpacing)
     }
 
     /**
@@ -132,6 +165,33 @@ object UIRendererDSL {
         path {
             rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
         }.fillPath()
+        if (isStroke) {
+            val stroke = activeStrokeWidth
+            path {
+                hole {
+                    when (activeStrokeDirection) {
+                        UIStrokeDirection.CENTER -> {
+                            rect(x - stroke / 2f, y - stroke / 2f, width + stroke, height + stroke, topLeft, topRight, bottomRight, bottomLeft)
+                            rect(x + stroke / 2f, y + stroke / 2f, width - stroke, height - stroke, topLeft, topRight, bottomRight, bottomLeft)
+                        }
+                        UIStrokeDirection.INSIDE -> {
+                            rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+                            rect(x + stroke, y + stroke, width - stroke - stroke, height - stroke - stroke, topLeft, topRight, bottomRight, bottomLeft)
+                        }
+                        UIStrokeDirection.OUTSIDE -> {
+                            rect(
+                                x - stroke,
+                                y - stroke,
+                                width + (stroke * 2),
+                                height + (stroke * 2),
+                                topLeft, topRight, bottomRight, bottomLeft
+                            )
+                            rect(x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+                        }
+                    }
+                }
+            }.fillPath(activeStrokeColor)
+        }
     }
 
     /**
@@ -183,11 +243,12 @@ object UIRendererDSL {
     }
 
     /**
-     * Supplies a [block] to create a new path within. The path will be automatically opened and closed.
+     * Creates a new path and invokes the code within the [block]. To automatically close the path
+     * set [closePath] to true. Closing the path makes a line to the initial starting point.
      *
-     * @param closePath When true, the path will be closed automatically.
+     * @param closePath Closes the path if true.
      */
-    inline fun path(closePath: Boolean = true, block: UIPathDSL.() -> Unit): UIPathDSL {
+    inline fun path(closePath: Boolean = false, block: UIPathDSL.() -> Unit): UIPathDSL {
         UIPathDSL.beginPath()
         UIPathDSL.block()
         if (closePath) UIPathDSL.closePath()
@@ -195,32 +256,52 @@ object UIRendererDSL {
     }
 
     /**
-     * Automatically saves and restores the state within this block
+     * Automatically saves and restores the state within this block. Any translations
+     * and other states such as scissor are saved within the state.
      */
-    inline fun save(block: UIComponentDSL.() -> Unit): UIComponentDSL {
+    inline fun save(block: UIRendererDSL.() -> Unit): UIRendererDSL {
         renderer.save()
-        UIComponentDSL.block()
+        UIRendererDSL.block()
         renderer.restore()
-        return UIComponentDSL
-    }
-
-    inline fun translate(x: Float, y: Float, block: UIComponentDSL.() -> Unit): UIRendererDSL {
-        save {
-            renderer.translate(x, y)
-            block()
-        }
         return this
     }
+
+    /**
+     * Saves the state (and automatically restores it) and translates the [block] by the given [x] and [y] values.
+     */
+    inline fun translate(x: Float, y: Float, block: Block<UIRendererDSL>): UIRendererDSL = save {
+        renderer.translate(x, y)
+        block()
+    }
+
 
     /**
      * Scissors (clips) any content that exceeds the give bounds.
      */
     inline fun scissor(
-        x: Float, y: Float, width: Float, height: Float, block: UIComponentDSL.() -> Unit
+        x: Float, y: Float, width: Float, height: Float, block: Block<UIRendererDSL>
+    ): UIRendererDSL = save {
+        renderer.scissor(x, y, width, height)
+        block()
+    }
+
+    /**
+     * Informs [UIRendererDSL] that anything within this [block] is should be a stroke.
+     *
+     * @see StrokeDirection
+     */
+    inline fun stroke(
+        strokeWidth: Float,
+        strokeColor: Int,
+        strokeDirection: UIStrokeDirection,
+        block: Block<UIRendererDSL>
     ): UIRendererDSL {
-        save {
-            UIComponentDSL.block()
-        }
+        activeStrokeWidth = strokeWidth
+        activeStrokeColor = strokeColor
+        activeStrokeDirection = strokeDirection
+        isStroke = true
+        block()
+        isStroke = false
         return this
     }
 }

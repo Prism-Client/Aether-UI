@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.dsl
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
+import net.prismclient.aether.ui.component.controller.impl.selection.UISelectableController
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.type.input.button.UIButton
@@ -44,6 +45,7 @@ object UIComponentDSL {
 
     @JvmStatic
     var activeController: UIController<*>? = null
+
     @JvmStatic
     var activeStyle: String? = null
 
@@ -109,13 +111,11 @@ object UIComponentDSL {
         check()
         val activeComponent = getActiveComponent()
         val activeFrame = getActiveFrame()
-        if (activeComponent != null)
-            component.parent = activeComponent
-        else if (activeFrame != null)
-            activeFrame.addComponent(component)
+        if (activeComponent != null) component.parent = activeComponent
+        else if (activeFrame != null) activeFrame.addComponent(component)
         else Aether.instance.components!!.add(component)
         if (component is UIFrame) Aether.instance.frames!!.add(component)
-        if (activeController != null && !ignoreController) activeController!!.addComponent(component)
+        if (activeController != null && !ignoreController) activeController!!.addComponent(component as UIComponent<UIStyleSheet>)
         updateState(component)
     }
 
@@ -149,15 +149,11 @@ object UIComponentDSL {
      *
      * @see ignore
      */
-    inline fun <T : UIComponent<*>> controller(
-        controller: UIController<T>,
-        block: UIController<T>.() -> Unit
-    ): UIController<T> {
+    inline fun <C : UIController<T>, T : UIComponent<*>> controller(controller: C, block: C.() -> Unit) {
         Aether.instance.controllers!!.add(controller)
         activeController = controller
         controller.block()
         activeController = null
-        return controller
     }
 
     /**
@@ -187,9 +183,7 @@ object UIComponentDSL {
     /**
      * Loads the [dependable].
      */
-    fun include(dependable: UIDependable) {
-        dependable.load()
-    }
+    fun include(dependable: UIDependable) = dependable.load()
 
     private fun getActiveComponent(): UIComponent<*>? =
         if (componentStack.isNullOrEmpty()) null else componentStack!!.peek()
@@ -203,7 +197,7 @@ object UIComponentDSL {
         if (componentStack == null || frameStack == null) throw UninitializedPropertyAccessException()
     }
 
-    /* Components */
+    // -- Components -- //
 
     /**
      * Creates a [UILabel] with the provided [text].
@@ -248,14 +242,8 @@ object UIComponentDSL {
      */
     @JvmOverloads
     inline fun slider(
-        value: Float,
-        min: Float,
-        max: Float,
-        step: Float,
-        style: String? = activeStyle,
-        block: UISlider.() -> Unit = {}
-    ) =
-        component(UISlider(value, min, max, step, style), block)
+        value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}
+    ) = component(UISlider(value, min, max, step, style), block)
 
     /**
      * Creates a [UIImage] with the [imageName] as the image to be rendered.
@@ -282,12 +270,21 @@ object UIComponentDSL {
         listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
         style: String? = activeStyle,
         block: UIListLayout.() -> Unit = {}
-    ) =
-        component(UIListLayout(listDirection, listOrder, style), block)
+    ) = component(UIListLayout(listDirection, listOrder, style), block)
 
     /**
      * Creates a copy of the given layout and creates a normal block of [UIAutoLayout] where
      * components can be defined.
      */
     inline fun autoLayout(layout: UIAutoLayout, block: UIAutoLayout.() -> Unit) = component(layout.copy(), block)
+
+    /**
+     * Creates a [UISelectableController] which is a controller that has a single selected
+     * component, while all the others components are considered deselected.
+     *
+     * @see controller
+     * @see UISelectableController
+     */
+    inline fun <T : UIComponent<*>> selectable(block: UISelectableController<T>.() -> Unit) =
+        controller(UISelectableController(), block)
 }

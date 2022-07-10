@@ -5,10 +5,7 @@ import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.util.extensions.getAlpha
-import net.prismclient.aether.ui.util.extensions.getBlue
-import net.prismclient.aether.ui.util.extensions.getGreen
-import net.prismclient.aether.ui.util.extensions.getRed
+import net.prismclient.aether.ui.util.extensions.*
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.nanovg.NanoVGGL3.*
@@ -55,13 +52,15 @@ class NanoVGRenderer : UIRenderer {
 
     override fun color(color: Int) {
         activeColor = color
-        nvgFillColor(ctx, nvgRGBA(
-            color.getRed().toByte(),
-            color.getGreen().toByte(),
-            color.getBlue().toByte(),
-            color.getAlpha().toByte(),
-            this.fillColor
-        ))
+        nvgFillColor(
+            ctx, nvgRGBA(
+                color.getRed().toByte(),
+                color.getGreen().toByte(),
+                color.getBlue().toByte(),
+                color.getAlpha().toByte(),
+                this.fillColor
+            )
+        )
     }
 
     override fun globalAlpha(alpha: Float) = nvgGlobalAlpha(ctx, alpha)
@@ -117,7 +116,10 @@ class NanoVGRenderer : UIRenderer {
     }
 
     override fun bindFBO(fbo: UIContentFBO) {
-        nvgluBindFramebuffer(ctx, framebuffers[fbo] ?: throw NullPointerException("Unable to find the framebuffer $fbo."))
+        nvgluBindFramebuffer(
+            ctx,
+            framebuffers[fbo] ?: throw NullPointerException("Unable to find the framebuffer $fbo.")
+        )
         GL11.glViewport(0, 0, fbo.width.toInt(), fbo.height.toInt())
         GL11.glClearColor(0f, 0f, 0f, 0f)
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
@@ -132,23 +134,29 @@ class NanoVGRenderer : UIRenderer {
         imageData.buffer = STBImage.stbi_load_from_memory(data, width, height, intArrayOf(0), 4)
         imageData.width = width[0]
         imageData.height = height[0]
-        imageData.handle = nvgCreateImageRGBA(ctx, imageData.width, imageData.height, flags, imageData.buffer ?: throw NullPointerException("Failed to load image. Is it corrupted?"))
+        imageData.handle = nvgCreateImageRGBA(
+            ctx,
+            imageData.width,
+            imageData.height,
+            flags,
+            imageData.buffer ?: throw NullPointerException("Failed to load image. Is it corrupted?")
+        )
         imageData.loaded = true
         UIProvider.registerImage(imageName, imageData)
         return imageData
     }
 
-    override fun deleteImage(imageData: UIImageData) {
-        TODO("Not yet implemented")
+    override fun deleteImage(imageName: String) {
+        nvgDeleteImage(ctx, UIProvider.getImage(imageName)?.handle ?: return)
+        UIProvider.deleteImage(imageName)
     }
 
-    // TODO: optimize rasterizer
     override fun createSvg(svgName: String, data: ByteBuffer?, scale: Float): UIImageData {
         val image = UIImageData()
         image.buffer = data
         image.imageType = UIImageData.ImageType.Svg
         val img: NSVGImage?
-        val stack = MemoryStack.stackPush().use {
+        MemoryStack.stackPush().use {
             if (image.buffer == null) {
                 println("Failed to load the svg: $svgName")
                 return image
@@ -185,13 +193,13 @@ class NanoVGRenderer : UIRenderer {
         return image
     }
 
-//    override fun createImageFromHandle(handle: Int, imageWidth: Int, imageHeight: Int) {
-//        nvglCreateImageFromHandle(ctx, handle, imageWidth, imageHeight, 0)
-//    }
-
-//    override fun deleteImageFromHandle(handle: Int) {
-//
-//    }
+    override fun createImageFromHandle(imageName: String, handle: Int, imageWidth: Int, imageHeight: Int): UIImageData {
+        val image = UIImageData()
+        image.handle = nnvglCreateImageFromHandle(ctx, handle, imageWidth, imageHeight, 0)
+        image.imageType = UIImageData.ImageType.Image
+        image.loaded = true
+        return image
+    }
 
     override fun createFont(fontName: String, fontData: ByteBuffer?): Boolean {
         if (fontData == null) {
@@ -306,8 +314,8 @@ class NanoVGRenderer : UIRenderer {
         nvgStrokeColor(ctx, strokeColor)
     }
 
-    override fun pathWinding(winding: UIRenderer.WindingOrder) =
-        nvgPathWinding(ctx, if (winding == UIRenderer.WindingOrder.CW) NVG_CW else NVG_CCW)
+    override fun pathHole(value: Boolean) =
+        nvgPathWinding(ctx, if (value) NVG_HOLE else NVG_SOLID)
 
     override fun moveTo(x: Float, y: Float) = nvgMoveTo(ctx, x, y)
 
@@ -403,4 +411,6 @@ class NanoVGRenderer : UIRenderer {
         )
         return nvgColor
     }
+
+
 }
