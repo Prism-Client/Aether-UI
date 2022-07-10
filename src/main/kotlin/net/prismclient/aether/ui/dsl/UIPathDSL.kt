@@ -10,17 +10,20 @@ import net.prismclient.aether.ui.renderer.UIRenderer
  * @since 1.2
  */
 object UIPathDSL {
+    @JvmStatic
     val renderer
         get() = Aether.instance.renderer
 
     /**
      * Clears the active path and begins a new one.
      */
+    @JvmStatic
     fun beginPath() = renderer.beginPath()
 
     /**
      * Closes the current sub-path with a line segment.
      */
+    @JvmStatic
     fun closePath() = renderer.closePath()
 
     /**
@@ -31,6 +34,7 @@ object UIPathDSL {
      * @see strokePaint
      * @see UIRendererDSL.color
      */
+    @JvmStatic
     fun fillPath() = fillPath(UIRendererDSL.color)
 
     /**
@@ -40,6 +44,7 @@ object UIPathDSL {
      * @see strokePath
      * @see strokePaint
      */
+    @JvmStatic
     fun fillPath(color: Int) {
         renderer.fillColor(color)
         renderer.fill()
@@ -52,6 +57,7 @@ object UIPathDSL {
      * @see strokePath
      * @see strokePaint
      */
+    @JvmStatic
     fun fillPaint() = renderer.fillPaint()
 
     /**
@@ -59,6 +65,7 @@ object UIPathDSL {
      *
      * @see UIRendererDSL.color
      */
+    @JvmStatic
     fun strokePath() = strokePath(UIRendererDSL.color)
 
     /**
@@ -69,6 +76,7 @@ object UIPathDSL {
      * @see strokePaint
      * @see strokeWidth
      */
+    @JvmStatic
     fun strokePath(color: Int) {
         renderer.strokeColor(color)
         renderer.stroke()
@@ -82,31 +90,37 @@ object UIPathDSL {
      * @see strokePath
      * @see strokeWidth
      */
+    @JvmStatic
     fun strokePaint() = renderer.strokePaint()
 
     /**
      * Sets the stroke width to the given value.
      */
+    @JvmStatic
     fun strokeWidth(width: Float) = renderer.strokeWidth(width)
 
     /**
      * Sets the line cap to the given [cap]
      */
+    @JvmStatic
     fun lineCap(cap: UIRenderer.LineCap) = renderer.lineCap(cap)
 
     /**
      * Creates a new sub-path with this as the first point.
      */
+    @JvmStatic
     fun moveTo(x: Float, y: Float) = renderer.moveTo(x, y)
 
     /**
      * Adds a line segment to the active path.
      */
+    @JvmStatic
     fun lineTo(x: Float, y: Float) = renderer.lineTo(x, y)
 
     /**
      * Adds a cubic bezier line segment to the active path.
      */
+    @JvmStatic
     fun bezierTo(x: Float, y: Float, x1: Float, y1: Float, x2: Float, y2: Float) =
         renderer.bezierTo(x, y, x1, y1, x2, y2)
 
@@ -116,11 +130,13 @@ object UIPathDSL {
      * @param x The control x-coordinate.
      * @param y The control y-coordinate.
      */
+    @JvmStatic
     fun quadTo(x: Float, y: Float, x1: Float, y1: Float) = renderer.quadTo(x, y, x1, y1)
 
     /**
      * Adds an arc segment at the corner defined by the last path point.
      */
+    @JvmStatic
     fun arcTo(x: Float, y: Float, x1: Float, y1: Float, radius: Float) = renderer.arcTo(x, y, x1, y1, radius)
 
     /**
@@ -128,6 +144,7 @@ object UIPathDSL {
      * [radius], and the arc is draw from angle [startAngle] to [endAngle]. The arc is drawn in the direction
      * of [UIRenderer.WindingOrder]. The angles are represented in radians.
      */
+    @JvmStatic
     fun arc(
         x: Float, y: Float, radius: Float, startAngle: Float, endAngle: Float, windingOrder: UIRenderer.WindingOrder
     ) = renderer.arc(x, y, radius, startAngle, endAngle, windingOrder)
@@ -135,6 +152,7 @@ object UIPathDSL {
     /**
      * Renders a rectangle with a single radius value.
      */
+    @JvmStatic
     @JvmOverloads
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) =
         rect(x, y, width, height, radius, radius, radius, radius)
@@ -142,6 +160,7 @@ object UIPathDSL {
     /**
      * Creates a varying rounded rectangle shaped sub-path.
      */
+    @JvmStatic
     fun rect(
         x: Float,
         y: Float,
@@ -156,8 +175,10 @@ object UIPathDSL {
     /**
      * Creates an ellipse shaped sub-path.
      */
+    @JvmStatic
     fun ellipse(x: Float, y: Float, width: Float, height: Float) = renderer.ellipse(x, y, width, height)
 
+    @JvmStatic
     fun imagePattern(imageHandle: Int, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float) =
         renderer.imagePattern(imageHandle, x, y, width, height, angle, alpha)
 
@@ -165,6 +186,7 @@ object UIPathDSL {
      * Creates a linear gradient for the active path with the [x] and [y] as the
      * starting point and the [x2] and [y2] as the ending point.
      */
+    @JvmStatic
     fun linearGradient(x: Float, y: Float, x2: Float, y2: Float, startColor: Int, endColor: Int) =
         renderer.linearGradient(x, y, x2, y2, startColor, endColor)
 
@@ -174,6 +196,7 @@ object UIPathDSL {
      * @param x The x-axis coordinate of the center of the circle.
      * @param y The y-axis coordinate of the center of the circle.
      */
+    @JvmStatic
     fun radialGradient(x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int) =
         renderer.radialGradient(x, y, innerRadius, outerRadius, startColor, endColor)
 
@@ -192,6 +215,7 @@ object UIPathDSL {
      *
      * @see <a href="https://github.com/memononen/nanovg#understanding-composite-paths">See NanoVG Composite paths</a>
      */
+    @JvmStatic
     inline fun hole(block: UIPathDSL.() -> Unit): UIPathDSL {
         block()
         renderer.pathHole(true)

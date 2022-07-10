@@ -23,22 +23,16 @@ abstract class UIController<T : UIComponent<*>> {
         protected set
 
     /**
-     * Adds a [UIComponent] to the list of [UIComponent]s to be controlled.
-     *
-     * @param component The [UIComponent] to be added.
-     * @return The [UIController] instance.
+     * Adds a [component] to the list of [UIComponent]. The [component] is expected to be an instance of [T].
      */
     open fun addComponent(component: UIComponent<*>) {
         components.add(component as T)
     }
 
     /**
-     * Removes a [UIComponent] from the list of [UIComponent]s to be controlled.
-     *
-     * @param component The [UIComponent] to be removed.
-     * @return The [UIController] instance.
+     * Removes the given [component] if it was found within the list.
      */
     open fun removeComponent(component: UIComponent<*>) {
-        components.add(component as T)
+        components.remove(component)
     }
 }

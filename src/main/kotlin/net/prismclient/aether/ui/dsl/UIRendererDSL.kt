@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.dsl
 
 import net.prismclient.aether.ui.Aether
+import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
@@ -18,10 +19,11 @@ import net.prismclient.aether.ui.util.UIColor
  * @since 1.0
  */
 object UIRendererDSL {
-
+    @JvmStatic
     val renderer
         get() = Aether.instance.renderer
 
+    @JvmStatic
     var color: Int = 0
         private set
 
@@ -30,17 +32,20 @@ object UIRendererDSL {
      *
      * @see stroke
      */
+    @JvmStatic
     var isStroke: Boolean = false
 
     /**
      * The active stroke width set with [stroke]. This does not reflect the renderer's stroke width
      * directly.
      */
+    @JvmStatic
     var activeStrokeWidth: Float = 0f
 
     /**
      * The color of the active stroke set with [stroke].
      */
+    @JvmStatic
     var activeStrokeColor: Int = 0
 
     /**
@@ -48,6 +53,7 @@ object UIRendererDSL {
      *
      * @see stroke
      */
+    @JvmStatic
     var activeStrokeDirection: UIStrokeDirection = UIStrokeDirection.CENTER
 
     /**
@@ -55,17 +61,20 @@ object UIRendererDSL {
      *
      * @param devicePxRatio The device pixel ratio of the device.
      */
+    @JvmStatic
     fun beginFrame(displayWidth: Float, displayHeight: Float, devicePxRatio: Float) =
         renderer.beginFrame(displayWidth, displayHeight, devicePxRatio)
 
     /**
      * Informs the renderer to render all the calls, and flush the paths.
      */
+    @JvmStatic
     fun endFrame() = renderer.endFrame()
 
     /**
      * Sets the fill color to the given color.
      */
+    @JvmStatic
     fun color(color: Int) {
         UIRendererDSL.color = color
         renderer.color(color)
@@ -74,6 +83,7 @@ object UIRendererDSL {
     /**
      * Sets the fill color to the given color.
      */
+    @JvmStatic
     fun color(color: UIColor?) = color(color?.rgba ?: 0)
 
     // -- Image -- //
@@ -84,6 +94,7 @@ object UIRendererDSL {
     /**
      * Applies the given font values to the active context.
      */
+    @JvmStatic
     fun font(fontFace: String, fontSize: Float, fontAlign: Int, fontSpacing: Float) {
         renderer.fontFace(fontFace)
         renderer.fontSize(fontSize)
@@ -94,6 +105,8 @@ object UIRendererDSL {
     /**
      * Applies the property of the given [font] to the active context.
      */
+
+    @JvmStatic
     fun font(font: UIFont) {
         color(font.fontColor)
         font(font.fontName, font.cachedFontSize, font.textAlignment, font.cachedFontSpacing)
@@ -102,33 +115,70 @@ object UIRendererDSL {
     /**
      * Renders the given string at the given position
      */
-    fun String.render(x: Float, y: Float) {
-        renderer.renderText(this@render, x, y)
+    @JvmStatic
+    fun String.render(x: Float, y: Float) = renderer.renderText(this@render, x, y)
+
+    /**
+     * Aligns the given string based on the [alignment] within the [width] and [height] boundaries.
+     */
+    @JvmStatic
+    fun String.render(alignment: UIAlignment, x: Float, y: Float, width: Float, height: Float) {
+        val alignedX: Float = when (alignment) {
+            UIAlignment.TOPCENTER, UIAlignment.CENTER, UIAlignment.BOTTOMCENTER -> width / 2f
+            UIAlignment.TOPRIGHT, UIAlignment.MIDDLERIGHT, UIAlignment.BOTTOMRIGHT -> width
+            else -> 0f
+        } + x
+        val alignedY: Float = when (alignment) {
+            UIAlignment.MIDDLELEFT, UIAlignment.CENTER, UIAlignment.MIDDLERIGHT -> height / 2f
+            UIAlignment.BOTTOMLEFT, UIAlignment.BOTTOMCENTER, UIAlignment.BOTTOMRIGHT -> height
+            else -> 0f
+        } + y
+
+        this.render(alignedX, alignedY)
     }
 
     /**
      * Returns the bounds of the most recent text render call
      */
+    @JvmStatic
     fun fontBounds(): FloatArray = renderer.fontBounds()
 
     /**
      * Returns the bounds of the given text. This is considered as text render call, so subsequent calls
      * to functions such as [fontBounds] and [fontAscender] will return the metrics of this.
      */
+    @JvmStatic
     fun String.fontBounds(): FloatArray = renderer.fontBounds(this)
+
+    /**
+     * Returns the width of the most recent text render call.
+     *
+     * @see fontBounds
+     */
+    @JvmStatic
+    fun fontWidth(): Float = fontBounds()[2] - fontBounds()[0]
+
+    /**
+     * Returns the height of the most recent text render call.
+     */
+    @JvmStatic
+    fun fontHeight(): Float = fontBounds()[3] - fontBounds()[1]
 
     /**
      * Returns the ascender of the most recent text render call.
      */
+    @JvmStatic
     fun fontAscender(): Float = renderer.fontAscender()
 
     /**
      * Returns the descender of the most recent text render call.
      */
+    @JvmStatic
     fun fontDescender(): Float = renderer.fontDescender()
 
     // -- General Rendering -- //
 
+    @JvmStatic
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(
         x,
         y,
@@ -143,6 +193,7 @@ object UIRendererDSL {
     /**
      * Renders a rectangle with a single radius value.
      */
+    @JvmStatic
     @JvmOverloads
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: Float = 0f) =
         rect(x, y, width, height, radius, radius, radius, radius)
@@ -150,6 +201,7 @@ object UIRendererDSL {
     /**
      * Renders a rectangle with multiple radius values.
      */
+    @JvmStatic
     fun rect(
         x: Float,
         y: Float,
@@ -225,6 +277,7 @@ object UIRendererDSL {
     /**
      * Renders an image with varying rounded corners at the given position.
      */
+    @JvmStatic
     fun renderImage(
         imageName: String,
         x: Float,
@@ -256,16 +309,19 @@ object UIRendererDSL {
     /**
      * Converts the given float from degrees to radians.
      */
+    @JvmStatic
     fun Float.toRad() = renderer.degToRad(this)
 
     /**
      * Converts the given float from radians to degrees.
      */
+    @JvmStatic
     fun Float.toDeg() = renderer.radToDeg(this)
 
     /**
      * Returns the x offset of the given string base on the index
      */
+    @JvmStatic
     fun String.indexOffset(index: Int): Float {
         var w = 0f
         if (index > this.length - 1) return this.fontBounds()[4] + this.fontBounds()[0]
@@ -279,6 +335,7 @@ object UIRendererDSL {
      *
      * @param closePath Closes the path if true.
      */
+    @JvmStatic
     inline fun path(closePath: Boolean = false, block: UIPathDSL.() -> Unit): UIPathDSL {
         UIPathDSL.beginPath()
         UIPathDSL.block()
@@ -290,6 +347,7 @@ object UIRendererDSL {
      * Automatically saves and restores the state within this block. Any translations
      * and other states such as scissor are saved within the state.
      */
+    @JvmStatic
     inline fun save(block: UIRendererDSL.() -> Unit): UIRendererDSL {
         renderer.save()
         UIRendererDSL.block()
@@ -300,6 +358,7 @@ object UIRendererDSL {
     /**
      * Saves the state (and automatically restores it) and translates the [block] by the given [x] and [y] values.
      */
+    @JvmStatic
     inline fun translate(x: Float, y: Float, block: Block<UIRendererDSL>): UIRendererDSL = save {
         renderer.translate(x, y)
         block()
@@ -309,6 +368,7 @@ object UIRendererDSL {
     /**
      * Scissors (clips) any content that exceeds the give bounds.
      */
+    @JvmStatic
     inline fun scissor(
         x: Float, y: Float, width: Float, height: Float, block: Block<UIRendererDSL>
     ): UIRendererDSL = save {
@@ -321,6 +381,7 @@ object UIRendererDSL {
      *
      * @see StrokeDirection
      */
+    @JvmStatic
     inline fun stroke(
         strokeWidth: Float, strokeColor: Int, strokeDirection: UIStrokeDirection, block: Block<UIRendererDSL>
     ): UIRendererDSL {

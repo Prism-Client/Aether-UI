@@ -145,7 +145,7 @@ object UIComponentDSL {
     /**
      * Sets the active controller to the given [controller] and accepts the block which applies the
      * controller to all the components within it. If the component within the [block] is not an
-     * instance of [T], a message will be printed.
+     * instance of [T], an error will be thrown.
      *
      * @see ignore
      */

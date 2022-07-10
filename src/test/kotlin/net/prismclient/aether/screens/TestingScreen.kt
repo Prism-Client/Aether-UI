@@ -1,12 +1,14 @@
 package net.prismclient.aether.screens
 
 import examples.deps.Generic
+import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
 import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayoutSheet
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.*
@@ -18,6 +20,8 @@ class TestingScreen : UIScreen {
     override fun build() {
         create {
             include(Generic())
+
+            UIAssetDSL.image("Logo", "/prism/icons/logo/Logo.png")
 
             style(UIStyleSheet("navbar-title")) {
                 x = px(24)
@@ -49,7 +53,19 @@ class TestingScreen : UIScreen {
             }
 
             val navbar: UIContainer<UIContainerSheet> = component(UIContainer<UIContainerSheet>(null)) {
+                container {
+                    image("Logo").style(UIImageSheet("")) {
+                        control(UIAlignment.CENTER)
+                        size(56, 62)
+                    }
+                }.style(UIContainerSheet("")) {
+                    size(rel(1), px(118))
+                }
                 list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrder.Forward) {
+                    this.style(UIContainerSheet("")) {
+                        y = px(118)
+                        size(rel(1), rel(0.8))
+                    }
                     selectable<UIAutoLayout> {
                         ignore { label("MENU", "navbar-title") }
                         navButton("Dashboard", "ui")
@@ -77,9 +93,6 @@ class TestingScreen : UIScreen {
                         }
                         this.selectComponent(0)
                     }
-                }.style(UIContainerSheet("")) {
-                    y = px(118)
-                    size(rel(1), rel(0.8))
                 }
                 navbarButtonLayout = null
             }.style(UIContainerSheet("navbar")) {
