@@ -21,6 +21,8 @@ class TestingScreen : UIScreen {
         create {
             include(Generic())
 
+            UIAssetDSL.image("Logo", "/prism/icons/logo/Logo.png")
+
             style(UIStyleSheet("navbar-title")) {
                 x = px(24)
                 font("Montserrat", px(11), colorOf(191, 189, 193), top or left)
@@ -50,52 +52,53 @@ class TestingScreen : UIScreen {
                 layoutPadding = paddingOf(8, 9, 8, 9)
             }
 
-            styleOf(UIImageSheet("a")) {
-                size(500, 500)
+            val navbar: UIContainer<UIContainerSheet> = component(UIContainer<UIContainerSheet>(null)) {
+                container {
+                    image("Logo").style(UIImageSheet("")) {
+                        control(UIAlignment.CENTER)
+                        size(56, 62)
+                    }
+                }.style(UIContainerSheet("")) {
+                    size(rel(1), px(118))
+                }
+                list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrder.Forward) {
+                    this.style(UIContainerSheet("")) {
+                        y = px(118)
+                        size(rel(1), rel(0.8))
+                    }
+                    selectable<UIAutoLayout> {
+                        ignore { label("MENU", "navbar-title") }
+                        navButton("Dashboard", "ui")
+                        navButton("Settings", "ui")
+                        navButton("Store", "ui")
+                        navButton("Profiles", "ui")
+
+                        ignore { label("SOCIAL", "navbar-title") }
+                        navButton("Messages", "ui")
+                        navButton("Achievements", "ui")
+                        navButton("Friends", "ui")
+                        navButton("Recordings", "ui")
+
+                        onSelection {
+                            it.applyStyle("active-navbar-button")
+                        }
+
+                        onDeselection {
+                            it.applyStyle("navbar-button")
+                        }
+                        this.components.forEach { component ->
+                            component.onMousePressed {
+                                selectComponent(it as UIAutoLayout)
+                            }
+                        }
+                        this.selectComponent(0)
+                    }
+                }
+                navbarButtonLayout = null
+            }.style(UIContainerSheet("navbar")) {
+                size(px(236), rel(1))
+                background(colorOf(36, 37, 37))
             }
-
-            UIAssetDSL.image("background", "/prism/backgrounds/main-menu.png")
-
-            image("background", "a")
-
-//            val navbar: UIContainer<UIContainerSheet> = component(UIContainer<UIContainerSheet>(null)) {
-//                list(UIListLayout.ListDirection.Vertical, UIListLayout.ListOrder.Forward) {
-//                    selectable<UIAutoLayout> {
-//                        ignore { label("MENU", "navbar-title") }
-//                        navButton("Dashboard", "ui")
-//                        navButton("Settings", "ui")
-//                        navButton("Store", "ui")
-//                        navButton("Profiles", "ui")
-//
-//                        ignore { label("SOCIAL", "navbar-title") }
-//                        navButton("Messages", "ui")
-//                        navButton("Achievements", "ui")
-//                        navButton("Friends", "ui")
-//                        navButton("Recordings", "ui")
-//
-//                        onSelection {
-//                            it.applyStyle("active-navbar-button")
-//                        }
-//
-//                        onDeselection {
-//                            it.applyStyle("navbar-button")
-//                        }
-//                        this.components.forEach { component ->
-//                            component.onMousePressed {
-//                                selectComponent(it as UIAutoLayout)
-//                            }
-//                        }
-//                        this.selectComponent(0)
-//                    }
-//                }.style(UIContainerSheet("")) {
-//                    y = px(118)
-//                    size(rel(1), rel(0.8))
-//                }
-//                navbarButtonLayout = null
-//            }.style(UIContainerSheet("navbar")) {
-//                size(px(236), rel(1))
-//                background(colorOf(36, 37, 37))
-//            }
         }
     }
 
