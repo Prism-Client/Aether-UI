@@ -99,7 +99,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
                     beginFrame(fbo!!.width, fbo!!.height, fbo!!.contentScale)
                     components.forEach(UIComponent<*>::render)
                     endFrame()
-                    Aether.renderer.unbindFBO()
+                    renderer.unbindFBO()
                 }
                 requiresUpdate = false
             }
@@ -108,6 +108,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
 
 
     override fun render() {
+        updateAnimation()
         if (lastUpdate + 1000L < System.currentTimeMillis()) {
             requestUpdate()
             lastUpdate = System.currentTimeMillis()
