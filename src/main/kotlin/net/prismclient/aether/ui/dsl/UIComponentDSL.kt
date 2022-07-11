@@ -239,13 +239,13 @@ object UIComponentDSL {
     ) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style), block)
 
     /**
-     * Creates a [UISlider] with the [value] as the value of the slider, [min] as the minimum
-     * value, [max] as the maximum value, and [step] as the distance to step by.
+     * Creates a [UISlider] with the given [value] which stays within the [range] and steps by the
+     * value given to [step].
      */
     @JvmOverloads
     inline fun slider(
-        value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}
-    ) = component(UISlider(value, min, max, step, style), block)
+        value: Number, range: ClosedFloatingPointRange<Double>, step: Number, style: String? = activeStyle, block: UISlider.() -> Unit = {}
+    ) = component(UISlider(value.toDouble(), range, step.toDouble(), style), block)
 
     /**
      * Creates a [UIImage] with the [imageName] as the image to be rendered.

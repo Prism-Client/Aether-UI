@@ -1,14 +1,10 @@
-package net.prismclient.aether
-
-
 import examples.Animations
 import examples.AutoLayouts
-import net.prismclient.aether.screens.TestingScreen
-import net.prismclient.aether.screens.prism.PrismGameMenu
+import examples.Default
+import examples.PathRendering
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
 import net.prismclient.aether.ui.dsl.UIAssetDSL
-import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import org.lwjgl.glfw.Callbacks
@@ -34,9 +30,6 @@ object Runner {
     var framebufferHeight = 0
     var contentScaleX = 0f
     var contentScaleY = 0f
-    var actualFps = 0
-    var fps = 0
-    var lastSecond = System.currentTimeMillis()
     var core: Aether? = null
 
     val keymap = HashMap<Int, UIKey>()
@@ -147,7 +140,7 @@ object Runner {
         glfwSetTime(0.0)
         glfwSwapInterval(1)
 
-        core = Aether(NanoVGRenderer())
+        core = Aether(Renderer())
 
         MemoryStack.stackPush().use {
             val fw = it.mallocInt(1)
@@ -177,13 +170,6 @@ object Runner {
             GL11.glClearColor(0.3f, 0.3f, 0.3f, 0f)
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
-//            renderer {
-//                beginFrame(framebufferWidth.toFloat() / contentScaleX, framebufferHeight.toFloat() / contentScaleY, Aether.devicePxRatio)
-//                color(-1)
-//                renderImage("background", 0f, 0f, Aether.width, Aether.height)
-//                endFrame()
-//            }
-
             core!!.render()
 
             glfwSwapBuffers(window)
@@ -196,6 +182,7 @@ object Runner {
     }
 
     fun createScreen(args: Array<String>) {
+<<<<<<< Updated upstream:src/test/kotlin/net/prismclient/aether/Runner.kt
         if (args.isNotEmpty()) when (args[0]) {
             "--testing" ->  Aether.displayScreen(TestingScreen())
             "--auto-layouts" -> Aether.displayScreen(AutoLayouts())
@@ -204,5 +191,15 @@ object Runner {
         else Aether.displayScreen(PrismGameMenu())
 
         //Aether.displayScreen(PrismGameMenu())
+=======
+        if (args.isNotEmpty()) {
+            Aether.displayScreen(when(args[0]) {
+                "Animations" -> Animations()
+                "AutoLayouts" -> AutoLayouts()
+                "PathRendering" -> PathRendering()
+                else -> Default()
+            })
+        }
+>>>>>>> Stashed changes:src/test/kotlin/Runner.kt
     }
 }

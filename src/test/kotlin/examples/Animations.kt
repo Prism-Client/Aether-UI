@@ -71,10 +71,20 @@ class Animations : UIScreen {
                 }
             }
 
-            label("Some text", "button").onMousePressed {
+            animationOf("move", UIStyleSheet()) {
+                kf {}
+                kf {
+                    x = px(50)
+                }
+            }
+
+            val l = label("Some text", "button").onMousePressed {
                 UIProvider.dispatchAnimation("test", it)
                 println("pressed")
+            }.style {
+                x = px(-50)
             }
+            UIProvider.dispatchAnimation("move", l)
         }
     }
 }

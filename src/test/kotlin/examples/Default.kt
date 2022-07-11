@@ -2,7 +2,7 @@ package examples
 
 import net.prismclient.aether.ui.screen.UIScreen
 
-class PathRendering : UIScreen {
+class Default : UIScreen {
     override fun build() {
 
     }

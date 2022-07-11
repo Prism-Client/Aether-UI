@@ -102,6 +102,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /** Listeners **/
     /**
      * The listeners for when the component is first initialized. This is only invoked once.
+     *
+     * @see onInitialization
      */
     var initializationListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
@@ -111,6 +113,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * screen is resized.
      *
      * @see update
+     * @see onUpdate
      */
     var updateListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
@@ -118,12 +121,16 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /**
      * The listeners for focus/defocus events. The first parameter of the [BiConsumer] is the
      * component and the second is if the component was focused
+     *
+     * @see onFocus
      */
     var focusListeners: HashMap<String, BiConsumer<UIComponent<T>, Boolean>>? = null
         protected set
 
     /**
      * The listeners for then the mouse is moved. This is not a bubbling event.
+     *
+     * @see mouseMoveListeners
      */
     var mouseMoveListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
@@ -131,7 +138,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /**
      * The listeners for when the component is pressed. This is a bubbling event.
      *
-     * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
+     * [See Bubbling Events](https://aether.prismclient.net/components/bubbling-events)
+     * @see mousePressedListeners
      */
     var mousePressedListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
@@ -139,6 +147,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /**
      * The listeners for when the mouse is released. Despite being the opposite of
      * [mousePressedListeners], this is NOT a bubbling event.
+     *
+     * @see onMouseReleased
      */
     var mouseReleasedListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
@@ -147,6 +157,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * The listeners for when the mouse enters this component. The mouse considered being inside
      * is if it passes the check for it being within these bounds and the parent(s) of this. This
      * is not a bubbling event.
+     *
+     * @see onMouseEnter
      */
     var mouseEnteredListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
@@ -154,6 +166,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /**
      * The opposite of [mouseEnteredListeners]. Invoked when the mouse leaves this component. This
      * is not a bubbling event.
+     *
+     * @see onMouseLeave
      */
     var mouseLeaveListeners: HashMap<String, Consumer<UIComponent<T>>>? = null
         protected set
@@ -163,6 +177,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * that is focused to be invoked. This is not a bubbling event.
      *
      * @see UIFocusable
+     * @see keyPressListeners
      */
     var keyPressListeners: HashMap<String, BiConsumer<UIComponent<T>, Char>>? = null
         protected set
@@ -171,8 +186,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * Invoked when the mouse is scrolled. This must be focused or a parent of a component
      * that is focused to be invoked. This is a bubbling event.
      *
+     * [See Bubbling Events](https://aether.prismclient.net/components/bubbling-events)
      * @see UIFocusable
-     * @see <a href="https://aether.prismclient.net/components/bubbling-events">Bubbling Events</a>
+     * @see onFocus
      */
     var mouseScrollListeners: HashMap<String, BiConsumer<UIComponent<T>, Float>>? = null
         protected set
