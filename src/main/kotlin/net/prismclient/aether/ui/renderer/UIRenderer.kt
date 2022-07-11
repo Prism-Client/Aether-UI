@@ -155,11 +155,11 @@ interface UIRenderer {
     /**
      * Returns an array of five floats representing the most recently rendered text.
      *
-     * [0] = x
-     * [1] = y
-     * [2] = x + width
-     * [3] = y + height
-     * [4] = advance (the next glyph's x position)
+     *      [0] = x
+     *      [1] = y
+     *      [2] = x + width
+     *      [3] = y + height
+     *      [4] = advance (the next glyph's x position)
      */
     fun fontBounds(): FloatArray
 

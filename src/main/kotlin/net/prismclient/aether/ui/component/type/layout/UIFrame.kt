@@ -65,7 +65,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      */
     open fun updateFBO() {
         if (style.useFBO)
-            fbo = Aether.instance.renderer.createFBO(relWidth, relHeight)
+            fbo = Aether.renderer.createFBO(relWidth, relHeight)
     }
 
     /**
@@ -99,7 +99,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
                     beginFrame(fbo!!.width, fbo!!.height, fbo!!.contentScale)
                     components.forEach(UIComponent<*>::render)
                     endFrame()
-                    Aether.instance.renderer.unbindFBO()
+                    Aether.renderer.unbindFBO()
                 }
                 requiresUpdate = false
             }

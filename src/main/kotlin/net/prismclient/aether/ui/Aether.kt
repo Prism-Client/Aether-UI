@@ -42,7 +42,7 @@ import kotlin.collections.HashMap
  * @see <a href="https://aether.prismclient.net/getting-started">UICore documentation</a>
  * @see UIProvider
  */
-open class Aether(val renderer: UIRenderer) {
+open class Aether(renderer: UIRenderer) {
     /**
      * All components that are not nested within a frame
      *
@@ -67,6 +67,7 @@ open class Aether(val renderer: UIRenderer) {
 
     init {
         instance = this
+        Properties.renderer = renderer
         UIProvider.initialize(renderer)
     }
 
@@ -233,6 +234,10 @@ open class Aether(val renderer: UIRenderer) {
 
         @JvmStatic
         lateinit var instance: Aether
+            protected set
+
+        @JvmStatic
+        lateinit var renderer: UIRenderer
             protected set
 
         @JvmStatic

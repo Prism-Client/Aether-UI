@@ -12,7 +12,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer
 object UIPathDSL {
     @JvmStatic
     val renderer
-        get() = Aether.instance.renderer
+        get() = Aether.renderer
 
     /**
      * Clears the active path and begins a new one.

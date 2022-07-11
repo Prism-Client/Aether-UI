@@ -21,7 +21,7 @@ import net.prismclient.aether.ui.util.UIColor
 object UIRendererDSL {
     @JvmStatic
     val renderer
-        get() = Aether.instance.renderer
+        get() = Aether.renderer
 
     @JvmStatic
     var color: Int = 0
