@@ -46,7 +46,10 @@ import java.util.regex.Pattern
  */
 @Suppress("MemberVisibilityCanBePrivate")
 open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
-    protected val newline: Pattern = Pattern.compile("\\r?\\n|\\r")
+    companion object {
+        @JvmStatic
+        protected val newline: Pattern = Pattern.compile("\\r?\\n|\\r")
+    }
 
     /**
      * When true, the component will be ensured to be at
@@ -223,8 +226,8 @@ open class UIFont : UIShape<UIFont>(), UIAnimatable<UIFont> {
         if (ignore) return
 
         this.component = component!!
-        cachedX = component.x + calculate(x, component, component.width, component.height, false) - component.anchorX
-        cachedY = component.y + calculate(y, component, component.width, component.height, true) - component.anchorY
+        cachedX = component.x + calculate(x, component, component.width, component.height, false) //- component.anchorX
+        cachedY = component.y + calculate(y, component, component.width, component.height, true) //- component.anchorY
         cachedWidth = calculate(width, component, component.width, component.height, false)
         cachedHeight = calculate(height, component, component.width, component.height, true)
 

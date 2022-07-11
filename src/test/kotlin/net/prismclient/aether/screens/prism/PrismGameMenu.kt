@@ -26,7 +26,7 @@ class PrismGameMenu : UIScreen {
                 UIAssetDSL.image(
                     "menu-bg",
                     "/prism/backgrounds/main-menu.png"
-                ) // or // loadImage(imageName, ByteBuffer)
+                )
             }
 
             styleOf(UIStyleSheet("button")) {
@@ -67,7 +67,6 @@ class PrismGameMenu : UIScreen {
 
             autoLayout(UIAutoLayout(UIListLayout.ListDirection.Vertical, null).style(UIContainerSheet("")) {}) {
                 button("Singleplayer", "button")
-
                 button("Multiplayer", "button")
 
                 verticalResizing = UIAutoLayout.ResizingMode.Hug

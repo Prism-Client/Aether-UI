@@ -21,6 +21,8 @@ class TestingScreen : UIScreen {
         create {
             include(Generic())
 
+            UIAssetDSL.bulkLoad("/prism/icons/")
+
             UIAssetDSL.image("Logo", "/prism/icons/logo/Logo.png")
 
             style(UIStyleSheet("navbar-title")) {
