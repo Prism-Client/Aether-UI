@@ -1,8 +1,7 @@
 package net.prismclient.aether.ui.style.util
 
 import net.prismclient.aether.ui.dsl.UIAssetDSL
-import net.prismclient.aether.ui.renderer.UIProvider
-import net.prismclient.aether.ui.util.extensions.nullableByteBuffer
+import net.prismclient.aether.ui.util.extensions.safeByteBuffer
 import java.nio.ByteBuffer
 
 /**
@@ -22,8 +21,8 @@ class UIFontType(val normal: String = "", val italic: String = "") {
 
     fun load(fileLocation: String) {
         load(
-            if (normal.isNotEmpty()) ("$fileLocation.ttf").nullableByteBuffer() else null,
-            if (italic.isNotEmpty()) ("$fileLocation-italic.ttf").nullableByteBuffer() else null
+            if (normal.isNotEmpty()) ("$fileLocation.ttf").safeByteBuffer() else null,
+            if (italic.isNotEmpty()) ("$fileLocation-italic.ttf").safeByteBuffer() else null
         )
     }
 
