@@ -4,6 +4,7 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.function.Consumer
+import kotlin.reflect.KClass
 
 /**
  * [UISelectableController] is a controller which accepts [T] and only allows
@@ -15,7 +16,7 @@ import java.util.function.Consumer
  * @since 1.0
  * @param T The type of component you want to control. Leave T as UIComponent<*> to allow any component to be selected.
  */
-class UISelectableController<T : UIComponent<*>> : UIController<T>() {
+class UISelectableController<T : UIComponent<*>>(filter: KClass<T>) : UIController<T>(filter) {
     /**
      * The component that is actively selected
      */

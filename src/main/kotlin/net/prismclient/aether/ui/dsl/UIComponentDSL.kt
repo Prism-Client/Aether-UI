@@ -107,15 +107,17 @@ object UIComponentDSL {
      * Applies any properties pertaining to state and updates the state to the component's needs.
      */
     @JvmStatic
-    fun pushComponent(component: UIComponent<*>) {
+    inline fun <reified T: UIComponent<*>> pushComponent(component: T) {
         check()
         val activeComponent = getActiveComponent()
         val activeFrame = getActiveFrame()
         if (activeComponent != null) component.parent = activeComponent
         else if (activeFrame != null) activeFrame.addComponent(component)
         else Aether.instance.components!!.add(component)
-        if (component is UIFrame) Aether.instance.frames!!.add(component)
-        if (activeController != null && !ignoreController) activeController!!.addComponent(component as UIComponent<UIStyleSheet>)
+        if (component is UIFrame<*>) Aether.instance.frames!!.add(component)
+        if (activeController != null && !ignoreController && activeController?.filter?.isInstance(component) == true) {
+            activeController!!.addComponent(component)
+        }
         updateState(component)
     }
 
@@ -134,7 +136,7 @@ object UIComponentDSL {
      *
      * @return T The component
      */
-    inline fun <T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
+    inline fun <reified T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
         pushComponent(component)
         component.block()
         component.initialize()
@@ -185,15 +187,15 @@ object UIComponentDSL {
      */
     fun include(dependable: UIDependable) = dependable.load()
 
-    private fun getActiveComponent(): UIComponent<*>? =
+    fun getActiveComponent(): UIComponent<*>? =
         if (componentStack.isNullOrEmpty()) null else componentStack!!.peek()
 
-    private fun getActiveFrame(): UIFrame<*>? = if (frameStack.isNullOrEmpty()) null else frameStack!!.peek()
+    fun getActiveFrame(): UIFrame<*>? = if (frameStack.isNullOrEmpty()) null else frameStack!!.peek()
 
     /**
      * Throws an exception if the properties have not been initialized.
      */
-    private fun check() {
+    fun check() {
         if (componentStack == null || frameStack == null) throw UninitializedPropertyAccessException()
     }
 
@@ -285,6 +287,6 @@ object UIComponentDSL {
      * @see controller
      * @see UISelectableController
      */
-    inline fun <T : UIComponent<*>> selectable(block: UISelectableController<T>.() -> Unit) =
-        controller(UISelectableController(), block)
+    inline fun <reified T : UIComponent<*>> selectable(block: UISelectableController<T>.() -> Unit) =
+        controller(UISelectableController(T::class), block)
 }

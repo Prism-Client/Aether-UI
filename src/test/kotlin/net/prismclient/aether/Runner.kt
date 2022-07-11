@@ -196,13 +196,13 @@ object Runner {
     }
 
     fun createScreen(args: Array<String>) {
-//        if (args.isNotEmpty()) when (args[0]) {
-//            "--testing" ->  Aether.displayScreen(TestingScreen())
-//            "--auto-layouts" -> Aether.displayScreen(AutoLayouts())
-//            "--animations" -> Aether.displayScreen(Animations())
-//        }
-//        else Aether.displayScreen(PrismGameMenu())
+        if (args.isNotEmpty()) when (args[0]) {
+            "--testing" ->  Aether.displayScreen(TestingScreen())
+            "--auto-layouts" -> Aether.displayScreen(AutoLayouts())
+            "--animations" -> Aether.displayScreen(Animations())
+        }
+        else Aether.displayScreen(PrismGameMenu())
 
-        Aether.displayScreen(PrismGameMenu())
+        //Aether.displayScreen(PrismGameMenu())
     }
 }
