@@ -107,15 +107,17 @@ object UIComponentDSL {
      * Applies any properties pertaining to state and updates the state to the component's needs.
      */
     @JvmStatic
-    fun pushComponent(component: UIComponent<*>) {
+    inline fun <reified T: UIComponent<*>> pushComponent(component: T) {
         check()
         val activeComponent = getActiveComponent()
         val activeFrame = getActiveFrame()
         if (activeComponent != null) component.parent = activeComponent
         else if (activeFrame != null) activeFrame.addComponent(component)
         else Aether.instance.components!!.add(component)
-        if (component is UIFrame) Aether.instance.frames!!.add(component)
-        if (activeController != null && !ignoreController) activeController!!.addComponent(component as UIComponent<UIStyleSheet>)
+        if (component is UIFrame<*>) Aether.instance.frames!!.add(component)
+        if (activeController != null && !ignoreController && activeController?.filter?.isInstance(component) == true) {
+            activeController!!.addComponent(component)
+        }
         updateState(component)
     }
 
@@ -134,7 +136,7 @@ object UIComponentDSL {
      *
      * @return T The component
      */
-    inline fun <T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
+    inline fun <reified T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
         pushComponent(component)
         component.block()
         component.initialize()
@@ -185,15 +187,15 @@ object UIComponentDSL {
      */
     fun include(dependable: UIDependable) = dependable.load()
 
-    private fun getActiveComponent(): UIComponent<*>? =
+    fun getActiveComponent(): UIComponent<*>? =
         if (componentStack.isNullOrEmpty()) null else componentStack!!.peek()
 
-    private fun getActiveFrame(): UIFrame<*>? = if (frameStack.isNullOrEmpty()) null else frameStack!!.peek()
+    fun getActiveFrame(): UIFrame<*>? = if (frameStack.isNullOrEmpty()) null else frameStack!!.peek()
 
     /**
      * Throws an exception if the properties have not been initialized.
      */
-    private fun check() {
+    fun check() {
         if (componentStack == null || frameStack == null) throw UninitializedPropertyAccessException()
     }
 
@@ -237,13 +239,13 @@ object UIComponentDSL {
     ) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style), block)
 
     /**
-     * Creates a [UISlider] with the [value] as the value of the slider, [min] as the minimum
-     * value, [max] as the maximum value, and [step] as the distance to step by.
+     * Creates a [UISlider] with the given [value] which stays within the [range] and steps by the
+     * value given to [step].
      */
     @JvmOverloads
     inline fun slider(
-        value: Float, min: Float, max: Float, step: Float, style: String? = activeStyle, block: UISlider.() -> Unit = {}
-    ) = component(UISlider(value, min, max, step, style), block)
+        value: Number, range: ClosedFloatingPointRange<Double>, step: Number, style: String? = activeStyle, block: UISlider.() -> Unit = {}
+    ) = component(UISlider(value.toDouble(), range, step.toDouble(), style), block)
 
     /**
      * Creates a [UIImage] with the [imageName] as the image to be rendered.
@@ -285,6 +287,6 @@ object UIComponentDSL {
      * @see controller
      * @see UISelectableController
      */
-    inline fun <T : UIComponent<*>> selectable(block: UISelectableController<T>.() -> Unit) =
-        controller(UISelectableController(), block)
+    inline fun <reified T : UIComponent<*>> selectable(block: UISelectableController<T>.() -> Unit) =
+        controller(UISelectableController(T::class), block)
 }

@@ -1,5 +1,3 @@
-package net.prismclient.aether
-
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
@@ -18,12 +16,12 @@ import java.nio.ByteBuffer
 /**
  * Aether allows for the ability to provide your own rendering system. However, you might not
  * want to write a rendering system, or simply don't know how. The class provides an implementation
- * with NanoVG which is fast vector graphics rendering library.
+ * with NanoVG which is a fast vector graphics rendering library.
  *
  * @author sen
  * @since 1.0
  */
-class NanoVGRenderer : UIRenderer {
+class Renderer : UIRenderer {
     private val framebuffers: HashMap<UIContentFBO, NVGLUFramebuffer> = hashMapOf()
 
     private val ctx: Long = nvgCreate(NVG_ANTIALIAS)
@@ -411,6 +409,4 @@ class NanoVGRenderer : UIRenderer {
         )
         return nvgColor
     }
-
-
 }

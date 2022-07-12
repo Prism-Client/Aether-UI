@@ -132,9 +132,9 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
         val mouseY = component!!.getMouseY()
         if (selected) {
             value = if (type == Scrollbar.Vertical) {
-                (mouseY - cachedY - mouseOffset) / (cachedHeight - sliderSize)
+                (mouseY - cachedY - mouseOffset) / (cachedHeight - sliderSize).coerceAtLeast(Float.MIN_VALUE)
             } else {
-                (mouseX - cachedX - mouseOffset) / (cachedWidth - sliderSize)
+                (mouseX - cachedX - mouseOffset) / (cachedWidth - sliderSize).coerceAtLeast(Float.MIN_VALUE)
             }
         }
     }

@@ -33,7 +33,7 @@ class UIFontFamily(
         black: String,
         bold: String,
         light: String,
-        thin: String
+        thin: String,
     ) : this(
         familyName,
         if (regular.isNotEmpty()) UIFontType("$familyName-regular", "$familyName-regular-italic") else null,

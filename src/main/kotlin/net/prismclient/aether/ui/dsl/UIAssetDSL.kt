@@ -74,6 +74,8 @@ object UIAssetDSL {
         Aether.renderer.createFont(name, buffer)
     }
 
+    // TODO: Append stuff to bulk load and stuff
+
     /**
      * Attempts to load a folder/directory of resources from the classpath. The files that can be loaded
      * include  PNG, JPEG, SVG, and TTF.
