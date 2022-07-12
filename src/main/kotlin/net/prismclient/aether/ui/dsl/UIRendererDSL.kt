@@ -25,7 +25,7 @@ object UIRendererDSL {
         get() = Aether.renderer
 
     @JvmStatic
-    var color: Int = 0
+    var activeColor: Int = 0
         private set
 
     /**
@@ -77,7 +77,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: Int) {
-        UIRendererDSL.color = color
+        UIRendererDSL.activeColor = color
         renderer.color(color)
     }
 
@@ -86,9 +86,6 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: UIColor?) = color(color?.rgba ?: 0)
-
-    // -- Image -- //
-
 
     // -- Font -- //
 

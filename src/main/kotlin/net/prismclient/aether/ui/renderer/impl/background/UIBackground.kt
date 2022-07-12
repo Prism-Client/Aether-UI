@@ -19,7 +19,7 @@ import net.prismclient.aether.ui.util.interfaces.UIAnimatable
  * derivatives, [UIGradientBackground] and [UIImageBackground] to support different backgrounds types.
  *
  * @author sen
- * @since 4/26/2022
+ * @since 1.0
  */
 open class UIBackground : UIShape<UIBackground>(), UIAnimatable<UIBackground> {
     var backgroundColor: UIColor? = null

@@ -16,7 +16,7 @@ open class UICaret : UIRectangle() {
 
     override fun render() {
         renderer {
-            color(color)
+            color(activeColor)
             rect(cachedX + offsetX, cachedY + offsetY, cachedWidth, cachedHeight, radius)
         }
     }

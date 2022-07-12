@@ -27,15 +27,15 @@ object UIPathDSL {
     fun closePath() = renderer.closePath()
 
     /**
-     * Instructs the renderer to fill the current path as the active color of [UIRendererDSL.color].
+     * Instructs the renderer to fill the current path as the active color of [UIRendererDSL.activeColor].
      *
      * @see fillPaint
      * @see strokePath
      * @see strokePaint
-     * @see UIRendererDSL.color
+     * @see UIRendererDSL.activeColor
      */
     @JvmStatic
-    fun fillPath() = fillPath(UIRendererDSL.color)
+    fun fillPath() = fillPath(UIRendererDSL.activeColor)
 
     /**
      * Instructs the renderer to fill the current path with the given [color].
@@ -61,12 +61,12 @@ object UIPathDSL {
     fun fillPaint() = renderer.fillPaint()
 
     /**
-     * Instructs the renderer to fill the current path as a stroke with the act ive color of [UIRendererDSL.color].
+     * Instructs the renderer to fill the current path as a stroke with the act ive color of [UIRendererDSL.activeColor].
      *
-     * @see UIRendererDSL.color
+     * @see UIRendererDSL.activeColor
      */
     @JvmStatic
-    fun strokePath() = strokePath(UIRendererDSL.color)
+    fun strokePath() = strokePath(UIRendererDSL.activeColor)
 
     /**
      * Instructs the renderer to fill the current path as a stroke with the given [color].

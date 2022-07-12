@@ -106,7 +106,17 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
 
     override fun renderComponent() {
         if (style.useFBO) {
-            Aether.renderer.renderFbo(fbo!!, relX, relY, relWidth, relHeight)
+            Aether.renderer.renderFbo(
+                fbo!!,
+                relX,
+                relY,
+                relWidth,
+                relHeight,
+                style.background?.radius?.topLeft ?: 0f,
+                style.background?.radius?.topRight ?: 0f,
+                style.background?.radius?.bottomLeft ?: 0f,
+                style.background?.radius?.bottomRight ?: 0f
+            )
         } else {
             if (style.clipContent) UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
                 components.forEach(UIComponent<*>::render)

@@ -91,19 +91,14 @@ open class Aether(renderer: UIRenderer) {
      */
     open fun renderFrames() {
         renderer {
+            val shouldUpdate = if (lastUpdate + 1000L < System.currentTimeMillis()) {
+                lastUpdate = System.currentTimeMillis()
+                true
+            } else false
             frames?.forEach {
+                if (shouldUpdate) it.requestUpdate()
                 it.renderContent()
             }
-//            val shouldUpdate = if (lastUpdate + 1000L < System.currentTimeMillis()) {
-//                lastUpdate = System.currentTimeMillis()
-//                true
-//            } else false
-//            frames?.forEach {
-//                if (shouldUpdate)
-//                    it.requestUpdate()
-//                if (it.visible && it.requiresUpdate && it.style.useFBO)
-//                    it.renderContent()
-//            }
         }
     }
 
@@ -116,8 +111,7 @@ open class Aether(renderer: UIRenderer) {
                 beginFrame(width, height, devicePxRatio)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]
-                    if (component.visible)
-                        component.render()
+                    if (component.visible) component.render()
                 }
                 endFrame()
             }
@@ -132,8 +126,7 @@ open class Aether(renderer: UIRenderer) {
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
         mouseMoveListeners?.forEach { it.value.run() }
-        if (activeScreen != null)
-            for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
+        if (activeScreen != null) for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
     }
 
     /**
@@ -183,8 +176,7 @@ open class Aether(renderer: UIRenderer) {
                             )
                         ) return true
                     }
-                    if (check)
-                        component = child
+                    if (check) component = child
                 }
             }
 
@@ -482,8 +474,7 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         fun displayScreen(screen: UIScreen) {
-            if (activeScreen != null)
-                deallocateComponents()
+            if (activeScreen != null) deallocateComponents()
 
             activeScreen = screen
             instance.components = ArrayList()
@@ -534,16 +525,14 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         fun tryFocus() {
-            if (activeScreen == null)
-                return
+            if (activeScreen == null) return
 
             fun peek(contain: UIContainer<*>): Boolean {
                 var component: UIContainer<*>? = null
                 for (i in 0 until contain.components.size) {
                     val container = contain.components[i] as? UIContainer<*> ?: continue
                     if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
-                        if (peek(container))
-                            return true
+                        if (peek(container)) return true
                         component = container
                     }
                 }
@@ -570,8 +559,7 @@ open class Aether(renderer: UIRenderer) {
             }
 
             // If a container was found, then focus it
-            if (component != null)
-                component!!.focus()
+            if (component != null) component!!.focus()
         }
 
         /**

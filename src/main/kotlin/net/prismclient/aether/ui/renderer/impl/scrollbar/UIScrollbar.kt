@@ -14,11 +14,13 @@ import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 
 class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
+    var background: UIBackground? = null
     var border: UIBorder? = null
     var radius: UIRadius? = null
-
-    var background: UIBackground? = null
-
+        set(value) {
+            field = value
+            background?.radius = value
+        }
     var value = 0f
         set(value) {
             field = value.limit()
