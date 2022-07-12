@@ -23,13 +23,15 @@ import java.nio.ByteBuffer
  */
 object UIAssetDSL {
 
+    private var DEFAULT_IMAGE_FLAGS = PREMULTIPLIED or GENERATE_MIPMAPS or REPEATX or REPEATY
+
     /**
      * Loads an image from the classpath. Supports general images formats such as PNG, JPEG, etc...
      *
      * @see svg
      */
     @JvmStatic
-    fun image(name: String, path: String, flags: Int = GENERATE_MIPMAPS or REPEATX or REPEATY) =
+    fun image(name: String, path: String, flags: Int = DEFAULT_IMAGE_FLAGS) =
         image(name, path.toByteBuffer(), flags)
 
     /**
@@ -87,7 +89,7 @@ object UIAssetDSL {
     fun bulkLoad(
         folderLocation: String,
         deep: Boolean = true,
-        imageFlags: Int = GENERATE_MIPMAPS or REPEATX or REPEATY,
+        imageFlags: Int = DEFAULT_IMAGE_FLAGS,
         svgScale: Float = Aether.devicePxRatio
     ): Int  {
         val file = Aether.javaClass.getResource(folderLocation) ?: run {
@@ -111,7 +113,7 @@ object UIAssetDSL {
     fun bulkLoad(
         fileLocation: File,
         deep: Boolean,
-        imageFlags: Int = PREMULTIPLIED or GENERATE_MIPMAPS or REPEATX or REPEATY,
+        imageFlags: Int = DEFAULT_IMAGE_FLAGS,
         svgScale: Float = Aether.devicePxRatio
     ): Int {
         var count = 0
