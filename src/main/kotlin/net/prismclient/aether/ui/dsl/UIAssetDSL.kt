@@ -76,8 +76,22 @@ object UIAssetDSL {
     // TODO: Append stuff to bulk load and stuff
 
     /**
-     * Attempts to load a folder/directory of resources from the classpath. The files that can be loaded
-     * include  PNG, JPEG, SVG, and TTF.
+     * Attempts to load a directory of images and SVGs into memory. TTF files are not loaded. When the images
+     * are loaded into memory, they are formatted as
+     *
+     *      [appendedString][directory/][fileName]
+     *
+     * For example if the appended string is blank, the file is a svg in the directory called gradient, then
+     *
+     *      gradient/setting
+     *
+     * This can be especially useful if there is multiple of the same file name in different directory's:
+     *
+     *      solid/setting
+     *      outline/setting
+     *      gradient/setting
+     *
+     * The appended string appends at the front prior to everything else.
      *
      * @param deep When true, subdirectories will also be loaded.
      * @param imageFlags The flags of the image if the file is an image
@@ -85,9 +99,11 @@ object UIAssetDSL {
      * @return The number of files loaded.
      * @see bulkLoad
      */
+    @JvmOverloads
     fun bulkLoad(
         folderLocation: String,
         deep: Boolean = true,
+        appendedString: String = "",
         imageFlags: Int = DEFAULT_IMAGE_FLAGS,
         svgScale: Float = Aether.devicePxRatio
     ): Int {
@@ -96,36 +112,37 @@ object UIAssetDSL {
             return 0
         }
 
-        return bulkLoad(File(file.toURI()), deep, imageFlags, svgScale).also {
+        return internalBulkLoad(File(file.toURI()), deep, appendedString, imageFlags, svgScale).also {
             warn("Bulk loaded $it files.")
         }
     }
 
     /**
-     * Loads the files from the given [fileLocation].
-     *
-     * @param deep When true, subdirectories will also be loaded.
-     * @see bulkLoad
+     * An internal version of [bulkLoad] which expects a file instead of a resource location.
      */
     @JvmStatic
     @JvmOverloads
-    fun bulkLoad(
+    fun internalBulkLoad(
         fileLocation: File,
         deep: Boolean,
+        appendedString: String,
         imageFlags: Int = DEFAULT_IMAGE_FLAGS,
-        svgScale: Float = Aether.devicePxRatio
+        svgScale: Float = Aether.devicePxRatio,
+        first: Boolean = true
     ): Int {
+        var loc = "${fileLocation.name}/"
+        if (first)
+            loc = appendedString + loc
         var count = 0
         for (file in fileLocation.listFiles()!!) {
             val fileExtension = FilenameUtils.getExtension(file.name).lowercase()
             if (file.isDirectory && deep) {
-                count += bulkLoad(file, true, imageFlags, svgScale)
+                count += internalBulkLoad(file, true, loc, imageFlags, svgScale, false)
             } else {
-                val name = FilenameUtils.removeExtension(file.name)
+                val name = loc + FilenameUtils.removeExtension(file.name)
 
                 when (fileExtension) {
                     "png", "jpeg", "jpg" -> image(name, file.inputStream().safeByteBuffer(), imageFlags)
-                    "ttf" -> font(name, file.inputStream().safeByteBuffer())
                     "svg" -> svg(name, file.inputStream().safeByteBuffer(), svgScale)
                     else -> {
                         warn("Unsupported file type: ${file.name}")
@@ -135,7 +152,6 @@ object UIAssetDSL {
                 count++
             }
         }
-
         return count
     }
 }
