@@ -7,6 +7,7 @@ import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.UIColor
 
@@ -24,7 +25,7 @@ object UIRendererDSL {
         get() = Aether.renderer
 
     @JvmStatic
-    var color: Int = 0
+    var activeColor: Int = 0
         private set
 
     /**
@@ -76,7 +77,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: Int) {
-        UIRendererDSL.color = color
+        UIRendererDSL.activeColor = color
         renderer.color(color)
     }
 
@@ -85,9 +86,6 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: UIColor?) = color(color?.rgba ?: 0)
-
-    // -- Image -- //
-
 
     // -- Font -- //
 
@@ -275,7 +273,8 @@ object UIRendererDSL {
     }
 
     /**
-     * Renders an image with varying rounded corners at the given position.
+     * Renders an image of [imageName] at the given positions with varying rounded corners. If the [imageName] is
+     * not found, the image will not be rendered, and instead a rectangle with the color of the image is rendered.
      */
     @JvmStatic
     fun renderImage(
@@ -291,8 +290,7 @@ object UIRendererDSL {
     ) {
         path {
             imagePattern(
-                (UIProvider.getImage(imageName)
-                    ?: throw NullPointerException("No image as found with the name $imageName")).handle,
+                UIProvider.getImage(imageName)?.handle ?: 0,
                 x,
                 y,
                 width,
@@ -324,7 +322,7 @@ object UIRendererDSL {
     @JvmStatic
     fun String.indexOffset(index: Int): Float {
         var w = 0f
-        if (index > this.length - 1) return this.fontBounds()[4] + this.fontBounds()[0]
+        if (index > this.length - 1) return UIRendererDSL.fontBounds()[4] + this.fontBounds()[0]
         for (i in 0 until index) w += this[i].toString().fontBounds()[4]
         return w + this.fontBounds()[0]
     }
@@ -336,7 +334,7 @@ object UIRendererDSL {
      * @param closePath Closes the path if true.
      */
     @JvmStatic
-    inline fun path(closePath: Boolean = false, block: UIPathDSL.() -> Unit): UIPathDSL {
+    inline fun path(closePath: Boolean = false, block: Block<UIPathDSL>): UIPathDSL {
         UIPathDSL.beginPath()
         UIPathDSL.block()
         if (closePath) UIPathDSL.closePath()
@@ -348,11 +346,11 @@ object UIRendererDSL {
      * and other states such as scissor are saved within the state.
      */
     @JvmStatic
-    inline fun save(block: UIRendererDSL.() -> Unit): UIRendererDSL {
+    inline fun save(block: Block<UIRendererDSL>): UIRendererDSL {
         renderer.save()
         UIRendererDSL.block()
         renderer.restore()
-        return this
+        return UIRendererDSL
     }
 
     /**
@@ -373,7 +371,7 @@ object UIRendererDSL {
         x: Float, y: Float, width: Float, height: Float, block: Block<UIRendererDSL>
     ): UIRendererDSL = save {
         renderer.scissor(x, y, width, height)
-        block()
+        UIRendererDSL.block()
     }
 
     /**
@@ -389,8 +387,22 @@ object UIRendererDSL {
         activeStrokeColor = strokeColor
         activeStrokeDirection = strokeDirection
         isStroke = true
-        block()
+        UIRendererDSL.block()
         isStroke = false
-        return this
+        return UIRendererDSL
+    }
+
+    /**
+     * Begins a new frame and binds the given [framebuffer]. The [block] will be executed and the frame
+     * will be drawn and the framebuffer will be unbound.
+     */
+    @JvmStatic
+    inline fun UIContentFBO.renderToFramebuffer(block: Block<UIRendererDSL>): UIRendererDSL {
+        renderer.bindFBO(this)
+        beginFrame(this.scaledWidth, this.scaledHeight, this.contentScale)
+        UIRendererDSL.block()
+        endFrame()
+        renderer.unbindFBO()
+        return UIRendererDSL
     }
 }

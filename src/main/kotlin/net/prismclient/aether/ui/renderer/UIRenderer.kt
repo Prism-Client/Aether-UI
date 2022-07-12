@@ -1,19 +1,21 @@
 package net.prismclient.aether.ui.renderer
 
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import java.nio.ByteBuffer
 
 /**
- * [UIRenderer] wraps all the render calls into this class. An implementation of this must
- * be providd to Aether within its constructor. The class is modeled after NanoVG, which is
- * "loosely" modeled on the HTML5 Canvas API.
+ * [UIRenderer] wraps all the necessary render calls into this class. An implementation of this must
+ * be provided to Aether within its constructor. The class is modeled after NanoVG, which is
+ * "loosely" modeled on the HTML5 Canvas API. Depending on how the renderer that is used is designed,
+ * certain methods might be blank calls as they might not need to inform the renderer.
  *
  * @author sen
  * @since 1.0
  */
 interface UIRenderer {
-    /** Frame **/
+    // -- Frame -- //
 
     /**
      * Begins the active frame with the given [width], and [height].
@@ -30,7 +32,7 @@ interface UIRenderer {
      */
     fun cancelFrame()
 
-    /** State **/
+    // -- State -- //
 
     /**
      * Saves the current render state.
@@ -58,24 +60,52 @@ interface UIRenderer {
      */
     fun color(color: Int)
 
+    /**
+     * Sets the alpha of the current path to [alpha].
+     */
     fun globalAlpha(alpha: Float)
 
+    /**
+     * Pre multiplies the current coordinate system by the given matrix. The matrix is as:
+     *
+     *      [a, c, e]
+     *      [b, d, f]
+     *      [0, 0, 1]
+     */
     fun transform(a: Float, b: Float, c: Float, d: Float, e: Float, f: Float)
 
+    /**
+     * Translates the current coordinate system by the given [x] and [y] values.
+     */
     fun translate(x: Float, y: Float)
 
+    /**
+     * Scales the current coordinate system by the given [x] and [y] scale factors.
+     */
     fun scale(x: Float, y: Float)
 
+    /**
+     * Rotates the current coordinate system by the given [angle] in radians.
+     */
     fun rotate(angle: Float)
 
     fun skewX(angle: Float)
 
     fun skewY(angle: Float)
 
+    /**
+     * Creates a box where anything outside the box is clipped (scissored).
+     */
     fun scissor(x: Float, y: Float, w: Float, h: Float)
 
+    /**
+     * Resets scissors of the current state.
+     */
     fun resetScissor()
 
+    /**
+     * Resets the transformations of the current coordinate system.
+     */
     fun resetTransformation()
 
     /**
@@ -83,17 +113,45 @@ interface UIRenderer {
      */
     fun useAntialiasing(antialiasing: Boolean)
 
-    /** FBO **/
+    // -- FBO --//
 
+    /**
+     * Creates a framebuffer from the given [width] and [height].
+     */
     fun createFBO(width: Float, height: Float): UIContentFBO
 
+    /**
+     * Deletes the framebuffer from memory.
+     */
     fun deleteFBO(fbo: UIContentFBO)
 
+    /**
+     * Begins a new draw frame and binds the given fbo to render content to.
+     *
+     * @see unbindFBO
+     */
     fun bindFBO(fbo: UIContentFBO)
 
+    /**
+     * Unbinds the active framebuffer.
+     *
+     * @see bindFBO
+     */
     fun unbindFBO()
 
-    /** Asset Loading **/
+    fun renderFbo(
+        fbo: UIContentFBO,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    )
+
+    // -- Asset Loading --/
     /**
      * Creates an image from the given [data] registered to the [imageName].
      *
@@ -101,6 +159,9 @@ interface UIRenderer {
      */
     fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData
 
+    /**
+     * Deallocates the given image from memory.
+     */
     fun deleteImage(imageData: String)
 
     /**
@@ -125,7 +186,7 @@ interface UIRenderer {
     /** Image **/
     fun imagePattern(imageHandle: Int, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float)
 
-    /** Font **/
+    // -- Font -- //
 
     /**
      * Sets the active font to the given [fontName].
@@ -182,12 +243,21 @@ interface UIRenderer {
      */
     fun fontDescender(): Float
 
-    /** General Shapes **/
+    // -- General Shapes -- //
 
     /**
      * Creates a rounded rectangle from the given [x], [y], [width], [height], with four corner radii points.
      */
-    fun rect(x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float)
+    fun rect(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    )
 
     /**
      * Creates an ellipse from the given [x], and [y].
@@ -199,7 +269,7 @@ interface UIRenderer {
      */
     fun circle(x: Float, y: Float, radius: Float)
 
-    /** Path **/
+    // -- Path -- //
 
     /**
      * Begins a new path
@@ -243,6 +313,12 @@ interface UIRenderer {
      */
     fun strokeWidth(size: Float)
 
+    /**
+     * Sets the stroke color to the given [color]. The color does not affect the fill color.
+     *
+     * @see color
+     * @see fillColor
+     */
     fun strokeColor(color: Int)
 
     /**
@@ -323,7 +399,7 @@ interface UIRenderer {
      */
     fun lineJoin(join: LineJoin)
 
-    /** Gradients **/
+    // -- Gradient -- //
 
     /**
      * Creates a linear gradient for the active path with the [x] and [y] as the
@@ -339,7 +415,7 @@ interface UIRenderer {
      */
     fun radialGradient(x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int)
 
-    /** Paint **/
+    // -- Paint -- //
 
     /**
      * Creates a new paint.
@@ -351,7 +427,7 @@ interface UIRenderer {
      */
     fun deallocatePaint()
 
-    /** Util **/
+    // -- Util -- //
 
     /**
      * Converts degrees to radians.
@@ -375,11 +451,10 @@ interface UIRenderer {
     }
 
     /**
-     * [LineCap] describes how the start and end of stroke shapes are drawn.
+     * [LineCap] describes how the start and end of stroke shapes are drawn. [Line cap visualization](https://www.w3.org/TR/svg-strokes/images/linecap.svg).
      *
      * @author sen
      * @since 1.0
-     * @see [Line cap visualization](https://www.w3.org/TR/svg-strokes/images/linecap.svg)
      */
     enum class LineCap {
         Butt,
@@ -388,11 +463,10 @@ interface UIRenderer {
     }
 
     /**
-     * [LineJoin] describes are sharp turns in a stroke are drawn
+     * [LineJoin] describes are sharp turns in a stroke are drawn. [Line join visualization](https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/img/cap-join.png).
      *
      * @author sen
      * @since 1.0
-     * @see [Line join visualization](https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/img/cap-join.png)
      */
     enum class LineJoin {
         Miter,

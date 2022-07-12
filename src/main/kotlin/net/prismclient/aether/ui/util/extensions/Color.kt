@@ -44,7 +44,8 @@ fun asRGBA(r: Int, g: Int, b: Int, a: Int = 255) =
 /**
  * Returns an [Int] with the given RGBA int, with a float alpha value.
  */
-fun asRGBA(r: Float, g: Float, b: Float, a: Float = 1f): Int = asRGBA((r * 255 + 0.5).toInt(), (g * 255 + 0.5).toInt(), (b * 255 + 0.5).toInt(), (a * 255 + 0.5).toInt())
+fun asRGBA(r: Float, g: Float, b: Float, a: Float = 1f): Int =
+    asRGBA((r * 255 + 0.5).toInt(), (g * 255 + 0.5).toInt(), (b * 255 + 0.5).toInt(), (a * 255 + 0.5).toInt())
 
 /**
  * Returns an [Int] with the given RGBA float values

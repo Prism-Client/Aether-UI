@@ -3,7 +3,8 @@ package net.prismclient.aether.ui.component.type.input.textfield
 import net.prismclient.aether.ui.component.type.input.textfield.caret.UICaret
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.UIColor
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.extensions.em
+import net.prismclient.aether.ui.util.extensions.px
 
 /**
  * The corresponding style sheet for text fields. It contains basic styling information

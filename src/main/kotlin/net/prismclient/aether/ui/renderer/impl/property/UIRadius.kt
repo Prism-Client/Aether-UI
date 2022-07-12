@@ -1,8 +1,6 @@
 package net.prismclient.aether.ui.renderer.impl.property
 
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.util.extensions.fromProgress
 import net.prismclient.aether.ui.util.extensions.lerp
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy

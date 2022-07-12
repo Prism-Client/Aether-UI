@@ -1,6 +1,5 @@
 package net.prismclient.aether.ui.component.type.input.button
 
-import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.function.BiConsumer
 
@@ -13,7 +12,8 @@ import java.util.function.BiConsumer
  * @author sen
  * @since 5/24/2022
  */
-open class UISelectableButton<T : UIStyleSheet>(checked: Boolean = false, text: String, style: String?) : UIButton<T>(text, style) {
+open class UISelectableButton<T : UIStyleSheet>(checked: Boolean = false, text: String, style: String?) :
+    UIButton<T>(text, style) {
     var checked = checked
         set(value) {
             field = value

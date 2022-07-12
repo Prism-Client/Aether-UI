@@ -1,7 +1,6 @@
 package net.prismclient.aether.ui.util.extensions
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIColor
 

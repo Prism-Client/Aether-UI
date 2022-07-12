@@ -3,7 +3,10 @@ import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.extensions.getAlpha
+import net.prismclient.aether.ui.util.extensions.getBlue
+import net.prismclient.aether.ui.util.extensions.getGreen
+import net.prismclient.aether.ui.util.extensions.getRed
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.nanovg.NanoVGGL3.*
@@ -21,7 +24,7 @@ import java.nio.ByteBuffer
  * @author sen
  * @since 1.0
  */
-class Renderer : UIRenderer {
+object Renderer : UIRenderer {
     private val framebuffers: HashMap<UIContentFBO, NVGLUFramebuffer> = hashMapOf()
 
     private val ctx: Long = nvgCreate(NVG_ANTIALIAS)
@@ -88,16 +91,10 @@ class Renderer : UIRenderer {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
         val contentScale = Aether.devicePxRatio
         val framebuffer = nvgluCreateFramebuffer(
-            ctx, (width * contentScale).toInt(), (height * contentScale).toInt(),
-            NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
+            ctx, (width * contentScale).toInt(), (height * contentScale).toInt(), NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
-            framebuffer.fbo(),
-            width * contentScale,
-            height * contentScale,
-            width,
-            height,
-            contentScale
+            framebuffer.fbo(), width * contentScale, height * contentScale, width, height, contentScale
         )
         framebuffers[fbo] = framebuffer
         return fbo
@@ -115,15 +112,38 @@ class Renderer : UIRenderer {
 
     override fun bindFBO(fbo: UIContentFBO) {
         nvgluBindFramebuffer(
-            ctx,
-            framebuffers[fbo] ?: throw NullPointerException("Unable to find the framebuffer $fbo.")
+            ctx, framebuffers[fbo] ?: throw NullPointerException("Unable to find the framebuffer $fbo.")
         )
         GL11.glViewport(0, 0, fbo.width.toInt(), fbo.height.toInt())
         GL11.glClearColor(0f, 0f, 0f, 0f)
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
     }
 
-    override fun unbindFBO() = nvgluBindFramebuffer(ctx, null)
+    override fun unbindFBO() {
+        nvgluBindFramebuffer(ctx, null)
+    }
+
+    override fun renderFbo(
+        fbo: UIContentFBO,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float,
+    ) {
+        allocPaint()
+        nvgImagePattern(ctx, x, y, width, height, 0f, framebuffers[fbo]!!.image(), 1f, paint!!)
+        nvgBeginPath(ctx)
+        color(-1)
+        paint!!.innerColor(fillColor)
+        paint!!.outerColor(fillColor)
+        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
+        nvgFillPaint(ctx, paint!!)
+        nvgFill(ctx)
+    }
 
     override fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData {
         val imageData = UIImageData()
@@ -170,19 +190,11 @@ class Renderer : UIRenderer {
         val h = (img.height() * scale).toInt()
         val rast = MemoryUtil.memAlloc(w * h * 4)
         NanoSVG.nsvgRasterize(
-            rasterizer,
-            img, 0f, 0f,
-            scale,
-            rast, w, h,
-            w * 4
+            rasterizer, img, 0f, 0f, scale, rast, w, h, w * 4
         )
         NanoSVG.nsvgDeleteRasterizer(rasterizer)
         image.handle = nvgCreateImageRGBA(
-            ctx,
-            w,
-            h,
-            NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY or NVG_IMAGE_GENERATE_MIPMAPS,
-            rast
+            ctx, w, h, NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY or NVG_IMAGE_GENERATE_MIPMAPS, rast
         )
         image.width = w
         image.height = h
@@ -209,25 +221,13 @@ class Renderer : UIRenderer {
     }
 
     override fun imagePattern(
-        imageHandle: Int,
-        x: Float,
-        y: Float,
-        width: Float,
-        height: Float,
-        angle: Float,
-        alpha: Float
+        imageHandle: Int, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float
     ) {
         allocPaint()
         paint!!.innerColor(fillColor)
         paint!!.outerColor(fillColor)
         nvgImagePattern(
-            ctx,
-            x, y,
-            width, height,
-            angle,
-            imageHandle,
-            alpha,
-            paint!!
+            ctx, x, y, width, height, angle, imageHandle, alpha, paint!!
         )
     }
 
@@ -312,8 +312,7 @@ class Renderer : UIRenderer {
         nvgStrokeColor(ctx, strokeColor)
     }
 
-    override fun pathHole(value: Boolean) =
-        nvgPathWinding(ctx, if (value) NVG_HOLE else NVG_SOLID)
+    override fun pathHole(value: Boolean) = nvgPathWinding(ctx, if (value) NVG_HOLE else NVG_SOLID)
 
     override fun moveTo(x: Float, y: Float) = nvgMoveTo(ctx, x, y)
 
@@ -325,24 +324,12 @@ class Renderer : UIRenderer {
     override fun quadTo(cx: Float, cy: Float, x: Float, y: Float) = nvgQuadTo(ctx, cx, cy, x, y)
 
     override fun arc(
-        x: Float,
-        y: Float,
-        radius: Float,
-        startAngle: Float,
-        endAngle: Float,
-        windingOrder: UIRenderer.WindingOrder
+        x: Float, y: Float, radius: Float, startAngle: Float, endAngle: Float, windingOrder: UIRenderer.WindingOrder
     ) = nvgArc(
-        ctx,
-        x,
-        y,
-        radius,
-        startAngle,
-        endAngle,
-        if (windingOrder == UIRenderer.WindingOrder.CW) NVG_CW else NVG_CCW
+        ctx, x, y, radius, startAngle, endAngle, if (windingOrder == UIRenderer.WindingOrder.CW) NVG_CW else NVG_CCW
     )
 
-    override fun arcTo(x: Float, y: Float, x1: Float, y1: Float, radius: Float) =
-        nvgArcTo(ctx, x, y, x1, y1, radius)
+    override fun arcTo(x: Float, y: Float, x1: Float, y1: Float, radius: Float) = nvgArcTo(ctx, x, y, x1, y1, radius)
 
     override fun lineCap(cap: UIRenderer.LineCap) = nvgLineCap(
         ctx, when (cap) {
@@ -370,12 +357,7 @@ class Renderer : UIRenderer {
     }
 
     override fun radialGradient(
-        x: Float,
-        y: Float,
-        innerRadius: Float,
-        outerRadius: Float,
-        startColor: Int,
-        endColor: Int
+        x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int
     ) {
         allocPaint()
         val color1 = createColor(startColor)

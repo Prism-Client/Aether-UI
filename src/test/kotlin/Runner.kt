@@ -4,7 +4,6 @@ import examples.Default
 import examples.PathRendering
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
-import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import org.lwjgl.glfw.Callbacks
@@ -111,7 +110,10 @@ object Runner {
                     GLFW_KEY_TAB -> Aether.updateModifierKey(UIModifierKey.TAB, isRelease)
                     GLFW_KEY_ESCAPE -> Aether.updateModifierKey(UIModifierKey.ESCAPE, isRelease)
                     GLFW_KEY_ENTER -> Aether.updateModifierKey(UIModifierKey.ENTER, isRelease)
-                    GLFW_KEY_CAPS_LOCK, GLFW_MOD_CAPS_LOCK -> Aether.updateModifierKey(UIModifierKey.CAPS_LOCK, isRelease)
+                    GLFW_KEY_CAPS_LOCK, GLFW_MOD_CAPS_LOCK -> Aether.updateModifierKey(
+                        UIModifierKey.CAPS_LOCK,
+                        isRelease
+                    )
                     GLFW_KEY_BACKSPACE -> Aether.updateModifierKey(UIModifierKey.BACKSPACE, isRelease)
                 }
             } else {
@@ -140,7 +142,7 @@ object Runner {
         glfwSetTime(0.0)
         glfwSwapInterval(1)
 
-        core = Aether(Renderer())
+        core = Aether(Renderer)
 
         MemoryStack.stackPush().use {
             val fw = it.mallocInt(1)
@@ -154,12 +156,14 @@ object Runner {
             contentScaleX = sx[0]
             contentScaleY = sy[0]
 
-            core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
+            core!!.update(
+                framebufferWidth / contentScaleX,
+                framebufferHeight / contentScaleY,
+                max(contentScaleX, contentScaleY)
+            )
         }
 
         createScreen(args)
-
-        UIAssetDSL.image("background", "/prism/background.png")
 
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())
@@ -182,24 +186,15 @@ object Runner {
     }
 
     fun createScreen(args: Array<String>) {
-<<<<<<< Updated upstream:src/test/kotlin/net/prismclient/aether/Runner.kt
-        if (args.isNotEmpty()) when (args[0]) {
-            "--testing" ->  Aether.displayScreen(TestingScreen())
-            "--auto-layouts" -> Aether.displayScreen(AutoLayouts())
-            "--animations" -> Aether.displayScreen(Animations())
-        }
-        else Aether.displayScreen(PrismGameMenu())
-
-        //Aether.displayScreen(PrismGameMenu())
-=======
         if (args.isNotEmpty()) {
-            Aether.displayScreen(when(args[0]) {
-                "Animations" -> Animations()
-                "AutoLayouts" -> AutoLayouts()
-                "PathRendering" -> PathRendering()
-                else -> Default()
-            })
+            Aether.displayScreen(
+                when (args[0]) {
+                    "Animations" -> Animations()
+                    "AutoLayouts" -> AutoLayouts()
+                    "PathRendering" -> PathRendering()
+                    else -> Default()
+                }
+            )
         }
->>>>>>> Stashed changes:src/test/kotlin/Runner.kt
     }
 }

@@ -23,7 +23,8 @@ import java.util.function.Consumer
  * @since 6/6/2022
  * @see UITextField.filter Pre-made text filters.
  */
-open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String?) : UIButton<UITextFieldSheet>(text, style), UIFocusable {
+open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String?) :
+    UIButton<UITextFieldSheet>(text, style), UIFocusable {
     override var text: String = text
         set(value) {
             field = value
@@ -59,7 +60,10 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
                             clearSelection()
 //                            moveCaret(getCaretPosition() - clearSelection())
                         } else if (getCaretPosition() > 0) {
-                            this.text = this.text.substring(0, getCaretPosition() - 1) + this.text.substring(getCaretPosition(), this.text.length)
+                            this.text = this.text.substring(0, getCaretPosition() - 1) + this.text.substring(
+                                getCaretPosition(),
+                                this.text.length
+                            )
                             moveCaret(getCaretPosition() - 1)
                         }
                     }
@@ -125,11 +129,21 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
         if (isCtrlHeld) {
             when (character.lowercase()[0]) {
                 /* Select all */ 'a' -> select(0, text.length)
-                /* Copy */ 'c' -> { warn("Copy not implemented") }
-                /* Paste */ 'v' -> { warn("Paste not implemented") }
-                /* Cut */ 'x' -> { warn("Cut not implemented") }
-                /* Undo */ 'z' -> { warn("Undo not implemented") }
-                /* Redo */ 'y' -> { warn("Redo not implemented") }
+                /* Copy */ 'c' -> {
+                warn("Copy not implemented")
+            }
+                /* Paste */ 'v' -> {
+                warn("Paste not implemented")
+            }
+                /* Cut */ 'x' -> {
+                warn("Cut not implemented")
+            }
+                /* Undo */ 'z' -> {
+                warn("Undo not implemented")
+            }
+                /* Redo */ 'y' -> {
+                warn("Redo not implemented")
+            }
             }
             return
         }
@@ -184,7 +198,10 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
      * @return The length of the cleared string
      */
     open fun clearSelection() {
-        text = text.substring(0, min(getCaretPosition(), getSelectionPosition())) + text.substring(max(getSelectionPosition(), getCaretPosition()), text.length)
+        text = text.substring(
+            0,
+            min(getCaretPosition(), getSelectionPosition())
+        ) + text.substring(max(getSelectionPosition(), getCaretPosition()), text.length)
         moveCaret(min(getCaretPosition(), getSelectionPosition()))
     }
 
@@ -230,7 +247,8 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
 
     companion object Filters {
         @JvmStatic
-        val any = TextFilter("ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890~`!@#$%^&*()_+-=|,./<>?;':{}[]\"\\ ")
+        val any =
+            TextFilter("ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890~`!@#$%^&*()_+-=|,./<>?;':{}[]\"\\ ")
 
         @JvmStatic
         val alphabet = TextFilter("ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")

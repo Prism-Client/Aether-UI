@@ -1,11 +1,11 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -53,8 +53,8 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
             h = (c.relY + c.relHeight + c.marginBottom).coerceAtLeast(h)
         }
 
-        val x = if (style.clipContent) 0f else relX
-        val y = if (style.clipContent) 0f else relY
+        val x = if (style.useFBO) 0f else relX
+        val y = if (style.useFBO) 0f else relY
 
         expandedWidth = (w - relWidth - x).coerceAtLeast(0f)
         expandedHeight = (h - relHeight - y).coerceAtLeast(0f)
@@ -62,7 +62,9 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
         updateScrollbar()
     }
 
-    override fun updateLayout() {}
+    override fun updateLayout() {
+        components.forEach { it.update() }
+    }
 
     open fun updateScrollbar() {
         style.verticalScrollbar.update(this)
@@ -75,29 +77,47 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
     }
 
     override fun renderContent() {
-        if (style.useFBO) {
-            if (requiresUpdate || !style.optimizeRenderer) {
-                if (fbo == null) updateFBO()
-                UIRendererDSL.translate(
-                    -(style.horizontalScrollbar.value * expandedWidth),
-                    -(style.verticalScrollbar.value * expandedHeight)
-                ) {
-                    renderFBO()
-                }
-                requiresUpdate = false
+        if (style.useFBO && (requiresUpdate || !style.optimizeRenderer)) {
+            if (fbo == null) {
+                updateFBO()
             }
+            renderer {
+                fbo!!.renderToFramebuffer {
+                    translate(
+                        -(style.horizontalScrollbar.value * expandedWidth),
+                        -(style.verticalScrollbar.value * expandedHeight)
+                    ) {
+                        components.forEach(UIComponent<*>::render)
+                    }
+                }
+            }
+            requiresUpdate = false
         }
     }
 
     override fun renderComponent() {
-        // Translations for FBOs are handled above
-        if (!style.useFBO) {
+        if (style.useFBO) {
+            Aether.renderer.renderFbo(
+                fbo!!,
+                relX,
+                relY,
+                relWidth,
+                relHeight,
+                style.background?.radius?.topLeft ?: 0f,
+                style.background?.radius?.topRight ?: 0f,
+                style.background?.radius?.bottomLeft ?: 0f,
+                style.background?.radius?.bottomRight ?: 0f
+            )
+        } else {
             renderer {
                 translate(
                     -(style.horizontalScrollbar.value * expandedWidth),
                     -(style.verticalScrollbar.value * expandedHeight)
                 ) {
-                    super.renderComponent()
+                    if (style.clipContent) scissor(relX, relY, relWidth, relHeight) {
+                        components.forEach(UIComponent<*>::render)
+                    }
+                    else components.forEach(UIComponent<*>::render)
                 }
             }
         }
@@ -106,6 +126,16 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
     override fun render() {
         super.render()
         renderScrollbar()
+    }
+
+    override fun updateAnimation() {
+        if (animations != null) {
+            animations!!.forEach { it.value.update() }
+            animations!!.entries.removeIf { it.value.isCompleted }
+            if (animations!!.isEmpty())
+                animations = null
+            updateLayout()
+        }
     }
 
     override fun mousePressed(event: UIMouseEvent) {
@@ -129,6 +159,8 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
         )
         style.verticalScrollbar.mouseMoved()
         style.horizontalScrollbar.mouseMoved()
+        if (style.verticalScrollbar.selected || style.horizontalScrollbar.selected)
+            requestUpdate()
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {

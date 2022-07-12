@@ -11,4 +11,4 @@ import net.prismclient.aether.ui.unit.UIUnit
  * @author sen
  * @since 5/26/2022
  */
-class UIRangeUnit(var unit: UIUnit, var min: UIUnit, var max: UIUnit): UIUnit(0f, -1)
+class UIRangeUnit(var unit: UIUnit, var min: UIUnit, var max: UIUnit) : UIUnit(0f, -1)

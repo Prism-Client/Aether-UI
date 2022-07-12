@@ -1,10 +1,7 @@
 package net.prismclient.aether.ui.component.controller
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.style.UIStyleSheet
-import net.prismclient.aether.ui.util.warn
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
 
 /**
  * [UIController] is a transparent system that monitors and controls

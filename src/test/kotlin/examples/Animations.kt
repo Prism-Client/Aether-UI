@@ -3,7 +3,6 @@ package examples
 import examples.deps.Generic
 import net.prismclient.aether.ui.animation.ease.impl.UILinear
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
-import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.screen.UIScreen

@@ -14,11 +14,13 @@ import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 
 class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
+    var background: UIBackground? = null
     var border: UIBorder? = null
     var radius: UIRadius? = null
-
-    var background: UIBackground? = null
-
+        set(value) {
+            field = value
+            background?.radius = value
+        }
     var value = 0f
         set(value) {
             field = value.limit()
@@ -155,7 +157,11 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
      * Shorthand for adding a color, and radius (optional) for the background to this [UIScrollbar]
      */
     @JvmOverloads
-    inline fun background(color: UIColor? = null, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
+    inline fun background(
+        color: UIColor? = null,
+        radius: UIRadius? = background?.radius,
+        block: UIBackground.() -> Unit = {}
+    ) =
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /**

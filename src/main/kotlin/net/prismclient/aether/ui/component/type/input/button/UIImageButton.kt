@@ -10,7 +10,8 @@ import net.prismclient.aether.ui.util.ucreate
  * @author sen
  * @since 5/9/2022
  */
-class UIImageButton(private val imageName: String, private val imageStyle: String, text: String, style: String?) : UIButton<UIStyleSheet>(text, style) {
+class UIImageButton(private val imageName: String, private val imageStyle: String, text: String, style: String?) :
+    UIButton<UIStyleSheet>(text, style) {
     lateinit var image: UIImage
 
     override fun initialize() {

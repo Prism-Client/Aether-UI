@@ -2,9 +2,8 @@ package net.prismclient.aether.ui.component.type.image
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.dsl.UIAssetDSL
-import net.prismclient.aether.ui.dsl.UIRendererDSL
-import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**

@@ -5,10 +5,10 @@ import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.dsl.UIRendererDSL.fontBounds
 import net.prismclient.aether.ui.dsl.UIRendererDSL.indexOffset
+import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.font.UIFont.FontRenderType
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.UIStyleSheet

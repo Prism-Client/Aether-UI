@@ -1,27 +1,23 @@
 package net.prismclient.aether.ui
 
+import net.prismclient.aether.ui.Aether.Properties
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
-import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
-import net.prismclient.aether.ui.dsl.UIRendererDSL
+import net.prismclient.aether.ui.event.input.UIMouseEvent
+import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.renderer.UIProvider
-import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
-import net.prismclient.aether.ui.util.interfaces.UIFocusable
-
-import net.prismclient.aether.ui.util.input.UIKeyAction.*
 import net.prismclient.aether.ui.util.input.UIKey.*
+import net.prismclient.aether.ui.util.input.UIKeyAction.*
 import net.prismclient.aether.ui.util.input.UIModifierKey
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * [Aether] is the core of the Aether UI. It is responsible for managing the entirety
@@ -65,6 +61,12 @@ open class Aether(renderer: UIRenderer) {
     var controllers: ArrayList<UIController<*>>? = null
         protected set
 
+    /**
+     * Used to track the time between each frame framebuffer update. Frames with
+     * useFBO enabled are automatically updated every second.
+     */
+    protected var lastUpdate: Long = 0
+
     init {
         instance = this
         Properties.renderer = renderer
@@ -84,16 +86,18 @@ open class Aether(renderer: UIRenderer) {
     }
 
     /**
-     * This must be invoked before the rendering of the screen. It updates all active frames.
+     * This must be invoked before the rendering of the screen. It updates
+     * all active frames that are in need of a frame redraw or update.
      */
     open fun renderFrames() {
         renderer {
+            val shouldUpdate = if (lastUpdate + 1000L < System.currentTimeMillis()) {
+                lastUpdate = System.currentTimeMillis()
+                true
+            } else false
             frames?.forEach {
-                if (it.visible && it.requiresUpdate && it.style.useFBO) {
-                    beginFrame(width, height, devicePxRatio)
-                    it.renderContent()
-                    endFrame()
-                }
+                if (shouldUpdate) it.requestUpdate()
+                it.renderContent()
             }
         }
     }
@@ -107,8 +111,7 @@ open class Aether(renderer: UIRenderer) {
                 beginFrame(width, height, devicePxRatio)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]
-                    if (component.visible)
-                        component.render()
+                    if (component.visible) component.render()
                 }
                 endFrame()
             }
@@ -123,8 +126,7 @@ open class Aether(renderer: UIRenderer) {
     fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
         mouseMoveListeners?.forEach { it.value.run() }
-        if (activeScreen != null)
-            for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
+        if (activeScreen != null) for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
     }
 
     /**
@@ -167,10 +169,14 @@ open class Aether(renderer: UIRenderer) {
                 val check = child.isMouseInsideBounds()
                 if (child.isMouseInsideBounds() || !child.style.clipContent) {
                     if (child.childrenCount > 0) {
-                        if (peek(if (child is UIFrame) child.components else list, i + if (child is UIFrame) 0 else 1, clickCount)) return true
+                        if (peek(
+                                if (child is UIFrame) child.components else list,
+                                i + if (child is UIFrame) 0 else 1,
+                                clickCount
+                            )
+                        ) return true
                     }
-                    if (check)
-                        component = child
+                    if (check) component = child
                 }
             }
 
@@ -192,7 +198,12 @@ open class Aether(renderer: UIRenderer) {
 
             if (child.isMouseInsideBounds()) {
                 if (child.childrenCount > 0) {
-                    if (peek(if (child is UIFrame) child.components else components!!, if (child is UIFrame) 0 else i, clickCount)) return
+                    if (peek(
+                            if (child is UIFrame) child.components else components!!,
+                            if (child is UIFrame) 0 else i,
+                            clickCount
+                        )
+                    ) return
                     i += child.childrenCount
                 }
                 c = child
@@ -230,7 +241,8 @@ open class Aether(renderer: UIRenderer) {
      * as de-focusing the focused component and adding listeners to input.
      */
     companion object Properties {
-        @JvmStatic var debug: Boolean = true
+        @JvmStatic
+        var debug: Boolean = true
 
         @JvmStatic
         lateinit var instance: Aether
@@ -462,8 +474,7 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         fun displayScreen(screen: UIScreen) {
-            if (activeScreen != null)
-                deallocateComponents()
+            if (activeScreen != null) deallocateComponents()
 
             activeScreen = screen
             instance.components = ArrayList()
@@ -514,16 +525,14 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         fun tryFocus() {
-            if (activeScreen == null)
-                return
+            if (activeScreen == null) return
 
             fun peek(contain: UIContainer<*>): Boolean {
                 var component: UIContainer<*>? = null
                 for (i in 0 until contain.components.size) {
                     val container = contain.components[i] as? UIContainer<*> ?: continue
                     if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
-                        if (peek(container))
-                            return true
+                        if (peek(container)) return true
                         component = container
                     }
                 }
@@ -550,8 +559,7 @@ open class Aether(renderer: UIRenderer) {
             }
 
             // If a container was found, then focus it
-            if (component != null)
-                component!!.focus()
+            if (component != null) component!!.focus()
         }
 
         /**

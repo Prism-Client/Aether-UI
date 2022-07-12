@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.component.type.layout.styles
 
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet.Overflow
 import net.prismclient.aether.ui.renderer.impl.scrollbar.UIScrollbar
 import net.prismclient.aether.ui.style.UIStyleSheet
 
@@ -12,7 +13,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @see UIScrollbar
  * @see Overflow
  */
-open class UIContainerSheet(name: String) : UIFrameSheet(name) {
+open class UIContainerSheet @JvmOverloads constructor(name: String = "") : UIFrameSheet(name) {
     /**
      * Describes when to introduce the scrollbar
      *

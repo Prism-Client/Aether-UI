@@ -1,9 +1,7 @@
 package net.prismclient.aether.ui.renderer.impl.property
 
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.extensions.fromProgress
 import net.prismclient.aether.ui.util.extensions.lerp
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
@@ -22,10 +20,14 @@ class UIPadding : UICopy<UIPadding>, UIAnimatable<UIPadding> {
 
     override fun animate(animation: UIAnimation<*>, previous: UIPadding?, current: UIPadding?, progress: Float) {
         val component = animation.component
-        component.paddingTop = previous?.paddingTop?.lerp(current?.paddingTop, component, progress, true) ?: component.paddingTop
-        component.paddingRight = previous?.paddingRight?.lerp(current?.paddingRight, component, progress, true) ?: component.paddingRight
-        component.paddingBottom = previous?.paddingBottom?.lerp(current?.paddingBottom, component, progress, true) ?: component.paddingBottom
-        component.paddingLeft = previous?.paddingLeft?.lerp(current?.paddingLeft, component, progress, true) ?: component.paddingLeft
+        component.paddingTop =
+            previous?.paddingTop?.lerp(current?.paddingTop, component, progress, true) ?: component.paddingTop
+        component.paddingRight =
+            previous?.paddingRight?.lerp(current?.paddingRight, component, progress, true) ?: component.paddingRight
+        component.paddingBottom =
+            previous?.paddingBottom?.lerp(current?.paddingBottom, component, progress, true) ?: component.paddingBottom
+        component.paddingLeft =
+            previous?.paddingLeft?.lerp(current?.paddingLeft, component, progress, true) ?: component.paddingLeft
     }
 
     override fun save(animation: UIAnimation<*>, keyframe: UIPadding?) {
