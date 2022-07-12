@@ -1,11 +1,9 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
-import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -74,38 +72,31 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
         style.horizontalScrollbar.render()
     }
 
-    override fun renderContent() {
-        if (style.useFBO) {
-            if (requiresUpdate || !style.optimizeRenderer) {
-                if (fbo == null) updateFBO()
-                UIRendererDSL.translate(
-                    -(style.horizontalScrollbar.value * expandedWidth),
-                    -(style.verticalScrollbar.value * expandedHeight)
-                ) {
-                    renderFBO()
-                }
-                requiresUpdate = false
-            }
-        }
-    }
-
     override fun renderComponent() {
-        // Translations for FBOs are handled above
-        if (!style.useFBO) {
-            renderer {
-                translate(
-                    -(style.horizontalScrollbar.value * expandedWidth),
-                    -(style.verticalScrollbar.value * expandedHeight)
-                ) {
-                    super.renderComponent()
-                }
-            }
-        }
+        super.renderComponent()
+//        renderer {
+//            translate(
+//                -(style.horizontalScrollbar.value * expandedWidth),
+//                -(style.verticalScrollbar.value * expandedHeight)
+//            ) {
+//                super.renderComponent()
+//            }
+//        }
     }
 
     override fun render() {
         super.render()
         renderScrollbar()
+    }
+
+    override fun updateAnimation() {
+        if (animations != null) {
+            animations!!.forEach { it.value.update() }
+            animations!!.entries.removeIf { it.value.isCompleted }
+            if (animations!!.isEmpty())
+                animations = null
+            updateLayout()
+        }
     }
 
     override fun mousePressed(event: UIMouseEvent) {

@@ -1,16 +1,14 @@
 package net.prismclient.aether.ui.renderer.other
 
-import net.prismclient.aether.ui.component.type.layout.UIFrame
-
 /**
- * [UIContentFBO] represents an FBO object. They are general created
- * when a [UIFrame] is created
+ * [UIContentFBO] represents a framebuffer. It contains the necessary information to render the fbo
+ * to an image via the [imagePattern]. The [contentScale] represents the device pixel ratio.
  *
  * @author sen
- * @since 5/1/2022
+ * @since 1.0
  */
-class UIContentFBO(
-    val id: Int,
+data class UIContentFBO(
+    val imagePattern: Int,
     val width: Float,
     val height: Float,
     val scaledWidth: Float,

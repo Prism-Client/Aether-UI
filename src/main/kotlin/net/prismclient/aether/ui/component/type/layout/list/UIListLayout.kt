@@ -25,8 +25,8 @@ open class UIListLayout @JvmOverloads constructor(
     var componentSpacing: UIUnit? = null
 
     override fun updateLayout() {
-        var x = if (style.clipContent) 0f else x + getParentX()
-        var y = if (style.clipContent) 0f else y + getParentY()
+        var x = if (style.useFBO) 0f else x + getParentX()
+        var y = if (style.useFBO) 0f else y + getParentY()
         val spacing = if (listDirection == ListDirection.Horizontal) +componentSpacing else -componentSpacing
 
         if (listOrder == Forward) {
@@ -39,6 +39,8 @@ open class UIListLayout @JvmOverloads constructor(
                 if (component.parent != this)
                     continue
 
+                component.overridden = false
+                component.updatePosition()
                 component.overridden = true
 
                 if (listDirection == ListDirection.Vertical) {
@@ -56,6 +58,8 @@ open class UIListLayout @JvmOverloads constructor(
                 if (component.parent != this)
                     continue
 
+                component.overridden = false
+                component.updatePosition()
                 component.overridden = true
 
                 if (listDirection == ListDirection.Vertical) {

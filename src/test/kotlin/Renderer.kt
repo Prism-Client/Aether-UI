@@ -21,7 +21,7 @@ import java.nio.ByteBuffer
  * @author sen
  * @since 1.0
  */
-class Renderer : UIRenderer {
+object Renderer : UIRenderer {
     private val framebuffers: HashMap<UIContentFBO, NVGLUFramebuffer> = hashMapOf()
 
     private val ctx: Long = nvgCreate(NVG_ANTIALIAS)
@@ -123,7 +123,27 @@ class Renderer : UIRenderer {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
     }
 
-    override fun unbindFBO() = nvgluBindFramebuffer(ctx, null)
+    override fun unbindFBO() {
+        nvgluBindFramebuffer(ctx, null)
+    }
+
+    override fun renderFbo(
+        fbo: UIContentFBO,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+    ) {
+        allocPaint()
+        nvgImagePattern(ctx, x, y, width, height, 0f, framebuffers[fbo]!!.image(), 1f, paint!!)
+        nvgBeginPath(ctx)
+        color(-1)
+        paint!!.innerColor(fillColor)
+        paint!!.outerColor(fillColor)
+        nvgRect(ctx, x, y, width, height)
+        nvgFillPaint(ctx, paint!!)
+        nvgFill(ctx)
+    }
 
     override fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData {
         val imageData = UIImageData()

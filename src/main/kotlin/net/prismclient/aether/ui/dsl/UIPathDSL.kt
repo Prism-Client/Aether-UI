@@ -150,7 +150,7 @@ object UIPathDSL {
     ) = renderer.arc(x, y, radius, startAngle, endAngle, windingOrder)
 
     /**
-     * Renders a rectangle with a single radius value.
+     * Creates a rectangle sub-path with a single radius value.
      */
     @JvmStatic
     @JvmOverloads

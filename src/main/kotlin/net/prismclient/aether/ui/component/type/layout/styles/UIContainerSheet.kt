@@ -12,7 +12,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @see UIScrollbar
  * @see Overflow
  */
-open class UIContainerSheet(name: String) : UIFrameSheet(name) {
+open class UIContainerSheet @JvmOverloads constructor(name: String = "") : UIFrameSheet(name) {
     /**
      * Describes when to introduce the scrollbar
      *

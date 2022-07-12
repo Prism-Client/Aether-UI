@@ -48,11 +48,6 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
     var requiresUpdate: Boolean = true
         protected set
 
-    /**
-     * An internal clock to update the frame at least once per second
-     */
-    protected var lastUpdate: Long = System.currentTimeMillis()
-
     override fun update() {
         super.update()
         components.forEach { it.update() }
@@ -64,8 +59,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      * frame has been updated, but prior to the first render.
      */
     open fun updateFBO() {
-        if (style.useFBO)
-            fbo = Aether.renderer.createFBO(relWidth, relHeight)
+        if (style.useFBO) fbo = Aether.renderer.createFBO(relWidth, relHeight)
     }
 
     /**
@@ -80,8 +74,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      * Removes the given component from [components] and sets the parent to null.
      */
     open fun removeComponent(component: UIComponent<*>) {
-        if (!components.remove(component))
-            warn("Failed to remove $component, as it was not found within the list.")
+        if (!components.remove(component)) warn("Failed to remove $component, as it was not found within the list.")
         else {
             component.parent = null
         }
@@ -91,43 +84,33 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      * Renders the components within this frame.
      */
     open fun renderContent() {
-        if (style.useFBO) {
-            if (requiresUpdate || !style.optimizeRenderer) {
-                if (fbo == null) updateFBO()
-                renderer {
-                    renderer.bindFBO(fbo!!)
-                    beginFrame(fbo!!.width, fbo!!.height, fbo!!.contentScale)
-                    components.forEach(UIComponent<*>::render)
-                    endFrame()
-                    renderer.unbindFBO()
-                }
-                requiresUpdate = false
+        if (style.useFBO && (requiresUpdate || !style.optimizeRenderer)) {
+            if (fbo == null) {
+                updateFBO()
             }
+            renderer {
+                fbo!!.renderToFramebuffer {
+                    components.forEach(UIComponent<*>::render)
+                }
+            }
+            requiresUpdate = false
         }
     }
 
 
     override fun render() {
         updateAnimation()
-        if (lastUpdate + 1000L < System.currentTimeMillis()) {
-            requestUpdate()
-            lastUpdate = System.currentTimeMillis()
-        }
         style.background?.render()
         renderComponent()
-        if (style.useFBO) {
-            renderFBO()
-        }
     }
 
     override fun renderComponent() {
         if (style.useFBO) {
-            renderFBO()
+            Aether.renderer.renderFbo(fbo!!, relX, relY, relWidth, relHeight)
         } else {
-            if (style.clipContent)
-                UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
-                    components.forEach(UIComponent<*>::render)
-                }
+            if (style.clipContent) UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
+                components.forEach(UIComponent<*>::render)
+            }
             else components.forEach(UIComponent<*>::render)
         }
     }
@@ -170,12 +153,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
         requestUpdate()
     }
 
-    protected fun renderFBO() {
-        renderer {
-            path {
-                renderer.imagePattern(fbo!!.id,  relX, relY, relWidth, relHeight, 0f, 1f)
-                rect(relX, relY, relWidth, relHeight)
-            }.fillPaint()
-        }
+    protected open fun renderFBO() {
+
     }
 }
