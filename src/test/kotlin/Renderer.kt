@@ -3,7 +3,10 @@ import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.extensions.getAlpha
+import net.prismclient.aether.ui.util.extensions.getBlue
+import net.prismclient.aether.ui.util.extensions.getGreen
+import net.prismclient.aether.ui.util.extensions.getRed
 import org.lwjgl.nanovg.*
 import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.nanovg.NanoVGGL3.*

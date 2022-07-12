@@ -2,8 +2,6 @@ package net.prismclient.aether.ui.component.type.input.slider
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.util.extensions.asRGBA
-import net.prismclient.aether.ui.util.extensions.renderer
 import java.util.function.BiConsumer
 import kotlin.math.roundToInt
 

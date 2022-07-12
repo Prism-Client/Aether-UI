@@ -4,7 +4,6 @@ import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.util.*
 import net.prismclient.aether.ui.util.extensions.safeByteBuffer
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
-import net.prismclient.aether.ui.util.warn
 import org.apache.commons.io.FilenameUtils
 import java.io.File
 import java.nio.ByteBuffer
@@ -91,7 +90,7 @@ object UIAssetDSL {
         deep: Boolean = true,
         imageFlags: Int = DEFAULT_IMAGE_FLAGS,
         svgScale: Float = Aether.devicePxRatio
-    ): Int  {
+    ): Int {
         val file = Aether.javaClass.getResource(folderLocation) ?: run {
             warn("Failed to bulk load [$folderLocation] as the file was null.")
             return 0

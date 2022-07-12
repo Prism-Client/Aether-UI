@@ -152,8 +152,4 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
         components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
         requestUpdate()
     }
-
-    protected open fun renderFBO() {
-
-    }
 }

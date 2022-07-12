@@ -243,7 +243,16 @@ interface UIRenderer {
     /**
      * Creates a rounded rectangle from the given [x], [y], [width], [height], with four corner radii points.
      */
-    fun rect(x: Float, y: Float, width: Float, height: Float, topLeft: Float, topRight: Float, bottomRight: Float, bottomLeft: Float)
+    fun rect(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    )
 
     /**
      * Creates an ellipse from the given [x], and [y].

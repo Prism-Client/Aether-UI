@@ -1,25 +1,23 @@
 package net.prismclient.aether.ui
 
+import net.prismclient.aether.ui.Aether.Properties
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
-import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.event.input.UIMouseEvent
+import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.screen.UIScreen
-import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.util.extensions.renderer
-import net.prismclient.aether.ui.util.interfaces.UIFocusable
-
-import net.prismclient.aether.ui.util.input.UIKeyAction.*
 import net.prismclient.aether.ui.util.input.UIKey.*
+import net.prismclient.aether.ui.util.input.UIKeyAction.*
 import net.prismclient.aether.ui.util.input.UIModifierKey
+import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * [Aether] is the core of the Aether UI. It is responsible for managing the entirety
@@ -178,7 +176,12 @@ open class Aether(renderer: UIRenderer) {
                 val check = child.isMouseInsideBounds()
                 if (child.isMouseInsideBounds() || !child.style.clipContent) {
                     if (child.childrenCount > 0) {
-                        if (peek(if (child is UIFrame) child.components else list, i + if (child is UIFrame) 0 else 1, clickCount)) return true
+                        if (peek(
+                                if (child is UIFrame) child.components else list,
+                                i + if (child is UIFrame) 0 else 1,
+                                clickCount
+                            )
+                        ) return true
                     }
                     if (check)
                         component = child
@@ -203,7 +206,12 @@ open class Aether(renderer: UIRenderer) {
 
             if (child.isMouseInsideBounds()) {
                 if (child.childrenCount > 0) {
-                    if (peek(if (child is UIFrame) child.components else components!!, if (child is UIFrame) 0 else i, clickCount)) return
+                    if (peek(
+                            if (child is UIFrame) child.components else components!!,
+                            if (child is UIFrame) 0 else i,
+                            clickCount
+                        )
+                    ) return
                     i += child.childrenCount
                 }
                 c = child
@@ -241,7 +249,8 @@ open class Aether(renderer: UIRenderer) {
      * as de-focusing the focused component and adding listeners to input.
      */
     companion object Properties {
-        @JvmStatic var debug: Boolean = true
+        @JvmStatic
+        var debug: Boolean = true
 
         @JvmStatic
         lateinit var instance: Aether

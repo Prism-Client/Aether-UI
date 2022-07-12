@@ -42,7 +42,8 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md">Styles</s>
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md#creating-styles">How to create styles</a>
  */
-open class UIStyleSheet @JvmOverloads constructor(var name: String = "") : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
+open class UIStyleSheet @JvmOverloads constructor(var name: String = "") : UICopy<UIStyleSheet>,
+    UIAnimatable<UIStyleSheet> {
     /**
      * When true, the property will not be cleared when Aether cleans up styles.
      */

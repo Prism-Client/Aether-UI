@@ -8,7 +8,10 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIColor
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.extensions.calculate
+import net.prismclient.aether.ui.util.extensions.mix
+import net.prismclient.aether.ui.util.extensions.px
+import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
 /**
@@ -26,8 +29,20 @@ open class UIBackground : UIShape<UIBackground>(), UIAnimatable<UIBackground> {
     override fun update(component: UIComponent<*>?) {
         // Reflect the rel units instead of the inner values
         this.component = component
-        cachedX = (component?.relX ?: 0f) + calculate(x, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
-        cachedY = (component?.relY ?: 0f) + calculate(y, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
+        cachedX = (component?.relX ?: 0f) + calculate(
+            x,
+            component,
+            component?.relWidth ?: 0f,
+            component?.relHeight ?: 0f,
+            false
+        )
+        cachedY = (component?.relY ?: 0f) + calculate(
+            y,
+            component,
+            component?.relWidth ?: 0f,
+            component?.relHeight ?: 0f,
+            true
+        )
         cachedWidth = calculate(width, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
         cachedHeight = calculate(height, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
         border?.update(component)
@@ -47,7 +62,12 @@ open class UIBackground : UIShape<UIBackground>(), UIAnimatable<UIBackground> {
     }
 
     @JvmOverloads
-    inline fun border(borderColor: UIColor? = null, borderWidth: UIUnit? = px(1), strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE, block: UIBorder.() -> Unit = {}) {
+    inline fun border(
+        borderColor: UIColor? = null,
+        borderWidth: UIUnit? = px(1),
+        strokeDirection: UIStrokeDirection = UIStrokeDirection.OUTSIDE,
+        block: UIBorder.() -> Unit = {}
+    ) {
         border {
             this.borderColor = borderColor
             this.borderWidth = borderWidth
@@ -68,7 +88,8 @@ open class UIBackground : UIShape<UIBackground>(), UIAnimatable<UIBackground> {
     ) {
         if (previous?.backgroundColor != null || current?.backgroundColor != null) {
             backgroundColor = backgroundColor ?: UIColor(0)
-            backgroundColor!!.rgba = previous?.backgroundColor.mix(current?.backgroundColor, backgroundColor!!, progress)
+            backgroundColor!!.rgba =
+                previous?.backgroundColor.mix(current?.backgroundColor, backgroundColor!!, progress)
         }
         if (previous?.radius != null || current?.radius != null) {
             radius = radius ?: UIRadius()

@@ -30,10 +30,24 @@ class UIGradientBackground : UIBackground() {
 
     override fun update(component: UIComponent<*>?) {
         super.update(component)
-        gradientXCache = (component?.relX ?: 0f) + calculate(gradientX, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
-        gradientYCache = (component?.relY ?: 0f) + calculate(gradientY, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
-        gradientWidthCache = calculate(gradientWidth, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
-        gradientHeightCache = calculate(gradientHeight, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
+        gradientXCache = (component?.relX ?: 0f) + calculate(
+            gradientX,
+            component,
+            component?.relWidth ?: 0f,
+            component?.relHeight ?: 0f,
+            false
+        )
+        gradientYCache = (component?.relY ?: 0f) + calculate(
+            gradientY,
+            component,
+            component?.relWidth ?: 0f,
+            component?.relHeight ?: 0f,
+            true
+        )
+        gradientWidthCache =
+            calculate(gradientWidth, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
+        gradientHeightCache =
+            calculate(gradientHeight, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
     }
 
     override fun render() {

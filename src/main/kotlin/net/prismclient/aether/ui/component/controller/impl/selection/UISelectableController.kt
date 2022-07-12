@@ -2,7 +2,6 @@ package net.prismclient.aether.ui.component.controller.impl.selection
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
-import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.function.Consumer
 import kotlin.reflect.KClass
 

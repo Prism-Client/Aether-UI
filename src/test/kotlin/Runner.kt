@@ -4,7 +4,6 @@ import examples.Default
 import examples.PathRendering
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
-import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import org.lwjgl.glfw.Callbacks
@@ -111,7 +110,10 @@ object Runner {
                     GLFW_KEY_TAB -> Aether.updateModifierKey(UIModifierKey.TAB, isRelease)
                     GLFW_KEY_ESCAPE -> Aether.updateModifierKey(UIModifierKey.ESCAPE, isRelease)
                     GLFW_KEY_ENTER -> Aether.updateModifierKey(UIModifierKey.ENTER, isRelease)
-                    GLFW_KEY_CAPS_LOCK, GLFW_MOD_CAPS_LOCK -> Aether.updateModifierKey(UIModifierKey.CAPS_LOCK, isRelease)
+                    GLFW_KEY_CAPS_LOCK, GLFW_MOD_CAPS_LOCK -> Aether.updateModifierKey(
+                        UIModifierKey.CAPS_LOCK,
+                        isRelease
+                    )
                     GLFW_KEY_BACKSPACE -> Aether.updateModifierKey(UIModifierKey.BACKSPACE, isRelease)
                 }
             } else {
@@ -154,7 +156,11 @@ object Runner {
             contentScaleX = sx[0]
             contentScaleY = sy[0]
 
-            core!!.update(framebufferWidth / contentScaleX, framebufferHeight / contentScaleY, max(contentScaleX, contentScaleY))
+            core!!.update(
+                framebufferWidth / contentScaleX,
+                framebufferHeight / contentScaleY,
+                max(contentScaleX, contentScaleY)
+            )
         }
 
         createScreen(args)
@@ -181,12 +187,14 @@ object Runner {
 
     fun createScreen(args: Array<String>) {
         if (args.isNotEmpty()) {
-            Aether.displayScreen(when(args[0]) {
-                "Animations" -> Animations()
-                "AutoLayouts" -> AutoLayouts()
-                "PathRendering" -> PathRendering()
-                else -> Default()
-            })
+            Aether.displayScreen(
+                when (args[0]) {
+                    "Animations" -> Animations()
+                    "AutoLayouts" -> AutoLayouts()
+                    "PathRendering" -> PathRendering()
+                    else -> Default()
+                }
+            )
         }
     }
 }

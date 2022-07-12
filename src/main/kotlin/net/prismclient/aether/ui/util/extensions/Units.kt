@@ -8,8 +8,8 @@ import net.prismclient.aether.ui.unit.type.UIDependentUnit
 import net.prismclient.aether.ui.unit.type.UIOperationUnit
 import net.prismclient.aether.ui.unit.type.UIRangeUnit
 import net.prismclient.aether.ui.unit.util.UIOperation
-import java.util.function.Supplier
 import net.prismclient.aether.ui.unit.util.UIOperation.*
+import java.util.function.Supplier
 
 /**
  * The default unit type. Represents the value in pixels.
@@ -150,7 +150,13 @@ operator fun UIUnit?.div(unit: UIUnit) = UIOperationUnit(this ?: px(0), unit, DI
  * @param isY If true, calculate the y-axis, otherwise calculate the x-axis.
  */
 fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: Float, isY: Boolean): Float {
-    fun calculateOperation(unit: UIOperationUnit, component: UIComponent<*>?, width: Float, height: Float, isY: Boolean): Float {
+    fun calculateOperation(
+        unit: UIOperationUnit,
+        component: UIComponent<*>?,
+        width: Float,
+        height: Float,
+        isY: Boolean
+    ): Float {
         val unit1 = calculate(unit.unit1, component, width, height, isY)
         val unit2 = calculate(unit.unit2, component, width, height, isY)
         return when (unit.operation) {
@@ -164,8 +170,8 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
     if (unit == null) return 0f
     if (unit is UIOperationUnit) return calculateOperation(unit, component, width, height, isY)
     if (unit is UIRangeUnit) return calculate(unit.unit, component, width, height, isY)
-            .coerceAtLeast(calculate(unit.min, component, width, height, isY))
-            .coerceAtMost(calculate(unit.max, component, width, height, isY))
+        .coerceAtLeast(calculate(unit.min, component, width, height, isY))
+        .coerceAtMost(calculate(unit.max, component, width, height, isY))
     if (unit is UIDependentUnit) {
         unit.value = unit.function.get()
         return unit.value

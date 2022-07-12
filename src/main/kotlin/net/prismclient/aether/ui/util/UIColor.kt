@@ -55,5 +55,6 @@ class UIColor(color: Int) : UICopy<UIColor> {
 
     override fun copy(): UIColor = UIColor(rgba)
 
-    override fun toString(): String = "UIColor(color=$rgba, hsv=${hsv.contentToString()}, r:${rgba.getRed()}, g:${rgba.getGreen()}, b:${rgba.getBlue()}, a:${rgba.getAlpha()})"
+    override fun toString(): String =
+        "UIColor(color=$rgba, hsv=${hsv.contentToString()}, r:${rgba.getRed()}, g:${rgba.getGreen()}, b:${rgba.getBlue()}, a:${rgba.getAlpha()})"
 }

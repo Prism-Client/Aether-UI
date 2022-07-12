@@ -20,10 +20,14 @@ class UIMargin : UICopy<UIMargin>, UIAnimatable<UIMargin> {
 
     override fun animate(animation: UIAnimation<*>, previous: UIMargin?, current: UIMargin?, progress: Float) {
         val component = animation.component
-        component.marginTop = previous?.marginTop?.lerp(current?.marginTop, component, progress, true) ?: component.marginTop
-        component.marginRight = previous?.marginRight?.lerp(current?.marginRight, component, progress, true) ?: component.marginRight
-        component.marginBottom = previous?.marginBottom?.lerp(current?.marginBottom, component, progress, true) ?: component.marginBottom
-        component.marginLeft = previous?.marginLeft?.lerp(current?.marginLeft, component, progress, true) ?: component.marginLeft
+        component.marginTop =
+            previous?.marginTop?.lerp(current?.marginTop, component, progress, true) ?: component.marginTop
+        component.marginRight =
+            previous?.marginRight?.lerp(current?.marginRight, component, progress, true) ?: component.marginRight
+        component.marginBottom =
+            previous?.marginBottom?.lerp(current?.marginBottom, component, progress, true) ?: component.marginBottom
+        component.marginLeft =
+            previous?.marginLeft?.lerp(current?.marginLeft, component, progress, true) ?: component.marginLeft
     }
 
     override fun save(animation: UIAnimation<*>, keyframe: UIMargin?) {

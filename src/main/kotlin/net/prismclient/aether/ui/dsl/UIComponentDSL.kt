@@ -107,7 +107,7 @@ object UIComponentDSL {
      * Applies any properties pertaining to state and updates the state to the component's needs.
      */
     @JvmStatic
-    inline fun <reified T: UIComponent<*>> pushComponent(component: T) {
+    inline fun <reified T : UIComponent<*>> pushComponent(component: T) {
         check()
         val activeComponent = getActiveComponent()
         val activeFrame = getActiveFrame()
@@ -244,7 +244,11 @@ object UIComponentDSL {
      */
     @JvmOverloads
     inline fun slider(
-        value: Number, range: ClosedFloatingPointRange<Double>, step: Number, style: String? = activeStyle, block: UISlider.() -> Unit = {}
+        value: Number,
+        range: ClosedFloatingPointRange<Double>,
+        step: Number,
+        style: String? = activeStyle,
+        block: UISlider.() -> Unit = {}
     ) = component(UISlider(value.toDouble(), range, step.toDouble(), style), block)
 
     /**

@@ -76,6 +76,7 @@ inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(block: S.() -> Unit): 
     this.style.block()
     UIComponentDSL.restoreState(this)
 }
+
 /**
  * Returns a [UIRadius] with the given radius.
  */

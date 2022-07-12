@@ -14,7 +14,8 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * @author sen
  * @since 6/23/2022
  */
-class UIProgress @JvmOverloads constructor(var progress: Float = 0f, style: String?) : UIComponent<UIProgressSheet>(style) {
+class UIProgress @JvmOverloads constructor(var progress: Float = 0f, style: String?) :
+    UIComponent<UIProgressSheet>(style) {
     override fun renderComponent() {
         renderer {
             color(style.progressColor)

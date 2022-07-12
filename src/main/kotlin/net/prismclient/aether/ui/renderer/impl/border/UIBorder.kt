@@ -6,7 +6,9 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIColor
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.extensions.lerp
+import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.extensions.transition
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 
 /**
@@ -49,7 +51,11 @@ class UIBorder : UIShape<UIBorder>(), UIAnimatable<UIBorder> {
 //            borderColor = borderColor ?: UIColor(0)
 //            borderColor!!.rgba = previous?.borderColor.mix(current?.borderColor, borderColor!!, progress)
 //        }
-        borderColor?.rgba = transition(previous?.borderColor?.rgba ?: borderColor!!.rgba, current?.borderColor?.rgba ?: borderColor!!.rgba, progress)
+        borderColor?.rgba = transition(
+            previous?.borderColor?.rgba ?: borderColor!!.rgba,
+            current?.borderColor?.rgba ?: borderColor!!.rgba,
+            progress
+        )
     }
 
     override fun save(animation: UIAnimation<*>, keyframe: UIBorder?) {

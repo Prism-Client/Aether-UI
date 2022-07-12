@@ -4,7 +4,6 @@ import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**

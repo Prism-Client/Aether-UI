@@ -49,9 +49,9 @@ class AutoLayouts : UIScreen {
             // ListDirection -> Vertical or Horizontal
             val layout =
                 UIAutoLayout(UIListLayout.ListDirection.Horizontal, null).style(UIContainerSheet(("someStyle"))) {
-                        // Declare the style inline, as we only use it once
-                        background(colorOf(asRGBA(59, 145, 255)), radiusOf(9f))
-                    }
+                    // Declare the style inline, as we only use it once
+                    background(colorOf(asRGBA(59, 145, 255)), radiusOf(9f))
+                }
 
             // Create a DSL block using this shorthand
             blockFrom(layout) {

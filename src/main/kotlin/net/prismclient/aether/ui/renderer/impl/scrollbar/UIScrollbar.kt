@@ -155,7 +155,11 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
      * Shorthand for adding a color, and radius (optional) for the background to this [UIScrollbar]
      */
     @JvmOverloads
-    inline fun background(color: UIColor? = null, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
+    inline fun background(
+        color: UIColor? = null,
+        radius: UIRadius? = background?.radius,
+        block: UIBackground.() -> Unit = {}
+    ) =
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /**

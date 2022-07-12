@@ -1,20 +1,15 @@
 package examples
 
-import examples.deps.Generic
 import net.prismclient.aether.ui.animation.ease.impl.UIQuart
-import net.prismclient.aether.ui.component.type.image.UIImageSheet
 import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
-import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayoutSheet
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
 import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
-import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.*
-import net.prismclient.aether.ui.util.extensions.*
+import net.prismclient.aether.ui.util.extensions.colorOf
+import net.prismclient.aether.ui.util.extensions.px
 
 class Default : UIScreen {
 
@@ -25,7 +20,7 @@ class Default : UIScreen {
         create {
             styleOf(UIStyleSheet("btn")) {
                 size(200, 200)
-                background(colorOf(1f, 0f, 0f ,1f), radiusOf(25f))
+                background(colorOf(1f, 0f, 0f, 1f), radiusOf(25f))
             }
 
             val list = list(UIListLayout.ListDirection.Vertical) {
