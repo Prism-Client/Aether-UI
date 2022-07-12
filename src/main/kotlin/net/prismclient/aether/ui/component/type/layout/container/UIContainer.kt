@@ -62,7 +62,9 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
         updateScrollbar()
     }
 
-    override fun updateLayout() {}
+    override fun updateLayout() {
+        components.forEach { it.update() }
+    }
 
     open fun updateScrollbar() {
         style.verticalScrollbar.update(this)
