@@ -1,9 +1,7 @@
 package net.prismclient.aether.ui.dsl
 
 import net.prismclient.aether.ui.Aether
-import net.prismclient.aether.ui.util.GENERATE_MIPMAPS
-import net.prismclient.aether.ui.util.REPEATX
-import net.prismclient.aether.ui.util.REPEATY
+import net.prismclient.aether.ui.util.*
 import net.prismclient.aether.ui.util.extensions.safeByteBuffer
 import net.prismclient.aether.ui.util.extensions.toByteBuffer
 import net.prismclient.aether.ui.util.warn
@@ -113,7 +111,7 @@ object UIAssetDSL {
     fun bulkLoad(
         fileLocation: File,
         deep: Boolean,
-        imageFlags: Int = GENERATE_MIPMAPS or REPEATX or REPEATY,
+        imageFlags: Int = PREMULTIPLIED or GENERATE_MIPMAPS or REPEATX or REPEATY,
         svgScale: Float = Aether.devicePxRatio
     ): Int {
         var count = 0
