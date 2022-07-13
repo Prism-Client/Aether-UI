@@ -487,13 +487,7 @@ open class Aether(renderer: UIRenderer) {
          * Focuses the component. Please use [UIComponent.focus] instead.
          */
         @JvmStatic
-        fun focus(component: UIFocusable) {
-            // Check if the given value is a valid instance of UIComponent
-            try {
-                component as UIComponent<*>
-            } catch (castException: ClassCastException) {
-                throw RuntimeException("When trying to focus, the provided value is not an instance of UIComponent. Make sure you are only using the UIFocus interface to focus UIComponents.")
-            }
+        fun <T> focus(component: T) where T : UIComponent<*>, T : UIFocusable {
             focusedComponent = component
         }
 

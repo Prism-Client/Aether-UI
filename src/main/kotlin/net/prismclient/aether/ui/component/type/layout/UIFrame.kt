@@ -97,10 +97,9 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
                     components.forEach(UIComponent<*>::render)
                 }
             }
-            requiresUpdate = false
         }
+        requiresUpdate = false
     }
-
 
     override fun render() {
         updateAnimation()

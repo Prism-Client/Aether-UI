@@ -7,7 +7,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * [UILabel] is a component which draws a label, or string on screen.
  *
  * @author sen
- * @since 5/15/2022
+ * @since 1.0
  */
 class UILabel(var text: String, style: String?) : UIComponent<UIStyleSheet>(style) {
     override fun renderComponent() {
