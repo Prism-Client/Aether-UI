@@ -231,6 +231,7 @@ open class Aether(renderer: UIRenderer) {
      * of their eligibility to be focused or bubbled.
      */
     open fun mouseScrolled(scrollAmount: Float) {
+        if (scrollAmount == 0f) return
         tryFocus()
         mouseScrollListeners?.forEach { it.value.accept(scrollAmount) }
         components?.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
