@@ -4,6 +4,7 @@ import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.dsl.UIComponentDSL
 import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.renderer.impl.background.UIGradientBackground
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
@@ -157,12 +158,14 @@ fun include(dependable: UIDependable) = dependable.load()
  * given to add the keyframes and modify other properties of the [UIAnimation]. The animation is
  * automatically registered under the name given.
  */
-fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block: UIAnimation<S>.() -> Unit): UIAnimation<S> {
+inline fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block: UIAnimation<S>.() -> Unit): UIAnimation<S> {
     val animation = UIAnimation<S>(animationName, style)
     animation.block()
     UIProvider.registerAnimation(animationName, animation)
     return animation
 }
+
+inline fun gradient(block: Block<UIGradientBackground>): UIGradientBackground = UIGradientBackground().also(block)
 
 /**
  * Type alias for a function which has a receiver of [T] and accepts, and returns

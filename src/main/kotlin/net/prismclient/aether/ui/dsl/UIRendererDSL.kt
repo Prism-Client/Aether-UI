@@ -176,6 +176,9 @@ object UIRendererDSL {
 
     // -- General Rendering -- //
 
+    /**
+     * renders a rectangle with the given bounds and [radius].
+     */
     @JvmStatic
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(
         x,

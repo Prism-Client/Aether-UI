@@ -1,6 +1,6 @@
 # Aether UI
 
-<img src="/docs/assets/client-logo-rounded.png" align="right" width="230" height="230">
+<img src="/assets/client-logo-rounded.png" align="right" width="230" height="230">
 
 **Aether is a UI component library engine for Minecraft** and LWJGL projects (or anything really). You can create your
 own renderer implementation or use the default implementation

@@ -6,6 +6,7 @@ import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
+import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
@@ -78,10 +79,8 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
 
     override fun renderContent() {
         if (style.useFBO && (requiresUpdate || !style.optimizeRenderer)) {
-            if (fbo == null) {
-                updateFBO()
-            }
             renderer {
+                if (fbo == null) updateFBO()
                 fbo!!.renderToFramebuffer {
                     translate(
                         -(style.horizontalScrollbar.value * expandedWidth),
@@ -97,27 +96,30 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
 
     override fun renderComponent() {
         if (style.useFBO) {
-            Aether.renderer.renderFbo(
-                fbo!!,
-                relX,
-                relY,
-                relWidth,
-                relHeight,
-                style.background?.radius?.topLeft ?: 0f,
-                style.background?.radius?.topRight ?: 0f,
-                style.background?.radius?.bottomLeft ?: 0f,
-                style.background?.radius?.bottomRight ?: 0f
-            )
+                println("rende rthis fudmbfuck")
+                Aether.renderer.renderFbo(
+                    fbo!!,
+                    0f,
+                    0f,
+                    relWidth,
+                    relHeight,
+                    style.background?.radius?.topLeft ?: 0f,
+                    style.background?.radius?.topRight ?: 0f,
+                    style.background?.radius?.bottomLeft ?: 0f,
+                    style.background?.radius?.bottomRight ?: 0f
+                )
         } else {
             renderer {
-                translate(
-                    -(style.horizontalScrollbar.value * expandedWidth),
-                    -(style.verticalScrollbar.value * expandedHeight)
-                ) {
-                    if (style.clipContent) scissor(relX, relY, relWidth, relHeight) {
+                if (style.clipContent) {
+                    scissor(relX, relY, relWidth, relHeight) {
+                        translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
+                            components.forEach(UIComponent<*>::render)
+                        }
+                    }
+                } else {
+                    translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
                         components.forEach(UIComponent<*>::render)
                     }
-                    else components.forEach(UIComponent<*>::render)
                 }
             }
         }
@@ -135,6 +137,7 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
             if (animations!!.isEmpty())
                 animations = null
             updateLayout()
+            components.forEach { it.requestUpdate() }
         }
     }
 
