@@ -137,7 +137,7 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
 
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
-        if (style.verticalScrollbar.mousePressed() || style.horizontalScrollbar.mousePressed()) focus()
+//        if (style.verticalScrollbar.mousePressed() || style.horizontalScrollbar.mousePressed()) focus()
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
