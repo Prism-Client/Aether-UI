@@ -247,15 +247,12 @@ open class Aether(renderer: UIRenderer) {
 
         @JvmStatic
         lateinit var instance: Aether
-            protected set
 
         @JvmStatic
         lateinit var renderer: UIRenderer
-            protected set
 
         @JvmStatic
         var activeScreen: UIScreen? = null
-            protected set
 
         /**
          * The focused component (if applicable).
@@ -266,42 +263,36 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         var focusedComponent: UIFocusable? = null
-            protected set
 
         /**
          * The width of the screen. It can be set via [update]
          */
         @JvmStatic
         var width: Float = 0f
-            protected set
 
         /**
          * The width of the screen. It can be set via [update]
          */
         @JvmStatic
         var height: Float = 0f
-            protected set
 
         /**
          * The device pixel ratio. It can be set via [update]. It is the equivalent of content scale.
          */
         @JvmStatic
         var devicePxRatio: Float = 1f
-            protected set
 
         /**
          * The x position of the mouse relative to the screen
          */
         @JvmStatic
         var mouseX: Float = 0f
-            protected set
 
         /**
          * The y position of the mouse relative to the screen
          */
         @JvmStatic
         var mouseY: Float = 0f
-            protected set
 
         /**
          * Invoked whenever the layout needs to be updated. This can be when the screen
@@ -309,49 +300,42 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         var updateListeners: HashMap<String, Runnable>? = null
-            protected set
 
         /**
          * The listeners for then the mouse is moved. Invoked prior to components.
          */
         @JvmStatic
         var mouseMoveListeners: HashMap<String, Runnable>? = null
-            protected set
 
         /**
          * Invoked when the mouse is pressed. Invoked prior to components.
          */
         @JvmStatic
         var mousePressedListeners: HashMap<String, Runnable>? = null
-            protected set
 
         /**
          * Invoked when the mouse is released. Invoked prior to components.
          */
         @JvmStatic
         var mouseReleasedListeners: HashMap<String, Runnable>? = null
-            protected set
 
         /**
          * Invoked when a key is pressed. Invoked prior to components.
          */
         @JvmStatic
         var keyPressListeners: HashMap<String, Consumer<Char>>? = null
-            protected set
 
         /**
          * Invoked when the mouse is scrolled. Invoked prior to components.
          */
         @JvmStatic
         var mouseScrollListeners: HashMap<String, Consumer<Float>>? = null
-            protected set
 
         /**
          * Invoked when the screen is deleted. This is used to deallocate listeners added to UICore.
          */
         @JvmStatic
         var deallocationListeners: HashMap<String, Runnable>? = null
-            protected set
 
         /**
          * The list of modifier keys. The value is if the key is pressed
