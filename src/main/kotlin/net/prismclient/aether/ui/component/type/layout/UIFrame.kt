@@ -59,6 +59,11 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      * frame has been updated, but prior to the first render.
      */
     open fun updateFBO() {
+        // Deallocate any existing framebuffer
+        if (fbo != null) {
+            Aether.renderer.deleteFBO(fbo!!)
+            fbo = null
+        }
         if (style.useFBO) {
             if ((fbo != null && (fbo!!.width != relWidth || fbo!!.height != relHeight)) || fbo == null) {
                 fbo = Aether.renderer.createFBO(relWidth, relHeight)

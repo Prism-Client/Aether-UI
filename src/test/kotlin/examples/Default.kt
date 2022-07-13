@@ -8,28 +8,27 @@ import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.renderer.UIProvider
+import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.*
-import net.prismclient.aether.ui.util.extensions.colorOf
-import net.prismclient.aether.ui.util.extensions.minus
-import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.rel
+import net.prismclient.aether.ui.util.extensions.*
 
-class Default : UIScreen {
-    override fun build() {
-        create {
-            UIAssetDSL.bulkLoad("/prism/icons", imageFlags = REPEATX or REPEATY or GENERATE_MIPMAPS)
-            createNavbar()
-        }
+class Default : UIScreen {    override fun build() {
+    create {
+       // UIAssetDSL.image("NavbarLogo", "/prism/logo/Logo.png", flags = REPEATX or REPEATY or GENERATE_MIPMAPS)
+        // TODO: test if lods stuff in root directory
+        UIAssetDSL.bulkLoad("/prism/icons", imageFlags = REPEATX or REPEATY or GENERATE_MIPMAPS)
+        createNavbar()
     }
+}
 
     private fun createNavbar() {
         ucreate {
             val navbar = container {
                 // Logo
                 container {
-                    image("logo/Logo").style(UIImageSheet("navbar-logo")) {
+                    image("NavbarLogo").style(UIImageSheet("navbar-logo")) {
                         control(UIAlignment.CENTER)
                         size(56, 62)
                     }
@@ -46,8 +45,17 @@ class Default : UIScreen {
                     }.style(UIContainerSheet("navbar-button")) {
                         control(UIAlignment.CENTER)
                         size(206, 40)
-                        background(colorOf(0f, 1f, 0f, 0.3f), radiusOf(9f))
                         margin { marginBottom = px(8) }
+                    }
+
+                    // Navbar section style
+                    styleOf(UIStyleSheet("navbar-title")) {
+                        x = px(24)
+                        font("Montserrat", px(11), colorOf(191, 189, 193), top or left)
+                        margin {
+                            marginTop = descender(1f)
+                            marginBottom = px(8)
+                        }
                     }
 
                     // Navbar button styles
@@ -59,22 +67,22 @@ class Default : UIScreen {
                         font("Montserrat", px(14), colorOf(-1), left or top)
                     }
 
+                    label("MENU", "navbar-title")
                     navButton(layout, "Dashboard", "gradient/home")
-                    navButton(layout, "Mods", "gradient/mail")
+                    navButton(layout, "Mods", "gradient/folder")
                     navButton(layout, "Settings", "gradient/setting")
                     navButton(layout, "Store", "gradient/bag")
                     navButton(layout, "Profiles", "gradient/profile")
 
+                    label("SOCIAL", "navbar-title")
                     navButton(layout, "Messages", "gradient/mail")
                     navButton(layout, "Friends", "gradient/people")
                     navButton(layout, "Achievements", "gradient/medal")
                     navButton(layout, "Recordings", "gradient/video")
 
-
                 }.style(UIContainerSheet("navbar-list")) {
                     y = px(118)
                     size(rel(1), rel(1) - px(118 + 235)) // 118 = top area, 235 = bottom area
-                    background(colorOf(0f, 0f, 1f, 0.3f))
                     verticalScrollbar {
                         x = rel(1) - px(10)
                         y = rel(0.1)
@@ -87,17 +95,47 @@ class Default : UIScreen {
                             radius = radiusOf(2.5)
                         }
                     }
-                    useFBO = true
+                    clipContent = true
                 }
 
                 // Footer
-//                val footer = component(UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)) {
-//                    verticalResizing = UIAutoLayout.ResizingMode.Hug
-//                }
+                val footer = component(UIAutoLayout(UIListLayout.ListDirection.Vertical, null)) {
+                    verticalResizing = UIAutoLayout.ResizingMode.Hug
+                    horizontalResizing = UIAutoLayout.ResizingMode.Hug
+                    componentAlignment = UIAlignment.CENTER
+                    componentSpacing = px(6)
 
+                    // Promotion
+                    // TODO: Promotion component
+
+                    val editHud = component(UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)) {
+                        image("outline/ui", "navbar-icon")
+                        text("Edit HUD", "navbar-text")
+
+                        componentAlignment = UIAlignment.CENTER
+                        componentSpacing = px(20)
+                        layoutPadding = paddingOf(15, 37, 15, 37)
+
+                        verticalResizing = UIAutoLayout.ResizingMode.Hug
+                        horizontalResizing = UIAutoLayout.ResizingMode.Hug
+                    }.style(UIContainerSheet("edit-hud-layout")) {
+                        control(UIAlignment.BOTTOMCENTER)
+                        background(colorOf(36, 37, 37), radiusOf(15))
+                    }
+                }.style(UIContainerSheet("navbar-footer-layout")) {
+                    control(UIAlignment.BOTTOMCENTER)
+                    y -= px(16 + 8)
+                }
+
+                label("Running Prism Client v1.0.0-Beta").style(UIStyleSheet("nav-prism-version")) {
+                    font("Montserrat", px(8), colorOf(1f, 1f, 1f, 0.8f), left or top, UIFont.FontType.Light)
+                    control(UIAlignment.BOTTOMCENTER)
+                    y -= px(8)
+                }
             }.style(UIContainerSheet("navbar-container")) {
                 size(px(236), rel(1))
-                background(colorOf(36, 36, 37))
+                background(colorOf(32, 32, 32))
+                useFBO = true
             }
 
             // Navbar animation
@@ -107,6 +145,15 @@ class Default : UIScreen {
                 }
                 UIQuart(1000L) to {
                     x = px(0)
+                }
+            }
+
+            animationOf("navbar-exit", UIContainerSheet()) {
+                kf {
+                    x = px(0)
+                }
+                UIQuart(500L) to {
+                    x = px(-236)
                 }
             }
 
@@ -120,10 +167,8 @@ class Default : UIScreen {
     private fun navButton(layout: UIAutoLayout, buttonText: String, imageName: String) {
         ucreate {
             autoLayout(layout) {
-                ignore {
-                    image(imageName, "navbar-icon")
-                    text(buttonText, "navbar-text")
-                }
+                image(imageName, "navbar-icon")
+                text(buttonText, "navbar-text")
             }
         }
     }
