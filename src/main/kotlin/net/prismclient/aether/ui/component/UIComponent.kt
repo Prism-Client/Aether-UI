@@ -657,7 +657,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      */
     open fun focus() {
         if (this is UIFocusable) {
-            Aether.focus(this)
+//            Aether.focus(this)
             focusListeners?.forEach { it.value.accept(this, true) }
             requestUpdate()
         }
