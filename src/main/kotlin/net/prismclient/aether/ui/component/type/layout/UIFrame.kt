@@ -124,7 +124,7 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
     }
 
     override fun requestUpdate() {
-        requiresUpdate = true
+//        requiresUpdate = true
         super.requestUpdate()
     }
 
