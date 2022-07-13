@@ -106,7 +106,6 @@ class Default : UIScreen {
             }.style(UIContainerSheet("navbar-container")) {
                 size(px(236), rel(1))
                 background(colorOf(36, 36, 37))
-//                useFBO = true
             }
 
             // Navbar animation
@@ -119,7 +118,7 @@ class Default : UIScreen {
                 }
             }
 
-//            UIProvider.dispatchAnimation("navbar-enter", navbar)
+            UIProvider.dispatchAnimation("navbar-enter", navbar)
         }
     }
 

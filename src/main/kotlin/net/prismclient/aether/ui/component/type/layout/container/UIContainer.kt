@@ -96,18 +96,12 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
 
     override fun renderComponent() {
         if (style.useFBO) {
-                println("rende rthis fudmbfuck")
-                Aether.renderer.renderFbo(
-                    fbo!!,
-                    0f,
-                    0f,
-                    relWidth,
-                    relHeight,
-                    style.background?.radius?.topLeft ?: 0f,
-                    style.background?.radius?.topRight ?: 0f,
-                    style.background?.radius?.bottomLeft ?: 0f,
-                    style.background?.radius?.bottomRight ?: 0f
-                )
+            renderer {
+                path {
+                    imagePattern(fbo!!.imagePattern, relX, relY, relWidth, relHeight, 0f, 1f)
+                    rect(relX, relY, relWidth, relHeight)
+                }.fillPaint()
+            }
         } else {
             renderer {
                 if (style.clipContent) {

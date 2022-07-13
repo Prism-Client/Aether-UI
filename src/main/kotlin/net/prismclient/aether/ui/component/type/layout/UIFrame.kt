@@ -59,7 +59,11 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      * frame has been updated, but prior to the first render.
      */
     open fun updateFBO() {
-        if (style.useFBO) fbo = Aether.renderer.createFBO(relWidth, relHeight)
+        if (style.useFBO) {
+            if ((fbo != null && (fbo!!.width != relWidth || fbo!!.height != relHeight)) || fbo == null) {
+                fbo = Aether.renderer.createFBO(relWidth, relHeight)
+            }
+        }
     }
 
     /**
@@ -106,17 +110,12 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
 
     override fun renderComponent() {
         if (style.useFBO) {
-            Aether.renderer.renderFbo(
-                fbo!!,
-                relX,
-                relY,
-                relWidth,
-                relHeight,
-                style.background?.radius?.topLeft ?: 0f,
-                style.background?.radius?.topRight ?: 0f,
-                style.background?.radius?.bottomLeft ?: 0f,
-                style.background?.radius?.bottomRight ?: 0f
-            )
+            renderer {
+                path {
+                    imagePattern(fbo!!.imagePattern, relX, relY, relWidth, relHeight, 0f, 1f)
+                    rect(relX, relY, relWidth, relHeight)
+                }.fillPaint()
+            }
         } else {
             if (style.clipContent) UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
                 components.forEach(UIComponent<*>::render)

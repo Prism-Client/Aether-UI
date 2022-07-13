@@ -89,7 +89,7 @@ object Renderer : UIRenderer {
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(), NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
-            framebuffer.fbo(), width * contentScale, height * contentScale, width, height, contentScale
+            framebuffer.image(), width, height, width * contentScale, height * contentScale, contentScale
         )
         framebuffers[fbo] = framebuffer
         return fbo
@@ -116,28 +116,6 @@ object Renderer : UIRenderer {
 
     override fun unbindFBO() {
         nvgluBindFramebuffer(ctx, null)
-    }
-
-    override fun renderFbo(
-        fbo: UIContentFBO,
-        x: Float,
-        y: Float,
-        width: Float,
-        height: Float,
-        topLeft: Float,
-        topRight: Float,
-        bottomRight: Float,
-        bottomLeft: Float,
-    ) {
-        allocPaint()
-        nvgImagePattern(ctx, x, y, width, height, 0f, framebuffers[fbo]!!.image(), 1f, paint!!)
-        nvgBeginPath(ctx)
-        color(-1)
-        paint!!.innerColor(fillColor)
-        paint!!.outerColor(fillColor)
-        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-        nvgFillPaint(ctx, paint!!)
-        nvgFill(ctx)
     }
 
     override fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData {
