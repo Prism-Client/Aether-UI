@@ -37,13 +37,8 @@ class Default : UIScreen {
                     size(rel(1), px(118))
                 }
 
-                onMousePressed {
-
-                    UIProvider.dispatchAnimation("navbar-enter", this)
-                }
-
                 // Navbar list
-                list(UIListLayout.ListDirection.Vertical) {
+                val navList = list(UIListLayout.ListDirection.Vertical) {
                     val layout = UIAutoLayout(UIListLayout.ListDirection.Horizontal, null).apply {
                         componentAlignment = UIAlignment.MIDDLELEFT
                         componentSpacing = px(24)
@@ -64,22 +59,16 @@ class Default : UIScreen {
                         font("Montserrat", px(14), colorOf(-1), left or top)
                     }
 
-                    button("aaaa").style(UIStyleSheet()) {
-                        size(200, 100)
-                        background = gradient {
-                            gradientWidth = rel(1)
-                            gradientHeight = rel(1)
-                            gradientStartColor = colorOf(1f, 0f, 0f, 1f)
-                            gradientEndColor = colorOf(0, 255, 0)
-                        }
-                    }
+                    navButton(layout, "Dashboard", "gradient/home")
+                    navButton(layout, "Mods", "gradient/mail")
+                    navButton(layout, "Settings", "gradient/setting")
+                    navButton(layout, "Store", "gradient/bag")
+                    navButton(layout, "Profiles", "gradient/profile")
 
-//                    navButton(layout, "Text", "gradient/bag")
-//                    navButton(layout, "Text", "gradient/bag")
-//                    navButton(layout, "Text", "gradient/bag")
-//                    navButton(layout, "Text", "gradient/bag")
-//                    navButton(layout, "Text", "gradient/bag")
-//                    navButton(layout, "Text", "gradient/bag")
+                    navButton(layout, "Messages", "gradient/mail")
+                    navButton(layout, "Friends", "gradient/people")
+                    navButton(layout, "Achievements", "gradient/medal")
+                    navButton(layout, "Recordings", "gradient/video")
 
 
                 }.style(UIContainerSheet("navbar-list")) {
@@ -102,6 +91,9 @@ class Default : UIScreen {
                 }
 
                 // Footer
+//                val footer = component(UIAutoLayout(UIListLayout.ListDirection.Horizontal, null)) {
+//                    verticalResizing = UIAutoLayout.ResizingMode.Hug
+//                }
 
             }.style(UIContainerSheet("navbar-container")) {
                 size(px(236), rel(1))

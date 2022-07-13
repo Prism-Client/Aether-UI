@@ -33,9 +33,10 @@ import java.util.function.Consumer
  * functions [Properties.updateSize] and [Properties.updateMouse] to update the values without
  * invoking the [update], and [mouseMoved] functions.
  *
+ * [Aether Documentation](https://aether.prismclient.net/getting-started)
+ *
  * @author sen
  * @since 1.0
- * @see <a href="https://aether.prismclient.net/getting-started">UICore documentation</a>
  * @see UIProvider
  */
 open class Aether(renderer: UIRenderer) {
@@ -123,7 +124,7 @@ open class Aether(renderer: UIRenderer) {
      * eligibility to be focused or bubbled. The [Properties.mouseX] and [Properties.mouseY]
      * properties can be found in [Aether.Properties].
      */
-    fun mouseMoved(mouseX: Float, mouseY: Float) {
+    open fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
         mouseMoveListeners?.forEach { it.value.run() }
         if (activeScreen != null) for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
@@ -139,7 +140,7 @@ open class Aether(renderer: UIRenderer) {
      *
      * @see mouseScrolled
      */
-    fun mouseChanged(mouseButton: Int, isRelease: Boolean) {
+    open fun mouseChanged(mouseButton: Int, isRelease: Boolean) {
         if (isRelease) {
             mouseReleasedListeners?.forEach { it.value.run() }
             components?.forEach { it.mouseReleased(mouseX, mouseY) }
@@ -220,7 +221,7 @@ open class Aether(renderer: UIRenderer) {
      * @param character The key which was pressed or '\u0000'
      * @see updateModifierKey To update keys such as Shift, Alt, Tab etc...
      */
-    fun keyPressed(character: Char) {
+    open fun keyPressed(character: Char) {
         keyPressListeners?.forEach { it.value.accept(character) }
         (focusedComponent as? UIComponent<*>)?.keyPressed(character)
     }
