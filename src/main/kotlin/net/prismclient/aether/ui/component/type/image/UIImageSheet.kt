@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.component.type.image
 
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.UIColor
 
 /**
  * [UIImageSheet] is the sheet implementation for [UIImage].
@@ -11,9 +12,9 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  */
 class UIImageSheet(name: String) : UIStyleSheet(name) {
     /**
-     * The color of the image. Use -1 (WHITE) for the normal color.
+     * The color of the image. The default value is RGBA(255, 255, 255)
      */
-    var imageColor = -1
+    var imageColor: UIColor? = null
 
     /**
      * The radius of the image.

@@ -67,6 +67,14 @@ class UIAutoLayout @JvmOverloads constructor(
      */
     var componentAlignment: UIAlignment = TOPLEFT
 
+    /**
+     * Sets the [verticalResizing] and [horizontalResizing] to [vertical] and [horizontal] respectively.
+     */
+    fun resize(vertical: ResizingMode, horizontal: ResizingMode) {
+        verticalResizing = vertical
+        horizontalResizing = horizontal
+    }
+
     override fun updateLayout() {
         if (components.isEmpty()) return
 
@@ -82,18 +90,19 @@ class UIAutoLayout @JvmOverloads constructor(
         var h = 0f
 
         for (i in components.indices) {
+            val component = components[i]
             if (horizontalResizing == ResizingMode.Hug) {
                 w = if (listDirection == ListDirection.Horizontal) {
-                    w + components[i].relWidth + if (i < components.size - 1) spacing else 0f
+                    w + component.relWidth + component.marginLeft + component.marginRight + if (i < components.size - 1) spacing else 0f
                 } else {
-                    components[i].relWidth.coerceAtLeast(w)
+                    (component.relWidth + component.marginLeft + component.marginRight).coerceAtLeast(w)
                 }
             }
             if (verticalResizing == ResizingMode.Hug) {
                 h = if (listDirection == ListDirection.Vertical) {
-                    h + components[i].relHeight + if (i < components.size - 1) spacing else 0f
+                    h + component.relHeight + component.marginTop + component.marginBottom + if (i < components.size - 1) spacing else 0f
                 } else {
-                    components[i].relHeight.coerceAtLeast(h)
+                   (component.relHeight + component.marginTop + component.marginBottom).coerceAtLeast(h)
                 }
             }
         }
@@ -140,7 +149,7 @@ class UIAutoLayout @JvmOverloads constructor(
                     MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - c.height - top - bottom) / 2f
                     BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - c.height - left - right)
                     else -> 0f
-                }
+                } + c.marginTop - c.marginBottom
                 x += c.width + spacing
             } else if (listDirection == ListDirection.Vertical) {
                 c.x = x + when (componentAlignment) {
@@ -148,7 +157,7 @@ class UIAutoLayout @JvmOverloads constructor(
                     TOPCENTER, CENTER, BOTTOMCENTER -> (width - c.width - left - right) / 2f
                     TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - c.width - left - right)
                     else -> 0f
-                }
+                } + c.marginLeft - c.marginRight
                 c.y = y
                 y += c.height + spacing
             }

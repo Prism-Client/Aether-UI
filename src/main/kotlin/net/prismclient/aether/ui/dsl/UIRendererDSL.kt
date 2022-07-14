@@ -402,7 +402,7 @@ object UIRendererDSL {
     @JvmStatic
     inline fun UIContentFBO.renderToFramebuffer(block: Block<UIRendererDSL>): UIRendererDSL {
         renderer.bindFBO(this)
-        beginFrame(this.scaledWidth, this.scaledHeight, this.contentScale)
+        beginFrame(this.width, this.height, this.contentScale)
         UIRendererDSL.block()
         endFrame()
         renderer.unbindFBO()

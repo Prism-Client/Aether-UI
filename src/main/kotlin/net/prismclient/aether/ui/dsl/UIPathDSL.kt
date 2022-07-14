@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.dsl
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.util.Block
 
 /**
  * [UIPathDSL] is a DSL for paths. [UIRendererDSL] utilizes this to apply the paths.
@@ -232,8 +233,8 @@ object UIPathDSL {
      * @see <a href="https://github.com/memononen/nanovg#understanding-composite-paths">See NanoVG Composite paths</a>
      */
     @JvmStatic
-    inline fun hole(block: UIPathDSL.() -> Unit): UIPathDSL {
-        block()
+    inline fun hole(block: Block<UIPathDSL>): UIPathDSL {
+        UIPathDSL.block()
         renderer.pathHole(true)
         return this
     }
