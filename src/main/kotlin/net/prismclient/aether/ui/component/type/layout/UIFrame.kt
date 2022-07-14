@@ -2,12 +2,13 @@ package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
+import net.prismclient.aether.ui.util.name
 import net.prismclient.aether.ui.util.warn
 
 /**
@@ -27,7 +28,7 @@ import net.prismclient.aether.ui.util.warn
  * @author sen
  * @since 1.0
  */
-abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style), UIFocusable {
+abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
     /**
      * The components of this frame.
      */
@@ -165,4 +166,49 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
         components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
         requestUpdate()
     }
+
+    override fun createsStyle(): T = UIFrameSheet() as T
+}
+
+open class UIFrameSheet : UIStyleSheet() {
+    /**
+     * If true, the frame will use an FBO to render content.
+     */
+    var useFBO: Boolean = false
+
+    /**
+     * If true certain optimizations will be applied when
+     * rendering. This only works with [useFBO] as true.
+     */
+    var optimizeRenderer: Boolean = true
+
+    override fun apply(sheet: UIStyleSheet): UIFrameSheet {
+        // Override the default apply function because
+        // this is an inheritable class.
+        this.immutableStyle = sheet.immutableStyle
+        this.name = sheet.name
+
+        this.background = sheet.background?.copy()
+        this.font = sheet.font?.copy()
+
+        this.x = sheet.x?.copy()
+        this.y = sheet.y?.copy()
+        this.width = sheet.width?.copy()
+        this.height = sheet.height?.copy()
+
+        this.padding = sheet.padding?.copy()
+        this.margin = sheet.margin?.copy()
+        this.anchor = sheet.anchor?.copy()
+        this.clipContent = sheet.clipContent
+
+        // Frame properties
+        if (sheet is UIFrameSheet) {
+            this.useFBO = sheet.useFBO
+            this.optimizeRenderer = sheet.optimizeRenderer
+        }
+
+        return this
+    }
+
+    override fun copy(): UIFrameSheet = UIFrameSheet().name(name).apply(this)
 }

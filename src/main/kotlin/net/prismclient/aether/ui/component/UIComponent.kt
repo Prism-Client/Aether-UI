@@ -3,9 +3,9 @@ package net.prismclient.aether.ui.component
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.type.layout.UIFrame
+import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
-import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
+import net.prismclient.aether.ui.component.type.layout.container.UIContainerSheet
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
@@ -37,7 +37,7 @@ import java.util.function.Consumer
  * @since 1.0
  */
 @Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "LeakingThis")
-abstract class UIComponent<T : UIStyleSheet>(style: String?) {
+abstract class UIComponent<T : UIStyleSheet>() {
     /**
      * The style of the component.
      */
@@ -193,10 +193,6 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     var mouseScrollListeners: HashMap<String, BiConsumer<UIComponent<T>, Float>>? = null
         protected set
 
-    init {
-        applyStyle(style)
-    }
-
     /**
      * Attempts to apply the style to the component. If the style is
      * empty, or null, a NullPointerException will be thrown when the
@@ -246,8 +242,9 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      * might request for this method to be invoked.
      */
     open fun update() {
-        if (!this::style.isInitialized)
-            throw UninitializedStyleSheetException(this)
+        if (!this::style.isInitialized) {
+            style = createsStyle()
+        }
 
         calculateBounds()
         // Update the size, then the anchor, and then the position
@@ -365,7 +362,17 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
      */
     abstract fun renderComponent()
 
-    /** Input **/
+    /**
+     * Used to create a new instance of the style sheet provided, [T].
+     */
+    abstract fun createsStyle(): T
+
+    /**
+     * Returns true if [style] is intialized.
+     */
+    open fun hasStyle(): Boolean = this::style.isInitialized
+
+    // -- Input -- //
 
     /**
      * Invoked when the mouse moves
@@ -431,7 +438,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
         mouseScrollListeners?.forEach { it.value.accept(this, scrollAmount) }
     }
 
-    /** Event **/
+    // -- Event -- //
 
     /**
      * Invoked once on the initialization of the component.

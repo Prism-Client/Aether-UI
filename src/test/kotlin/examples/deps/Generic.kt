@@ -9,7 +9,7 @@ import net.prismclient.aether.ui.util.extensions.colorOf
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.left
-import net.prismclient.aether.ui.util.styleOf
+import net.prismclient.aether.ui.util.style
 import net.prismclient.aether.ui.util.top
 
 /**
@@ -47,12 +47,12 @@ class Generic : UIDependable {
         // assumeLoadImage()
 
         // A 24x24 icon
-        styleOf(UIImageSheet("icon24x")) {
+        style(UIImageSheet(), "icon24x") {
             size(24, 24)
         }
 
         // A example font
-        styleOf(UIStyleSheet("generic-font")) {
+        style(UIStyleSheet("generic-font")) {
             // FontFamily to Montserrat
             // FontSize -> 16f
             // FontColor -> -1 = asRGBA(255, 255, 255) (aka white)

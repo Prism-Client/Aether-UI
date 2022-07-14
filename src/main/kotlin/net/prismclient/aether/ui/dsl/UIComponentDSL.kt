@@ -7,13 +7,12 @@ import net.prismclient.aether.ui.component.controller.impl.selection.UISelectabl
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.type.input.button.UIButton
-import net.prismclient.aether.ui.component.type.input.button.UICheckbox
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
+import net.prismclient.aether.ui.component.type.layout.UIAutoLayout
 import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIListLayout
+import net.prismclient.aether.ui.component.type.layout.container.UIContainerSheet
 import net.prismclient.aether.ui.dsl.UIComponentDSL.activeStyle
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.Block
@@ -137,8 +136,9 @@ object UIComponentDSL {
      *
      * @return T The component
      */
-    inline fun <reified T : UIComponent<*>> component(component: T, block: Block<T>): T {
+    inline fun <reified T : UIComponent<*>> component(component: T, style: String?, block: Block<T>): T {
         pushComponent(component)
+        component.applyStyle(style)
         component.block()
         component.initialize()
         popComponent(component)
@@ -208,7 +208,7 @@ object UIComponentDSL {
      */
     @JvmOverloads
     inline fun text(text: String, style: String? = activeStyle, block: Block<UILabel> = {}) =
-        component(UILabel(text, style), block)
+        component(UILabel(text), style, block)
 
     /**
      * An alternative to [text]. Creates a [UILabel] with the provided [text].
@@ -217,26 +217,13 @@ object UIComponentDSL {
      */
     @JvmOverloads
     inline fun label(text: String, style: String? = activeStyle, block: Block<UILabel> = {}) =
-        component(UILabel(text, style), block)
+        component(UILabel(text), style, block)
 
     /**
      * Creates a [UIButton] with the provided [text], like a label.
      */
-    inline fun button(text: String, style: String? = activeStyle, block: Block<UIButton<UIStyleSheet>> = {}) =
-        component(UIButton(text, style), block)
-
-    /**
-     * Creates a [UICheckbox] from the given [selectedImageName], [deselectedImageName] and [imageStyle].
-     */
-    @JvmOverloads
-    inline fun checkbox(
-        checked: Boolean = false,
-        selectedImageName: String = "checkbox",
-        deselectedImageName: String = "",
-        imageStyle: String,
-        style: String? = activeStyle,
-        block: Block<UICheckbox> = {}
-    ) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style), block)
+    inline fun button(text: String, style: String? = activeStyle, block: Block<UIButton> = {}) =
+        component(UIButton(text), style, block)
 
     /**
      * Creates a [UISlider] with the given [value] which stays within the [range] and steps by the
@@ -249,21 +236,21 @@ object UIComponentDSL {
         step: Number,
         style: String? = activeStyle,
         block: Block<UISlider> = {}
-    ) = component(UISlider(value.toDouble(), range, step.toDouble(), style), block)
+    ) = component(UISlider(value.toDouble(), range, step.toDouble()), style, block)
 
     /**
      * Creates a [UIImage] with the [imageName] as the image to be rendered.
      */
     @JvmOverloads
     inline fun image(imageName: String, style: String? = activeStyle, block: Block<UIImage> = {}) =
-        component(UIImage(imageName, style), block)
+        component(UIImage(imageName), style, block)
 
     /**
      * Creates a [UIContainer]. Anything within the block will be added to the component list within this.
      */
     @JvmOverloads
     inline fun container(style: String? = activeStyle, block: Block<UIContainer<UIContainerSheet>> = {}) =
-        component(UIContainer(style), block)
+        component(UIContainer(), style, block)
 
     /**
      * Creates a [UIListLayout] with the given [listDirection], which defines the direction that it
@@ -276,7 +263,7 @@ object UIComponentDSL {
         listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
         style: String? = activeStyle,
         block: Block<UIListLayout> = {}
-    ) = component(UIListLayout(listDirection, listOrder, style), block)
+    ) = component(UIListLayout(listDirection, listOrder), style, block)
 
     /**
      * Creates a vertical list via [list].
@@ -305,7 +292,7 @@ object UIComponentDSL {
      * components can be defined.
      */
     @JvmOverloads
-    inline fun autoLayout(layout: UIAutoLayout, block: Block<UIAutoLayout> = {}) = component(layout.copy(), block)
+    inline fun autoLayout(layout: UIAutoLayout, block: Block<UIAutoLayout> = {}) = component(layout.copy(), activeStyle, block)
 
     /**
      * Creates an [UIAutoLayout] from the given [listDirection]. [UIAutoLayout] are designed to mimic Figma's
@@ -318,7 +305,7 @@ object UIComponentDSL {
         listDirection: UIListLayout.ListDirection,
         style: String? = null,
         block: Block<UIAutoLayout> = {}
-    ) = component(UIAutoLayout(listDirection, style), block)
+    ) = component(UIAutoLayout(listDirection), style, block)
 
     /**
      * Creates a [UISelectableController] which is a controller that has a single selected

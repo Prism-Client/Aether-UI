@@ -1,27 +1,24 @@
 package net.prismclient.aether.ui.component.type.layout.container
 
-import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.renderer.impl.scrollbar.UIScrollbar
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
- * [UIContainer] is the default implementation for [UIFrame]. It introduces
- * scrollbars which automatically resize to content being added/removed. It is
- * considered to be a [UIFocusable], so when the mouse is scrolled within the
- * container the focused component will become this.
- *
- *
+ * [UIContainer] is the default implementation for [UIFrame]. It introduces scrollbars which automatically
+ * resize to content being added/removed. It is considered to be a [UIFocusable], so when the mouse is scrolled
+ * within the container the focused component will become this.
  *
  * @author sen
- * @since 5/12/2022
+ * @since 1.0
  */
-open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style), UIFocusable, UILayout {
+open class UIContainer<T : UIContainerSheet> : UIFrame<T>(), UIFocusable, UILayout {
     /**
      * How sensitive the scrolling will be
      */
@@ -106,12 +103,18 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
             renderer {
                 if (style.clipContent) {
                     scissor(relX, relY, relWidth, relHeight) {
-                        translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
+                        translate(
+                            -(style.horizontalScrollbar.value * expandedWidth),
+                            -(style.verticalScrollbar.value * expandedHeight)
+                        ) {
                             components.forEach(UIComponent<*>::render)
                         }
                     }
                 } else {
-                    translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
+                    translate(
+                        -(style.horizontalScrollbar.value * expandedWidth),
+                        -(style.verticalScrollbar.value * expandedHeight)
+                    ) {
                         components.forEach(UIComponent<*>::render)
                     }
                 }
@@ -167,4 +170,94 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
         }
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
     }
+
+    override fun createsStyle(): T = UIContainerSheet() as T
+}
+
+open class UIContainerSheet : UIFrameSheet() {
+    /**
+     * Describes when to introduce the scrollbar
+     *
+     * @see Overflow
+     */
+    var overflowX: Overflow = Overflow.Auto
+
+    /**
+     * Describes when to introduce the scrollbar
+     *
+     * @see Overflow
+     */
+    var overflowY: Overflow = Overflow.Auto
+
+    var verticalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
+    var horizontalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Horizontal)
+
+    /**
+     * Creates a DSL block for the vertical scrollbar
+     */
+    inline fun verticalScrollbar(block: UIScrollbar.() -> Unit) = verticalScrollbar.block()
+
+    /**
+     * Creates a DSL block for the horizontal scrollbar
+     */
+    inline fun horizontalScrollbar(block: UIScrollbar.() -> Unit) = horizontalScrollbar.block()
+
+    /**
+     * [Overflow] defines what the vertical, and horizontal scrollbars
+     * are supposed to do when content leaves the screen. Check the enum
+     * documentation for more information.
+     *
+     * @author sen
+     * @since 5/12/2022
+     */
+    enum class Overflow {
+        /**
+         * Does not introduce a scrollbar on the given axis
+         */
+        None,
+
+        /**
+         * Creates a scrollbar on the given axis regardless if content leaves the window
+         */
+        Always,
+
+        /**
+         * Like scroll, but only adds the scrollbar on the given axis if content leaves the window
+         */
+        Auto
+    }
+
+    override fun apply(sheet: UIStyleSheet): UIContainerSheet {
+        // Override the default apply function because
+        // this is an inheritable class.
+        this.immutableStyle = sheet.immutableStyle
+        this.name = sheet.name
+
+        this.background = sheet.background?.copy()
+        this.font = sheet.font?.copy()
+
+        this.x = sheet.x?.copy()
+        this.y = sheet.y?.copy()
+        this.width = sheet.width?.copy()
+        this.height = sheet.height?.copy()
+
+        this.padding = sheet.padding?.copy()
+        this.margin = sheet.margin?.copy()
+        this.anchor = sheet.anchor?.copy()
+        this.clipContent = sheet.clipContent
+
+        // Frame properties
+        if (sheet is UIContainerSheet) {
+            this.useFBO = sheet.useFBO
+            this.optimizeRenderer = sheet.optimizeRenderer
+            this.overflowX = sheet.overflowX
+            this.overflowY = sheet.overflowY
+            this.verticalScrollbar = sheet.verticalScrollbar.copy()
+            this.horizontalScrollbar = sheet.horizontalScrollbar.copy()
+        }
+
+        return this
+    }
+
+    override fun copy(): UIContainerSheet = UIContainerSheet().apply(this)
 }

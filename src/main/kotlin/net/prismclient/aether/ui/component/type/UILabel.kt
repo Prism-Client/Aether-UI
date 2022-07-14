@@ -9,8 +9,10 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @author sen
  * @since 1.0
  */
-class UILabel(var text: String, style: String?) : UIComponent<UIStyleSheet>(style) {
+class UILabel(var text: String) : UIComponent<UIStyleSheet>() {
     override fun renderComponent() {
         style.font?.render(text)
     }
+
+    override fun createsStyle(): UIStyleSheet = UIStyleSheet()
 }

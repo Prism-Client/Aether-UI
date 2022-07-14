@@ -2,8 +2,8 @@ package examples
 
 import examples.deps.Generic
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
+import net.prismclient.aether.ui.component.type.layout.UIAutoLayout
+import net.prismclient.aether.ui.component.type.layout.UIListLayout
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.screen.UIScreen
