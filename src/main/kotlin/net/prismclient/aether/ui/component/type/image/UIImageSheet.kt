@@ -8,7 +8,7 @@ import net.prismclient.aether.ui.util.UIColor
  * [UIImageSheet] is the sheet implementation for [UIImage].
  *
  * @author sen
- * @since 5/25/2022
+ * @since 1.0
  */
 class UIImageSheet(name: String) : UIStyleSheet(name) {
     /**

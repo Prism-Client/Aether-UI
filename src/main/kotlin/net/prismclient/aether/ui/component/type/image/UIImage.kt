@@ -37,7 +37,7 @@ class UIImage(name: String, style: String?) : UIComponent<UIImageSheet>(style) {
 
     override fun renderComponent() {
         renderer {
-            color(style.imageColor)
+            color(style.imageColor?.rgba ?: -1)
             renderImage(
                 image, x, y, width, height,
                 style.imageRadius?.topLeft ?: 0f,

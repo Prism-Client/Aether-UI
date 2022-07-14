@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.component.type.input.button
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.dsl.UIComponentDSL
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.extensions.colorOf
 
 open class UICheckbox(
     checked: Boolean = false,
@@ -30,7 +31,7 @@ open class UICheckbox(
         selectedImage = UIImage(selectedImageName, imageStyle)
         deselectedImage = UIImage(deselectedImageName, imageStyle)
         if (deselectedImageName.isEmpty()) // Make the deselected image invisible
-            deselectedImage.style.imageColor = 0
+            deselectedImage.style.imageColor = colorOf(0)
         UIComponentDSL.pushComponent(selectedImage)
         UIComponentDSL.pushComponent(deselectedImage)
     }
