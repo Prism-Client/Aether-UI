@@ -71,9 +71,11 @@ inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(block: Block<S>): C = 
  */
 inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(name: String, block: Block<S>): C = also {
     if (!this.hasStyle()) {
-        this.createsStyle().run {
-            this.name = name
-            UIProvider.registerStyle(this)
+        if (UIProvider.styles[name] == null) {
+            this.createsStyle().run {
+                this.name = name
+                UIProvider.registerStyle(this)
+            }
         }
         this.applyStyle(name)
     }
