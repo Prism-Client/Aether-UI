@@ -76,7 +76,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: Int) {
-        UIRendererDSL.activeColor = color
+        activeColor = color
         renderer.color(color)
     }
 

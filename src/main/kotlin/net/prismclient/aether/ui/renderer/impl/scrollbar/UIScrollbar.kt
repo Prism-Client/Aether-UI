@@ -121,12 +121,19 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
         val mouseX = component!!.getMouseX()
         val mouseY = component!!.getMouseY()
 
-        if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
+        val isSliderSelected = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h
+        val isScrollbarSelected = mouseX >= cachedX && mouseX <= cachedX + cachedWidth && mouseY >= cachedY && mouseY <= cachedY + cachedHeight
+
+        if (isSliderSelected) {
             selected = true
             mouseOffset = if (type == Scrollbar.Vertical) mouseY - y else mouseX - x
-            return true
+        } else if (isScrollbarSelected) {
+            
+        } else {
+            return false
         }
-        return false
+
+        return true
     }
 
     fun mouseMoved() {

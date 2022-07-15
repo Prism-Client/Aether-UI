@@ -47,12 +47,11 @@ class Generic : UIDependable {
         // assumeLoadImage()
 
         // A 24x24 icon
-        style(UIImageSheet(), "icon24x") {
+        UIImageSheet().style("icon24x") {
             size(24, 24)
         }
 
-        // A example font
-        style(UIStyleSheet("generic-font")) {
+        UIStyleSheet().style("generic-font") {
             // FontFamily to Montserrat
             // FontSize -> 16f
             // FontColor -> -1 = asRGBA(255, 255, 255) (aka white)

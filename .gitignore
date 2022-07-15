@@ -10,3 +10,7 @@ gradle-app.setting
 .idea
 *.DS_STORE
 *.log
+
+src/test/resources/
+
+src/test/koltin/examples/prism/
