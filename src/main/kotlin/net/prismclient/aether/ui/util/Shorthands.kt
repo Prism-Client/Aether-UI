@@ -73,6 +73,7 @@ inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(name: String, block: B
     if (!this.hasStyle()) {
         this.createsStyle().run {
             this.name = name
+            UIProvider.registerStyle(this)
         }
         this.applyStyle("Gen-$this")
     }
