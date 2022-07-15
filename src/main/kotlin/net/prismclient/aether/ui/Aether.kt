@@ -145,7 +145,7 @@ open class Aether(renderer: UIRenderer) {
     open fun mouseChanged(mouseButton: Int, isRelease: Boolean) {
         if (isRelease) {
             mouseReleasedListeners?.forEach { it.value.run() }
-            components?.forEach { it.mouseReleased(mouseX, mouseY) }
+            components?.forEach { it.mouseReleased(it.getMouseX(), it.getMouseY()) }
             return
         }
 
@@ -185,7 +185,7 @@ open class Aether(renderer: UIRenderer) {
 
             return if (component != null) {
                 component.focus()
-                component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, clickCount))
+                component.mousePressed(UIMouseEvent(component.getMouseX(), component.getMouseY(), mouseButton, clickCount))
                 true
             } else false
         }
@@ -214,7 +214,7 @@ open class Aether(renderer: UIRenderer) {
             i++
         }
         c?.focus()
-        c?.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, clickCount))
+        c?.mousePressed(UIMouseEvent(c.getMouseX(), c.getMouseY(), mouseButton, clickCount))
     }
 
     /**

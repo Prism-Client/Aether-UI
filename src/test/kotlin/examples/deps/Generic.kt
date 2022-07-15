@@ -41,7 +41,7 @@ class Generic : UIDependable {
         // Load some assets into memory. Aether is intended to support mainly JPEG, PNG, and SVG.
         // Either explicitly state the type
         // Reference the image with the name "ui"
-        UIAssetDSL.svg("ui", "/prism/icons/navbar/ui.svg")
+        //UIAssetDSL.svg("ui", "/prism/icons/navbar/ui.svg")
         // loadImage()
         // or let Aether figure it out
         // assumeLoadImage()
