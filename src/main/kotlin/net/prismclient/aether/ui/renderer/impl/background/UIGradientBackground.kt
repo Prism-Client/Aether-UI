@@ -2,19 +2,18 @@ package net.prismclient.aether.ui.renderer.impl.background
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
 
 /**
- * [UIGradientBackground] is the background renderer for a component which requests a gradient instead of a solid.
+ * [UIGradientBackground] is the background renderer for a component which requests a gradient instead of a solid
  *
  * @author sen
- * @since 41.0
+ * @since 4/26/2022
  */
 class UIGradientBackground : UIBackground() {
-    var gradientStartColor: UIColor? = null
-    var gradientEndColor: UIColor? = null
+    var gradientStartColor = 0
+    var gradientEndColor = 0
     var gradientX: UIUnit? = null
     var gradientY: UIUnit? = null
     var gradientWidth: UIUnit? = null
@@ -45,18 +44,15 @@ class UIGradientBackground : UIBackground() {
             component?.relHeight ?: 0f,
             true
         )
-        gradientWidthCache = gradientXCache +
+        gradientWidthCache =
             calculate(gradientWidth, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, false)
-        gradientHeightCache = gradientYCache +
+        gradientHeightCache =
             calculate(gradientHeight, component, component?.relWidth ?: 0f, component?.relHeight ?: 0f, true)
     }
 
     override fun render() {
         renderer {
-            path {
-                linearGradient(gradientXCache, gradientYCache, gradientWidthCache, gradientHeightCache, gradientStartColor?.rgba ?: 0, gradientEndColor?.rgba ?: 0)
-                rect(cachedX, cachedY, cachedWidth, cachedHeight, radius)
-            }.fillPaint()
+            TODO("Gradient suport")
         }
     }
 

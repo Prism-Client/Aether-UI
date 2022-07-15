@@ -48,9 +48,10 @@ object UIProvider {
      * Returns the name of the images given the [UIImageData]
      */
     fun getImageName(imageData: UIImageData): String? {
-        for ((name, image) in images) {
-            if (image == imageData)
-                return name
+        for (image in images) {
+            if (image.value == imageData) {
+                return image.key
+            }
         }
         return null
     }

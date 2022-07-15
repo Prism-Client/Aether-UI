@@ -1,12 +1,13 @@
-package net.prismclient.aether.ui.component.type.layout
+package net.prismclient.aether.ui.component.type.layout.auto
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.util.interfaces.UICopy
-import net.prismclient.aether.ui.util.name
 
 /**
  * [UIAutoLayout] is a layout which is designed to mimic the behavior of Figma's auto
@@ -26,8 +27,10 @@ import net.prismclient.aether.ui.util.name
  * @author sen
  * @since 1.1
  */
-class UIAutoLayout @JvmOverloads constructor(listDirection: ListDirection = ListDirection.Horizontal) :
-    UIListLayout(listDirection, ListOrder.Forward), UICopy<UIAutoLayout> {
+class UIAutoLayout @JvmOverloads constructor(
+    listDirection: ListDirection = ListDirection.Horizontal,
+    style: String?
+) : UIListLayout(listDirection, ListOrder.Forward, style), UICopy<UIAutoLayout> {
     /**
      * Defines how the width should be sized. [ResizingMode.Hug] resizes based on the components and
      * the padding and spacing properties, and [ResizingMode.Fixed] acts like a normal component.
@@ -64,14 +67,6 @@ class UIAutoLayout @JvmOverloads constructor(listDirection: ListDirection = List
      */
     var componentAlignment: UIAlignment = TOPLEFT
 
-    /**
-     * Sets the [verticalResizing] and [horizontalResizing] to [vertical] and [horizontal] respectively.
-     */
-    fun resize(vertical: ResizingMode, horizontal: ResizingMode) {
-        verticalResizing = vertical
-        horizontalResizing = horizontal
-    }
-
     override fun updateLayout() {
         if (components.isEmpty()) return
 
@@ -87,27 +82,28 @@ class UIAutoLayout @JvmOverloads constructor(listDirection: ListDirection = List
         var h = 0f
 
         for (i in components.indices) {
-            val component = components[i]
             if (horizontalResizing == ResizingMode.Hug) {
                 w = if (listDirection == ListDirection.Horizontal) {
-                    w + component.relWidth + component.marginLeft + component.marginRight + if (i < components.size - 1) spacing else 0f
+                    w + components[i].relWidth + if (i < components.size - 1) spacing else 0f
                 } else {
-                    (component.relWidth + component.marginLeft + component.marginRight).coerceAtLeast(w)
+                    components[i].relWidth.coerceAtLeast(w)
                 }
             }
             if (verticalResizing == ResizingMode.Hug) {
                 h = if (listDirection == ListDirection.Vertical) {
-                    h + component.relHeight + component.marginTop + component.marginBottom + if (i < components.size - 1) spacing else 0f
+                    h + components[i].relHeight + if (i < components.size - 1) spacing else 0f
                 } else {
-                    (component.relHeight + component.marginTop + component.marginBottom).coerceAtLeast(h)
+                    components[i].relHeight.coerceAtLeast(h)
                 }
             }
         }
 
         // Adjust the width and/or height of the component based on the calculated
         // size, and ensure that the size is at least the size prior to this.
-        if (horizontalResizing == ResizingMode.Hug) width = (w + left + right).coerceAtLeast(width)
-        if (verticalResizing == ResizingMode.Hug) height = (h + top + bottom).coerceAtLeast(height)
+        if (horizontalResizing == ResizingMode.Hug)
+            width = (w + left + right).coerceAtLeast(width)
+        if (verticalResizing == ResizingMode.Hug)
+            height = (h + top + bottom).coerceAtLeast(height)
 
         // Update
         calculateBounds()
@@ -144,7 +140,7 @@ class UIAutoLayout @JvmOverloads constructor(listDirection: ListDirection = List
                     MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - c.height - top - bottom) / 2f
                     BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - c.height - left - right)
                     else -> 0f
-                } + c.marginTop - c.marginBottom
+                }
                 x += c.width + spacing
             } else if (listDirection == ListDirection.Vertical) {
                 c.x = x + when (componentAlignment) {
@@ -152,7 +148,7 @@ class UIAutoLayout @JvmOverloads constructor(listDirection: ListDirection = List
                     TOPCENTER, CENTER, BOTTOMCENTER -> (width - c.width - left - right) / 2f
                     TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - c.width - left - right)
                     else -> 0f
-                } + c.marginLeft - c.marginRight
+                }
                 c.y = y
                 y += c.height + spacing
             }
@@ -168,7 +164,7 @@ class UIAutoLayout @JvmOverloads constructor(listDirection: ListDirection = List
     /**
      * Copy the properties of this layout to a new one (excluding components).
      */
-    override fun copy(): UIAutoLayout = UIAutoLayout(listDirection).also {
+    override fun copy(): UIAutoLayout = UIAutoLayout(listDirection, style.name).also {
         // UIAutoLayout properties
         it.horizontalResizing = horizontalResizing
         it.verticalResizing = verticalResizing

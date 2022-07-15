@@ -2,7 +2,7 @@ package net.prismclient.aether.ui.style
 
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
@@ -19,7 +19,6 @@ import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.rel
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
-import net.prismclient.aether.ui.util.name
 
 /**
  * [UIStyleSheet] is the superclass of all styles. It holds the general
@@ -40,13 +39,11 @@ import net.prismclient.aether.ui.util.name
  * are thrown when used. If the style sheet is intended on being inheritable, the apply method
  * should also be overridden. See [UIFrameSheet] for an example.
  *
- * @since 1.0
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md">Styles</s>
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md#creating-styles">How to create styles</a>
  */
-open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
-    var name: String = ""
-
+open class UIStyleSheet @JvmOverloads constructor(var name: String = "") : UICopy<UIStyleSheet>,
+    UIAnimatable<UIStyleSheet> {
     /**
      * When true, the property will not be cleared when Aether cleans up styles.
      */
@@ -85,12 +82,10 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     ) {
         val component = animation.component
 
-        if (!component.overridden) {
-            component.x = previous?.x.lerp(current?.x, component, x, progress, false)
-            component.y = previous?.y.lerp(current?.y, component, y, progress, true)
-            component.width = previous?.width.lerp(current?.width, component, width, progress, false)
-            component.height = previous?.height.lerp(current?.height, component, height, progress, true)
-        }
+        component.x = previous?.x.lerp(current?.x, component, x, progress, false)
+        component.y = previous?.y.lerp(current?.y, component, y, progress, true)
+        component.width = previous?.width.lerp(current?.width, component, width, progress, false)
+        component.height = previous?.height.lerp(current?.height, component, height, progress, true)
 
         if (previous?.background != null || current?.background != null) {
             background = background ?: UIBackground()
@@ -349,7 +344,7 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         this.marginLeft = marginLeft
     }
 
-    override fun copy(): UIStyleSheet = UIStyleSheet().name(name).apply(this)
+    override fun copy(): UIStyleSheet = UIStyleSheet(name).apply(this)
 
     /**
      * Applies the properties of an existing sheet to this

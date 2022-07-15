@@ -22,15 +22,68 @@ import net.prismclient.aether.ui.util.extensions.px
 class Animations : UIScreen {
     override fun build() {
         create {
-            button("Hello").style {
+            include(Generic())
 
+            UIStyleSheet("button").style {
+                align(UIAlignment.CENTER)
+                size(400, 40)
+                background(colorOf(asRGBA(0f, 0f, 0f, 0.3f)), radiusOf(0f)) {
+                    border {
+                        borderWidth = px(10)
+                        borderColor = colorOf(asRGBA(255, 0, 0))
+                    }
+                }
+                font("Montserrat", px(16f), colorOf(-1), left or top)
             }
 
-            verticalList {
+            animationOf("someAnimation", UIStyleSheet()) {
+                UIQuart(1000L) repeat {
+                    kf {}
+                    kf {
+                        position(50, 0)
+                    }
+                    kf {
+                        position(0, 0)
+                    }
+                    kf {
+                        position(0, 50)
+                    }
+                    kf {
+                        position(50, 50)
+                    }
+                }
+                onCompletion {
+                    UIProvider.dispatchAnimation("someAnimation", it.component)
+                }
+            }
 
+            animationOf("test", UIStyleSheet()) {
+                kf {}
+                UILinear(1000L) to {
+                    background {
+//                        backgroundColor = colorOf(asRGBA(0, 0, 255))
+                        border {
+                            borderColor = colorOf(asRGBA(0f, 1f, 0f))
+                            borderWidth = px(1)
+                        }
+                    }
+                }
+            }
+
+            animationOf("move", UIStyleSheet()) {
+                kf {}
+                kf {
+                    x = px(50)
+                }
+            }
+
+            val l = label("Some text", "button").onMousePressed {
+                UIProvider.dispatchAnimation("test", it)
+                println("pressed")
             }.style {
-
+                x = px(-50)
             }
+            UIProvider.dispatchAnimation("move", l)
         }
     }
 }
