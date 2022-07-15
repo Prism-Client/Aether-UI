@@ -8,7 +8,8 @@ import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.util.*
+import net.prismclient.aether.ui.util.Block
+import net.prismclient.aether.ui.util.UIColor
 
 /**
  * [UIRendererDSL] wraps the [UIRenderer] class to minimize the amount of calls
@@ -76,7 +77,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: Int) {
-        activeColor = color
+        UIRendererDSL.activeColor = color
         renderer.color(color)
     }
 
@@ -153,13 +154,13 @@ object UIRendererDSL {
      * @see fontBounds
      */
     @JvmStatic
-    fun fontWidth(): Float = fontBounds().maxX() - fontBounds().minX()
+    fun fontWidth(): Float = fontBounds()[2] - fontBounds()[0]
 
     /**
      * Returns the height of the most recent text render call.
      */
     @JvmStatic
-    fun fontHeight(): Float = fontBounds().maxY() - fontBounds().minY()
+    fun fontHeight(): Float = fontBounds()[3] - fontBounds()[1]
 
     /**
      * Returns the ascender of the most recent text render call.
@@ -175,9 +176,6 @@ object UIRendererDSL {
 
     // -- General Rendering -- //
 
-    /**
-     * renders a rectangle with the given bounds and [radius].
-     */
     @JvmStatic
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(
         x,
@@ -401,7 +399,7 @@ object UIRendererDSL {
     @JvmStatic
     inline fun UIContentFBO.renderToFramebuffer(block: Block<UIRendererDSL>): UIRendererDSL {
         renderer.bindFBO(this)
-        beginFrame(this.width, this.height, this.contentScale)
+        beginFrame(this.scaledWidth, this.scaledHeight, this.contentScale)
         UIRendererDSL.block()
         endFrame()
         renderer.unbindFBO()

@@ -4,7 +4,6 @@ import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.dsl.UIComponentDSL
 import net.prismclient.aether.ui.renderer.UIProvider
-import net.prismclient.aether.ui.renderer.impl.background.UIGradientBackground
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
@@ -35,50 +34,47 @@ const val NEAREST = 32
 /**
  * Creates a DSL block from the given [obj] of type [T].
  */
-inline fun <T> blockFrom(obj: T, block: Block<T>) = obj.block()
+inline fun <T> blockFrom(obj: T, block: T.() -> Unit) = obj.block()
 
 /**
- * Creates a style sheet [block] from the given style sheet [S], sets the [name] and registers the style.
+ * Registers a style sheet for the given style, [S].
  */
-@JvmName("styleExtension")
-inline fun <S : UIStyleSheet> S.style(name: String, block: Block<S>): S = apply {
-    this.name = name
-    this.block()
-    UIProvider.registerStyle(this)
+inline fun <S : UIStyleSheet> style(style: S, block: S.() -> Unit) {
+    style.block()
+    UIProvider.registerStyle(style)
 }
 
 /**
- * Creates a style sheet [block] from the given style sheet [S], sets the [name] and registers the style.
- */
-inline fun <S : UIStyleSheet> style(sheet: S, name: String, block: Block<S>): S {
-    sheet.name = name
-    sheet.block()
-    UIProvider.registerStyle(sheet)
-    return sheet
-}
-
-/**
- * Creates a style [block] from the given component [C]. If the style has not been created
- * one is automatically allocated with the name of
+ * Registers a style sheet for the given style, [S]. Alternative to [style].
  *
- *      "$C.toString()-sheet"
+ * @see style
  */
-inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(block: Block<S>): C = this.style("$this-sheet", block)
+inline fun <S : UIStyleSheet> styleOf(style: S, block: S.() -> Unit) = style(style, block)
+
+@JvmName("styleExtension")
+inline fun <S : UIStyleSheet> S.style(block: S.() -> Unit) = style(this, block)
 
 /**
- * Creates a style [block] from the given component [C]. If the style has not been
- * created, one is automatically allocated with the name of [name].
+ * Registers a style sheet in the component scope. This is used when no style is provided
+ * to the component, and instead, the style is provided at the component level.
+ *
+ * If the style's name is blank, it will be formatted as "Gen-${component.toString()}".
  */
-inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(name: String, block: Block<S>): C = also {
-    if (!this.hasStyle()) {
-        this.createsStyle().run {
-            this.name = name
-            UIProvider.registerStyle(this)
-        }
-        this.applyStyle(name)
-    }
+inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(style: S, block: S.() -> Unit): C = apply {
+    UIComponentDSL.updateState(this)
+    if (style.name.isEmpty()) style.name = "Gen-$this"
+    styleOf(style, block)
+    this.applyStyle(style.name)
+    UIComponentDSL.restoreState(this)
+}
 
+/**
+ * Creates a style [block] on a [UIComponent] of the style sheet [S].
+ */
+inline fun <C : UIComponent<S>, S : UIStyleSheet> C.style(block: S.() -> Unit): C = apply {
+    UIComponentDSL.updateState(this)
     this.style.block()
+    UIComponentDSL.restoreState(this)
 }
 
 /**
@@ -139,7 +135,7 @@ fun marginOf(top: UIUnit, right: UIUnit, bottom: UIUnit, left: UIUnit): UIMargin
  *
  * @see ucreate
  */
-inline fun create(block: Block<UIComponentDSL>) {
+inline fun create(block: UIComponentDSL.() -> Unit) {
     UIComponentDSL.begin()
     UIComponentDSL.block()
     UIComponentDSL.complete()
@@ -148,7 +144,7 @@ inline fun create(block: Block<UIComponentDSL>) {
 /**
  * Unsafe version of [build]. Does not allocate/deallocate the stacks, thus nothing will be reset
  */
-inline fun ucreate(block: Block<UIComponentDSL>) = UIComponentDSL.block()
+inline fun ucreate(block: UIComponentDSL.() -> Unit) = UIComponentDSL.block()
 
 /**
  * Loads the [dependable].
@@ -156,11 +152,12 @@ inline fun ucreate(block: Block<UIComponentDSL>) = UIComponentDSL.block()
 fun include(dependable: UIDependable) = dependable.load()
 
 /**
- * Creates an animation for the stylesheet [S], with the name [animationName].
- * A block is given to add the keyframes and modify other properties of the [UIAnimation].
- * The animation is automatically registered under the name given.
+ * Creates an animation where the component is [C], the style of that component is [S], the animation
+ * name is [animationName], and an instance of the component's style is passed as [style]. A block is
+ * given to add the keyframes and modify other properties of the [UIAnimation]. The animation is
+ * automatically registered under the name given.
  */
-inline fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block: UIAnimation<S>.() -> Unit): UIAnimation<S> {
+fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block: UIAnimation<S>.() -> Unit): UIAnimation<S> {
     val animation = UIAnimation<S>(animationName, style)
     animation.block()
     UIProvider.registerAnimation(animationName, animation)
@@ -168,6 +165,7 @@ inline fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block
 }
 
 /**
- * Creates a [UIGradientBackground], applies the given block to it, and returns it.
+ * Type alias for a function which has a receiver of [T] and accepts, and returns
+ * nothing. The block is intended to apply properties to the receiver [T].
  */
-inline fun gradient(block: Block<UIGradientBackground>): UIGradientBackground = UIGradientBackground().also(block)
+typealias Block<T> = T.() -> Unit

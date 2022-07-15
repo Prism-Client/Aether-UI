@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.renderer
 
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import java.nio.ByteBuffer
 
@@ -137,6 +138,18 @@ interface UIRenderer {
      * @see bindFBO
      */
     fun unbindFBO()
+
+    fun renderFbo(
+        fbo: UIContentFBO,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        topLeft: Float,
+        topRight: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    )
 
     // -- Asset Loading --/
     /**

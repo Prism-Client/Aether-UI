@@ -4,8 +4,8 @@ import net.prismclient.aether.ui.Aether.Properties
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.UIContainer
-import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.container.UIContainer
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
@@ -33,10 +33,9 @@ import java.util.function.Consumer
  * functions [Properties.updateSize] and [Properties.updateMouse] to update the values without
  * invoking the [update], and [mouseMoved] functions.
  *
- * [Aether Documentation](https://aether.prismclient.net/getting-started)
- *
  * @author sen
  * @since 1.0
+ * @see <a href="https://aether.prismclient.net/getting-started">UICore documentation</a>
  * @see UIProvider
  */
 open class Aether(renderer: UIRenderer) {
@@ -109,14 +108,12 @@ open class Aether(renderer: UIRenderer) {
     open fun render() {
         renderer {
             if (activeScreen != null) {
-                timings.onFrameRenderStart()
                 beginFrame(width, height, devicePxRatio)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]
                     if (component.visible) component.render()
                 }
                 endFrame()
-                timings.onFrameRenderEnd()
             }
         }
     }
@@ -126,7 +123,7 @@ open class Aether(renderer: UIRenderer) {
      * eligibility to be focused or bubbled. The [Properties.mouseX] and [Properties.mouseY]
      * properties can be found in [Aether.Properties].
      */
-    open fun mouseMoved(mouseX: Float, mouseY: Float) {
+    fun mouseMoved(mouseX: Float, mouseY: Float) {
         updateMouse(mouseX, mouseY)
         mouseMoveListeners?.forEach { it.value.run() }
         if (activeScreen != null) for (i in 0 until components!!.size) components!![i].mouseMoved(mouseX, mouseY)
@@ -142,10 +139,10 @@ open class Aether(renderer: UIRenderer) {
      *
      * @see mouseScrolled
      */
-    open fun mouseChanged(mouseButton: Int, isRelease: Boolean) {
+    fun mouseChanged(mouseButton: Int, isRelease: Boolean) {
         if (isRelease) {
             mouseReleasedListeners?.forEach { it.value.run() }
-            components?.forEach { it.mouseReleased(it.getMouseX(), it.getMouseY()) }
+            components?.forEach { it.mouseReleased(mouseX, mouseY) }
             return
         }
 
@@ -185,7 +182,7 @@ open class Aether(renderer: UIRenderer) {
 
             return if (component != null) {
                 component.focus()
-                component.mousePressed(UIMouseEvent(component.getMouseX(), component.getMouseY(), mouseButton, clickCount))
+                component.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, clickCount))
                 true
             } else false
         }
@@ -214,7 +211,7 @@ open class Aether(renderer: UIRenderer) {
             i++
         }
         c?.focus()
-        c?.mousePressed(UIMouseEvent(c.getMouseX(), c.getMouseY(), mouseButton, clickCount))
+        c?.mousePressed(UIMouseEvent(mouseX, mouseY, mouseButton, clickCount))
     }
 
     /**
@@ -223,7 +220,7 @@ open class Aether(renderer: UIRenderer) {
      * @param character The key which was pressed or '\u0000'
      * @see updateModifierKey To update keys such as Shift, Alt, Tab etc...
      */
-    open fun keyPressed(character: Char) {
+    fun keyPressed(character: Char) {
         keyPressListeners?.forEach { it.value.accept(character) }
         (focusedComponent as? UIComponent<*>)?.keyPressed(character)
     }
@@ -233,7 +230,6 @@ open class Aether(renderer: UIRenderer) {
      * of their eligibility to be focused or bubbled.
      */
     open fun mouseScrolled(scrollAmount: Float) {
-        if (scrollAmount == 0f) return
         tryFocus()
         mouseScrollListeners?.forEach { it.value.accept(scrollAmount) }
         components?.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
@@ -245,20 +241,20 @@ open class Aether(renderer: UIRenderer) {
      * as de-focusing the focused component and adding listeners to input.
      */
     companion object Properties {
-
-        val timings: Timings = Timings()
-
         @JvmStatic
         var debug: Boolean = true
 
         @JvmStatic
         lateinit var instance: Aether
+            protected set
 
         @JvmStatic
         lateinit var renderer: UIRenderer
+            protected set
 
         @JvmStatic
         var activeScreen: UIScreen? = null
+            protected set
 
         /**
          * The focused component (if applicable).
@@ -269,36 +265,42 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         var focusedComponent: UIFocusable? = null
+            protected set
 
         /**
          * The width of the screen. It can be set via [update]
          */
         @JvmStatic
         var width: Float = 0f
+            protected set
 
         /**
          * The width of the screen. It can be set via [update]
          */
         @JvmStatic
         var height: Float = 0f
+            protected set
 
         /**
          * The device pixel ratio. It can be set via [update]. It is the equivalent of content scale.
          */
         @JvmStatic
         var devicePxRatio: Float = 1f
+            protected set
 
         /**
          * The x position of the mouse relative to the screen
          */
         @JvmStatic
         var mouseX: Float = 0f
+            protected set
 
         /**
          * The y position of the mouse relative to the screen
          */
         @JvmStatic
         var mouseY: Float = 0f
+            protected set
 
         /**
          * Invoked whenever the layout needs to be updated. This can be when the screen
@@ -306,42 +308,49 @@ open class Aether(renderer: UIRenderer) {
          */
         @JvmStatic
         var updateListeners: HashMap<String, Runnable>? = null
+            protected set
 
         /**
          * The listeners for then the mouse is moved. Invoked prior to components.
          */
         @JvmStatic
         var mouseMoveListeners: HashMap<String, Runnable>? = null
+            protected set
 
         /**
          * Invoked when the mouse is pressed. Invoked prior to components.
          */
         @JvmStatic
         var mousePressedListeners: HashMap<String, Runnable>? = null
+            protected set
 
         /**
          * Invoked when the mouse is released. Invoked prior to components.
          */
         @JvmStatic
         var mouseReleasedListeners: HashMap<String, Runnable>? = null
+            protected set
 
         /**
          * Invoked when a key is pressed. Invoked prior to components.
          */
         @JvmStatic
         var keyPressListeners: HashMap<String, Consumer<Char>>? = null
+            protected set
 
         /**
          * Invoked when the mouse is scrolled. Invoked prior to components.
          */
         @JvmStatic
         var mouseScrollListeners: HashMap<String, Consumer<Float>>? = null
+            protected set
 
         /**
          * Invoked when the screen is deleted. This is used to deallocate listeners added to UICore.
          */
         @JvmStatic
         var deallocationListeners: HashMap<String, Runnable>? = null
+            protected set
 
         /**
          * The list of modifier keys. The value is if the key is pressed
@@ -493,7 +502,13 @@ open class Aether(renderer: UIRenderer) {
          * Focuses the component. Please use [UIComponent.focus] instead.
          */
         @JvmStatic
-        fun <T> focus(component: T) where T : UIComponent<*>, T : UIFocusable {
+        fun focus(component: UIFocusable) {
+            // Check if the given value is a valid instance of UIComponent
+            try {
+                component as UIComponent<*>
+            } catch (castException: ClassCastException) {
+                throw RuntimeException("When trying to focus, the provided value is not an instance of UIComponent. Make sure you are only using the UIFocus interface to focus UIComponents.")
+            }
             focusedComponent = component
         }
 
@@ -533,7 +548,7 @@ open class Aether(renderer: UIRenderer) {
             for (i in 0 until instance.frames!!.size) {
                 // UIContainers are what control scrolling, so
                 // if it is not an instance of it, skip and continue
-                val container = instance.frames!![i] as? UIContainer<UIContainerSheet> ?: continue
+                val container = instance.frames!![i] as? UIContainer<*> ?: continue
                 if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
                     // Iterate through the frame to see if there are more
                     // containers with it. If there are, it will pass true

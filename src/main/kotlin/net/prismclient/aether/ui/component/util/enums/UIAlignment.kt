@@ -7,7 +7,7 @@ package net.prismclient.aether.ui.component.util.enums
  * @author sen
  * @since 1.0
  */
-@Suppress("Unused", "SpellCheckingInspection")
+@Suppress("unused", "SpellCheckingInspection")
 enum class UIAlignment {
     CUSTOM,
     TOPLEFT, TOPCENTER, TOPRIGHT,
