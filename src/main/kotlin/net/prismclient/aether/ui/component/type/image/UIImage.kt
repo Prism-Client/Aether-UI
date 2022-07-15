@@ -4,16 +4,21 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.impl.property.UIRadius
+import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.name
 
 /**
- * [UIImage] is the default implementation for rendering images on screen. It accepts`
- * an image
+ * [UIImage] is the default component for rendering images to a screen. It accepts
+ * the [name] of the image that is to be rendered onto the screen. Alternatively, the
+ * image can also be loaded with the alternative constructor from a resource file.
  *
  * @author sen
- * @since 5/20/2022
+ * @since 1.0
  */
-class UIImage(name: String, style: String?) : UIComponent<UIImageSheet>(style) {
+class UIImage(name: String) : UIComponent<UIImageSheet>() {
     var image: String = name
         set(value) {
             field = value
@@ -24,12 +29,9 @@ class UIImage(name: String, style: String?) : UIComponent<UIImageSheet>(style) {
     /**
      * Loads am image or svg from the specified location with a given name
      */
-    constructor(name: String, location: String, style: String?) : this(
-        name,
-        style
-    ) {
-        UIAssetDSL.image(name, location)
-    }
+    constructor(name: String, location: String) : this(
+        name
+    ) { UIAssetDSL.image(name, location) }
 
     init {
         activeImage = UIProvider.getImage(image)
@@ -37,7 +39,7 @@ class UIImage(name: String, style: String?) : UIComponent<UIImageSheet>(style) {
 
     override fun renderComponent() {
         renderer {
-            color(style.imageColor)
+            color(style.imageColor?.rgba ?: -1)
             renderImage(
                 image, x, y, width, height,
                 style.imageRadius?.topLeft ?: 0f,
@@ -46,5 +48,25 @@ class UIImage(name: String, style: String?) : UIComponent<UIImageSheet>(style) {
                 style.imageRadius?.bottomLeft ?: 0f,
             )
         }
+    }
+
+    override fun createsStyle(): UIImageSheet = UIImageSheet()
+}
+
+class UIImageSheet : UIStyleSheet() {
+    /**
+     * The color of the image. The default value is RGBA(255, 255, 255)
+     */
+    var imageColor: UIColor? = null
+
+    /**
+     * The radius of the image.
+     */
+    var imageRadius: UIRadius? = null
+
+    override fun copy() = UIImageSheet().name(name).also {
+        it.apply(this)
+        it.imageColor = imageColor
+        it.imageRadius = imageRadius?.copy()
     }
 }

@@ -1,9 +1,7 @@
-package net.prismclient.aether.ui.component.type.layout.list
+package net.prismclient.aether.ui.component.type.layout
 
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrder.Backwards
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout.ListOrder.Forward
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIListLayout.ListOrder.Backwards
+import net.prismclient.aether.ui.component.type.layout.UIListLayout.ListOrder.Forward
 import net.prismclient.aether.ui.unit.UIUnit
 
 /**
@@ -16,8 +14,7 @@ import net.prismclient.aether.ui.unit.UIUnit
 open class UIListLayout @JvmOverloads constructor(
     var listDirection: ListDirection = ListDirection.Vertical,
     var listOrder: ListOrder = Forward,
-    style: String?
-) : UIContainer<UIContainerSheet>(style) {
+) : UIContainer<UIContainerSheet>() {
     /**
      * The spacing between each component in the layout.
      */

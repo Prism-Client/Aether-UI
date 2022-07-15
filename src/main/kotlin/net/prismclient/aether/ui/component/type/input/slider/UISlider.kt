@@ -2,6 +2,9 @@ package net.prismclient.aether.ui.component.type.input.slider
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.event.input.UIMouseEvent
+import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.Block
+import net.prismclient.aether.ui.util.name
 import java.util.function.BiConsumer
 import kotlin.math.roundToInt
 
@@ -17,16 +20,15 @@ import kotlin.math.roundToInt
  * @see UISliderShape
  */
 open class UISlider(
-    value: Double, var range: ClosedFloatingPointRange<Double>, var step: Double, style: String?
-) : UIComponent<UISliderSheet>(style) {
+    value: Double, var range: ClosedFloatingPointRange<Double>, var step: Double
+) : UIComponent<UISliderSheet>() {
     /**
      * The value of this slider.
      */
     var value: Double = 0.0
         set(value) {
             val different = value != field
-            field = ((value / step.coerceAtLeast(Double.MIN_VALUE)).roundToInt() * step)
-                .coerceAtLeast(range.start)
+            field = ((value / step.coerceAtLeast(Double.MIN_VALUE)).roundToInt() * step).coerceAtLeast(range.start)
                 .coerceAtMost(range.endInclusive)
 //            normalizedValue = value / (range.endInclusive - range.start)
             if (different) valueChangeListeners?.forEach { it.value.accept(this, value) }
@@ -109,5 +111,21 @@ open class UISlider(
     ) {
         valueChangeListeners = valueChangeListeners ?: hashMapOf()
         valueChangeListeners!![eventName] = event
+    }
+
+    override fun createsStyle(): UISliderSheet = UISliderSheet()
+}
+
+class UISliderSheet : UIStyleSheet() {
+    /**
+     * The slider shape. The [UISliderShape.x] dictates the offset of the slider.
+     */
+    var control: UISliderShape = UISliderShape()
+
+    inline fun control(block: Block<UISliderShape>) = control.block()
+
+    override fun copy(): UISliderSheet = UISliderSheet().name(name).also {
+        it.apply(this)
+        it.control = control.copy()
     }
 }

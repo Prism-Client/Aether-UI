@@ -1,12 +1,19 @@
 package net.prismclient.aether.ui.component.type.input.textfield
 
 import net.prismclient.aether.ui.Aether
+import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.type.input.button.UIButton
+import net.prismclient.aether.ui.component.type.input.textfield.caret.UICaret
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
+import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.UIColor
+import net.prismclient.aether.ui.util.extensions.em
+import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
+import net.prismclient.aether.ui.util.name
 import net.prismclient.aether.ui.util.warn
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -20,12 +27,11 @@ import java.util.function.Consumer
  * length of the overall text.
  *
  * @author sen
- * @since 6/6/2022
- * @see UITextField.filter Pre-made text filters.
+ * @since 1.0
+ * @see UITextField.Filters pre-made text filters.
  */
-open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String?) :
-    UIButton<UITextFieldSheet>(text, style), UIFocusable {
-    override var text: String = text
+open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter) : UIComponent<UITextFieldSheet>(), UIFocusable {
+    var text: String = text
         set(value) {
             field = value
             textChangedListener?.forEach { it.value.accept(this) }
@@ -46,7 +52,7 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
 
     /** Blink **/
     protected var timeSinceLastBlink: Long = 0L
-    protected var blink: Boolean = false
+    protected var blink: Boolean = true
 
     init {
         Aether.onModifierKeyChange(this.toString()) { key, value ->
@@ -111,7 +117,7 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
             //style.caret.offsetY = font.cachedY + boundsOf(style.font!!.cachedText)[1] - y
 
             if (blink && isFocused()) style.caret.render()
-            if (timeSinceLastBlink + style.blinkRate <= System.currentTimeMillis()) {
+            if (style.blinkRate > 0 && (timeSinceLastBlink + style.blinkRate <= System.currentTimeMillis())) {
                 blink = !blink
                 timeSinceLastBlink = System.currentTimeMillis()
             }
@@ -231,6 +237,8 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
         textChangedListener!![eventName] = event
     }
 
+    override fun createsStyle(): UITextFieldSheet = UITextFieldSheet()
+
     /**
      * [TextFilter] holds a string which is compared to the input character. If the character
      * is found within the string, it will be added to the text field, else it will not. Furthermore,
@@ -258,5 +266,39 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
 
         @JvmStatic
         val hex = TextFilter("#ABCDEFabcdef0123456789")
+    }
+}
+
+class UITextFieldSheet : UIStyleSheet() {
+    /**
+     * The caret shape which is drawn to display the caret.
+     */
+    var caret: UICaret = UICaret().apply {
+        this.width = px(2)
+        this.height = em(1)
+    }
+
+    /**
+     * The rate at which the caret blinks at. 0 = never
+     */
+    var blinkRate: Long = 500L
+
+    /**
+     * The color of the text when the text field is not focused
+     */
+    var placeholderColor: UIColor? = null
+
+    /**
+     * Creates a caret DSL block.
+     */
+    inline fun caret(block: UICaret.() -> Unit) {
+        block.invoke(caret)
+    }
+
+    override fun copy(): UITextFieldSheet = UITextFieldSheet().name(name).also {
+        it.apply(this)
+        it.caret = caret.copy()
+        it.blinkRate = blinkRate
+        it.placeholderColor = placeholderColor
     }
 }
