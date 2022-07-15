@@ -9,7 +9,7 @@ import net.prismclient.aether.ui.util.extensions.colorOf
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import net.prismclient.aether.ui.util.left
-import net.prismclient.aether.ui.util.styleOf
+import net.prismclient.aether.ui.util.style
 import net.prismclient.aether.ui.util.top
 
 /**
@@ -41,18 +41,17 @@ class Generic : UIDependable {
         // Load some assets into memory. Aether is intended to support mainly JPEG, PNG, and SVG.
         // Either explicitly state the type
         // Reference the image with the name "ui"
-        UIAssetDSL.svg("ui", "/prism/icons/navbar/ui.svg")
+        //UIAssetDSL.svg("ui", "/prism/icons/navbar/ui.svg")
         // loadImage()
         // or let Aether figure it out
         // assumeLoadImage()
 
         // A 24x24 icon
-        styleOf(UIImageSheet("icon24x")) {
+        UIImageSheet().style("icon24x") {
             size(24, 24)
         }
 
-        // A example font
-        styleOf(UIStyleSheet("generic-font")) {
+        UIStyleSheet().style("generic-font") {
             // FontFamily to Montserrat
             // FontSize -> 16f
             // FontColor -> -1 = asRGBA(255, 255, 255) (aka white)
