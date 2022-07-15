@@ -31,11 +31,9 @@ class UIBorder : UIShape<UIBorder>(), UIAnimatable<UIBorder> {
             cachedBorderWidth = component!!.computeUnit(borderWidth, false)
     }
 
-    fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) {
-        renderer {
-            stroke(cachedBorderWidth, borderColor?.rgba ?: 0, borderDirection) {
-                rect(x, y, width, height, radius)
-            }
+    fun render(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = renderer {
+        stroke(cachedBorderWidth, borderColor?.rgba ?: 0, borderDirection) {
+            rect(x, y, width, height, radius)
         }
     }
 
@@ -71,6 +69,6 @@ class UIBorder : UIShape<UIBorder>(), UIAnimatable<UIBorder> {
         it.borderDirection = borderDirection
     }
 
-//    override fun toString(): String =
-//        "UIBorder(borderWidth=$borderWidth, borderColor=$borderColor, borderDirection=$borderDirection)"
+    override fun toString(): String =
+        "UIBorder(borderWidth=$borderWidth, borderColor=$borderColor, borderDirection=$borderDirection)"
 }

@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.type.layout.styles
 
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.warn
 
 /**
  * [UIFrameSheet] is the corresponding style sheet for frames. See field
@@ -19,7 +20,11 @@ open class UIFrameSheet(name: String) : UIStyleSheet(name) {
      * If true certain optimizations will be applied when
      * rendering. This only works with [useFBO] as true.
      */
-    var optimizeRenderer: Boolean = true
+    var optimizeRenderer: Boolean = false
+        set(value) {
+            if (!useFBO && value) warn("attempted to set optimizeRenderer when useFBO is false. ($name)")
+            field = value
+        }
 
     override fun apply(sheet: UIStyleSheet): UIFrameSheet {
         // Override the default apply function because

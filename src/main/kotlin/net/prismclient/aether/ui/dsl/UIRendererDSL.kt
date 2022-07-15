@@ -10,6 +10,10 @@ import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.UIColor
+import net.prismclient.aether.ui.util.extensions.maxX
+import net.prismclient.aether.ui.util.extensions.maxY
+import net.prismclient.aether.ui.util.extensions.minX
+import net.prismclient.aether.ui.util.extensions.minY
 
 /**
  * [UIRendererDSL] wraps the [UIRenderer] class to minimize the amount of calls
@@ -77,7 +81,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: Int) {
-        UIRendererDSL.activeColor = color
+        activeColor = color
         renderer.color(color)
     }
 
@@ -154,13 +158,13 @@ object UIRendererDSL {
      * @see fontBounds
      */
     @JvmStatic
-    fun fontWidth(): Float = fontBounds()[2] - fontBounds()[0]
+    fun fontWidth(): Float = fontBounds().maxX() - fontBounds().minX()
 
     /**
      * Returns the height of the most recent text render call.
      */
     @JvmStatic
-    fun fontHeight(): Float = fontBounds()[3] - fontBounds()[1]
+    fun fontHeight(): Float = fontBounds().maxY() - fontBounds().minY()
 
     /**
      * Returns the ascender of the most recent text render call.

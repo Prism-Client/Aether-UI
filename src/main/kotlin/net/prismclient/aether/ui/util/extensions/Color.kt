@@ -2,6 +2,32 @@ package net.prismclient.aether.ui.util.extensions
 
 import net.prismclient.aether.ui.util.UIColor
 
+enum class ColorMixMode {
+    RGB,
+    HSV
+}
+
+/**
+ * Returns the color based on the mixing/lerping of the initial color, [this], and the ending [color]
+ * based on the [progress]. If the color is null, it is considered to be 0 rgba(0, 0, 0, 0).
+ */
+fun Int.mix(color: Int, progress: Float): Int = transition(this, color, progress)
+
+/**
+ * Returns an RGBA color by mixing [this] and [color] based on the progress.
+ */
+fun UIColor?.mix(color: UIColor?, progress: Float, mode: ColorMixMode = ColorMixMode.RGB): Int {
+    return when (mode) {
+        ColorMixMode.RGB -> (this?.rgba ?: 0).mix(color?.rgba ?: 0, progress)
+        ColorMixMode.HSV -> TODO("HSV color mixing not yet supported.")
+    }
+}
+
+// TODO: Mix function with HSV instead of RGB
+
+fun UIColor?.mix(color: UIColor?, default: UIColor, progress: Float, mode: ColorMixMode = ColorMixMode.RGB): Int =
+    (this?.rgba ?: default.rgba).mix(color?.rgba ?: default.rgba, progress)
+
 /**
  * Returns the red color of the given [Int]
  *

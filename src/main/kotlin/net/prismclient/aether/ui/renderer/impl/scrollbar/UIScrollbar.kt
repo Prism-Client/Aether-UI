@@ -23,7 +23,8 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
         }
     var value = 0f
         set(value) {
-            field = value.limit()
+            // TODO: how to allow for elastic when no stylesheet is available for this component?
+            field = value.coerceAtMost(1f).coerceAtLeast(0f)
         }
     var shouldRender = false
     var selected = false
@@ -43,9 +44,9 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
         cachedHeight = calculate(height, container, container.relWidth, container.relHeight, true)
 
         if (type == Scrollbar.Vertical) {
-            sliderSize = cachedHeight * (cachedHeight / (container.expandedHeight + cachedHeight))
+            sliderSize = cachedHeight * (cachedHeight / (container.offscreenHeight + cachedHeight))
         } else if (type == Scrollbar.Horizontal) {
-            sliderSize = cachedWidth * (cachedWidth / (container.expandedWidth + cachedWidth))
+            sliderSize = cachedWidth * (cachedWidth / (container.offscreenWidth + cachedWidth))
         }
 
         background?.x = px(cachedX)
@@ -63,13 +64,13 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
             when (container.style.overflowY) {
                 UIContainerSheet.Overflow.None -> false
                 UIContainerSheet.Overflow.Always -> true
-                UIContainerSheet.Overflow.Auto -> container.expandedHeight > 0f
+                UIContainerSheet.Overflow.Auto -> container.offscreenHeight > 0f
             }
         } else {
             when (container.style.overflowX) {
                 UIContainerSheet.Overflow.None -> false
                 UIContainerSheet.Overflow.Always -> true
-                UIContainerSheet.Overflow.Auto -> container.expandedWidth > 0f
+                UIContainerSheet.Overflow.Auto -> container.offscreenWidth > 0f
             }
         }
     }
@@ -103,7 +104,7 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
      * Invoked when the mouse is pressed. Returns true if the scrollbar was selected
      */
     fun mousePressed(): Boolean {
-        if (!shouldRender || (((component!! as UIContainer<*>).expandedWidth <= 0f && type == Scrollbar.Horizontal) || ((component!! as UIContainer<*>).expandedHeight <= 0f && type == Scrollbar.Vertical))) return false
+        if (!shouldRender || (((component!! as UIContainer<*>).offscreenWidth <= 0f && type == Scrollbar.Horizontal) || ((component!! as UIContainer<*>).offscreenHeight <= 0f && type == Scrollbar.Vertical))) return false
 
         var x = cachedX
         var y = cachedY
@@ -121,12 +122,37 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
         val mouseX = component!!.getMouseX()
         val mouseY = component!!.getMouseY()
 
-        if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
-            selected = true
+        val isInSliderBounds = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h
+
+        selected = true
+
+//        if (isInSliderBounds) {
+//            mouseOffset = if (type == Scrollbar.Vertical) mouseY - y else mouseX - x
+//        } else {
+//            mouseOffset = if (type == Scrollbar.Vertical) mouseY - y - (h / 2) else mouseX - x - (w / 2)
+//        }
+
+//        if (!isInSliderBounds) {
+//            value = if (type == Scrollbar.Vertical) {
+//                (mouseY - cachedY - mouseOffset) / (cachedHeight - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            } else {
+//                (mouseX - cachedX - mouseOffset) / (cachedWidth - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            }
+//        }
+
+        if (isInSliderBounds) {
             mouseOffset = if (type == Scrollbar.Vertical) mouseY - y else mouseX - x
             return true
         }
-        return false
+//        else {
+//            // TODO: lerp to offset
+//            value = if (type == Scrollbar.Vertical) {
+//                (mouseY - cachedY - mouseOffset) / (cachedHeight - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            } else {
+//                (mouseX - cachedX - mouseOffset) / (cachedWidth - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            }
+//        }
+        return true
     }
 
     fun mouseMoved() {
@@ -161,8 +187,7 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
         color: UIColor? = null,
         radius: UIRadius? = background?.radius,
         block: UIBackground.() -> Unit = {}
-    ) =
-        background { this.backgroundColor = color; this.radius = radius; this.block() }
+    ) = background { this.backgroundColor = color; this.radius = radius; this.block() }
 
     /**
      * A DSL block for creating a border to this [UIScrollbar]

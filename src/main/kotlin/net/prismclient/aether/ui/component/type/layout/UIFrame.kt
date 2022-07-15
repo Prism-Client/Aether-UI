@@ -11,8 +11,8 @@ import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import net.prismclient.aether.ui.util.warn
 
 /**
- * [UIFrame] in a single word is a "viewport," or frame, which holds a list of
- * components within it. It is the superclass of all layouts, and has support
+ * [UIFrame] in a single word is a "viewport" or frame, which holds a list of
+ * components. It is the superclass of all layouts, and has support
  * for advanced features such as shaders. Behind the scenes, it uses am FBO to
  * render the content (unless disabled) via [UIContentFBO].
  *
@@ -28,6 +28,7 @@ import net.prismclient.aether.ui.util.warn
  * @since 1.0
  */
 abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style), UIFocusable {
+
     /**
      * The components of this frame.
      */

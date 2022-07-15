@@ -10,7 +10,7 @@ import net.prismclient.aether.ui.util.UIColor
  * @author sen
  * @since 1.0
  */
-class UIImageSheet(name: String) : UIStyleSheet(name) {
+class UIImageSheet(name: String = "") : UIStyleSheet(name) {
     /**
      * The color of the image. The default value is RGBA(255, 255, 255)
      */

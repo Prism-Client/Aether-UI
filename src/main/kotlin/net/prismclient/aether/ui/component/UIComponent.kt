@@ -13,6 +13,7 @@ import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.calculate
+import net.prismclient.aether.ui.util.extensions.inferredStyle
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 import java.util.function.BiConsumer
@@ -194,7 +195,11 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
         protected set
 
     init {
-        applyStyle(style)
+        if (style == null) {
+            this.style = inferredStyle()
+        } else {
+            applyStyle(style)
+        }
     }
 
     /**
@@ -611,7 +616,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
             return (if (clipContent) {
                 parent!!.relX
             } else 0f) + parent!!.getParentXOffset() - if (parent is UIContainer) {
-                (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
+                (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).offscreenWidth
             } else 0f
         } else 0f
     }
@@ -627,7 +632,7 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
             return (if (clipContent) {
                 parent!!.relY
             } else 0f) + parent!!.getParentYOffset() - if (parent is UIContainer) {
-                (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
+                (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).offscreenHeight
             } else 0f
         } else 0f
     }
@@ -644,6 +649,8 @@ abstract class UIComponent<T : UIStyleSheet>(style: String?) {
 
     /**
      * Returns the computed version of the given unit based on this and the parent of this
+     *
+     * If [unit] is null, the computation will result in 0
      */
     open fun computeUnit(unit: UIUnit?, isY: Boolean) = calculate(unit, this, getParentWidth(), getParentHeight(), isY)
 

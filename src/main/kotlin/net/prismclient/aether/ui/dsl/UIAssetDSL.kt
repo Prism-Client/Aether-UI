@@ -113,7 +113,7 @@ object UIAssetDSL {
         }
 
         return internalBulkLoad(File(file.toURI()), deep, appendedString, imageFlags, svgScale).also {
-            warn("Bulk loaded $it files.")
+            inform("Bulk loaded $it files.")
         }
     }
 

@@ -153,13 +153,12 @@ inline fun ucreate(block: UIComponentDSL.() -> Unit) = UIComponentDSL.block()
 fun include(dependable: UIDependable) = dependable.load()
 
 /**
- * Creates an animation where the component is [C], the style of that component is [S], the animation
- * name is [animationName], and an instance of the component's style is passed as [style]. A block is
- * given to add the keyframes and modify other properties of the [UIAnimation]. The animation is
- * automatically registered under the name given.
+ * Creates an animation for the stylesheet [S], with the name [animationName].
+ * A block is given to add the keyframes and modify other properties of the [UIAnimation].
+ * The animation is automatically registered under the name given.
  */
 inline fun <S : UIStyleSheet> animationOf(animationName: String, style: S, block: UIAnimation<S>.() -> Unit): UIAnimation<S> {
-    val animation = UIAnimation<S>(animationName, style)
+    val animation = UIAnimation(animationName, style)
     animation.block()
     UIProvider.registerAnimation(animationName, animation)
     return animation

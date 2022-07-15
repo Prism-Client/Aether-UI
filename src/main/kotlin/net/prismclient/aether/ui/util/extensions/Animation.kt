@@ -33,22 +33,6 @@ fun lerp(a: Float, b: Float, progress: Float): Float = a.lerp(b, progress)
 fun Boolean.lerp(next: Boolean, progress: Float): Boolean = if (progress > 0.5f) next else this
 
 /**
- * Returns the color based on the mixing/lerping of the initial color, [this], and the ending [color]
- * based on the [progress]. If the color is null, it is considered to be 0 rgba(0, 0, 0, 0).
- */
-fun Int.mix(color: Int, progress: Float): Int = transition(this, color, progress)
-
-/**
- * Returns an RGBA color by mixing [this] and [color] based on the progress.
- */
-fun UIColor?.mix(color: UIColor?, progress: Float): Int = (this?.rgba ?: 0).mix(color?.rgba ?: 0, progress)
-
-// TODO: Mix function with HSV instead of RGB
-
-fun UIColor?.mix(color: UIColor?, default: UIColor, progress: Float): Int =
-    (this?.rgba ?: default.rgba).mix(color?.rgba ?: default.rgba, progress)
-
-/**
  * Lerps the position from the starting [UIUnit] to the ending [UIUnit]. The axis to calculate the units
  * is specified with [isY].
  */

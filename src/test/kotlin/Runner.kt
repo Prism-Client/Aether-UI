@@ -1,9 +1,7 @@
-import examples.Animations
-import examples.AutoLayouts
-import examples.Default
-import examples.PathRendering
+import examples.*
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
+import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import org.lwjgl.glfw.Callbacks
@@ -84,9 +82,11 @@ object Runner {
         }
 
         glfwSetFramebufferSizeCallback(window) { _: Long, width: Int, height: Int ->
-            framebufferWidth = width
-            framebufferHeight = height
-            core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
+            if (width > 0 && height > 0) {
+                framebufferWidth = width
+                framebufferHeight = height
+                core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
+            }
         }
 
         glfwSetKeyCallback(window) { _: Long, keyCode: Int, scanCode: Int, action: Int, _: Int ->
@@ -140,7 +140,7 @@ object Runner {
         glfwMakeContextCurrent(window)
         GL.createCapabilities()
         glfwSetTime(0.0)
-        glfwSwapInterval(1)
+        glfwSwapInterval(-1)
 
         core = Aether(Renderer)
 
@@ -166,6 +166,7 @@ object Runner {
         createScreen(args)
 
         while (!glfwWindowShouldClose(window)) {
+            //if ((glfwGetTime() * 1000) )
             updateMouse(mouseX.toFloat(), mouseY.toFloat())
 
             core!!.renderFrames()
@@ -175,6 +176,13 @@ object Runner {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
 
             core!!.render()
+
+            renderer {
+                translate(0f, 0f) {
+                    color(-1)
+                    "FPS: ${Aether.timings.frameRate}".render(20f, 20f)
+                }
+            }
 
             glfwSwapBuffers(window)
             glfwPollEvents()
@@ -192,6 +200,7 @@ object Runner {
                     "Animations" -> Animations()
                     "AutoLayouts" -> AutoLayouts()
                     "PathRendering" -> PathRendering()
+                    "SmoothScrolling" -> SmoothScrolling()
                     else -> Default()
                 }
             )

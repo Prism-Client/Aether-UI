@@ -109,12 +109,14 @@ open class Aether(renderer: UIRenderer) {
     open fun render() {
         renderer {
             if (activeScreen != null) {
+                timings.onFrameRenderStart()
                 beginFrame(width, height, devicePxRatio)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]
                     if (component.visible) component.render()
                 }
                 endFrame()
+                timings.onFrameRenderEnd()
             }
         }
     }
@@ -243,6 +245,9 @@ open class Aether(renderer: UIRenderer) {
      * as de-focusing the focused component and adding listeners to input.
      */
     companion object Properties {
+
+        val timings: Timings = Timings()
+
         @JvmStatic
         var debug: Boolean = true
 
@@ -511,7 +516,7 @@ open class Aether(renderer: UIRenderer) {
                 var component: UIContainer<*>? = null
                 for (i in 0 until contain.components.size) {
                     val container = contain.components[i] as? UIContainer<*> ?: continue
-                    if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
+                    if (container.isMouseInsideBounds() && container.offscreenHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
                         if (peek(container)) return true
                         component = container
                     }
@@ -529,7 +534,7 @@ open class Aether(renderer: UIRenderer) {
                 // UIContainers are what control scrolling, so
                 // if it is not an instance of it, skip and continue
                 val container = instance.frames!![i] as? UIContainer<*> ?: continue
-                if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
+                if (container.isMouseInsideBounds() && container.offscreenHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
                     // Iterate through the frame to see if there are more
                     // containers with it. If there are, it will pass true
                     // and this function will return, else this will be invoked

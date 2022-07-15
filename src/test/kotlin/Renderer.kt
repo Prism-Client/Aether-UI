@@ -25,13 +25,12 @@ import java.nio.ByteBuffer
  * @since 1.0
  */
 object Renderer : UIRenderer {
+    val ctx: Long = NanoVGGL2.nvgCreate(NanoVGGL2.NVG_ANTIALIAS)
+
     private val framebuffers: HashMap<UIContentFBO, NVGLUFramebuffer> = hashMapOf()
 
-    private val ctx: Long = nvgCreate(NVG_ANTIALIAS)
     private val fillColor: NVGColor = NVGColor.create()
     private val strokeColor: NVGColor = NVGColor.create()
-    private val gradient1: NVGColor = NVGColor.create()
-    private val gradient2: NVGColor = NVGColor.create()
     private var paint: NVGPaint? = null
 
     private var activeColor: Int = 0
@@ -40,10 +39,15 @@ object Renderer : UIRenderer {
     private var ascender: FloatArray = FloatArray(1)
     private var descender: FloatArray = FloatArray(1)
 
-    override fun beginFrame(width: Float, height: Float, devicePxRatio: Float) =
+    override fun beginFrame(width: Float, height: Float, devicePxRatio: Float) {
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         nvgBeginFrame(ctx, width, height, devicePxRatio)
+    }
 
-    override fun endFrame() = nvgEndFrame(ctx)
+    override fun endFrame() {
+        nvgEndFrame(ctx)
+        GL11.glPopAttrib()
+    }
 
     override fun cancelFrame() = nvgCancelFrame(ctx)
 
@@ -55,8 +59,15 @@ object Renderer : UIRenderer {
 
     override fun color(color: Int) {
         activeColor = color
-        nvgColor(color, fillColor)
-        nvgFillColor(ctx, fillColor)
+        nvgFillColor(
+            ctx, nvgRGBA(
+                color.getRed().toByte(),
+                color.getGreen().toByte(),
+                color.getBlue().toByte(),
+                color.getAlpha().toByte(),
+                this.fillColor
+            )
+        )
     }
 
     override fun globalAlpha(alpha: Float) = nvgGlobalAlpha(ctx, alpha)
@@ -85,7 +96,7 @@ object Renderer : UIRenderer {
     override fun createFBO(width: Float, height: Float): UIContentFBO {
         if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
         val contentScale = Aether.devicePxRatio
-        val framebuffer = nvgluCreateFramebuffer(
+        val framebuffer = NanoVGGL2.nvgluCreateFramebuffer(
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(), NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
@@ -98,7 +109,7 @@ object Renderer : UIRenderer {
     override fun deleteFBO(fbo: UIContentFBO) {
         val framebuffer = framebuffers[fbo]
         if (framebuffer != null) {
-            nvgluDeleteFramebuffer(ctx, framebuffer)
+            NanoVGGL2.nvgluDeleteFramebuffer(ctx, framebuffer)
             framebuffers.remove(fbo)
             return
         }
@@ -106,15 +117,16 @@ object Renderer : UIRenderer {
     }
 
     override fun bindFBO(fbo: UIContentFBO) {
-        nvgluBindFramebuffer(
+        NanoVGGL2.nvgluBindFramebuffer(
             ctx, framebuffers[fbo] ?: throw NullPointerException("Unable to find the framebuffer $fbo.")
         )
         GL11.glViewport(0, 0, fbo.scaledWidth.toInt(), fbo.scaledHeight.toInt())
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
+        GL11.glClearColor(0f, 0f, 0f, 0f)
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT)
     }
 
     override fun unbindFBO() {
-        nvgluBindFramebuffer(ctx, null)
+        NanoVGGL2.nvgluBindFramebuffer(ctx, null)
     }
 
     override fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData {
@@ -177,7 +189,7 @@ object Renderer : UIRenderer {
 
     override fun createImageFromHandle(imageName: String, handle: Int, imageWidth: Int, imageHeight: Int): UIImageData {
         val image = UIImageData()
-        image.handle = nnvglCreateImageFromHandle(ctx, handle, imageWidth, imageHeight, 0)
+        image.handle = NanoVGGL2.nnvglCreateImageFromHandle(ctx, handle, imageWidth, imageHeight, 0)
         image.imageType = UIImageData.ImageType.Image
         image.loaded = true
         return image
@@ -198,6 +210,7 @@ object Renderer : UIRenderer {
         allocPaint()
         paint!!.innerColor(fillColor)
         paint!!.outerColor(fillColor)
+        //nvgFillPaint(ctx, paint!!)
         nvgImagePattern(
             ctx, x, y, width, height, angle, imageHandle, alpha, paint!!
         )
@@ -274,7 +287,13 @@ object Renderer : UIRenderer {
     override fun strokeWidth(size: Float) = nvgStrokeWidth(ctx, size)
 
     override fun strokeColor(color: Int) {
-        nvgColor(color, strokeColor)
+        nvgRGBA(
+            color.getRed().toByte(),
+            color.getGreen().toByte(),
+            color.getBlue().toByte(),
+            color.getAlpha().toByte(),
+            strokeColor
+        )
         nvgStrokeColor(ctx, strokeColor)
     }
 
@@ -315,18 +334,22 @@ object Renderer : UIRenderer {
 
     override fun linearGradient(x: Float, y: Float, x2: Float, y2: Float, startColor: Int, endColor: Int) {
         allocPaint()
-        nvgColor(startColor, gradient1)
-        nvgColor(endColor, gradient2)
-        nvgLinearGradient(ctx, x, y, x2, y2, gradient1, gradient2, paint!!)
+        val color1 = createColor(startColor)
+        val color2 = createColor(endColor)
+        nvgLinearGradient(ctx, x, y, x2, y2, color1, color2, paint!!)
+        color1.free()
+        color2.free()
     }
 
     override fun radialGradient(
         x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int
     ) {
         allocPaint()
-        nvgColor(startColor, gradient1)
-        nvgColor(endColor, gradient2)
-        nvgRadialGradient(ctx, x, y, innerRadius, outerRadius, gradient1, gradient2, paint!!)
+        val color1 = createColor(startColor)
+        val color2 = createColor(endColor)
+        nvgRadialGradient(ctx, x, y, innerRadius, outerRadius, color1, color2, paint!!)
+        color1.free()
+        color2.free()
     }
 
     override fun allocPaint() {
@@ -342,7 +365,8 @@ object Renderer : UIRenderer {
 
     override fun radToDeg(rad: Float): Float = nvgRadToDeg(rad)
 
-    private fun nvgColor(color: Int, nvgColor: NVGColor) {
+    private fun createColor(color: Int): NVGColor {
+        val nvgColor = NVGColor.calloc()
         nvgRGBA(
             color.getRed().toByte(),
             color.getGreen().toByte(),
@@ -350,5 +374,6 @@ object Renderer : UIRenderer {
             color.getAlpha().toByte(),
             nvgColor
         )
+        return nvgColor
     }
 }

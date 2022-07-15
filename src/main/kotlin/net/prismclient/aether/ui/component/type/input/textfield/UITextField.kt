@@ -21,7 +21,7 @@ import java.util.function.Consumer
  *
  * @author sen
  * @since 6/6/2022
- * @see UITextField.filter Pre-made text filters.
+ * @see UITextField.Filters pre-made text filters.
  */
 open class UITextField(text: String, var placeholder: String? = null, var filter: TextFilter, style: String?) :
     UIButton<UITextFieldSheet>(text, style), UIFocusable {
@@ -46,7 +46,7 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
 
     /** Blink **/
     protected var timeSinceLastBlink: Long = 0L
-    protected var blink: Boolean = false
+    protected var blink: Boolean = true
 
     init {
         Aether.onModifierKeyChange(this.toString()) { key, value ->
@@ -111,7 +111,7 @@ open class UITextField(text: String, var placeholder: String? = null, var filter
             //style.caret.offsetY = font.cachedY + boundsOf(style.font!!.cachedText)[1] - y
 
             if (blink && isFocused()) style.caret.render()
-            if (timeSinceLastBlink + style.blinkRate <= System.currentTimeMillis()) {
+            if (style.blinkRate > 0 && (timeSinceLastBlink + style.blinkRate <= System.currentTimeMillis())) {
                 blink = !blink
                 timeSinceLastBlink = System.currentTimeMillis()
             }

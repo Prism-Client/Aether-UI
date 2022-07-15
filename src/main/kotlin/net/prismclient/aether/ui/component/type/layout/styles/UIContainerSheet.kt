@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.component.type.layout.styles
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet.Overflow
 import net.prismclient.aether.ui.renderer.impl.scrollbar.UIScrollbar
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.Block
 
 /**
  * [UIContainerSheet] is the corresponding style sheet for containers. It provides
@@ -28,26 +29,32 @@ open class UIContainerSheet @JvmOverloads constructor(name: String = "") : UIFra
      */
     var overflowY: Overflow = Overflow.Auto
 
+    /**
+     * Describes how scrolling effects the content
+     *
+     * @see ScrollBehaviour
+     */
+    var scrollBehaviour: ScrollBehaviour = ScrollBehaviour.Fixed
+
     var verticalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
+        private set
+
     var horizontalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Horizontal)
+        private set
 
     /**
      * Creates a DSL block for the vertical scrollbar
      */
-    inline fun verticalScrollbar(block: UIScrollbar.() -> Unit) = verticalScrollbar.block()
+    inline fun verticalScrollbar(block: Block<UIScrollbar>) = verticalScrollbar.block()
 
     /**
      * Creates a DSL block for the horizontal scrollbar
      */
-    inline fun horizontalScrollbar(block: UIScrollbar.() -> Unit) = horizontalScrollbar.block()
+    inline fun horizontalScrollbar(block: Block<UIScrollbar>) = horizontalScrollbar.block()
 
     /**
      * [Overflow] defines what the vertical, and horizontal scrollbars
-     * are supposed to do when content leaves the screen. Check the enum
-     * documentation for more information.
-     *
-     * @author sen
-     * @since 5/12/2022
+     * are supposed to do when content leaves the screen.
      */
     enum class Overflow {
         /**
@@ -64,6 +71,21 @@ open class UIContainerSheet @JvmOverloads constructor(name: String = "") : UIFra
          * Like scroll, but only adds the scrollbar on the given axis if content leaves the window
          */
         Auto
+    }
+
+    /**
+     * [ScrollBehaviour] defines how the encompassing container behaves when the mouse is scrolled.
+     */
+    enum class ScrollBehaviour {
+        /**
+         * Clamps the content
+         */
+        Fixed,
+
+        /**
+         * Introduces elasticity to the encompassing container.
+         */
+        Elastic
     }
 
     override fun apply(sheet: UIStyleSheet): UIContainerSheet {

@@ -6,9 +6,11 @@ import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
-import net.prismclient.aether.ui.util.extensions.asRGBA
+import net.prismclient.aether.ui.util.debug
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
+import kotlin.math.abs
+import kotlin.math.pow
 
 /**
  * [UIContainer] is the default implementation for [UIFrame]. It introduces
@@ -22,21 +24,38 @@ import net.prismclient.aether.ui.util.interfaces.UIFocusable
  * @since 5/12/2022
  */
 open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style), UIFocusable, UILayout {
+
     /**
      * How sensitive the scrolling will be
      */
-    var scrollSensitivity: Float = 10f
+    var scrollSensitivity = 10f
+
+    /**
+     * The velocity of the content scroll
+     */
+    var scrollVelocity = 0f
+
+    /**
+     * The rate at which the content scroll will decelerate
+     */
+    var scrollDecelerationRate = .125f
+
+    /**
+     * If the content will have inertia when scrolled.
+     */
+    private val hasInertia
+        get() = scrollDecelerationRate > 0f
 
     /**
      * The expanded width determined by components that leave the component bounds
      */
-    var expandedWidth = 0f
+    var offscreenWidth = 0f
         protected set
 
     /**
      * The expanded height determined by components that leave the components bounds
      */
-    var expandedHeight = 0f
+    var offscreenHeight = 0f
         protected set
 
     override fun update() {
@@ -54,11 +73,13 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
             h = (c.relY + c.relHeight + c.marginBottom).coerceAtLeast(h)
         }
 
+        // todo buggin...
+
         val x = if (style.useFBO) 0f else relX
         val y = if (style.useFBO) 0f else relY
 
-        expandedWidth = (w - relWidth - x).coerceAtLeast(0f)
-        expandedHeight = (h - relHeight - y).coerceAtLeast(0f)
+        offscreenWidth = (w - relWidth - x).coerceAtLeast(0f)
+        offscreenHeight = (h - relHeight - y).coerceAtLeast(0f)
 
         updateScrollbar()
     }
@@ -83,8 +104,8 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
                 if (fbo == null) updateFBO()
                 fbo!!.renderToFramebuffer {
                     translate(
-                        -(style.horizontalScrollbar.value * expandedWidth),
-                        -(style.verticalScrollbar.value * expandedHeight)
+                        -(style.horizontalScrollbar.value * offscreenWidth),
+                        -(style.verticalScrollbar.value * offscreenHeight)
                     ) {
                         components.forEach(UIComponent<*>::render)
                     }
@@ -106,16 +127,31 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
             renderer {
                 if (style.clipContent) {
                     scissor(relX, relY, relWidth, relHeight) {
-                        translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
+                        translate(-(style.horizontalScrollbar.value * offscreenWidth), -(style.verticalScrollbar.value * offscreenHeight)) {
                             components.forEach(UIComponent<*>::render)
                         }
                     }
                 } else {
-                    translate(-(style.horizontalScrollbar.value * expandedWidth), -(style.verticalScrollbar.value * expandedHeight)) {
+                    translate(-(style.horizontalScrollbar.value * offscreenWidth), -(style.verticalScrollbar.value * offscreenHeight)) {
                         components.forEach(UIComponent<*>::render)
                     }
                 }
             }
+        }
+
+        if (hasInertia && scrollVelocity != 0f) {
+
+            scrollVelocity *= scrollDecelerationRate.pow(Aether.timings.deltaFrameRenderTimeSeconds.toFloat() + 0.1f)
+
+            style.verticalScrollbar.value += (scrollVelocity)
+
+            val offset = style.verticalScrollbar.value
+
+            if (abs(scrollVelocity) < 0.01 || (offset <= 0 || offset >= 1)) {
+                scrollVelocity = 0f
+            }
+        } else {
+            scrollVelocity = 0f
         }
     }
 
@@ -142,8 +178,8 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(
-            mouseX - (style.horizontalScrollbar.value * expandedWidth),
-            mouseY - (style.verticalScrollbar.value * expandedHeight)
+            mouseX - (style.horizontalScrollbar.value * offscreenWidth),
+            mouseY - (style.verticalScrollbar.value * offscreenHeight)
         )
         style.verticalScrollbar.release()
         style.horizontalScrollbar.release()
@@ -151,9 +187,10 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
 
     override fun mouseMoved(mouseX: Float, mouseY: Float) {
         super.mouseMoved(
-            mouseX - (style.horizontalScrollbar.value * expandedWidth),
-            mouseY - (style.verticalScrollbar.value * expandedHeight)
+            mouseX - (style.horizontalScrollbar.value * offscreenWidth),
+            mouseY - (style.verticalScrollbar.value * offscreenHeight)
         )
+
         style.verticalScrollbar.mouseMoved()
         style.horizontalScrollbar.mouseMoved()
         if (style.verticalScrollbar.selected || style.horizontalScrollbar.selected)
@@ -162,7 +199,7 @@ open class UIContainer<T : UIContainerSheet>(style: String?) : UIFrame<T>(style)
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         if (isFocused()) {
-            style.verticalScrollbar.value -= ((scrollAmount * scrollSensitivity) / style.verticalScrollbar.cachedHeight)
+            scrollVelocity -= ((scrollAmount * scrollSensitivity) / style.verticalScrollbar.cachedHeight)
             mouseMoved(mouseX, mouseY)
         }
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
