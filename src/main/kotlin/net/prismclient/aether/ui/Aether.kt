@@ -109,12 +109,14 @@ open class Aether(renderer: UIRenderer) {
     open fun render() {
         renderer {
             if (activeScreen != null) {
+                timings.onFrameRenderStart()
                 beginFrame(width, height, devicePxRatio)
                 for (i in 0 until components!!.size) {
                     val component = components!![i]
                     if (component.visible) component.render()
                 }
                 endFrame()
+                timings.onFrameRenderEnd()
             }
         }
     }
@@ -243,6 +245,9 @@ open class Aether(renderer: UIRenderer) {
      * as de-focusing the focused component and adding listeners to input.
      */
     companion object Properties {
+
+        val timings: Timings = Timings()
+
         @JvmStatic
         var debug: Boolean = true
 

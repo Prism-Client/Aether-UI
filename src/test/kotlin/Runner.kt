@@ -1,7 +1,7 @@
 import examples.Animations
-import examples.AutoLayouts
 import examples.Default
 import examples.PathRendering
+
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
 import net.prismclient.aether.ui.util.input.UIKey
@@ -84,9 +84,11 @@ object Runner {
         }
 
         glfwSetFramebufferSizeCallback(window) { _: Long, width: Int, height: Int ->
-            framebufferWidth = width
-            framebufferHeight = height
-            core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
+            if (width > 0 && height > 0) {
+                framebufferWidth = width
+                framebufferHeight = height
+                core!!.update(width / contentScaleX, height / contentScaleY, max(contentScaleX, contentScaleY))
+            }
         }
 
         glfwSetKeyCallback(window) { _: Long, keyCode: Int, scanCode: Int, action: Int, _: Int ->
@@ -190,7 +192,6 @@ object Runner {
             Aether.displayScreen(
                 when (args[0]) {
                     "Animations" -> Animations()
-                    "AutoLayouts" -> AutoLayouts()
                     "PathRendering" -> PathRendering()
                     else -> Default()
                 }

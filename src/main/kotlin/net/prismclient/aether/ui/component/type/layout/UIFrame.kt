@@ -180,7 +180,11 @@ open class UIFrameSheet : UIStyleSheet() {
      * If true certain optimizations will be applied when
      * rendering. This only works with [useFBO] as true.
      */
-    var optimizeRenderer: Boolean = true
+    var optimizeRenderer: Boolean = false
+        set(value) {
+            if (!useFBO && value) warn("attempted to set optimizeRenderer when useFBO is false. ($name)")
+            field = value
+        }
 
     override fun apply(sheet: UIStyleSheet): UIFrameSheet {
         // Override the default apply function because

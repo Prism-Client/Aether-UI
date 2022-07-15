@@ -206,9 +206,6 @@ open class UIContainerSheet : UIFrameSheet() {
      * [Overflow] defines what the vertical, and horizontal scrollbars
      * are supposed to do when content leaves the screen. Check the enum
      * documentation for more information.
-     *
-     * @author sen
-     * @since 5/12/2022
      */
     enum class Overflow {
         /**
@@ -225,6 +222,21 @@ open class UIContainerSheet : UIFrameSheet() {
          * Like scroll, but only adds the scrollbar on the given axis if content leaves the window
          */
         Auto
+    }
+
+    /**
+     * [ScrollBehaviour] defines how the encompassing container behaves when the mouse is scrolled.
+     */
+    enum class ScrollBehaviour {
+        /**
+         * Clamps the content
+         */
+        Fixed,
+
+        /**
+         * Introduces elasticity to the encompassing container.
+         */
+        Elastic
     }
 
     override fun apply(sheet: UIStyleSheet): UIContainerSheet {
