@@ -1,8 +1,8 @@
 package net.prismclient.aether.ui.renderer.impl.scrollbar
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.container.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIContainer
+import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
@@ -128,7 +128,13 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
             selected = true
             mouseOffset = if (type == Scrollbar.Vertical) mouseY - y else mouseX - x
         } else if (isScrollbarSelected) {
-            
+            println("scrollbarSelected")
+
+//            value = if (type == Scrollbar.Vertical) {
+//                (mouseY - cachedY - (mouseY - y)) / (cachedHeight - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            } else {
+//                (mouseX - cachedX - (mouseX - x)) / (cachedWidth - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            }
         } else {
             return false
         }

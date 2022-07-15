@@ -1,8 +1,6 @@
-package net.prismclient.aether.ui.component.type.layout.container
+package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.impl.scrollbar.UIScrollbar
@@ -188,6 +186,8 @@ open class UIContainerSheet : UIFrameSheet() {
      * @see Overflow
      */
     var overflowY: Overflow = Overflow.Auto
+
+    var scrollBehaviour: ScrollBehaviour = ScrollBehaviour.Fixed
 
     var verticalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Vertical)
     var horizontalScrollbar: UIScrollbar = UIScrollbar(UIScrollbar.Scrollbar.Horizontal)

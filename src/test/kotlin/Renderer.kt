@@ -110,6 +110,7 @@ object Renderer : UIRenderer {
             ctx, framebuffers[fbo] ?: throw NullPointerException("Unable to find the framebuffer $fbo.")
         )
         GL11.glViewport(0, 0, fbo.scaledWidth.toInt(), fbo.scaledHeight.toInt())
+        GL11.glClearColor(0f, 0f, 0f, 0f)
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
     }
 

@@ -85,10 +85,12 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     ) {
         val component = animation.component
 
-        component.x = previous?.x.lerp(current?.x, component, x, progress, false)
-        component.y = previous?.y.lerp(current?.y, component, y, progress, true)
-        component.width = previous?.width.lerp(current?.width, component, width, progress, false)
-        component.height = previous?.height.lerp(current?.height, component, height, progress, true)
+        if (!component.overridden) {
+            component.x = previous?.x.lerp(current?.x, component, x, progress, false)
+            component.y = previous?.y.lerp(current?.y, component, y, progress, true)
+            component.width = previous?.width.lerp(current?.width, component, width, progress, false)
+            component.height = previous?.height.lerp(current?.height, component, height, progress, true)
+        }
 
         if (previous?.background != null || current?.background != null) {
             background = background ?: UIBackground()

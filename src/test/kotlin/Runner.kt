@@ -196,6 +196,6 @@ object Runner {
                     else -> Default()
                 }
             )
-        }
+        } else Aether.displayScreen(Default())
     }
 }

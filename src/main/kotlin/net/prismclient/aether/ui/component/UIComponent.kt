@@ -4,8 +4,8 @@ import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.container.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIContainer
+import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
@@ -243,6 +243,7 @@ abstract class UIComponent<T : UIStyleSheet>() {
      */
     open fun update() {
         if (!this::style.isInitialized) {
+            println("creating style...")
             style = createsStyle()
         }
 

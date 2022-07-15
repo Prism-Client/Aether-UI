@@ -4,8 +4,8 @@ import net.prismclient.aether.ui.Aether.Properties
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.container.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIContainer
+import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
