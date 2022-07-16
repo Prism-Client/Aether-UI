@@ -53,6 +53,7 @@ class Default : UIScreen {
                     control(UIAlignment.CENTER)
                     size(206, 40)
                     margin { marginBottom = px(8) }
+                    background(colorOf(0))
                 }
 
                 val activeNavbarButtonStyle = UIContainerSheet().style("active-navbar-button") {
@@ -63,7 +64,7 @@ class Default : UIScreen {
                 }
 
                 val hoveredNavbarButtonStyle = UIContainerSheet().style("hovered-navbar-button") {
-                    background(colorOf(255, 0, 0), radiusOf(9f))
+                    background(colorOf(41, 41, 41), radiusOf(9f))
                 }
 
                 // Navbar list
@@ -85,13 +86,7 @@ class Default : UIScreen {
                     }
 
                     animationOf("navbar-button", UIContainerSheet()) {
-//                        keyframe(UIQuart(1000L), navbarButtonStyle)
-                        kf {}
-                        kf {
-                            background {
-                                background(colorOf(0))
-                            }
-                        }
+                        keyframe(UIQuart(1000L), navbarButtonStyle)
                     }
 
 //                    animationOf("active-navbar-button", UIContainerSheet()) {
@@ -100,7 +95,7 @@ class Default : UIScreen {
 //                    }
 
                     animationOf("hovered-navbar-button", UIContainerSheet()) {
-                        keyframe(UIQuart(1000L), hoveredNavbarButtonStyle.copy())
+                        keyframe(UIQuart(1000L), hoveredNavbarButtonStyle)
                     }
 
                     // Navbar button styles
@@ -148,7 +143,6 @@ class Default : UIScreen {
 
                             component.onMouseEnter {
                                 if (!isSelected(it)) {
-                                    println("enter")
                                     UIProvider.dispatchAnimation("hovered-navbar-button", it)
                                     //it.applyStyle("hovered-navbar-button")
                                 }
@@ -156,7 +150,6 @@ class Default : UIScreen {
 
                             component.onMouseLeave {
                                 if (!isSelected(it)) {
-                                    println("leave")
                                     UIProvider.dispatchAnimation("navbar-button", it)
                                     //it.applyStyle("navbar-button")
                                 }
