@@ -67,6 +67,7 @@ class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIA
      * Starts the animation with the given [component].
      */
     fun start(component: UIComponent<S>) {
+        println("Started animation")
         this.component = component
 
         component.animations = component.animations ?: hashMapOf()

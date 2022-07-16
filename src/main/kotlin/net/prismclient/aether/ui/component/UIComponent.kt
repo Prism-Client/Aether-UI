@@ -333,7 +333,10 @@ abstract class UIComponent<T : UIStyleSheet> {
         if (animations != null) {
             animations!!.forEach { it.value.update() }
             animations!!.entries.removeIf { it.value.isCompleted }
-            if (animations!!.isEmpty()) animations = null
+            if (animations!!.isEmpty()) {
+                println("Completed animation")
+                animations = null
+            }
         }
     }
 

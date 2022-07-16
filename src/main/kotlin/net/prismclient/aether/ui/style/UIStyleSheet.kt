@@ -86,8 +86,8 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         val component = animation.component
 
         if (!component.overridden) {
-            component.x = previous?.x.lerp(current?.x, component, x, progress, false)
-            component.y = previous?.y.lerp(current?.y, component, y, progress, true)
+            component.x = previous?.x.lerp(current?.x, component, x, progress, false) + component.getParentX()
+            component.y = previous?.y.lerp(current?.y, component, y, progress, true) + component.getParentY()
             component.width = previous?.width.lerp(current?.width, component, width, progress, false)
             component.height = previous?.height.lerp(current?.height, component, height, progress, true)
         }
@@ -112,17 +112,19 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
             anchor = anchor ?: UIAnchorPoint()
             anchor!!.animate(animation, previous?.anchor, current?.anchor, progress)
         }
-        component.x += component.getParentX() + component.marginLeft - component.anchorX
-        component.y += component.getParentY() + component.marginTop - component.anchorY
+        if (!component.overridden) {
+            component.x += component.getParentX() + component.marginLeft - component.anchorX
+            component.y += component.getParentY() + component.marginTop - component.anchorY
+        }
         component.updateBounds()
         component.updateStyle()
     }
 
     override fun save(animation: UIAnimation<*>, keyframe: UIStyleSheet?) {
-        x = keyframe?.x ?: x
-        y = keyframe?.y ?: y
-        width = keyframe?.width ?: width
-        height = keyframe?.height ?: height
+        x = keyframe?.x ?: x?.copy()
+        y = keyframe?.y ?: y?.copy()
+        width = keyframe?.width ?: width?.copy()
+        height = keyframe?.height ?: height?.copy()
 
         background?.save(animation, keyframe?.background)
         font?.save(animation, keyframe?.font)
