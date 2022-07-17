@@ -180,8 +180,8 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
     return when (unit.type) {
         PIXELS -> unit.value
         RELATIVE -> (if (isY) height else width) * unit.value
-        ASCENDER -> (component?.style?.font?.getAscend() ?: 0f) * unit.value
-        DESCENDER -> (component?.style?.font?.getDescend() ?: 0f) * unit.value
+        ASCENDER -> (component?.style?.font?.fontAscender ?: 0f) * unit.value
+        DESCENDER -> (component?.style?.font?.fontDescender ?: 0f) * unit.value
         EM -> (component?.style?.font?.cachedFontSize ?: 0f) * unit.value
         WIDTH -> width * unit.value
         HEIGHT -> height * unit.value

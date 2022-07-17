@@ -56,13 +56,13 @@ class Generic : UIDependable {
             // FontSize -> 16f
             // FontColor -> -1 = asRGBA(255, 255, 255) (aka white)
             // TextAlignment -> How the text aligns relative to the screen using bit shifting
-            font("Montserrat", px(16f), colorOf(-1), left or top)
-
-            // The above was a shorthand for
-            font {
-                fontFamily = "Montserrat"
-                // etc...
-            }
+//            font("Montserrat", px(16f), colorOf(-1), left or top)
+//
+//            // The above was a shorthand for
+//            font {
+//                fontFamily = "Montserrat"
+//                // etc...
+//            }
         }
     }
 }

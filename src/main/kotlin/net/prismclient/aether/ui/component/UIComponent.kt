@@ -9,9 +9,9 @@ import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
-import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
@@ -30,7 +30,7 @@ import java.util.function.Consumer
  * values. The relative values are the normal property, except with the bounds of the
  * component calculated and applied to it via the [calculateBounds] function. Bounds
  * include the padding and margin properties of the component. Classes such as [UIBackground]
- * render the background to the relative properties, while other classes such as [UIFont]
+ * render the background to the relative properties, while other classes such as [UIFont__]
  * render to the absolute properties.
  *
  * @author sen
@@ -241,8 +241,7 @@ abstract class UIComponent<T : UIStyleSheet> {
      * might request for this method to be invoked.
      */
     open fun update() {
-        if (!this::style.isInitialized) {
-            println("creating style...")
+        if (!hasStyle()) {
             style = createsStyle()
         }
 
@@ -334,7 +333,6 @@ abstract class UIComponent<T : UIStyleSheet> {
             animations!!.forEach { it.value.update() }
             animations!!.entries.removeIf { it.value.isCompleted }
             if (animations!!.isEmpty()) {
-                println("Completed animation")
                 animations = null
             }
         }
@@ -678,6 +676,8 @@ abstract class UIComponent<T : UIStyleSheet> {
     open fun requestUpdate() {
         if (parent != null) parent!!.requestUpdate()
     }
+
+    inline fun stylize(block: Block<T>) = style.block()
 
     /**
      * [UninitializedStyleSheetException] is thrown when the style sheet of

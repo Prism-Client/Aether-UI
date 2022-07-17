@@ -2,7 +2,9 @@ import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.impl.font.TextAlignment
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
+import net.prismclient.aether.ui.util.bottom
 import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.extensions.getBlue
 import net.prismclient.aether.ui.util.extensions.getGreen
@@ -208,15 +210,150 @@ object Renderer : UIRenderer {
 
     override fun fontSize(size: Float) = nvgFontSize(ctx, size)
 
-    override fun fontAlignment(alignment: Int) = nvgTextAlign(ctx, alignment)
-
     override fun fontSpacing(spacing: Float) = nvgTextLetterSpacing(ctx, spacing)
+
+    override fun fontAlignment(horizontalAlignment: TextAlignment, verticalAlignment: TextAlignment) {
+        var alignment = when (horizontalAlignment) {
+            TextAlignment.LEFT -> NVG_ALIGN_LEFT
+            TextAlignment.CENTER -> NVG_ALIGN_CENTER
+            TextAlignment.RIGHT -> NVG_ALIGN_RIGHT
+            else -> 0
+        }
+        alignment = alignment or when (verticalAlignment) {
+            TextAlignment.TOP -> NVG_ALIGN_TOP
+            TextAlignment.CENTER -> NVG_ALIGN_MIDDLE
+            TextAlignment.BOTTOM -> NVG_ALIGN_BOTTOM
+            else -> 0
+        }
+        nvgTextAlign(ctx, alignment)
+    }
 
     override fun renderText(text: String, x: Float, y: Float) {
         nvgFillColor(ctx, fillColor)
         nvgText(ctx, x, y, text)
         nvgTextMetrics(ctx, ascender, descender, null)
         fontBounds[4] = nvgTextBounds(ctx, x, y, text, fontBounds)
+    }
+
+    override fun renderText(text: ArrayList<String>, x: Float, y: Float, lineHeight: Float) {
+        var offset = y
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in text.indices) {
+            renderText(text[i], x, offset)
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+    }
+
+    val rows = NVGTextRow.create(50)
+
+    override fun renderText(text: String, x: Float, y: Float, lineWidth: Float, lineHeight: Float, lines: ArrayList<String>?): Int {
+        val nrows = nvgTextBreakLines(ctx, text, lineWidth, rows)
+
+        var offset = y
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in 0 until nrows) {
+            val row = rows[i]
+
+            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
+            nnvgTextBounds(ctx, x, offset, row.start(), row.end(), fontBounds)
+            nnvgText(ctx, x, offset, row.start(), row.end())
+
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+
+        return nrows
+    }
+
+    override fun calculateText(text: ArrayList<String>, x: Float, y: Float, lineHeight: Float) {
+        var offset = y
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in text.indices) {
+            nvgTextBounds(ctx, x, offset, text[i], fontBounds)
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+    }
+
+    override fun calculateText(
+        text: String,
+        x: Float,
+        y: Float,
+        lineWidth: Float,
+        lineHeight: Float,
+        lines: ArrayList<String>?
+    ): Int {
+        val nrows = nvgTextBreakLines(ctx, text, lineWidth, rows)
+
+        var offset = y
+
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in 0 until nrows) {
+            val row = rows[i]
+
+            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
+            nnvgTextBounds(ctx, x, offset, row.start(), row.end(), fontBounds)
+
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+
+        return nrows
     }
 
     override fun fontBounds(): FloatArray = fontBounds

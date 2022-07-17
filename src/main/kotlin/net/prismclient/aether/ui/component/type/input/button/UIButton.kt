@@ -9,9 +9,20 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @author sen
  * @since 1.0
  */
-open class UIButton(open var text: String) : UIComponent<UIStyleSheet>() {
+open class UIButton(text: String) : UIComponent<UIStyleSheet>() {
+    open var text: String = text
+        set(value) {
+            field = value
+            style.font?.actualText = text
+        }
+
+    override fun update() {
+        super.update()
+        style.font?.actualText = text
+    }
+
     override fun renderComponent() {
-        style.font?.render(text)
+        style.font?.render()
     }
 
     override fun createsStyle(): UIStyleSheet = UIStyleSheet()

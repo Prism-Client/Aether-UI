@@ -262,22 +262,22 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     /**
      * Creates a font DSL block which optionally accepts a size, color, text alignment, font family, and font type.
      */
-    @JvmOverloads
-    inline fun font(
-        fontFamily: String = font?.fontFamily ?: "",
-        fontSize: UIUnit? = font?.fontSize,
-        fontColor: UIColor? = font?.fontColor,
-        textAlignment: Int = font?.textAlignment ?: 0,
-        fontType: UIFont.FontType? = font?.fontType,
-        block: UIFont.() -> Unit = {}
-    ) = font {
-        this.fontSize = fontSize
-        this.fontColor = fontColor
-        this.textAlignment = textAlignment
-        this.fontFamily = fontFamily
-        this.fontType = fontType
-        this.block()
-    }
+//    @JvmOverloads
+//    inline fun font(
+//        fontFamily: String = font?.fontFamily ?: "",
+//        fontSize: UIUnit? = font?.fontSize,
+//        fontColor: UIColor? = font?.fontColor,
+//        textAlignment: Int = font?.textAlignment ?: 0,
+//        fontType: UIFont.FontType? = font?.fontType,
+//        block: UIFont.() -> Unit = {}
+//    ) = font {
+//        this.fontSize = fontSize
+//        this.fontColor = fontColor
+//        this.textAlignment = textAlignment
+//        this.fontFamily = fontFamily
+//        this.fontType = fontType
+//        this.block()
+//    }
 
     /** Plotting **/
 

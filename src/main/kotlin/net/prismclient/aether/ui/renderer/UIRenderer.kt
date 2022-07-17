@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.renderer
 
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.impl.font.TextAlignment
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import java.nio.ByteBuffer
 
@@ -185,12 +186,15 @@ interface UIRenderer {
      */
     fun fontSize(size: Float)
 
-    fun fontAlignment(alignment: Int)
-
     /**
      * Spaces the text by the given [spacing].
      */
     fun fontSpacing(spacing: Float)
+
+    /**
+     * Aligns the text to the given [horizontalAlignment] and [verticalAlignment] based on the enum [TextAlignment].
+     */
+    fun fontAlignment(horizontalAlignment: TextAlignment, verticalAlignment: TextAlignment)
 
     /**
      * Renders the [text] based on the [x], and [y] position and all the states
@@ -199,6 +203,30 @@ interface UIRenderer {
      * @see fontSpacing
      */
     fun renderText(text: String, x: Float, y: Float)
+
+    /**
+     * Renders the given [text] splitting each line by the given [lineHeight].
+     */
+    fun renderText(text: ArrayList<String>, x: Float, y: Float, lineHeight: Float)
+
+    /**
+     * Renders the given [text]; however, if the text exceeds [lineWidth], the text will be put onto a newline
+     * with the spacing of [lineHeight]. If [lines] is not null, the string will be added to it.
+     *
+     * @return The row count
+     */
+    fun renderText(text: String, x: Float, y: Float, lineWidth: Float, lineHeight: Float, lines: ArrayList<String>?): Int
+
+    /**
+     * Calculates the bounds given the array of [text] splitting it by the [lineHeight].
+     */
+    fun calculateText(text: ArrayList<String>, x: Float, y: Float, lineHeight: Float)
+
+    /**
+     * Calculates the given [text] where if the text exceeds the [lineWidth], it will
+     * be put onto a new line. If [lines] is not null, the string will be added to it.
+     */
+    fun calculateText(text: String, x: Float, y: Float, lineWidth: Float, lineHeight: Float, lines: ArrayList<String>?): Int
 
     /**
      * Returns an array of five floats representing the most recently rendered text.
