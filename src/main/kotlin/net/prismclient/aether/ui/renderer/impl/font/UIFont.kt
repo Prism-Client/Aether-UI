@@ -9,6 +9,7 @@ import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.calculate
+import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.middle
 import java.util.regex.Pattern
@@ -77,6 +78,24 @@ open class UIFont : UIShape<UIFont>() {
         protected set
     var cachedLineHeightSpacing: Float = 0f
         protected set
+
+    // -- Shorthands -- //
+
+    fun size(width: UIUnit?, height: UIUnit?) {
+        this.width = width
+        this.height = height
+    }
+
+    fun size(width: Number, height: Number) = size(px(width), px(height))
+
+    fun align(horizontal: TextAlignment, vertical: TextAlignment) = alignment(horizontal, vertical)
+
+    fun alignment(horizontal: TextAlignment, vertical: TextAlignment) {
+        horizontalAlignment = horizontal
+        verticalAlignment = vertical
+    }
+
+    // -- Core -- //
 
     override fun update(component: UIComponent<*>?) {
         super.update(component)

@@ -6,12 +6,14 @@ import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
+import net.prismclient.aether.ui.renderer.impl.font.TextAlignment
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.RELATIVE
 import net.prismclient.aether.ui.util.extensions.lerp
@@ -133,7 +135,7 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         anchor?.save(animation, keyframe?.anchor)
     }
 
-    /** Shorthands **/
+    // -- Control Shorthands -- //
 
     /**
      * Shorthand for setting the position and size as pixels.
@@ -159,7 +161,7 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     /**
      * Positions the component at the given [x], and [y] values as the given units.
      */
-    fun position(x: UIUnit, y: UIUnit) {
+    fun position(x: UIUnit?, y: UIUnit?) {
         this.x = x
         this.y = y
     }
@@ -232,59 +234,44 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         }
     }
 
-    /** Background **/
+    // -- Background Shorthands -- //
 
-    /**
-     * Creates a background DSL block. If background is null, an instance of it is created
-     */
-    inline fun background(block: UIBackground.() -> Unit) {
+    inline fun background(block: Block<UIBackground>) {
         background = background ?: UIBackground()
         background!!.block()
     }
 
-    /**
-     * Sets the color of the background
-     */
-    @JvmOverloads
-    inline fun background(color: UIColor, radius: UIRadius? = background?.radius, block: UIBackground.() -> Unit = {}) =
+    inline fun background(color: UIColor, radius: UIRadius? = background?.radius, block: Block<UIBackground> = {}) =
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
-    /** Font **/
+    // -- Font Shorthands -- //
 
-    /**
-     * Creates a font DSL block. If font is null, an instance of it is created
-     */
-    inline fun font(block: UIFont.() -> Unit) {
+    inline fun font(block: Block<UIFont>) {
         font = font ?: UIFont()
         font!!.block()
     }
 
-    /**
-     * Creates a font DSL block which optionally accepts a size, color, text alignment, font family, and font type.
-     */
-//    @JvmOverloads
-//    inline fun font(
-//        fontFamily: String = font?.fontFamily ?: "",
-//        fontSize: UIUnit? = font?.fontSize,
-//        fontColor: UIColor? = font?.fontColor,
-//        textAlignment: Int = font?.textAlignment ?: 0,
-//        fontType: UIFont.FontType? = font?.fontType,
-//        block: UIFont.() -> Unit = {}
-//    ) = font {
-//        this.fontSize = fontSize
-//        this.fontColor = fontColor
-//        this.textAlignment = textAlignment
-//        this.fontFamily = fontFamily
-//        this.fontType = fontType
-//        this.block()
-//    }
+    inline fun font(fontName: String, fontSize: UIUnit?, fontColor: UIColor, block: Block<UIFont> = {}) = font {
+        this.fontName = fontName
+        this.fontSize = fontSize
+        this.fontColor = fontColor
+        this.block()
+    }
 
-    /** Plotting **/
+    inline fun font(verticalAlignment: TextAlignment, horizontalAlignment: TextAlignment, block: Block<UIFont>) = font {
+        this.verticalAlignment = verticalAlignment
+        this.horizontalAlignment = horizontalAlignment
+        this.block()
+    }
 
-    /**
-     * Creates a padding DSL block. If padding is null, an instance of it is created
-     */
-    inline fun padding(block: UIPadding.() -> Unit) {
+    inline fun fontSize(width: UIUnit, height: UIUnit, block: Block<UIFont>) = font {
+        this.size(width, height)
+        this.block()
+    }
+
+    // -- Padding and Margin Shorthands -- //
+
+    inline fun padding(block: Block<UIPadding>) {
         padding = padding ?: UIPadding()
         padding!!.block()
     }
@@ -322,7 +309,7 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     /**
      * Creates a margin DSL block. If margin is null, an instance of it is created
      */
-    inline fun margin(block: UIMargin.() -> Unit) {
+    inline fun margin(block: Block<UIMargin>) {
         margin = margin ?: UIMargin()
         margin!!.block()
     }
