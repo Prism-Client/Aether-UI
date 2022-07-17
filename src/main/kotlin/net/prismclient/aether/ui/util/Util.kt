@@ -1,6 +1,11 @@
 package net.prismclient.aether.ui.util
 
+import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.style.util.UIAnchorPoint
+import net.prismclient.aether.ui.util.extensions.RELATIVE
+import net.prismclient.aether.ui.util.extensions.px
+import net.prismclient.aether.ui.util.extensions.rel
 
 /**
  * Type alias for a function which has a receiver of [T] and accepts, and returns
@@ -29,3 +34,22 @@ fun FloatArray.blue(): Float = this[2]
 fun FloatArray.alpha(): Float = this[3]
 
 fun FloatArray.advance(): Float = this[4]
+
+fun UIAnchorPoint.anchor(alignment: UIAlignment) {
+    x = x ?: rel(0)
+    y = y ?: rel(0)
+
+    x!!.value = when (alignment) {
+        UIAlignment.TOPLEFT, UIAlignment.MIDDLELEFT, UIAlignment.BOTTOMLEFT -> 0f
+        UIAlignment.TOPCENTER, UIAlignment.CENTER, UIAlignment.BOTTOMCENTER -> 0.5f
+        UIAlignment.TOPRIGHT, UIAlignment.MIDDLERIGHT, UIAlignment.BOTTOMRIGHT -> 1f
+        else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
+    }
+
+    y!!.value = when (alignment) {
+        UIAlignment.TOPLEFT, UIAlignment.TOPCENTER, UIAlignment.TOPRIGHT -> 0f
+        UIAlignment.MIDDLELEFT, UIAlignment.CENTER, UIAlignment.MIDDLERIGHT -> 0.5f
+        UIAlignment.BOTTOMLEFT, UIAlignment.BOTTOMCENTER, UIAlignment.BOTTOMRIGHT -> 1f
+        else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
+    }
+}

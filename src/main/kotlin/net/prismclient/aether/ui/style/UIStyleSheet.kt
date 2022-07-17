@@ -214,24 +214,7 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
      */
     fun anchor(alignment: UIAlignment) {
         anchor = anchor ?: UIAnchorPoint()
-        anchor!!.x = anchor!!.x ?: px(0)
-        anchor!!.y = anchor!!.y ?: px(0)
-        anchor!!.x!!.type = RELATIVE
-        anchor!!.y!!.type = RELATIVE
-
-        anchor!!.x!!.value = when (alignment) {
-            TOPLEFT, MIDDLELEFT, BOTTOMLEFT -> 0f
-            TOPCENTER, CENTER, BOTTOMCENTER -> 0.5f
-            TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> 1f
-            else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
-        }
-
-        anchor!!.y!!.value = when (alignment) {
-            TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
-            MIDDLELEFT, CENTER, MIDDLERIGHT -> 0.5f
-            BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> 1f
-            else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
-        }
+        anchor!!.align(alignment)
     }
 
     // -- Background Shorthands -- //
