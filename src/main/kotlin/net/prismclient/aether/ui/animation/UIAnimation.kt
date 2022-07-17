@@ -25,6 +25,7 @@ import java.util.function.Consumer
  *
  * @param style The style sheet of the component. The style should be completely new, with no styles changed.
  */
+@Suppress("UNCHECKED_CAST")
 class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIAnimation<S>> {
     /**
      * The component that this animation is attached to
@@ -158,6 +159,7 @@ class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIA
      * Creates a keyframe with the given [ease], and properties from [block]
      */
     inline fun keyframe(ease: UIEase? = null, block: S.() -> Unit = {}) {
+
         val style = this.style.copy() as S
         style.block()
         // Ease -> activeEase -> UILinear if null.

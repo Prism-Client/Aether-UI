@@ -169,6 +169,7 @@ open class UIContainer<T : UIContainerSheet> : UIFrame<T>(), UIFocusable, UILayo
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun createsStyle(): T = UIContainerSheet() as T
 }
 

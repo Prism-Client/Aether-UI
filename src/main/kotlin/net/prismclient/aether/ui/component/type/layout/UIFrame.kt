@@ -167,6 +167,7 @@ abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
         requestUpdate()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun createsStyle(): T = UIFrameSheet() as T
 }
 

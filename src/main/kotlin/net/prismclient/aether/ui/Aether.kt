@@ -533,6 +533,7 @@ open class Aether(renderer: UIRenderer) {
             for (i in 0 until instance.frames!!.size) {
                 // UIContainers are what control scrolling, so
                 // if it is not an instance of it, skip and continue
+                @Suppress("UNCHECKED_CAST")
                 val container = instance.frames!![i] as? UIContainer<UIContainerSheet> ?: continue
                 if (container.isMouseInsideBounds() && container.expandedHeight > 0f && container.style.overflowY != UIContainerSheet.Overflow.None) {
                     // Iterate through the frame to see if there are more
