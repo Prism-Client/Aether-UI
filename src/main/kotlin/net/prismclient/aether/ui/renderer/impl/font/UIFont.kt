@@ -1,19 +1,13 @@
 package net.prismclient.aether.ui.renderer.impl.font
 
-import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
-import net.prismclient.aether.ui.dsl.UIRendererDSL
-import net.prismclient.aether.ui.renderer.impl.background.UIBackground
-import net.prismclient.aether.ui.renderer.impl.font.TextAlignment.*
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment.*
 import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIColor
-import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.calculate
-import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.renderer
-import net.prismclient.aether.ui.util.middle
 import java.util.regex.Pattern
 
 /**
@@ -46,8 +40,8 @@ open class UIFont : UIShape<UIFont>() {
 
     var textResizing: TextResizing = TextResizing.AutoWidth
 
-    var horizontalAlignment: TextAlignment = CENTER
-    var verticalAlignment: TextAlignment = CENTER
+    var horizontalAlignment: UITextAlignment = CENTER
+    var verticalAlignment: UITextAlignment = CENTER
 
     /**
      * The spacing between each line break.
@@ -93,9 +87,9 @@ open class UIFont : UIShape<UIFont>() {
 
     // -- Shorthands -- //
 
-    fun align(horizontal: TextAlignment, vertical: TextAlignment) = alignment(horizontal, vertical)
+    fun align(horizontal: UITextAlignment, vertical: UITextAlignment) = alignment(horizontal, vertical)
 
-    fun alignment(horizontal: TextAlignment, vertical: TextAlignment) {
+    fun alignment(horizontal: UITextAlignment, vertical: UITextAlignment) {
         horizontalAlignment = horizontal
         verticalAlignment = vertical
     }
@@ -167,6 +161,11 @@ open class UIFont : UIShape<UIFont>() {
                     cachedHeight = (maxy - miny).coerceAtLeast(cachedHeight)
                 }
                 TextResizing.TruncateText -> {}
+                TextResizing.Auto -> {
+                    textResizing = TextResizing.AutoWidth
+                    updateFont()
+                    return
+                }
             }
 
             // Update properties
@@ -201,9 +200,8 @@ open class UIFont : UIShape<UIFont>() {
                 TextResizing.AutoHeight -> renderer.renderText(text, x, y, cachedLineHeightSpacing)
                 TextResizing.FixedSize -> renderer.renderText(actualText, x, y, cachedWidth, cachedLineHeightSpacing, null)
                 TextResizing.TruncateText -> {} // TODO: Truncate text
+                TextResizing.Auto -> throw RuntimeException("Auto should not be the text resizing mode when rendering???")
             }
-            color(asRGBA(1f, 0f, 0f, 0.3f))
-            rect(cachedX - cachedAnchorX, cachedY - cachedAnchorY, cachedWidth, cachedHeight)
         }
     }
 
@@ -248,7 +246,12 @@ open class UIFont : UIShape<UIFont>() {
         /**
          * Cuts the text off at the point where it exceeds the width of this, and append the string [UIFont.truncatedText]
          */
-        TruncateText
+        TruncateText,
+
+        /**
+         * Automatically figures out which one is the best based on the properties of the font.
+         */
+        Auto
     }
 
     companion object {

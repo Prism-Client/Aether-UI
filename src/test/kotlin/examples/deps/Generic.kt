@@ -1,16 +1,11 @@
 package examples.deps
 
 import net.prismclient.aether.ui.component.type.image.UIImageSheet
-import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.dsl.UIComponentDSL
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
-import net.prismclient.aether.ui.util.extensions.colorOf
-import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIDependable
-import net.prismclient.aether.ui.util.left
 import net.prismclient.aether.ui.util.style
-import net.prismclient.aether.ui.util.top
 
 /**
  * This is an example of a (depend/include)-able file. In essence, [UIDependable] is a single function

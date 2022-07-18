@@ -90,15 +90,14 @@ open class UIContainer<T : UIContainerSheet> : UIFrame<T>(), UIFocusable, UILayo
     }
 
     override fun renderComponent() {
-        if (style.useFBO) {
-            renderer {
+        renderer {
+            if (style.useFBO) {
+                color(-1)
                 path {
                     imagePattern(fbo!!.imagePattern, relX, relY, relWidth, relHeight, 0f, 1f)
-                    rect(relX, relY, relWidth, relHeight)
+                    rect(relX, relY, relWidth, relHeight, style.background?.radius)
                 }.fillPaint()
-            }
-        } else {
-            renderer {
+            } else {
                 if (style.clipContent) {
                     scissor(relX, relY, relWidth, relHeight) {
                         translate(

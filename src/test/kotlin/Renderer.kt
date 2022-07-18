@@ -2,9 +2,8 @@ import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
-import net.prismclient.aether.ui.renderer.impl.font.TextAlignment
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.util.bottom
 import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.extensions.getBlue
 import net.prismclient.aether.ui.util.extensions.getGreen
@@ -139,9 +138,9 @@ object Renderer : UIRenderer {
         return imageData
     }
 
-    override fun deleteImage(imageName: String) {
-        nvgDeleteImage(ctx, UIProvider.getImage(imageName)?.handle ?: return)
-        UIProvider.deleteImage(imageName)
+    override fun deleteImage(imageData: String) {
+        nvgDeleteImage(ctx, UIProvider.getImage(imageData)?.handle ?: return)
+        UIProvider.deleteImage(imageData)
     }
 
     override fun createSvg(svgName: String, data: ByteBuffer?, scale: Float): UIImageData {
@@ -199,11 +198,11 @@ object Renderer : UIRenderer {
         imageHandle: Int, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float
     ) {
         allocPaint()
-        paint!!.innerColor(fillColor)
-        paint!!.outerColor(fillColor)
         nvgImagePattern(
             ctx, x, y, width, height, angle, imageHandle, alpha, paint!!
         )
+        paint!!.innerColor(fillColor)
+        paint!!.outerColor(fillColor)
     }
 
     override fun fontFace(fontName: String) = nvgFontFace(ctx, fontName)
@@ -212,17 +211,17 @@ object Renderer : UIRenderer {
 
     override fun fontSpacing(spacing: Float) = nvgTextLetterSpacing(ctx, spacing)
 
-    override fun fontAlignment(horizontalAlignment: TextAlignment, verticalAlignment: TextAlignment) {
+    override fun fontAlignment(horizontalAlignment: UITextAlignment, verticalAlignment: UITextAlignment) {
         var alignment = when (horizontalAlignment) {
-            TextAlignment.LEFT -> NVG_ALIGN_LEFT
-            TextAlignment.CENTER -> NVG_ALIGN_CENTER
-            TextAlignment.RIGHT -> NVG_ALIGN_RIGHT
+            UITextAlignment.LEFT -> NVG_ALIGN_LEFT
+            UITextAlignment.CENTER -> NVG_ALIGN_CENTER
+            UITextAlignment.RIGHT -> NVG_ALIGN_RIGHT
             else -> 0
         }
         alignment = alignment or when (verticalAlignment) {
-            TextAlignment.TOP -> NVG_ALIGN_TOP
-            TextAlignment.CENTER -> NVG_ALIGN_MIDDLE
-            TextAlignment.BOTTOM -> NVG_ALIGN_BOTTOM
+            UITextAlignment.TOP -> NVG_ALIGN_TOP
+            UITextAlignment.CENTER -> NVG_ALIGN_MIDDLE
+            UITextAlignment.BOTTOM -> NVG_ALIGN_BOTTOM
             else -> 0
         }
         nvgTextAlign(ctx, alignment)

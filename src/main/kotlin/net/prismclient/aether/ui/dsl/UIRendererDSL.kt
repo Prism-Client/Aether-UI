@@ -5,7 +5,7 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
-import net.prismclient.aether.ui.renderer.impl.font.TextAlignment
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.*
@@ -92,7 +92,7 @@ object UIRendererDSL {
      * Applies the given font values to the active context.
      */
     @JvmStatic
-    fun font(fontFace: String, fontSize: Float, horizontalAlignment: TextAlignment, verticalAlignment: TextAlignment, fontSpacing: Float) {
+    fun font(fontFace: String, fontSize: Float, horizontalAlignment: UITextAlignment, verticalAlignment: UITextAlignment, fontSpacing: Float) {
         renderer.fontFace(fontFace)
         renderer.fontSize(fontSize)
         renderer.fontAlignment(horizontalAlignment, verticalAlignment)

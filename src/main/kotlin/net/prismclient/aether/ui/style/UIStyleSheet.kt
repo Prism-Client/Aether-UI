@@ -6,7 +6,7 @@ import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
-import net.prismclient.aether.ui.renderer.impl.font.TextAlignment
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
@@ -15,13 +15,11 @@ import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.UIColor
-import net.prismclient.aether.ui.util.extensions.RELATIVE
-import net.prismclient.aether.ui.util.extensions.lerp
-import net.prismclient.aether.ui.util.extensions.px
-import net.prismclient.aether.ui.util.extensions.rel
+import net.prismclient.aether.ui.util.extensions.*
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
 import net.prismclient.aether.ui.util.name
+import net.prismclient.aether.ui.util.radiusOf
 
 /**
  * [UIStyleSheet] is the superclass of all styles. It holds the general
@@ -46,7 +44,7 @@ import net.prismclient.aether.ui.util.name
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md">Styles</s>
  * @see <a href="https://github.com/Prism-Client/Aether-UI/blob/production/docs/Styling.md#creating-styles">How to create styles</a>
  */
-open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
+open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     var name: String = ""
 
     /**
@@ -137,81 +135,55 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
 
     // -- Control Shorthands -- //
 
-    /**
-     * Shorthand for setting the position and size as pixels.
-     */
+    fun plot(controlAlignment: UIAlignment, width: Number, height: Number) {
+        control(controlAlignment)
+        size(width, height)
+    }
+
+    @JvmOverloads
+    fun plot(controlAlignment: UIAlignment, width: UIUnit? = null, height: UIUnit? = null) {
+        control(controlAlignment)
+        size(width, height)
+    }
+
     fun plot(x: Number, y: Number, width: Number, height: Number) {
         position(x, y)
         size(width, height)
     }
 
-    /**
-     * Shorthand for setting the position and size as units.
-     */
-    fun plot(x: UIUnit, y: UIUnit, width: UIUnit, height: UIUnit) {
+    fun plot(x: UIUnit?, y: UIUnit?, width: UIUnit?, height: UIUnit?) {
         position(x, y)
         size(width, height)
     }
 
-    /**
-     * Positions the component at the given [x], and [y] value as pixels.
-     */
     fun position(x: Number, y: Number) = position(px(x), px(y))
 
-    /**
-     * Positions the component at the given [x], and [y] values as the given units.
-     */
     fun position(x: UIUnit?, y: UIUnit?) {
         this.x = x
         this.y = y
     }
 
-    /**
-     * Sizes the component with the given [width], and height as pixels.
-     */
     fun size(width: Number, height: Number) = size(px(width), px(height))
 
-    /**
-     * Sizes the component with the given [width], and height as the given units.
-     */
-    fun size(width: UIUnit, height: UIUnit) {
+    fun size(width: UIUnit?, height: UIUnit?) {
         this.width = width
         this.height = height
     }
 
-    /**
-     * Aligns the component's position to the relative point of it's parent
-     *
-     * @see control Shorthand
-     */
     fun align(alignment: UIAlignment) {
         x = x ?: px(0)
         y = y ?: px(0)
-        net.prismclient.aether.ui.util.extensions.align(alignment, x!!, y!!)
+        align(alignment, x!!, y!!)
     }
 
-    /**
-     * Shorthand for [align] and anchor. Both values are set to the [alignment]
-     *
-     * @see align
-     * @see anchor
-     */
+
     fun control(alignment: UIAlignment) = control(alignment, alignment)
 
-    /**
-     * Shorthand for [align] and [anchor]
-     *
-     * @see align
-     * @see anchor
-     */
     fun control(alignment: UIAlignment, anchorAlignment: UIAlignment) {
         align(alignment)
         anchor(anchorAlignment)
     }
 
-    /**
-     * Anchors the component to the given [alignment].
-     */
     fun anchor(alignment: UIAlignment) {
         anchor = anchor ?: UIAnchorPoint()
         anchor!!.align(alignment)
@@ -224,6 +196,12 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         background!!.block()
     }
 
+    inline fun background(color: Int, radius: Number = 0, block: Block<UIBackground> = {}) = background {
+        this.backgroundColor = colorOf(color)
+        if (radius != 0 || this.radius != null) this.radius = radiusOf(radius)
+        block()
+    }
+
     inline fun background(color: UIColor, radius: UIRadius? = background?.radius, block: Block<UIBackground> = {}) =
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
@@ -234,14 +212,57 @@ open class UIStyleSheet() : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         font!!.block()
     }
 
-    inline fun font(fontName: String, fontSize: UIUnit?, fontColor: UIColor, block: Block<UIFont> = {}) = font {
+    inline fun font(
+        fontName: String,
+        fontColor: UIColor,
+        fontSize: UIUnit?,
+        lineHeightSpacing: UIUnit? = null,
+        block: Block<UIFont> = {}
+    ) = font {
         this.fontName = fontName
         this.fontSize = fontSize
         this.fontColor = fontColor
+        this.lineHeightSpacing = lineHeightSpacing
         this.block()
     }
 
-    inline fun font(verticalAlignment: TextAlignment, horizontalAlignment: TextAlignment, block: Block<UIFont>) = font {
+    inline fun font(
+        alignment: UIAlignment,
+        x: UIUnit? = null,
+        y: UIUnit? = null,
+        width: UIUnit? = null,
+        height: UIUnit? = null,
+        block: Block<UIFont> = {}
+    ) = font {
+        this.anchor(alignment)
+        this.x = x
+        this.y = y
+        this.width = width
+        this.height = height
+        this.block()
+    }
+
+    inline fun font(
+        x: UIUnit? = null,
+        y: UIUnit? = null,
+        width: UIUnit? = null,
+        height: UIUnit? = null,
+        block: Block<UIFont> = {}
+    ) = font {
+        this.x = x
+        this.y = y
+        this.width = width
+        this.height = height
+        this.block()
+    }
+
+    inline fun font(
+        verticalAlignment: UITextAlignment,
+        horizontalAlignment: UITextAlignment,
+        textResizing: UIFont.TextResizing = UIFont.TextResizing.Auto,
+        block: Block<UIFont> = {}
+    ) = font {
+        this.textResizing = textResizing
         this.verticalAlignment = verticalAlignment
         this.horizontalAlignment = horizontalAlignment
         this.block()

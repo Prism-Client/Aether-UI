@@ -13,15 +13,6 @@ import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 
-/** Font Alignments **/
-const val left = 1
-const val center = 2
-const val right = 4
-const val top = 8
-const val middle = 16
-const val bottom = 32
-const val baseline = 64
-
 /**
  * Image flags
  */

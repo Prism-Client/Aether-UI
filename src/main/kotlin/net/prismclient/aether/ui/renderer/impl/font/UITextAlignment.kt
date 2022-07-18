@@ -7,7 +7,7 @@ package net.prismclient.aether.ui.renderer.impl.font
  * @author sen
  * @since 1.3
  */
-enum class TextAlignment {
+enum class UITextAlignment {
     /**
      * Aligns to the left on the x-axis
      */

@@ -114,18 +114,19 @@ abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
     }
 
     override fun renderComponent() {
-        if (style.useFBO) {
-            renderer {
+        renderer {
+            if (style.useFBO) {
+                color(-1)
                 path {
                     imagePattern(fbo!!.imagePattern, relX, relY, relWidth, relHeight, 0f, 1f)
-                    rect(relX, relY, relWidth, relHeight)
+                    rect(relX, relY, relWidth, relHeight, style.background?.radius)
                 }.fillPaint()
+            } else {
+                if (style.clipContent) scissor(relX, relY, relWidth, relHeight) {
+                    components.forEach(UIComponent<*>::render)
+                }
+                else components.forEach(UIComponent<*>::render)
             }
-        } else {
-            if (style.clipContent) UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
-                components.forEach(UIComponent<*>::render)
-            }
-            else components.forEach(UIComponent<*>::render)
         }
     }
 

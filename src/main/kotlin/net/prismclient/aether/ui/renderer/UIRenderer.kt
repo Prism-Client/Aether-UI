@@ -1,7 +1,7 @@
 package net.prismclient.aether.ui.renderer
 
 import net.prismclient.aether.ui.renderer.image.UIImageData
-import net.prismclient.aether.ui.renderer.impl.font.TextAlignment
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import java.nio.ByteBuffer
 
@@ -192,9 +192,9 @@ interface UIRenderer {
     fun fontSpacing(spacing: Float)
 
     /**
-     * Aligns the text to the given [horizontalAlignment] and [verticalAlignment] based on the enum [TextAlignment].
+     * Aligns the text to the given [horizontalAlignment] and [verticalAlignment] based on the enum [UITextAlignment].
      */
-    fun fontAlignment(horizontalAlignment: TextAlignment, verticalAlignment: TextAlignment)
+    fun fontAlignment(horizontalAlignment: UITextAlignment, verticalAlignment: UITextAlignment)
 
     /**
      * Renders the [text] based on the [x], and [y] position and all the states

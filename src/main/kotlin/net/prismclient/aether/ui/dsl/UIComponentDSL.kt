@@ -135,7 +135,8 @@ object UIComponentDSL {
      *
      * @return T The component
      */
-    inline fun <reified T : UIComponent<*>> component(component: T, style: String?, block: Block<T>): T {
+    @JvmOverloads
+    inline fun <reified T : UIComponent<*>> component(component: T, style: String? = null, block: Block<T> = {}): T {
         pushComponent(component)
         component.applyStyle(style)
         component.block()
