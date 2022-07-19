@@ -8,11 +8,7 @@ import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.type.input.button.UIButton
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
-import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.UIAutoLayout
-import net.prismclient.aether.ui.component.type.layout.UIContainer
-import net.prismclient.aether.ui.component.type.layout.UIListLayout
-import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.*
 import net.prismclient.aether.ui.dsl.UIComponentDSL.activeStyle
 import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.interfaces.UIDependable
@@ -253,28 +249,17 @@ object UIComponentDSL {
         component(UIContainer(), style, block)
 
     /**
-     * Creates a [UIListLayout] with the given [listDirection], which defines the direction that it
+     * Creates a [UIListLayout] with the given [layoutDirection], which defines the direction that it
      * lays out in (vertical or horizontal), and the given [listOrder] defining which direction
      * the list is ordered in.
      */
     @JvmOverloads
     inline fun list(
-        listDirection: UIListLayout.ListDirection,
+        layoutDirection: UILayoutDirection,
         listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
         style: String? = activeStyle,
         block: Block<UIListLayout> = {}
-    ) = component(UIListLayout(listDirection, listOrder), style, block)
-
-    /**
-     * Creates a vertical list via [list].
-     *
-     * @see list
-     */
-    inline fun verticalList(
-        listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
-        style: String? = activeStyle,
-        block: Block<UIListLayout> = {}
-    ) = list(UIListLayout.ListDirection.Vertical, listOrder, style, block)
+    ) = component(UIListLayout(layoutDirection, listOrder), style, block)
 
     /**
      * Creates a horizontal list via [list].
@@ -285,7 +270,18 @@ object UIComponentDSL {
         listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
         style: String? = activeStyle,
         block: Block<UIListLayout> = {}
-    ) = list(UIListLayout.ListDirection.Horizontal, listOrder, style, block)
+    ) = list(UILayoutDirection.Horizontal, listOrder, style, block)
+
+    /**
+     * Creates a vertical list via [list].
+     *
+     * @see list
+     */
+    inline fun verticalList(
+        listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
+        style: String? = activeStyle,
+        block: Block<UIListLayout> = {}
+    ) = list(UILayoutDirection.Vertical, listOrder, style, block)
 
     /**
      * Creates a copy of the given layout and creates a normal block of [UIAutoLayout] where
@@ -302,7 +298,7 @@ object UIComponentDSL {
      */
     @JvmOverloads
     inline fun autoLayout(
-        listDirection: UIListLayout.ListDirection,
+        listDirection: UILayoutDirection,
         style: String? = null,
         block: Block<UIAutoLayout> = {}
     ) = component(UIAutoLayout(listDirection), style, block)

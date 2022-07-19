@@ -1,6 +1,7 @@
 package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.type.frame.UIFrameLayout
 import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.impl.scrollbar.UIScrollbar
@@ -9,14 +10,15 @@ import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
 
 /**
- * [UIContainer] is the default implementation for [UIFrame]. It introduces scrollbars which automatically
- * resize to content being added/removed. It is considered to be a [UIFocusable], so when the mouse is scrolled
- * within the container the focused component will become this.
+ * [UIContainer] is the default implementation for [UIFrame] and [UILayout]. It introduces scrollbars which automatically
+ * resize to content being added/removed; furthermore, it is considered the base class of layouts. The container does nothing
+ * to the layouts. It is also considered to be a [UIFocusable], so when the mouse is scrolled within the container the focused
+ * component will become this.
  *
  * @author sen
  * @since 1.0
  */
-open class UIContainer<T : UIContainerSheet> : UIFrame<T>(), UIFocusable, UILayout {
+open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, UILayout {
     /**
      * How sensitive the scrolling will be
      */
@@ -36,7 +38,6 @@ open class UIContainer<T : UIContainerSheet> : UIFrame<T>(), UIFocusable, UILayo
 
     override fun update() {
         super.update()
-        updateLayout()
 
         // Calculate the distance of the components
         // and find the largest of them on both axes

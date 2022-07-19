@@ -6,6 +6,7 @@ import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIColor
+import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
 import java.util.regex.Pattern
@@ -105,8 +106,23 @@ open class UIFont : UIShape<UIFont>() {
      * Calculates and updates the bounds for this.
      */
     fun updateFont() {
+        val component = component ?: return
+
+        // Adjust to the right resize type
+        when {
+            (textResizing == TextResizing.AutoWidth || textResizing == TextResizing.AutoHeight) && (width != null || height != null) -> {
+                textResizing = TextResizing.FixedSize
+                updateFont()
+                return
+            }
+            textResizing == TextResizing.AutoWidth && actualText.contains(NEWLINE) -> {
+                textResizing = TextResizing.AutoHeight
+                updateFont()
+                return
+            }
+        }
+
         update(component)
-        val component = component ?: throw RuntimeException("Component cannot be null for UIFont")
         text.clear()
 
         // Update initial properties
@@ -118,27 +134,15 @@ open class UIFont : UIShape<UIFont>() {
             font(fontName ?: "", cachedFontSize, horizontalAlignment, verticalAlignment, cachedFontSpacing)
             when (textResizing) {
                 TextResizing.AutoWidth -> {
-                    if (actualText.contains(NEWLINE)) {
-                        textResizing = TextResizing.AutoHeight
-                        updateFont()
-                        return
-                    }
-                    text.add(actualText)
-
                     val (minx, miny, maxx, maxy) = actualText.fontBounds()
+                    text.add(actualText)
 
                     // Update component size
                     cachedWidth = maxx - minx
                     cachedHeight = maxy - miny
                 }
                 TextResizing.AutoHeight -> {
-                    if (width != null || height != null) {
-                        textResizing = TextResizing.FixedSize
-                        updateFont()
-                        return
-                    }
                     text.addAll(actualText.split(NEWLINE))
-
                     renderer.calculateText(text, 0f, 0f, cachedLineHeightSpacing)
 
                     val (minx, miny, maxx, maxy) = fontBounds()
@@ -148,14 +152,10 @@ open class UIFont : UIShape<UIFont>() {
                     cachedHeight = maxy - miny
                 }
                 TextResizing.FixedSize -> {
-                    if (actualText.contains(NEWLINE)) {
-                        text.addAll(actualText.split(NEWLINE))
-                        renderer.calculateText(text, 0f, 0f, cachedLineHeightSpacing)
-                    } else {
-                        renderer.calculateText(actualText, 0f, 0f, cachedWidth, cachedLineHeightSpacing, text)
-                    }
+                    // TODO: Fixed size newline
+                    renderer.calculateText(actualText, 0f, 0f, cachedWidth, cachedLineHeightSpacing, text)
 
-                    val (minx, miny, maxx, maxy) = fontBounds()
+                    val (_, miny, _, maxy) = fontBounds()
 
                     // Update component size
                     cachedHeight = (maxy - miny).coerceAtLeast(cachedHeight)
@@ -182,19 +182,19 @@ open class UIFont : UIShape<UIFont>() {
     }
 
     override fun render() {
-        val x = cachedX + when (verticalAlignment) {
+        val x = cachedX + when (horizontalAlignment) {
             CENTER -> cachedWidth / 2f
             RIGHT -> cachedWidth
             else -> 0f
         } - cachedAnchorX
-        val y = cachedY + when (horizontalAlignment) {
+        val y = cachedY + when (verticalAlignment) {
             CENTER -> cachedFontSize / 2f + (cachedHeight - (cachedFontSize * text.size) - (cachedLineHeightSpacing * (text.size - 1))) / 2f
             BOTTOM -> cachedFontSize + (cachedHeight - (cachedFontSize * text.size) - (cachedLineHeightSpacing * (text.size - 1)))
             else -> 0f
         } - cachedAnchorY
         renderer {
             color(fontColor)
-            font(fontName ?: "", cachedFontSize, verticalAlignment, horizontalAlignment, cachedFontSpacing)
+            font(fontName ?: "", cachedFontSize, horizontalAlignment, verticalAlignment, cachedFontSpacing)
             when (textResizing) {
                 TextResizing.AutoWidth -> actualText.render(x, y)
                 TextResizing.AutoHeight -> renderer.renderText(text, x, y, cachedLineHeightSpacing)
@@ -202,10 +202,13 @@ open class UIFont : UIShape<UIFont>() {
                 TextResizing.TruncateText -> {} // TODO: Truncate text
                 TextResizing.Auto -> throw RuntimeException("Auto should not be the text resizing mode when rendering???")
             }
+//            color(asRGBA(1f, 1f, 1f, 0.3f))
+//            rect(cachedX - cachedAnchorX, cachedY - cachedAnchorY, cachedWidth, cachedHeight)
         }
     }
 
     override fun copy(): UIFont = UIFont().also {
+        it.apply(this)
         it.actualText = actualText
         it.fontName = fontName
         it.fontSize = fontSize?.copy()
@@ -216,6 +219,7 @@ open class UIFont : UIShape<UIFont>() {
         it.horizontalAlignment = horizontalAlignment
         it.lineHeightSpacing = lineHeightSpacing?.copy()
         it.truncatedText = truncatedText
+        it.anchor = anchor?.copy()
     }
 
     /**

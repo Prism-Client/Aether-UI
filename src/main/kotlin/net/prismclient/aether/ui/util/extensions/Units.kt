@@ -50,19 +50,34 @@ const val WIDTH: Byte = 5
 const val HEIGHT: Byte = 6
 
 /**
+ * The width or height of the component's parent, or the screen width/height.
+ */
+const val PRELATIVE: Byte = 7
+
+/**
+ * The width of the parent of the given value, or the screen width.
+ */
+const val PARENTWIDTH: Byte = 8
+
+/**
+ * The height of the parent of the given value, or the screen height.
+ */
+const val PARENTHEIGHT: Byte = 9
+
+/**
  * The border width of the active component
  */
-const val BORDER: Byte = 7
+const val BORDER: Byte = 10
 
 /**
  * The width of the screen
  */
-const val SCREENWIDTH: Byte = 8
+const val SCREENWIDTH: Byte = 11
 
 /**
  * The height of the screen
  */
-const val SCREENHEIGHT: Byte = 9
+const val SCREENHEIGHT: Byte = 12
 
 /** Unit Functions **/
 
@@ -84,6 +99,13 @@ fun rel(value: Number) = UIUnit(value.toFloat(), RELATIVE)
  * @see rel
  */
 fun percent(value: Number) = UIUnit(value.toFloat() / 100f, RELATIVE)
+
+/**
+ * The relative value of the parent or screen size
+ *
+ * @see rel
+ */
+fun prel(value: Number) = UIUnit(value.toFloat(), PRELATIVE)
 
 /**
  * Creates a unit that represents the font size of this (else 0 if not applicable)
@@ -185,6 +207,9 @@ fun calculate(unit: UIUnit?, component: UIComponent<*>?, width: Float, height: F
         EM -> (component?.style?.font?.cachedFontSize ?: 0f) * unit.value
         WIDTH -> width * unit.value
         HEIGHT -> height * unit.value
+        PRELATIVE -> (if (isY) (component?.getParentHeight() ?: Aether.height) else (component?.getParentWidth() ?: Aether.width)) * unit.value
+        PARENTWIDTH -> (component?.getParentWidth() ?: Aether.width) * unit.value
+        PARENTHEIGHT -> (component?.getParentHeight() ?: Aether.height) * unit.value
         SCREENWIDTH -> Aether.width
         SCREENHEIGHT -> Aether.height
         else -> throw RuntimeException("${unit.type} is not considered a unit type.")

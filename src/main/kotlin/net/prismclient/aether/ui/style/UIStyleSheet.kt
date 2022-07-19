@@ -6,8 +6,8 @@ import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
-import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.impl.font.UIFont
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.impl.property.UIMargin
 import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
@@ -176,7 +176,6 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         align(alignment, x!!, y!!)
     }
 
-
     fun control(alignment: UIAlignment) = control(alignment, alignment)
 
     fun control(alignment: UIAlignment, anchorAlignment: UIAlignment) {
@@ -198,10 +197,11 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
 
     inline fun background(color: Int, radius: Number = 0, block: Block<UIBackground> = {}) = background {
         this.backgroundColor = colorOf(color)
-        if (radius != 0 || this.radius != null) this.radius = radiusOf(radius)
+        if (radius != 0) this.radius = radiusOf(radius)
         block()
     }
 
+    @JvmOverloads
     inline fun background(color: UIColor, radius: UIRadius? = background?.radius, block: Block<UIBackground> = {}) =
         background { this.backgroundColor = color; this.radius = radius; this.block() }
 
@@ -257,14 +257,13 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     }
 
     inline fun font(
-        verticalAlignment: UITextAlignment,
         horizontalAlignment: UITextAlignment,
+        verticalAlignment: UITextAlignment,
         textResizing: UIFont.TextResizing = UIFont.TextResizing.Auto,
         block: Block<UIFont> = {}
     ) = font {
         this.textResizing = textResizing
-        this.verticalAlignment = verticalAlignment
-        this.horizontalAlignment = horizontalAlignment
+        this.align(horizontalAlignment, verticalAlignment)
         this.block()
     }
 
@@ -283,14 +282,14 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     /**
      * Sets the padding to the given [value] as pixels.
      */
-    fun padding(value: Float) = padding(value, value, value, value)
+    fun padding(value: Number) = padding(value, value, value, value)
 
     /**
      * Sets the padding to the given [unit] as the unit.
      */
     fun padding(unit: UIUnit) = padding(unit, unit, unit, unit)
 
-    fun padding(paddingTop: Float = 0f, paddingRight: Float = 0f, paddingBottom: Float = 0f, paddingLeft: Float = 0f) =
+    fun padding(paddingTop: Number = 0, paddingRight: Number = 0, paddingBottom: Number = 0, paddingLeft: Number = 0) =
         padding {
             this.paddingTop = px(paddingTop)
             this.paddingRight = px(paddingRight)
