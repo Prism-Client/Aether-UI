@@ -1,11 +1,14 @@
 package examples
 
+import net.prismclient.aether.ui.animation.ease.impl.UIQuart
 import net.prismclient.aether.ui.component.type.layout.UIAutoLayout
 import net.prismclient.aether.ui.component.type.layout.UILayoutDirection
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
+import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.screen.UIScreen
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
+import net.prismclient.aether.ui.util.animationOf
 import net.prismclient.aether.ui.util.create
 import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.colorOf
@@ -35,6 +38,16 @@ class Default : UIScreen {
                 }
             }
 
+            animationOf("blue-hover", UIStyleSheet()) {
+                UIQuart(1000L) to {
+                    background(colorOf(asRGBA(87, 164, 255, 0.8f)))
+                }
+            }
+
+            animationOf("blue-unhover", UIStyleSheet()) {
+                keyframe(UIQuart(1000L), UIProvider.getStyle("button", true))
+            }
+
             autoLayout(UILayoutDirection.Vertical) {
                 hug() space 70
                 autoLayout(UILayoutDirection.Vertical) {
@@ -58,7 +71,6 @@ class Default : UIScreen {
                 }
                 autoLayout(UILayoutDirection.Horizontal) {
                     hug() space 10
-
 
                     button("Show me how!", "button").style {
                         font {
