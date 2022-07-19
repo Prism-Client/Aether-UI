@@ -30,54 +30,46 @@ class Default : UIScreen {
             style(UIStyleSheet(), "button") {
                 size(260, 50)
                 background(-1, 12)
-//                font("Montserrat-medium", colorOf( 32, 32, 32), px(18)) {
-//                    font(UIAlignment.CENTER, rel(0.5), rel(0.5))
-//                }
+                font("Montserrat-medium", colorOf(32, 32, 32), px(18)) {
+                    font(UIAlignment.CENTER, rel(0.5), rel(0.5))
+                }
             }
 
             autoLayout(UILayoutDirection.Vertical) {
-                hug()
+                hug() space 70
                 autoLayout(UILayoutDirection.Vertical) {
-                    hug() space 70
-                    autoLayout(UILayoutDirection.Vertical) {
-                        space(10)
-                        componentAlignment = UIAlignment.CENTER
-                        horizontalResizing = UIAutoLayout.ResizingMode.Hug
-                        verticalResizing = UIAutoLayout.ResizingMode.Hug
+                    space(10)
+                    componentAlignment = UIAlignment.CENTER
+                    horizontalResizing = UIAutoLayout.ResizingMode.Hug
+                    verticalResizing = UIAutoLayout.ResizingMode.Hug
 
-//                    label("Welcome to your dashboard!").style {
-//                        font("Montserrat-bold", colorOf(-1), px(24))
-//                    }
-                        label("Customize the dashboard to show your statistics from Bedwars to Skyblock, or even Minemen statistics!").style {
-                            width = rel(1)
-                            height = px(20)
-                            font("Montserrat-regular", colorOf(1f, 1f, 1f, 0.8f), px(14)) {
-                                width = rel(1)
-                            }
-                            background(asRGBA(1f, 1f, 1f, 0.3f))
-                        }
-                    }.style {
-                        width = rel(1)
-                        background(asRGBA(0f, 0f, 1f, 0.3f))
+                    label("Welcome to your dashboard!").style {
+                        font("Montserrat-bold", colorOf(-1), px(24))
                     }
-                    autoLayout(UILayoutDirection.Horizontal) {
-                        hug() space 10
-
-
-                        button("Show me how!", "button").style {
-//                        font {
-//                            fontColor = colorOf(-1)
-//                        }
+                    label("Customize the dashboard to show your statistics from Bedwars to Skyblock, or even Minemen statistics!").style {
+                        width = rel(1)
+                        height = px(20)
+                        font("Montserrat-regular", colorOf(1f, 1f, 1f, 0.8f), px(14)) {
+                            width = rel(1)
                         }
-                        button("Maybe later...", "button")
                     }
                 }.style {
-                    control(UIAlignment.CENTER)
-                    background(asRGBA(1f, 0f, 0f, 0.3f))
+                    width = rel(1)
+                }
+                autoLayout(UILayoutDirection.Horizontal) {
+                    hug() space 10
+
+
+                    button("Show me how!", "button").style {
+                        font {
+                            fontColor = colorOf(-1)
+                        }
+                        background(asRGBA(87, 164, 255))
+                    }
+                    button("Maybe later...", "button")
                 }
             }.style {
                 control(UIAlignment.CENTER)
-//                background(asRGBA(0f, 1f, 1f, 0.3f))
             }
         }
 
