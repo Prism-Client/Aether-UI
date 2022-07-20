@@ -5,6 +5,7 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.lerp
+import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
 
@@ -30,6 +31,24 @@ abstract class UIShape<T : UIShape<T>> : UIObject(), UICopy<T>, UIAnimatable<T> 
         protected set
     var cachedHeight = 0f
         protected set
+
+    // -- Shorthands -- //
+
+    fun position(x: UIUnit?, y: UIUnit?) {
+        this.x = x
+        this.y = y
+    }
+
+    fun position(x: Number, y: Number) = position(px(x), px(y))
+
+    fun size(width: UIUnit?, height: UIUnit?) {
+        this.width = width
+        this.height = height
+    }
+
+    fun size(width: Number, height: Number) = size(px(width), px(height))
+
+    // -- Core -- //
 
     override fun update(component: UIComponent<*>?) {
         this.component = component

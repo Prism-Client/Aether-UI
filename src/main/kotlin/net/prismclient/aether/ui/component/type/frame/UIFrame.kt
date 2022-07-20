@@ -2,12 +2,13 @@ package net.prismclient.aether.ui.component.type.layout
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.dsl.UIRendererDSL
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
+import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
+import net.prismclient.aether.ui.util.name
 import net.prismclient.aether.ui.util.warn
 
 /**
@@ -27,7 +28,7 @@ import net.prismclient.aether.ui.util.warn
  * @author sen
  * @since 1.0
  */
-abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style), UIFocusable {
+abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
     /**
      * The components of this frame.
      */
@@ -59,7 +60,16 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
      * frame has been updated, but prior to the first render.
      */
     open fun updateFBO() {
-        if (style.useFBO) fbo = Aether.renderer.createFBO(relWidth, relHeight)
+        // Deallocate any existing framebuffer
+        if (fbo != null) {
+            Aether.renderer.deleteFBO(fbo!!)
+            fbo = null
+        }
+        if (style.useFBO) {
+            if ((fbo != null && (fbo!!.width != relWidth || fbo!!.height != relHeight)) || fbo == null) {
+                fbo = Aether.renderer.createFBO(relWidth, relHeight)
+            }
+        }
     }
 
     /**
@@ -93,10 +103,9 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
                     components.forEach(UIComponent<*>::render)
                 }
             }
-            requiresUpdate = false
         }
+        requiresUpdate = false
     }
-
 
     override fun render() {
         updateAnimation()
@@ -105,23 +114,19 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
     }
 
     override fun renderComponent() {
-        if (style.useFBO) {
-            Aether.renderer.renderFbo(
-                fbo!!,
-                relX,
-                relY,
-                relWidth,
-                relHeight,
-                style.background?.radius?.topLeft ?: 0f,
-                style.background?.radius?.topRight ?: 0f,
-                style.background?.radius?.bottomLeft ?: 0f,
-                style.background?.radius?.bottomRight ?: 0f
-            )
-        } else {
-            if (style.clipContent) UIRendererDSL.scissor(relX, relY, relWidth, relHeight) {
-                components.forEach(UIComponent<*>::render)
+        renderer {
+            if (style.useFBO) {
+                color(-1)
+                path {
+                    imagePattern(fbo!!.imagePattern, relX, relY, relWidth, relHeight, 0f, 1f)
+                    rect(relX, relY, relWidth, relHeight, style.background?.radius)
+                }.fillPaint()
+            } else {
+                if (style.clipContent) scissor(relX, relY, relWidth, relHeight) {
+                    components.forEach(UIComponent<*>::render)
+                }
+                else components.forEach(UIComponent<*>::render)
             }
-            else components.forEach(UIComponent<*>::render)
         }
     }
 
@@ -162,4 +167,54 @@ abstract class UIFrame<T : UIFrameSheet>(style: String?) : UIComponent<T>(style)
         components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
         requestUpdate()
     }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun createsStyle(): T = UIFrameSheet() as T
+}
+
+open class UIFrameSheet : UIStyleSheet() {
+    /**
+     * If true, the frame will use an FBO to render content.
+     */
+    var useFBO: Boolean = false
+
+    /**
+     * If true certain optimizations will be applied when
+     * rendering. This only works with [useFBO] as true.
+     */
+    var optimizeRenderer: Boolean = false
+        set(value) {
+            if (!useFBO && value) warn("attempted to set optimizeRenderer when useFBO is false. ($name)")
+            field = value
+        }
+
+    override fun apply(sheet: UIStyleSheet): UIFrameSheet {
+        // Override the default apply function because
+        // this is an inheritable class.
+        this.immutableStyle = sheet.immutableStyle
+        this.name = sheet.name
+
+        this.background = sheet.background?.copy()
+        this.font = sheet.font?.copy()
+
+        this.x = sheet.x?.copy()
+        this.y = sheet.y?.copy()
+        this.width = sheet.width?.copy()
+        this.height = sheet.height?.copy()
+
+        this.padding = sheet.padding?.copy()
+        this.margin = sheet.margin?.copy()
+        this.anchor = sheet.anchor?.copy()
+        this.clipContent = sheet.clipContent
+
+        // Frame properties
+        if (sheet is UIFrameSheet) {
+            this.useFBO = sheet.useFBO
+            this.optimizeRenderer = sheet.optimizeRenderer
+        }
+
+        return this
+    }
+
+    override fun copy(): UIFrameSheet = UIFrameSheet().name(name).apply(this)
 }

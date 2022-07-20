@@ -7,15 +7,10 @@ import net.prismclient.aether.ui.component.controller.impl.selection.UISelectabl
 import net.prismclient.aether.ui.component.type.UILabel
 import net.prismclient.aether.ui.component.type.image.UIImage
 import net.prismclient.aether.ui.component.type.input.button.UIButton
-import net.prismclient.aether.ui.component.type.input.button.UICheckbox
 import net.prismclient.aether.ui.component.type.input.slider.UISlider
-import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.auto.UIAutoLayout
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.list.UIListLayout
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.*
 import net.prismclient.aether.ui.dsl.UIComponentDSL.activeStyle
-import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.interfaces.UIDependable
 import java.util.*
 
@@ -136,8 +131,10 @@ object UIComponentDSL {
      *
      * @return T The component
      */
-    inline fun <reified T : UIComponent<*>> component(component: T, block: T.() -> Unit): T {
+    @JvmOverloads
+    inline fun <reified T : UIComponent<*>> component(component: T, style: String? = null, block: Block<T> = {}): T {
         pushComponent(component)
+        component.applyStyle(style)
         component.block()
         component.initialize()
         popComponent(component)
@@ -151,7 +148,7 @@ object UIComponentDSL {
      *
      * @see ignore
      */
-    inline fun <C : UIController<T>, T : UIComponent<*>> controller(controller: C, block: C.() -> Unit) {
+    inline fun <C : UIController<T>, T : UIComponent<*>> controller(controller: C, block: Block<C>) {
         Aether.instance.controllers!!.add(controller)
         activeController = controller
         controller.block()
@@ -161,7 +158,7 @@ object UIComponentDSL {
     /**
      * Creates a block where the [activeController] is ignored.
      */
-    inline fun ignore(block: UIComponentDSL.() -> Unit): UIComponentDSL {
+    inline fun ignore(block: Block<UIComponentDSL>): UIComponentDSL {
         ignoreController = true
         block(this)
         ignoreController = false
@@ -171,7 +168,7 @@ object UIComponentDSL {
     /**
      * Creates a block where the style is set to the given value.
      */
-    inline fun style(styleName: String, block: UIComponentDSL.() -> Unit) {
+    inline fun style(styleName: String, block: Block<UIComponentDSL>) {
         // Technically this function supports nesting, soooooo the documentation
         // is "technically" wrong but whatever. In the case of controllers, it
         // doesn't actually make sense to have the ability to nest them.
@@ -187,8 +184,7 @@ object UIComponentDSL {
      */
     fun include(dependable: UIDependable) = dependable.load()
 
-    fun getActiveComponent(): UIComponent<*>? =
-        if (componentStack.isNullOrEmpty()) null else componentStack!!.peek()
+    fun getActiveComponent(): UIComponent<*>? = if (componentStack.isNullOrEmpty()) null else componentStack!!.peek()
 
     fun getActiveFrame(): UIFrame<*>? = if (frameStack.isNullOrEmpty()) null else frameStack!!.peek()
 
@@ -207,8 +203,8 @@ object UIComponentDSL {
      * @see label
      */
     @JvmOverloads
-    inline fun text(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) =
-        component(UILabel(text, style), block)
+    inline fun text(text: String, style: String? = activeStyle, block: Block<UILabel> = {}) =
+        component(UILabel(text), style, block)
 
     /**
      * An alternative to [text]. Creates a [UILabel] with the provided [text].
@@ -216,27 +212,14 @@ object UIComponentDSL {
      * @see text
      */
     @JvmOverloads
-    inline fun label(text: String, style: String? = activeStyle, block: UILabel.() -> Unit = {}) =
-        component(UILabel(text, style), block)
+    inline fun label(text: String, style: String? = activeStyle, block: Block<UILabel> = {}) =
+        component(UILabel(text), style, block)
 
     /**
      * Creates a [UIButton] with the provided [text], like a label.
      */
-    inline fun button(text: String, style: String? = activeStyle, block: UIButton<UIStyleSheet>.() -> Unit = {}) =
-        component(UIButton(text, style), block)
-
-    /**
-     * Creates a [UICheckbox] from the given [selectedImageName], [deselectedImageName] and [imageStyle].
-     */
-    @JvmOverloads
-    inline fun checkbox(
-        checked: Boolean = false,
-        selectedImageName: String = "checkbox",
-        deselectedImageName: String = "",
-        imageStyle: String,
-        style: String? = activeStyle,
-        block: UICheckbox.() -> Unit
-    ) = component(UICheckbox(checked, selectedImageName, deselectedImageName, imageStyle, style), block)
+    inline fun button(text: String, style: String? = activeStyle, block: Block<UIButton> = {}) =
+        component(UIButton(text), style, block)
 
     /**
      * Creates a [UISlider] with the given [value] which stays within the [range] and steps by the
@@ -248,41 +231,77 @@ object UIComponentDSL {
         range: ClosedFloatingPointRange<Double>,
         step: Number,
         style: String? = activeStyle,
-        block: UISlider.() -> Unit = {}
-    ) = component(UISlider(value.toDouble(), range, step.toDouble(), style), block)
+        block: Block<UISlider> = {}
+    ) = component(UISlider(value.toDouble(), range, step.toDouble()), style, block)
 
     /**
      * Creates a [UIImage] with the [imageName] as the image to be rendered.
      */
     @JvmOverloads
-    inline fun image(imageName: String, style: String? = activeStyle, block: UIImage.() -> Unit = {}) =
-        component(UIImage(imageName, style), block)
+    inline fun image(imageName: String, style: String? = activeStyle, block: Block<UIImage> = {}) =
+        component(UIImage(imageName), style, block)
 
     /**
      * Creates a [UIContainer]. Anything within the block will be added to the component list within this.
      */
     @JvmOverloads
-    inline fun container(style: String? = activeStyle, block: UIContainer<UIContainerSheet>.() -> Unit = {}) =
-        component(UIContainer(style), block)
+    inline fun container(style: String? = activeStyle, block: Block<UIContainer<UIContainerSheet>> = {}) =
+        component(UIContainer(), style, block)
 
     /**
-     * Creates a [UIListLayout] with the given [listDirection], which defines the direction that it
+     * Creates a [UIListLayout] with the given [layoutDirection], which defines the direction that it
      * lays out in (vertical or horizontal), and the given [listOrder] defining which direction
      * the list is ordered in.
      */
     @JvmOverloads
     inline fun list(
-        listDirection: UIListLayout.ListDirection,
+        layoutDirection: UILayoutDirection,
         listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
         style: String? = activeStyle,
-        block: UIListLayout.() -> Unit = {}
-    ) = component(UIListLayout(listDirection, listOrder, style), block)
+        block: Block<UIListLayout> = {}
+    ) = component(UIListLayout(layoutDirection, listOrder), style, block)
+
+    /**
+     * Creates a horizontal list via [list].
+     *
+     * @see list
+     */
+    inline fun horizontalList(
+        listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
+        style: String? = activeStyle,
+        block: Block<UIListLayout> = {}
+    ) = list(UILayoutDirection.Horizontal, listOrder, style, block)
+
+    /**
+     * Creates a vertical list via [list].
+     *
+     * @see list
+     */
+    inline fun verticalList(
+        listOrder: UIListLayout.ListOrder = UIListLayout.ListOrder.Forward,
+        style: String? = activeStyle,
+        block: Block<UIListLayout> = {}
+    ) = list(UILayoutDirection.Vertical, listOrder, style, block)
 
     /**
      * Creates a copy of the given layout and creates a normal block of [UIAutoLayout] where
      * components can be defined.
      */
-    inline fun autoLayout(layout: UIAutoLayout, block: UIAutoLayout.() -> Unit) = component(layout.copy(), block)
+    @JvmOverloads
+    inline fun autoLayout(layout: UIAutoLayout, block: Block<UIAutoLayout> = {}) = component(layout.copy(), activeStyle, block)
+
+    /**
+     * Creates an [UIAutoLayout] from the given [listDirection]. [UIAutoLayout] are designed to mimic Figma's
+     * auto layout feature. See [UIAutoLayout] for more information.
+     *
+     * @see UIAutoLayout
+     */
+    @JvmOverloads
+    inline fun autoLayout(
+        listDirection: UILayoutDirection,
+        style: String? = null,
+        block: Block<UIAutoLayout> = {}
+    ) = component(UIAutoLayout(listDirection), style, block)
 
     /**
      * Creates a [UISelectableController] which is a controller that has a single selected
@@ -291,6 +310,7 @@ object UIComponentDSL {
      * @see controller
      * @see UISelectableController
      */
-    inline fun <reified T : UIComponent<*>> selectable(block: UISelectableController<T>.() -> Unit) =
+    @JvmOverloads
+    inline fun <reified T : UIComponent<*>> selectable(block: Block<UISelectableController<T>> = {}) =
         controller(UISelectableController(T::class), block)
 }

@@ -17,15 +17,15 @@ import java.util.function.Consumer
  * keyframe is given, the animation will automatically allocate a default animation before
  * the keyframe.
  *
- * When ran, a copy of this is assigned to the component. Everything except the actual keyframes
- * are copied. If any styles are changed at that point, it will change the original animation keyframes.
- * The same is applied to listeners. They are not copied.
+ * When ran, a copy of this is assigned to the component. If any styles are changed at that point,
+ * it will change the original animation keyframes. Everything but the listeners are copied.
  *
  * @author sen
  * @since 1.0
  *
  * @param style The style sheet of the component. The style should be completely new, with no styles changed.
  */
+@Suppress("UNCHECKED_CAST")
 class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIAnimation<S>> {
     /**
      * The component that this animation is attached to
@@ -75,7 +75,7 @@ class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIA
         if (keyframes.isEmpty()) throw IllegalStateException("No keyframes were added to the animation.")
         if (keyframes.size == 1) {
             keyframes.add(keyframes.first())
-            keyframes[0] = Keyframe(UILinear(1000L), style.copy() as S, true)
+            keyframes[0] = Keyframe(UILinear(1000L), style, true)
         }
 
         // Load the keyframes
@@ -159,6 +159,7 @@ class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIA
      * Creates a keyframe with the given [ease], and properties from [block]
      */
     inline fun keyframe(ease: UIEase? = null, block: S.() -> Unit = {}) {
+
         val style = this.style.copy() as S
         style.block()
         // Ease -> activeEase -> UILinear if null.
@@ -223,7 +224,7 @@ class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIA
         // only copy the ease and pass the reference of the style sheet in a
         // new keyframe and populate the copy of this.
         for (keyframe in keyframes)
-            it.keyframes.add(Keyframe(keyframe.ease.copy(), keyframe.style, keyframe.relative))
+            it.keyframes.add(Keyframe(keyframe.ease.copy(), keyframe.style.copy() as S, keyframe.relative))
         it.completionListeners = completionListeners
     }
 

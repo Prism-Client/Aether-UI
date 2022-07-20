@@ -1,7 +1,10 @@
-package net.prismclient.aether.ui.component.type.other.progress
+package net.prismclient.aether.ui.component.type.other
 
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.style.UIStyleSheet
+import net.prismclient.aether.ui.util.UIColor
 import net.prismclient.aether.ui.util.extensions.renderer
+import net.prismclient.aether.ui.util.name
 
 /**
  * [UIProgress] is a component which displays the distance between the x and width
@@ -12,14 +15,27 @@ import net.prismclient.aether.ui.util.extensions.renderer
  * To configure the color see [UIProgressSheet.progressColor].
  *
  * @author sen
- * @since 6/23/2022
+ * @since 1.0
  */
-class UIProgress @JvmOverloads constructor(var progress: Float = 0f, style: String?) :
-    UIComponent<UIProgressSheet>(style) {
+class UIProgress @JvmOverloads constructor(var progress: Float = 0f) : UIComponent<UIProgressSheet>() {
     override fun renderComponent() {
         renderer {
             color(style.progressColor)
             rect(relX, relY, relWidth * progress, relHeight, style.background?.radius)
         }
+    }
+
+    override fun createsStyle(): UIProgressSheet = UIProgressSheet()
+}
+
+class UIProgressSheet : UIStyleSheet() {
+    /**
+     * The color of the actual progress bar.
+     */
+    var progressColor: UIColor? = null
+
+    override fun copy() = UIProgressSheet().name(name).also {
+        it.apply(this)
+        it.progressColor = progressColor
     }
 }

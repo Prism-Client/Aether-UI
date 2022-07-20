@@ -47,24 +47,12 @@ dependencies {
     testRuntimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        languageVersion = "1.7"
-        freeCompilerArgs += [
-                '-Xno-call-assertions',
-                '-Xno-receiver-assertions',
-                '-Xno-param-assertions',
-                '-Xjvm-default=enable'
-        ]
-    }
-}
-
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = 'com.github.Prism-Client'
             artifactId = 'Aether-UI'
-            version = '1.2-release'
+            version = '1.2-Production'
             from components.kotlin
         }
     }

@@ -1,8 +1,8 @@
 package net.prismclient.aether.ui.renderer.impl.scrollbar
 
 import net.prismclient.aether.ui.component.UIComponent
-import net.prismclient.aether.ui.component.type.layout.container.UIContainer
-import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIContainer
+import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
 import net.prismclient.aether.ui.renderer.impl.border.UIBorder
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
@@ -56,7 +56,7 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
     }
 
     fun shouldRender() {
-        val container = component as UIContainer<*>
+        val container = component as UIContainer<UIContainerSheet>
 
         // Check based on the overflow if the scrollbar should be rendered or not
         shouldRender = if (type == Scrollbar.Vertical) {
@@ -121,12 +121,25 @@ class UIScrollbar(val type: Scrollbar) : UIColoredShape<UIScrollbar>() {
         val mouseX = component!!.getMouseX()
         val mouseY = component!!.getMouseY()
 
-        if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
+        val isSliderSelected = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h
+        val isScrollbarSelected = mouseX >= cachedX && mouseX <= cachedX + cachedWidth && mouseY >= cachedY && mouseY <= cachedY + cachedHeight
+
+        if (isSliderSelected) {
             selected = true
             mouseOffset = if (type == Scrollbar.Vertical) mouseY - y else mouseX - x
-            return true
+        } else if (isScrollbarSelected) {
+            println("scrollbarSelected")
+
+//            value = if (type == Scrollbar.Vertical) {
+//                (mouseY - cachedY - (mouseY - y)) / (cachedHeight - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            } else {
+//                (mouseX - cachedX - (mouseX - x)) / (cachedWidth - sliderSize).coerceAtLeast(Float.MIN_VALUE)
+//            }
+        } else {
+            return false
         }
-        return false
+
+        return true
     }
 
     fun mouseMoved() {

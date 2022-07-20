@@ -2,6 +2,7 @@ import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.image.UIImageData
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
 import net.prismclient.aether.ui.util.extensions.getAlpha
 import net.prismclient.aether.ui.util.extensions.getBlue
@@ -30,6 +31,8 @@ object Renderer : UIRenderer {
     private val ctx: Long = nvgCreate(NVG_ANTIALIAS)
     private val fillColor: NVGColor = NVGColor.create()
     private val strokeColor: NVGColor = NVGColor.create()
+    private val gradient1: NVGColor = NVGColor.create()
+    private val gradient2: NVGColor = NVGColor.create()
     private var paint: NVGPaint? = null
 
     private var activeColor: Int = 0
@@ -53,15 +56,8 @@ object Renderer : UIRenderer {
 
     override fun color(color: Int) {
         activeColor = color
-        nvgFillColor(
-            ctx, nvgRGBA(
-                color.getRed().toByte(),
-                color.getGreen().toByte(),
-                color.getBlue().toByte(),
-                color.getAlpha().toByte(),
-                this.fillColor
-            )
-        )
+        nvgColor(color, fillColor)
+        nvgFillColor(ctx, fillColor)
     }
 
     override fun globalAlpha(alpha: Float) = nvgGlobalAlpha(ctx, alpha)
@@ -94,7 +90,7 @@ object Renderer : UIRenderer {
             ctx, (width * contentScale).toInt(), (height * contentScale).toInt(), NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
-            framebuffer.fbo(), width * contentScale, height * contentScale, width, height, contentScale
+            framebuffer.image(), width, height, width * contentScale, height * contentScale, contentScale
         )
         framebuffers[fbo] = framebuffer
         return fbo
@@ -114,35 +110,13 @@ object Renderer : UIRenderer {
         nvgluBindFramebuffer(
             ctx, framebuffers[fbo] ?: throw NullPointerException("Unable to find the framebuffer $fbo.")
         )
-        GL11.glViewport(0, 0, fbo.width.toInt(), fbo.height.toInt())
+        GL11.glViewport(0, 0, fbo.scaledWidth.toInt(), fbo.scaledHeight.toInt())
         GL11.glClearColor(0f, 0f, 0f, 0f)
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_STENCIL_BUFFER_BIT)
     }
 
     override fun unbindFBO() {
         nvgluBindFramebuffer(ctx, null)
-    }
-
-    override fun renderFbo(
-        fbo: UIContentFBO,
-        x: Float,
-        y: Float,
-        width: Float,
-        height: Float,
-        topLeft: Float,
-        topRight: Float,
-        bottomRight: Float,
-        bottomLeft: Float,
-    ) {
-        allocPaint()
-        nvgImagePattern(ctx, x, y, width, height, 0f, framebuffers[fbo]!!.image(), 1f, paint!!)
-        nvgBeginPath(ctx)
-        color(-1)
-        paint!!.innerColor(fillColor)
-        paint!!.outerColor(fillColor)
-        nvgRoundedRectVarying(ctx, x, y, width, height, topLeft, topRight, bottomRight, bottomLeft)
-        nvgFillPaint(ctx, paint!!)
-        nvgFill(ctx)
     }
 
     override fun createImage(imageName: String, data: ByteBuffer, flags: Int): UIImageData {
@@ -164,9 +138,9 @@ object Renderer : UIRenderer {
         return imageData
     }
 
-    override fun deleteImage(imageName: String) {
-        nvgDeleteImage(ctx, UIProvider.getImage(imageName)?.handle ?: return)
-        UIProvider.deleteImage(imageName)
+    override fun deleteImage(imageData: String) {
+        nvgDeleteImage(ctx, UIProvider.getImage(imageData)?.handle ?: return)
+        UIProvider.deleteImage(imageData)
     }
 
     override fun createSvg(svgName: String, data: ByteBuffer?, scale: Float): UIImageData {
@@ -224,26 +198,161 @@ object Renderer : UIRenderer {
         imageHandle: Int, x: Float, y: Float, width: Float, height: Float, angle: Float, alpha: Float
     ) {
         allocPaint()
-        paint!!.innerColor(fillColor)
-        paint!!.outerColor(fillColor)
         nvgImagePattern(
             ctx, x, y, width, height, angle, imageHandle, alpha, paint!!
         )
+        paint!!.innerColor(fillColor)
+        paint!!.outerColor(fillColor)
     }
 
     override fun fontFace(fontName: String) = nvgFontFace(ctx, fontName)
 
     override fun fontSize(size: Float) = nvgFontSize(ctx, size)
 
-    override fun fontAlignment(alignment: Int) = nvgTextAlign(ctx, alignment)
-
     override fun fontSpacing(spacing: Float) = nvgTextLetterSpacing(ctx, spacing)
+
+    override fun fontAlignment(horizontalAlignment: UITextAlignment, verticalAlignment: UITextAlignment) {
+        var alignment = when (horizontalAlignment) {
+            UITextAlignment.LEFT -> NVG_ALIGN_LEFT
+            UITextAlignment.CENTER -> NVG_ALIGN_CENTER
+            UITextAlignment.RIGHT -> NVG_ALIGN_RIGHT
+            else -> 0
+        }
+        alignment = alignment or when (verticalAlignment) {
+            UITextAlignment.TOP -> NVG_ALIGN_TOP
+            UITextAlignment.CENTER -> NVG_ALIGN_MIDDLE
+            UITextAlignment.BOTTOM -> NVG_ALIGN_BOTTOM
+            else -> 0
+        }
+        nvgTextAlign(ctx, alignment)
+    }
 
     override fun renderText(text: String, x: Float, y: Float) {
         nvgFillColor(ctx, fillColor)
         nvgText(ctx, x, y, text)
         nvgTextMetrics(ctx, ascender, descender, null)
         fontBounds[4] = nvgTextBounds(ctx, x, y, text, fontBounds)
+    }
+
+    override fun renderText(text: ArrayList<String>, x: Float, y: Float, lineHeight: Float) {
+        var offset = y
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in text.indices) {
+            renderText(text[i], x, offset)
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+    }
+
+    val rows = NVGTextRow.create(50)
+
+    override fun renderText(text: String, x: Float, y: Float, lineWidth: Float, lineHeight: Float, lines: ArrayList<String>?): Int {
+        val nrows = nvgTextBreakLines(ctx, text, lineWidth, rows)
+
+        var offset = y
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in 0 until nrows) {
+            val row = rows[i]
+
+            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
+            nnvgTextBounds(ctx, x, offset, row.start(), row.end(), fontBounds)
+            nnvgText(ctx, x, offset, row.start(), row.end())
+
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+
+        return nrows
+    }
+
+    override fun calculateText(text: ArrayList<String>, x: Float, y: Float, lineHeight: Float) {
+        var offset = y
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in text.indices) {
+            nvgTextBounds(ctx, x, offset, text[i], fontBounds)
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+    }
+
+    override fun calculateText(
+        text: String,
+        x: Float,
+        y: Float,
+        lineWidth: Float,
+        lineHeight: Float,
+        lines: ArrayList<String>?
+    ): Int {
+        val nrows = nvgTextBreakLines(ctx, text, lineWidth, rows)
+
+        var offset = y
+
+        var minx = x
+        var miny = y
+        var maxx = 0f
+        var maxy = 0f
+
+        for (i in 0 until nrows) {
+            val row = rows[i]
+
+            lines?.add(MemoryUtil.memUTF8(row.start(), (row.end() - row.start()).toInt()))
+            nnvgTextBounds(ctx, x, offset, row.start(), row.end(), fontBounds)
+
+            minx = fontBounds[0].coerceAtMost(minx)
+            miny = fontBounds[1].coerceAtMost(miny)
+            maxx = fontBounds[2].coerceAtLeast(maxx)
+            maxy = fontBounds[3].coerceAtLeast(maxy)
+
+            offset += fontBounds[3] - fontBounds[1] + lineHeight
+        }
+
+        fontBounds[0] = minx
+        fontBounds[1] = miny
+        fontBounds[2] = maxx
+        fontBounds[3] = maxy
+        fontBounds[4] = maxx
+
+        return nrows
     }
 
     override fun fontBounds(): FloatArray = fontBounds
@@ -302,13 +411,7 @@ object Renderer : UIRenderer {
     override fun strokeWidth(size: Float) = nvgStrokeWidth(ctx, size)
 
     override fun strokeColor(color: Int) {
-        nvgRGBA(
-            color.getRed().toByte(),
-            color.getGreen().toByte(),
-            color.getBlue().toByte(),
-            color.getAlpha().toByte(),
-            strokeColor
-        )
+        nvgColor(color, strokeColor)
         nvgStrokeColor(ctx, strokeColor)
     }
 
@@ -349,22 +452,18 @@ object Renderer : UIRenderer {
 
     override fun linearGradient(x: Float, y: Float, x2: Float, y2: Float, startColor: Int, endColor: Int) {
         allocPaint()
-        val color1 = createColor(startColor)
-        val color2 = createColor(endColor)
-        nvgLinearGradient(ctx, x, y, x2, y2, color1, color2, paint!!)
-        color1.free()
-        color2.free()
+        nvgColor(startColor, gradient1)
+        nvgColor(endColor, gradient2)
+        nvgLinearGradient(ctx, x, y, x2, y2, gradient1, gradient2, paint!!)
     }
 
     override fun radialGradient(
         x: Float, y: Float, innerRadius: Float, outerRadius: Float, startColor: Int, endColor: Int
     ) {
         allocPaint()
-        val color1 = createColor(startColor)
-        val color2 = createColor(endColor)
-        nvgRadialGradient(ctx, x, y, innerRadius, outerRadius, color1, color2, paint!!)
-        color1.free()
-        color2.free()
+        nvgColor(startColor, gradient1)
+        nvgColor(endColor, gradient2)
+        nvgRadialGradient(ctx, x, y, innerRadius, outerRadius, gradient1, gradient2, paint!!)
     }
 
     override fun allocPaint() {
@@ -380,8 +479,7 @@ object Renderer : UIRenderer {
 
     override fun radToDeg(rad: Float): Float = nvgRadToDeg(rad)
 
-    private fun createColor(color: Int): NVGColor {
-        val nvgColor = NVGColor.calloc()
+    private fun nvgColor(color: Int, nvgColor: NVGColor) {
         nvgRGBA(
             color.getRed().toByte(),
             color.getGreen().toByte(),
@@ -389,6 +487,5 @@ object Renderer : UIRenderer {
             color.getAlpha().toByte(),
             nvgColor
         )
-        return nvgColor
     }
 }

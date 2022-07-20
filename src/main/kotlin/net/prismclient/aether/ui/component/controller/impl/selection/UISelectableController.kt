@@ -2,6 +2,7 @@ package net.prismclient.aether.ui.component.controller.impl.selection
 
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
+import net.prismclient.aether.ui.style.UIStyleSheet
 import java.util.function.Consumer
 import kotlin.reflect.KClass
 
@@ -57,7 +58,19 @@ class UISelectableController<T : UIComponent<*>>(filter: KClass<T>) : UIControll
             }
             it.update()
         }
+
+        selectedComponent = component
     }
+
+    /**
+     * Returns true if the selected component is at index [index]
+     */
+    fun isSelected(index: Int) = selectedComponent == components[index]
+
+    /**
+     * Returns true if the selected component is [component]
+     */
+    fun <O : UIComponent<out UIStyleSheet>> isSelected(component: O) = selectedComponent == component
 
     /**
      * The action that is preformed when a component is selected

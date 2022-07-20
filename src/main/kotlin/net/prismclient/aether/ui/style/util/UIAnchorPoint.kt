@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.style.util
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.unit.UIUnit
+import net.prismclient.aether.ui.util.extensions.align
 import net.prismclient.aether.ui.util.extensions.lerp
 import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
@@ -22,7 +23,7 @@ class UIAnchorPoint : UIAnimatable<UIAnchorPoint> {
     infix fun align(alignment: UIAlignment) {
         x ?: run { x = px(0) }
         y ?: run { y = px(0) }
-        net.prismclient.aether.ui.util.extensions.align(alignment, x!!, y!!)
+        align(alignment, x!!, y!!)
     }
 
     override fun animate(

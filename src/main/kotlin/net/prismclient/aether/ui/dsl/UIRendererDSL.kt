@@ -5,11 +5,10 @@ import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
 import net.prismclient.aether.ui.renderer.impl.border.UIStrokeDirection
-import net.prismclient.aether.ui.renderer.impl.font.UIFont
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.renderer.other.UIContentFBO
-import net.prismclient.aether.ui.util.Block
-import net.prismclient.aether.ui.util.UIColor
+import net.prismclient.aether.ui.util.*
 
 /**
  * [UIRendererDSL] wraps the [UIRenderer] class to minimize the amount of calls
@@ -77,7 +76,7 @@ object UIRendererDSL {
      */
     @JvmStatic
     fun color(color: Int) {
-        UIRendererDSL.activeColor = color
+        activeColor = color
         renderer.color(color)
     }
 
@@ -93,21 +92,11 @@ object UIRendererDSL {
      * Applies the given font values to the active context.
      */
     @JvmStatic
-    fun font(fontFace: String, fontSize: Float, fontAlign: Int, fontSpacing: Float) {
+    fun font(fontFace: String, fontSize: Float, horizontalAlignment: UITextAlignment, verticalAlignment: UITextAlignment, fontSpacing: Float) {
         renderer.fontFace(fontFace)
         renderer.fontSize(fontSize)
-        renderer.fontAlignment(fontAlign)
+        renderer.fontAlignment(horizontalAlignment, verticalAlignment)
         renderer.fontSpacing(fontSpacing)
-    }
-
-    /**
-     * Applies the property of the given [font] to the active context.
-     */
-
-    @JvmStatic
-    fun font(font: UIFont) {
-        color(font.fontColor)
-        font(font.fontName, font.cachedFontSize, font.textAlignment, font.cachedFontSpacing)
     }
 
     /**
@@ -154,13 +143,13 @@ object UIRendererDSL {
      * @see fontBounds
      */
     @JvmStatic
-    fun fontWidth(): Float = fontBounds()[2] - fontBounds()[0]
+    fun fontWidth(): Float = fontBounds().maxX() - fontBounds().minX()
 
     /**
      * Returns the height of the most recent text render call.
      */
     @JvmStatic
-    fun fontHeight(): Float = fontBounds()[3] - fontBounds()[1]
+    fun fontHeight(): Float = fontBounds().maxY() - fontBounds().minY()
 
     /**
      * Returns the ascender of the most recent text render call.
@@ -176,6 +165,9 @@ object UIRendererDSL {
 
     // -- General Rendering -- //
 
+    /**
+     * renders a rectangle with the given bounds and [radius].
+     */
     @JvmStatic
     fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(
         x,
@@ -399,7 +391,7 @@ object UIRendererDSL {
     @JvmStatic
     inline fun UIContentFBO.renderToFramebuffer(block: Block<UIRendererDSL>): UIRendererDSL {
         renderer.bindFBO(this)
-        beginFrame(this.scaledWidth, this.scaledHeight, this.contentScale)
+        beginFrame(this.width, this.height, this.contentScale)
         UIRendererDSL.block()
         endFrame()
         renderer.unbindFBO()
