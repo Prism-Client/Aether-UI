@@ -14,15 +14,27 @@ open class UIButton(text: String) : UIComponent<UIStyleSheet>() {
         set(value) {
             field = value
             style.font?.actualText = text
+            updateFont()
         }
 
     override fun update() {
         super.update()
         style.font?.actualText = text
+        updateFont()
     }
 
     override fun renderComponent() {
         style.font?.render()
+    }
+
+    fun updateFont() {
+        width = width.coerceAtLeast(style.font?.cachedWidth ?: 0f)
+        height = height.coerceAtLeast(style.font?.cachedHeight ?: 0f)
+        updateAnchorPoint()
+        updatePosition()
+        updateBounds()
+        updateStyle()
+        style.font?.updateFont()
     }
 
     override fun createsStyle(): UIStyleSheet = UIStyleSheet()
