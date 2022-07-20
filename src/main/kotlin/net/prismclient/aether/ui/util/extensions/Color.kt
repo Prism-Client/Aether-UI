@@ -69,6 +69,7 @@ fun Float.limit(): Float = this.coerceAtMost(1f).coerceAtLeast(0f)
  * Creates a new color from two provided values based on the progress between each value.
  */
 fun transition(color1: Int, color2: Int, progress: Float): Int {
+    println(progress)
     val red1 = color1 shr 16 and 0xFF
     val green1 = color1 shr 8 and 0xFF
     val blue1 = color1 and 0xFF

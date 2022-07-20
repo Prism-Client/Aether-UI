@@ -6,12 +6,8 @@ import net.prismclient.aether.ui.style.UIStyleSheet
 /**
  * An example component which draws a chart.
  */
-class Chart() : UIComponent<UIStyleSheet>() {
+class Chart(style: String?) : UIComponent<UIStyleSheet>(style) {
     override fun renderComponent() {
 
-    }
-
-    override fun createsStyle(): UIStyleSheet {
-        TODO("Not yet implemented")
     }
 }

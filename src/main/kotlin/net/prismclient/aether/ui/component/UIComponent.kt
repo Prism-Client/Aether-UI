@@ -2,16 +2,16 @@ package net.prismclient.aether.ui.component
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.animation.UIAnimation
-import net.prismclient.aether.ui.component.type.layout.UIContainer
-import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.UIFrame
-import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
+import net.prismclient.aether.ui.component.type.layout.container.UIContainer
+import net.prismclient.aether.ui.component.type.layout.styles.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.styles.UIFrameSheet
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
+import net.prismclient.aether.ui.renderer.impl.font.UIFont
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.Block
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.interfaces.UIFocusable
@@ -30,14 +30,14 @@ import java.util.function.Consumer
  * values. The relative values are the normal property, except with the bounds of the
  * component calculated and applied to it via the [calculateBounds] function. Bounds
  * include the padding and margin properties of the component. Classes such as [UIBackground]
- * render the background to the relative properties, while other classes such as [UIFont__]
+ * render the background to the relative properties, while other classes such as [UIFont]
  * render to the absolute properties.
  *
  * @author sen
  * @since 1.0
  */
 @Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "LeakingThis")
-abstract class UIComponent<T : UIStyleSheet> {
+abstract class UIComponent<T : UIStyleSheet>(style: String?) {
     /**
      * The style of the component.
      */
@@ -193,6 +193,10 @@ abstract class UIComponent<T : UIStyleSheet> {
     var mouseScrollListeners: HashMap<String, BiConsumer<UIComponent<T>, Float>>? = null
         protected set
 
+    init {
+        applyStyle(style)
+    }
+
     /**
      * Attempts to apply the style to the component. If the style is
      * empty, or null, a NullPointerException will be thrown when the
@@ -204,7 +208,8 @@ abstract class UIComponent<T : UIStyleSheet> {
      * @throws InvalidStyleSheetException If the style is not a valid style sheet of the given component
      */
     open fun applyStyle(style: String?) {
-        if (style.isNullOrEmpty()) return
+        if (style.isNullOrEmpty())
+            return
 
         // Attempt to apply the style provided to the component.
         // Throw a InvalidStyleException if the style is not valid.
@@ -241,9 +246,8 @@ abstract class UIComponent<T : UIStyleSheet> {
      * might request for this method to be invoked.
      */
     open fun update() {
-        if (!hasStyle()) {
-            style = createsStyle()
-        }
+        if (!this::style.isInitialized)
+            throw UninitializedStyleSheetException(this)
 
         calculateBounds()
         // Update the size, then the anchor, and then the position
@@ -332,9 +336,8 @@ abstract class UIComponent<T : UIStyleSheet> {
         if (animations != null) {
             animations!!.forEach { it.value.update() }
             animations!!.entries.removeIf { it.value.isCompleted }
-            if (animations!!.isEmpty()) {
+            if (animations!!.isEmpty())
                 animations = null
-            }
         }
     }
 
@@ -362,17 +365,7 @@ abstract class UIComponent<T : UIStyleSheet> {
      */
     abstract fun renderComponent()
 
-    /**
-     * Used to create a new instance of the style sheet provided, [T].
-     */
-    abstract fun createsStyle(): T
-
-    /**
-     * Returns true if [style] is intialized.
-     */
-    open fun hasStyle(): Boolean = this::style.isInitialized
-
-    // -- Input -- //
+    /** Input **/
 
     /**
      * Invoked when the mouse moves
@@ -438,7 +431,7 @@ abstract class UIComponent<T : UIStyleSheet> {
         mouseScrollListeners?.forEach { it.value.accept(this, scrollAmount) }
     }
 
-    // -- Event -- //
+    /** Event **/
 
     /**
      * Invoked once on the initialization of the component.
@@ -608,28 +601,36 @@ abstract class UIComponent<T : UIStyleSheet> {
     open fun getMouseY(): Float = Aether.mouseY - getParentYOffset()
 
     /**
-     * Returns the actual x position of this component rendered on screen. FBOs change the point of origin
-     * back to 0, so the values that the component has might not reflect it's actual position on screen.
+     * Returns the offset of the parent on the x-axis. It incorporates for [UIFrame] and [UIContainer] scroll offsets.
      */
-    open fun getParentXOffset(): Float = if (parent is UIFrame) {
-        ((if ((parent!!.style as UIFrameSheet).useFBO) {
-            parent!!.relX
-        } else 0f) + parent!!.getParentXOffset()) - if (parent is UIContainer) {
-            (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
+    open fun getParentXOffset(): Float {
+        if (parent == null) return 0f
+
+        return if (parent is UIFrame) {
+            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
+            return (if (clipContent) {
+                parent!!.relX
+            } else 0f) + parent!!.getParentXOffset() - if (parent is UIContainer) {
+                (parent!!.style as UIContainerSheet).horizontalScrollbar.value * (parent as UIContainer).expandedWidth
+            } else 0f
         } else 0f
-    } else 0f
+    }
 
     /**
-     * Returns the actual y position of this component rendered on screen. FBOs change the point of origin
-     * back to 0, so the values that the component has might not reflect it's actual position on screen.
+     * Returns the offset of the parent on the y-axis. It incorporates for [UIFrame] and [UIContainer] scrolling offsets
      */
-    open fun getParentYOffset(): Float = if (parent is UIFrame) {
-        ((if ((parent!!.style as UIFrameSheet).useFBO) {
-            parent!!.relY
-        } else 0f) + parent!!.getParentYOffset()) - if (parent is UIContainer) {
-            (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
+    open fun getParentYOffset(): Float {
+        if (parent == null) return 0f
+
+        return if (parent is UIFrame) {
+            val clipContent = ((parent as UIFrame).style as UIFrameSheet).clipContent
+            return (if (clipContent) {
+                parent!!.relY
+            } else 0f) + parent!!.getParentYOffset() - if (parent is UIContainer) {
+                (parent!!.style as UIContainerSheet).verticalScrollbar.value * (parent as UIContainer).expandedHeight
+            } else 0f
         } else 0f
-    } else 0f
+    }
 
     /**
      * Shorthand for calculating the x or width of this component
@@ -657,7 +658,7 @@ abstract class UIComponent<T : UIStyleSheet> {
     open fun focus() {
         if (this is UIFocusable) {
             Aether.focus(this)
-            focusListeners?.forEach { it.value.accept(this, true) }
+            focusListeners?.forEach { it.value.accept(this as UIComponent<T>, true) }
             requestUpdate()
         }
     }
@@ -676,8 +677,6 @@ abstract class UIComponent<T : UIStyleSheet> {
     open fun requestUpdate() {
         if (parent != null) parent!!.requestUpdate()
     }
-
-    inline fun stylize(block: Block<T>) = style.block()
 
     /**
      * [UninitializedStyleSheetException] is thrown when the style sheet of

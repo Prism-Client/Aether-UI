@@ -4,38 +4,14 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.style.UIStyleSheet
 
 /**
- * [UIButton] is the default implementation of [UIComponent]. It renders the given text to the font.
+ * [UIButton] is a simple class, which is used to create a button.
  *
  * @author sen
- * @since 1.0
+ * @since 5/16/2022
+ * @param T The stylesheet (used for inheritance) leave as UIStyleSheet.
  */
-open class UIButton(text: String) : UIComponent<UIStyleSheet>() {
-    open var text: String = text
-        set(value) {
-            field = value
-            style.font?.actualText = text
-            updateFont()
-        }
-
-    override fun update() {
-        super.update()
-        style.font?.actualText = text
-        updateFont()
-    }
-
+open class UIButton<T : UIStyleSheet>(open var text: String, style: String?) : UIComponent<T>(style) {
     override fun renderComponent() {
-        style.font?.render()
+        style.font?.render(text)
     }
-
-    fun updateFont() {
-        width = width.coerceAtLeast(style.font?.cachedWidth ?: 0f)
-        height = height.coerceAtLeast(style.font?.cachedHeight ?: 0f)
-        updateAnchorPoint()
-        updatePosition()
-        updateBounds()
-        updateStyle()
-        style.font?.updateFont()
-    }
-
-    override fun createsStyle(): UIStyleSheet = UIStyleSheet()
 }

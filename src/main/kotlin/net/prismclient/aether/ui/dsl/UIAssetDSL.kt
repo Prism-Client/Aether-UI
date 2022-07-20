@@ -108,12 +108,12 @@ object UIAssetDSL {
         svgScale: Float = Aether.devicePxRatio
     ): Int {
         val file = Aether.javaClass.getResource(folderLocation) ?: run {
-            error("Failed to bulk load [$folderLocation] as the file was null.")
+            warn("Failed to bulk load [$folderLocation] as the file was null.")
             return 0
         }
 
         return internalBulkLoad(File(file.toURI()), deep, appendedString, imageFlags, svgScale).also {
-            inform("Bulk loaded $it files.")
+            warn("Bulk loaded $it files.")
         }
     }
 

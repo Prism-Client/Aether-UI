@@ -6,7 +6,6 @@ import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIFontFamily
-import net.prismclient.aether.ui.util.warn
 
 /**
  * [UIProvider] handles style sheets, images, fonts, and animations, a.k.a. resources
@@ -49,9 +48,10 @@ object UIProvider {
      * Returns the name of the images given the [UIImageData]
      */
     fun getImageName(imageData: UIImageData): String? {
-        for ((name, image) in images) {
-            if (image == imageData)
-                return name
+        for (image in images) {
+            if (image.value == imageData) {
+                return image.key
+            }
         }
         return null
     }
@@ -92,11 +92,7 @@ object UIProvider {
     }
 
     fun <S : UIStyleSheet> dispatchAnimation(animationName: String, component: UIComponent<S>) {
-        val animation: UIAnimation<S>? = animations[animationName]?.copy() as? UIAnimation<S>
-        if (animation == null) {
-            warn("Animation of name [$animationName] was not found")
-            return
-        }
+        val animation: UIAnimation<S> = animations[animationName]?.copy() as UIAnimation<S>
         animation.start(component)
     }
 

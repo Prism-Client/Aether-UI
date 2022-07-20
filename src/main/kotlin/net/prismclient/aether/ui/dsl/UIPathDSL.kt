@@ -2,8 +2,6 @@ package net.prismclient.aether.ui.dsl
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.renderer.UIRenderer
-import net.prismclient.aether.ui.renderer.impl.property.UIRadius
-import net.prismclient.aether.ui.util.Block
 
 /**
  * [UIPathDSL] is a DSL for paths. [UIRendererDSL] utilizes this to apply the paths.
@@ -152,21 +150,6 @@ object UIPathDSL {
     ) = renderer.arc(x, y, radius, startAngle, endAngle, windingOrder)
 
     /**
-     * Renders a rectangle sub-path with the given bounds and [radius].
-     */
-    @JvmStatic
-    fun rect(x: Float, y: Float, width: Float, height: Float, radius: UIRadius?) = rect(
-        x,
-        y,
-        width,
-        height,
-        radius?.topLeft ?: 0f,
-        radius?.topRight ?: 0f,
-        radius?.bottomRight ?: 0f,
-        radius?.bottomLeft ?: 0f
-    )
-
-    /**
      * Creates a rectangle sub-path with a single radius value.
      */
     @JvmStatic
@@ -233,8 +216,8 @@ object UIPathDSL {
      * @see <a href="https://github.com/memononen/nanovg#understanding-composite-paths">See NanoVG Composite paths</a>
      */
     @JvmStatic
-    inline fun hole(block: Block<UIPathDSL>): UIPathDSL {
-        UIPathDSL.block()
+    inline fun hole(block: UIPathDSL.() -> Unit): UIPathDSL {
+        block()
         renderer.pathHole(true)
         return this
     }
