@@ -3,9 +3,9 @@ package net.prismclient.aether.ui
 import net.prismclient.aether.ui.Aether.Properties
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.component.controller.UIController
-import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.UIContainer
 import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
+import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.UIRenderer
@@ -165,27 +165,25 @@ open class Aether(renderer: UIRenderer) {
          * mouse coordinates. Index is the index of the component.
          */
         fun peek(list: ArrayList<UIComponent<*>>, index: Int, clickCount: Int): Boolean {
-            var component: UIComponent<*>? = null
+            var foundComponent: UIComponent<*>? = null
 
             for (i in index until list.size) {
                 val child = list[i]
-                val check = child.isMouseInsideBounds()
-                if (child.isMouseInsideBounds() || !child.style.clipContent) {
-                    if (child.childrenCount > 0) {
-                        if (peek(
-                                if (child is UIFrame) child.components else list,
-                                i + if (child is UIFrame) 0 else 1,
-                                clickCount
-                            )
-                        ) return true
+
+                // If the mouse is inside the component
+                if (child.isMouseInside()) {
+                    // Check if the component is a UIFrame. If it is, integrate through the children
+                    // of this frame and find the one, if applicable that should be invoked.
+                    if (child is UIFrame) {
+                        // Break the loop by returning true if the component is found
+                        if (peek(child.components, 0, clickCount)) return true
                     }
-                    if (check) component = child
+                    foundComponent = child
                 }
             }
-
-            return if (component != null) {
-                component.focus()
-                component.mousePressed(UIMouseEvent(component.getMouseX(), component.getMouseY(), mouseButton, clickCount))
+            return if (foundComponent != null) {
+                foundComponent.focus()
+                foundComponent.mousePressed(UIMouseEvent(foundComponent.getMouseX(), foundComponent.getMouseY(), mouseButton, clickCount))
                 true
             } else false
         }

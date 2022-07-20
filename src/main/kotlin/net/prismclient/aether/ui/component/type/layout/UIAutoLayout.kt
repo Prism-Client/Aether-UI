@@ -143,51 +143,55 @@ class UIAutoLayout @JvmOverloads constructor(layoutDirection: UILayoutDirection 
             components.forEach { it.update() }
         }
 
-        val w = layoutWidth
-        val h = layoutHeight
+        layoutWidth += left + right
+        layoutHeight += top + bottom
 
         // Calculate the initial position based on the alignment
         var x = this.x + left
         var y = this.y + top
 
-        // Update the other direction's alignment
+        // Update the x or y position of the layout based on the leftover space in the component
+        // and the alignment of the same axis of the layout. The other direction is updated when
+        // the component's positions are updated below.
         if (layoutDirection == UILayoutDirection.Horizontal) {
             x += when (componentAlignment) {
-                TOPCENTER, CENTER, BOTTOMCENTER -> (width - (w + left + right)) / 2f
-                TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - (w + left + right))
+                TOPCENTER, CENTER, BOTTOMCENTER -> (width - layoutWidth) / 2f
+                TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - layoutWidth)
                 else -> 0f
             }
         } else if (layoutDirection == UILayoutDirection.Vertical) {
             y += when (componentAlignment) {
-                MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - (h + top + bottom)) / 2f
-                BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - (h + top + bottom))
+                MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - layoutHeight) / 2f
+                BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - layoutHeight)
                 else -> 0f
             }
         }
 
-        for (c in components) {
-            c.overridden = true
+        for (child in components) {
+            child.overridden = true
             if (layoutDirection == UILayoutDirection.Horizontal) {
-                c.x = x
-                c.y = y + when (componentAlignment) {
+                child.x = x + child.paddingLeft
+                child.y = y + when (componentAlignment) {
                     TOPLEFT, TOPCENTER, TOPRIGHT -> 0f
-                    MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - c.height - top - bottom) / 2f
-                    BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - c.height - left - right)
+                    MIDDLELEFT, CENTER, MIDDLERIGHT -> (height - child.relHeight - top - bottom) / 2f
+                    BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT -> (height - child.relHeight - top - bottom)
                     else -> 0f
-                } + c.marginTop - c.marginBottom
-                x += c.width + spacing
+                } + child.marginTop - child.marginBottom + child.paddingTop
+                x += child.relWidth + spacing
             } else if (layoutDirection == UILayoutDirection.Vertical) {
-                c.x = x + when (componentAlignment) {
+                child.x = x + when (componentAlignment) {
                     TOPLEFT, MIDDLELEFT, BOTTOMLEFT -> 0f
-                    TOPCENTER, CENTER, BOTTOMCENTER -> (width - c.width - left - right) / 2f
-                    TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - c.width - left - right)
+                    TOPCENTER, CENTER, BOTTOMCENTER -> (width - child.width - left - right) / 2f
+                    TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT -> (width - child.width - left - right)
                     else -> 0f
-                } + c.marginLeft - c.marginRight
-                c.y = y
-                y += c.height + spacing
+                } + child.marginLeft - child.marginRight + child.paddingLeft
+                child.y = y + child.paddingTop
+                y += child.relHeight + spacing
             }
-            c.update()
+            child.update()
         }
+
+        updateStyle()
     }
 
     private fun calculateLayoutSize(spacing: Float) {
@@ -195,20 +199,20 @@ class UIAutoLayout @JvmOverloads constructor(layoutDirection: UILayoutDirection 
         var h = 0f
 
         for (i in components.indices) {
-            if (horizontalResizing == ResizingMode.Hug) {
-                w = if (layoutDirection == UILayoutDirection.Horizontal) {
+            w = if (horizontalResizing == ResizingMode.Hug) {
+                if (layoutDirection == UILayoutDirection.Horizontal) {
                     w + components[i].relWidth + if (i < components.size - 1) spacing else 0f
                 } else {
                     components[i].relWidth.coerceAtLeast(w)
                 }
-            }
-            if (verticalResizing == ResizingMode.Hug) {
-                h = if (layoutDirection == UILayoutDirection.Vertical) {
+            } else width
+            h = if (verticalResizing == ResizingMode.Hug) {
+                if (layoutDirection == UILayoutDirection.Vertical) {
                     h + components[i].relHeight + if (i < components.size - 1) spacing else 0f
                 } else {
                     components[i].relHeight.coerceAtLeast(h)
                 }
-            }
+            } else height
         }
 
         layoutWidth = w
