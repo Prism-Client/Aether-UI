@@ -11,6 +11,6 @@ gradle-app.setting
 *.DS_STORE
 *.log
 
-src/test/resources/
+/src/test/resources/
 
-src/test/koltin/examples/prism/
+/src/test/kotlin/examples/prism/
