@@ -96,10 +96,10 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
             background = background ?: UIBackground()
             background!!.animate(animation, previous?.background, current?.background, progress)
         }
-        if (previous?.font != null || current?.font != null) {
-            font = font ?: UIFont()
-            font!!.animate(animation, previous?.font, current?.font, progress)
-        }
+//        if (previous?.font != null || current?.font != null) {
+//            font = font ?: UIFont()
+//            font!!.animate(animation, previous?.font, current?.font, progress)
+//        }
         if (previous?.padding != null || current?.padding != null) {
             padding = padding ?: UIPadding()
             padding!!.animate(animation, previous?.padding, current?.padding, progress)

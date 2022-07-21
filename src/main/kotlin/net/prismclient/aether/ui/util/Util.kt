@@ -13,6 +13,8 @@ import net.prismclient.aether.ui.util.extensions.rel
  */
 typealias Block<T> = T.() -> Unit
 
+typealias Listener<T, V> = HashMap<T, V>
+
 fun <T : UIStyleSheet> T.name(styleName: String): T {
     this.name = styleName
     return this

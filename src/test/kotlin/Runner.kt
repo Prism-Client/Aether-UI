@@ -1,6 +1,7 @@
 import examples.Animations
 import examples.Default
 import examples.PathRendering
+import examples.prism.PrismScreen
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
