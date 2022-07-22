@@ -1,7 +1,11 @@
 package net.prismclient.aether.ui.style
 
+import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.type.layout.UIAccordion
+import net.prismclient.aether.ui.component.type.layout.UIContainer
+import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.component.util.enums.UIAlignment.*
@@ -88,10 +92,9 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
         if (!component.overridden) {
             component.x = previous?.x.lerp(current?.x, component, x, progress, false) + component.getParentX()
             component.y = previous?.y.lerp(current?.y, component, y, progress, true) + component.getParentY()
-            component.width = previous?.width.lerp(current?.width, component, width, progress, false)
-            component.height = previous?.height.lerp(current?.height, component, height, progress, true)
         }
-
+        component.width = previous?.width.lerp(current?.width, component, width, progress, false)
+        component.height = previous?.height.lerp(current?.height, component, height, progress, true)
         if (previous?.background != null || current?.background != null) {
             background = background ?: UIBackground()
             background!!.animate(animation, previous?.background, current?.background, progress)
@@ -243,11 +246,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     }
 
     inline fun font(
-        x: UIUnit? = null,
-        y: UIUnit? = null,
-        width: UIUnit? = null,
-        height: UIUnit? = null,
-        block: Block<UIFont> = {}
+        x: UIUnit? = null, y: UIUnit? = null, width: UIUnit? = null, height: UIUnit? = null, block: Block<UIFont> = {}
     ) = font {
         this.x = x
         this.y = y

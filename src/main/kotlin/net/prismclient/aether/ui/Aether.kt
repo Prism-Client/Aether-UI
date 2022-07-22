@@ -97,7 +97,7 @@ open class Aether(renderer: UIRenderer) {
                 true
             } else false
             frames?.forEach {
-                if (shouldUpdate) it.requestUpdate()
+//                if (shouldUpdate) it.requestUpdate()
                 it.renderContent()
             }
         }

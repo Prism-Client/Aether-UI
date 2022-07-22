@@ -30,7 +30,7 @@ import net.prismclient.aether.ui.util.interfaces.UICopy
  * @author sen
  * @since 1.1
  */
-class UIAutoLayout @JvmOverloads constructor(layoutDirection: UILayoutDirection = UILayoutDirection.Horizontal) : UIFrameLayout<UIFrameSheet>(), UICopy<UIAutoLayout> {
+open class UIAutoLayout @JvmOverloads constructor(layoutDirection: UILayoutDirection = UILayoutDirection.Horizontal) : UIFrameLayout<UIFrameSheet>(), UICopy<UIAutoLayout> {
     /**
      * Defines the direction/axis which the list should flow. (Horizontal or Vertical).
      */
@@ -194,7 +194,7 @@ class UIAutoLayout @JvmOverloads constructor(layoutDirection: UILayoutDirection 
         updateStyle()
     }
 
-    private fun calculateLayoutSize(spacing: Float) {
+    protected open fun calculateLayoutSize(spacing: Float) {
         var w = 0f
         var h = 0f
 
@@ -217,11 +217,6 @@ class UIAutoLayout @JvmOverloads constructor(layoutDirection: UILayoutDirection 
 
         layoutWidth = w
         layoutHeight = h
-    }
-
-    override fun requestUpdate() {
-        super.requestUpdate()
-        update()
     }
 
     /**

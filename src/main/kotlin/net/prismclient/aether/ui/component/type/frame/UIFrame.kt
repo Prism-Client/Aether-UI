@@ -94,7 +94,8 @@ abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
      * Renders the components within this frame.
      */
     open fun renderContent() {
-        if (style.useFBO && (requiresUpdate || !style.optimizeRenderer)) {
+        if (style.useFBO) {
+//        if (style.useFBO && (requiresUpdate || !style.optimizeRenderer)) {
             if (fbo == null) {
                 updateFBO()
             }
@@ -104,7 +105,7 @@ abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
                 }
             }
         }
-        requiresUpdate = false
+//        requiresUpdate = false
     }
 
     override fun render() {
@@ -114,6 +115,8 @@ abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
     }
 
     override fun renderComponent() {
+        if (relWidth == 0f || relHeight == 0f)
+            return
         renderer {
             if (style.useFBO) {
                 color(-1)
@@ -130,11 +133,6 @@ abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
         }
     }
 
-    override fun requestUpdate() {
-        requiresUpdate = true
-        super.requestUpdate()
-    }
-
     override fun deallocate() {
         components.forEach { it.deallocate() }
     }
@@ -142,30 +140,25 @@ abstract class UIFrame<T : UIFrameSheet> : UIComponent<T>(), UIFocusable {
     override fun mouseMoved(mouseX: Float, mouseY: Float) {
         super.mouseMoved(mouseX, mouseY)
         components.forEach { it.mouseMoved(mouseX, mouseY) }
-        if (this.isMouseInsideBounds()) requestUpdate()
     }
 
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
-        requestUpdate()
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float) {
         super.mouseReleased(mouseX, mouseY)
         components.forEach { it.mouseReleased(mouseX + relX, mouseY + relY) }
-        requestUpdate()
     }
 
     override fun keyPressed(character: Char) {
         super.keyPressed(character)
         keyPressListeners?.forEach { it.value.accept(this, character) }
-        requestUpdate()
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {
         super.mouseScrolled(mouseX, mouseY, scrollAmount)
         components.forEach { it.mouseScrolled(mouseX, mouseY, scrollAmount) }
-        requestUpdate()
     }
 
     @Suppress("UNCHECKED_CAST")

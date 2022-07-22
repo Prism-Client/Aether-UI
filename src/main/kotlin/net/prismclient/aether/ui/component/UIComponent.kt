@@ -2,10 +2,12 @@ package net.prismclient.aether.ui.component
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.animation.UIAnimation
+import net.prismclient.aether.ui.component.type.frame.UIFrameLayout
 import net.prismclient.aether.ui.component.type.layout.UIContainer
 import net.prismclient.aether.ui.component.type.layout.UIContainerSheet
 import net.prismclient.aether.ui.component.type.layout.UIFrame
 import net.prismclient.aether.ui.component.type.layout.UIFrameSheet
+import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.event.input.UIMouseEvent
 import net.prismclient.aether.ui.renderer.UIProvider
 import net.prismclient.aether.ui.renderer.impl.background.UIBackground
@@ -383,7 +385,7 @@ abstract class UIComponent<T : UIStyleSheet> {
                 mouseEntered()
                 wasInside = true
             }
-            requestUpdate()
+//            requestUpdate()
         } else if (wasInside) {
             mouseLeft()
             wasInside = false
@@ -421,7 +423,7 @@ abstract class UIComponent<T : UIStyleSheet> {
      */
     protected open fun mouseLeft() {
         mouseLeaveListeners?.forEach { it.value.accept(this) }
-        requestUpdate()
+//        requestUpdate()
     }
 
     /**
@@ -658,7 +660,7 @@ abstract class UIComponent<T : UIStyleSheet> {
         if (this is UIFocusable) {
             Aether.focus(this)
             focusListeners?.forEach { it.value.accept(this, true) }
-            requestUpdate()
+//            requestUpdate()
         }
     }
 
@@ -671,10 +673,13 @@ abstract class UIComponent<T : UIStyleSheet> {
     }
 
     /**
-     * Requests the frame of this to be redrawn.
+     * Used for classes that implement the auto layout interface.
      */
-    open fun requestUpdate() {
-        if (parent != null) parent!!.requestUpdate()
+    open fun updateParentLayout() {
+        if (parent != null && parent is UILayout) {
+            (parent as UILayout).updateLayout()
+            parent!!.updateParentLayout()
+        }
     }
 
     inline fun stylize(block: Block<T>) = style.block()

@@ -21,7 +21,6 @@ open class UIListLayout @JvmOverloads constructor(
     var componentSpacing: UIUnit? = null
 
     override fun updateLayout() {
-        println("updated layout")
         var x = if (style.useFBO) 0f else x + getParentX()
         var y = if (style.useFBO) 0f else y + getParentY()
         val spacing = if (layoutDirection == UILayoutDirection.Horizontal) +componentSpacing else -componentSpacing

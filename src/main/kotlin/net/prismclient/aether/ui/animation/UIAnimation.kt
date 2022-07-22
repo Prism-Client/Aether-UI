@@ -144,6 +144,7 @@ class UIAnimation<S : UIStyleSheet>(val name: String, val style: S) : UICopy<UIA
             nextKeyframe!!.style,
             nextKeyframe!!.ease.getValue().toFloat()
         )
+        component.updateParentLayout()
     }
 
     /**

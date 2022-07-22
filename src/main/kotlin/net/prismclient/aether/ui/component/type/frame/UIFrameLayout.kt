@@ -16,4 +16,18 @@ abstract class UIFrameLayout<T : UIFrameSheet> : UIFrame<T>(), UILayout {
         super.update()
         updateLayout()
     }
+
+    override fun updateAnimation() {
+        if (animations != null) {
+            animations!!.forEach { it.value.update() }
+            animations!!.entries.removeIf { it.value.isCompleted }
+            updateLayout()
+            updateParentLayout()
+            if (animations!!.isEmpty()) {
+                animations = null
+            }
+        }
+    }
+
+    override fun updateLayout() {}
 }

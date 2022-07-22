@@ -37,6 +37,25 @@ class UIAccordion : UIListLayout(UILayoutDirection.Vertical) {
      */
     lateinit var contentChange: BiConsumer<AccordionItem, Boolean>
 
+    override fun updateLayout() {
+        super.updateLayout()
+        var h = 0f ///-  if (!style.useFBO) y else 0f
+        for (child in components) {
+            h = (child.relY + child.relHeight + child.marginBottom).coerceAtLeast(h)
+        }
+        height =  h - y
+        updateAnchorPoint()
+        updatePosition()
+        updateBounds()
+        updateStyle()
+        super.updateLayout()
+    }
+
+    override fun update() {
+        super.update()
+        items.forEach { adjustDropdown(it, it.open) }
+    }
+
     /**
      * Creates an item with the given [name] and [description] which applies to the
      * [informationContainer]. The [block]  is invoked onto the [contentContainer], so
@@ -56,6 +75,8 @@ class UIAccordion : UIListLayout(UILayoutDirection.Vertical) {
     fun adjustDropdown(item: AccordionItem, shouldCollapse: Boolean) {
         item.open = shouldCollapse
         contentChange.accept(item, shouldCollapse)
+        println(item.content.relHeight)
+        updateLayout()
     }
 
     /**
