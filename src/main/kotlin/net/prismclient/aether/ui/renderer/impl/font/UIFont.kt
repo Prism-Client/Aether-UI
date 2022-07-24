@@ -6,7 +6,6 @@ import net.prismclient.aether.ui.shape.UIShape
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
 import net.prismclient.aether.ui.util.UIColor
-import net.prismclient.aether.ui.util.extensions.asRGBA
 import net.prismclient.aether.ui.util.extensions.calculate
 import net.prismclient.aether.ui.util.extensions.renderer
 import java.util.regex.Pattern
@@ -110,16 +109,8 @@ open class UIFont : UIShape<UIFont>() {
 
         // Adjust to the right resize type
         when {
-            (textResizing == TextResizing.AutoWidth || textResizing == TextResizing.AutoHeight) && (width != null || height != null) -> {
-                textResizing = TextResizing.FixedSize
-                updateFont()
-                return
-            }
-            textResizing == TextResizing.AutoWidth && actualText.contains(NEWLINE) -> {
-                textResizing = TextResizing.AutoHeight
-                updateFont()
-                return
-            }
+            (textResizing == TextResizing.AutoWidth || textResizing == TextResizing.AutoHeight) && (width != null || height != null) -> textResizing = TextResizing.FixedSize
+            textResizing == TextResizing.AutoWidth && actualText.contains(NEWLINE) -> textResizing = TextResizing.AutoHeight
         }
 
         update(component)

@@ -243,9 +243,7 @@ abstract class UIComponent<T : UIStyleSheet> {
      * might request for this method to be invoked.
      */
     open fun update() {
-        if (!hasStyle()) {
-            style = createsStyle()
-        }
+        if (!hasStyle()) style = createsStyle()
 
         calculateBounds()
         // Update the size, then the anchor, and then the position

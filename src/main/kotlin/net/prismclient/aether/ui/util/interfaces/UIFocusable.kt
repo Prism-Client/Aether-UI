@@ -8,7 +8,6 @@ import net.prismclient.aether.ui.component.UIComponent
  * you only want one component to be focused at once.
  *
  * @author sen
- * @since 6/1/2022
- * @param T The type of component which is focusable.
+ * @since 1.1
  */
 interface UIFocusable
