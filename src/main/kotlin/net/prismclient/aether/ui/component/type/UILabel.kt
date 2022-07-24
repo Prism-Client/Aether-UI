@@ -39,5 +39,11 @@ class UILabel(text: String) : UIComponent<UIStyleSheet>() {
         style.font?.render()
     }
 
+    override fun updateAnimation() {
+        super.updateAnimation()
+        if (animations != null)
+            updateFont()
+    }
+
     override fun createsStyle(): UIStyleSheet = UIStyleSheet()
 }

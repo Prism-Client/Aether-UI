@@ -672,12 +672,9 @@ abstract class UIComponent<T : UIStyleSheet> {
         focusListeners?.forEach { it.value.accept(this, false) }
     }
 
-    /**
-     * Used for classes that implement the auto layout interface.
-     */
     open fun updateParentLayout() {
         if (parent != null && parent is UILayout) {
-            (parent as UILayout).updateLayout()
+            (parent!! as UILayout).updateLayout()
             parent!!.updateParentLayout()
         }
     }

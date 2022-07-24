@@ -81,9 +81,9 @@ open class Aether(renderer: UIRenderer) {
      */
     open fun update(width: Float, height: Float, devicePxRatio: Float) {
         updateSize(width, height, devicePxRatio)
-        updateListeners?.forEach { it.value.run() }
         components?.forEach { it.update() }
         frames?.forEach { it.update() }
+        updateListeners?.forEach { it.value.run() }
     }
 
     /**
@@ -92,10 +92,10 @@ open class Aether(renderer: UIRenderer) {
      */
     open fun renderFrames() {
         renderer {
-            val shouldUpdate = if (lastUpdate + 1000L < System.currentTimeMillis()) {
-                lastUpdate = System.currentTimeMillis()
-                true
-            } else false
+//            val shouldUpdate = if (lastUpdate + 1000L < System.currentTimeMillis()) {
+//                lastUpdate = System.currentTimeMillis()
+//                true
+//            } else false
             frames?.forEach {
 //                if (shouldUpdate) it.requestUpdate()
                 it.renderContent()

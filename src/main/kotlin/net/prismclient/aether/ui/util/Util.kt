@@ -3,8 +3,6 @@ package net.prismclient.aether.ui.util
 import net.prismclient.aether.ui.component.util.enums.UIAlignment
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
-import net.prismclient.aether.ui.util.extensions.RELATIVE
-import net.prismclient.aether.ui.util.extensions.px
 import net.prismclient.aether.ui.util.extensions.rel
 
 /**
@@ -55,3 +53,8 @@ fun UIAnchorPoint.anchor(alignment: UIAlignment) {
         else -> throw UnsupportedOperationException("Unknown alignment type: $alignment")
     }
 }
+
+/**
+ * Returns true if [obj1] or [obj2] is not null.
+ */
+internal fun notnull(obj1: Any?, obj2: Any?): Boolean = obj1 != null || obj2 != null

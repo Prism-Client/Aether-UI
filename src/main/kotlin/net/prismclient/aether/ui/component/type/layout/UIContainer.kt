@@ -124,17 +124,16 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
         renderScrollbar()
     }
 
-    override fun updateAnimation() {
-        if (animations != null) {
-            animations!!.forEach { it.value.update() }
-            animations!!.entries.removeIf { it.value.isCompleted }
-            if (animations!!.isEmpty())
-                animations = null
-            updateLayout()
-            updateParentLayout()
-//            components.forEach { it.requestUpdate() }
-        }
-    }
+//    override fun updateAnimation() {
+//        if (animations != null) {
+//            animations!!.forEach { it.value.update() }
+//            animations!!.entries.removeIf { it.value.isCompleted }
+//            if (animations!!.isEmpty()) {
+//                animations = null
+//            }
+////            updateParentLayout()
+//        }
+//    }
 
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)

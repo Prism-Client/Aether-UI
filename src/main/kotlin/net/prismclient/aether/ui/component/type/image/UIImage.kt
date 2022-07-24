@@ -1,5 +1,6 @@
 package net.prismclient.aether.ui.component.type.image
 
+import net.prismclient.aether.ui.animation.UIAnimation
 import net.prismclient.aether.ui.component.UIComponent
 import net.prismclient.aether.ui.dsl.UIAssetDSL
 import net.prismclient.aether.ui.renderer.UIProvider
@@ -7,6 +8,7 @@ import net.prismclient.aether.ui.renderer.image.UIImageData
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.UIColor
+import net.prismclient.aether.ui.util.extensions.mix
 import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.name
 
@@ -63,6 +65,20 @@ class UIImageSheet : UIStyleSheet() {
      * The radius of the image.
      */
     var imageRadius: UIRadius? = null
+
+    override fun animate(animation: UIAnimation<*>, previous: UIStyleSheet?, current: UIStyleSheet?, progress: Float) {
+        super.animate(animation, previous, current, progress)
+        val p = previous as UIImageSheet
+        val c = current as UIImageSheet
+        if (p.imageColor != null || c.imageColor != null) {
+            imageColor = imageColor ?: UIColor(0)
+            imageColor!!.rgba = p.imageColor.mix(c.imageColor, imageColor!!, progress)
+        }
+    }
+
+    override fun save(animation: UIAnimation<*>, keyframe: UIStyleSheet?) {
+        super.save(animation, keyframe)
+    }
 
     override fun copy() = UIImageSheet().name(name).also {
         it.apply(this)

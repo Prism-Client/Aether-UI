@@ -37,5 +37,11 @@ open class UIButton(text: String) : UIComponent<UIStyleSheet>() {
         style.font?.updateFont()
     }
 
+    override fun updateAnimation() {
+        super.updateAnimation()
+        if (animations != null)
+            updateFont()
+    }
+
     override fun createsStyle(): UIStyleSheet = UIStyleSheet()
 }
