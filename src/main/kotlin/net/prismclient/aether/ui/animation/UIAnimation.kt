@@ -3,6 +3,7 @@ package net.prismclient.aether.ui.animation
 import net.prismclient.aether.ui.animation.ease.UIEase
 import net.prismclient.aether.ui.animation.ease.impl.UILinear
 import net.prismclient.aether.ui.component.UIComponent
+import net.prismclient.aether.ui.component.util.interfaces.UILayout
 import net.prismclient.aether.ui.style.UIStyleSheet
 import net.prismclient.aether.ui.util.interfaces.UICopy
 import java.util.function.Consumer

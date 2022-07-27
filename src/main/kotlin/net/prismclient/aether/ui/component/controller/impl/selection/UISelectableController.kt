@@ -23,6 +23,9 @@ class UISelectableController<T : UIComponent<*>>(filter: KClass<T>) : UIControll
     var selectedComponent: T? = null
         private set
 
+    var previousSelected: T? = null
+        private set
+
     /**
      * The action to apply to all components when they are selected
      *
@@ -48,6 +51,8 @@ class UISelectableController<T : UIComponent<*>>(filter: KClass<T>) : UIControll
      * Selects the given component and notifies all the other component to deselect
      */
     fun selectComponent(component: T) {
+        previousSelected = selectedComponent
+
         // Invoke the selected action on the selected component
         selectedComponentAction?.accept(component)
 
@@ -85,4 +90,8 @@ class UISelectableController<T : UIComponent<*>>(filter: KClass<T>) : UIControll
     fun onDeselection(action: Consumer<T>) {
         deselectedComponentAction = action
     }
+
+    fun <O : UIComponent<out UIStyleSheet>> wasSelected(component: O) = previousSelected == component
+
+    fun wasSelected(index: Int) = previousSelected == components[index]
 }

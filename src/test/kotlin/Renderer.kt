@@ -84,10 +84,9 @@ object Renderer : UIRenderer {
     override fun useAntialiasing(antialiasing: Boolean) = nvgShapeAntiAlias(ctx, antialiasing)
 
     override fun createFBO(width: Float, height: Float): UIContentFBO {
-        if (width <= 0 || height <= 0) throw RuntimeException("Failed to create the framebuffer. It must have a width and height greater than 0")
         val contentScale = Aether.devicePxRatio
         val framebuffer = nvgluCreateFramebuffer(
-            ctx, (width * contentScale).toInt(), (height * contentScale).toInt(), NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
+            ctx, (width * contentScale).toInt().coerceAtLeast(1), (height * contentScale).toInt().coerceAtLeast(1), NVG_IMAGE_REPEATX or NVG_IMAGE_REPEATY
         ) ?: throw RuntimeException("Failed to create the framebuffer. w: $width, h: $height")
         val fbo = UIContentFBO(
             framebuffer.image(), width, height, width * contentScale, height * contentScale, contentScale
@@ -467,6 +466,7 @@ object Renderer : UIRenderer {
     }
 
     override fun allocPaint() {
+        paint?.free()
         paint = NVGPaint.calloc()
     }
 

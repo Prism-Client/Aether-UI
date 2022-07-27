@@ -59,10 +59,6 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
         updateScrollbar()
     }
 
-    override fun updateLayout() {
-        components.forEach { it.update() }
-    }
-
     open fun updateScrollbar() {
         style.verticalScrollbar.update(this)
         style.horizontalScrollbar.update(this)
@@ -74,7 +70,8 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
     }
 
     override fun renderContent() {
-        if (style.useFBO && (requiresUpdate || !style.optimizeRenderer)) {
+        if (style.useFBO) {
+//        if (style.useFBO && (requiresUpdate || !style.optimizeRenderer)) {
             renderer {
                 if (fbo == null) updateFBO()
                 fbo!!.renderToFramebuffer {
@@ -82,7 +79,11 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
                         -(style.horizontalScrollbar.value * expandedWidth),
                         -(style.verticalScrollbar.value * expandedHeight)
                     ) {
-                        components.forEach(UIComponent<*>::render)
+                        components.forEach {
+                            if (!(it.relX > relX + relWidth || it.relY > relY + (relHeight + (style.verticalScrollbar.value * expandedHeight)) || it.relX + it.relWidth < 0 || it.relY + it.relHeight < (style.verticalScrollbar.value * expandedHeight))) {
+                                it.render()
+                            }
+                        }
                     }
                 }
             }
@@ -91,6 +92,8 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
     }
 
     override fun renderComponent() {
+        if (relWidth == 0f || relHeight == 0f)
+            return
         renderer {
             if (style.useFBO) {
                 color(-1)
@@ -105,7 +108,11 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
                             -(style.horizontalScrollbar.value * expandedWidth),
                             -(style.verticalScrollbar.value * expandedHeight)
                         ) {
-                            components.forEach(UIComponent<*>::render)
+                            components.forEach {
+                                if (!(it.relX > relX + relWidth || it.relY > relY + relHeight || it.relX + it.relWidth < relX || it.relY + it.relHeight < relY)) {
+                                    it.render()
+                                }
+                            }
                         }
                     }
                 } else {
@@ -125,16 +132,16 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
         renderScrollbar()
     }
 
-    override fun updateAnimation() {
-        if (animations != null) {
-            animations!!.forEach { it.value.update() }
-            animations!!.entries.removeIf { it.value.isCompleted }
-            if (animations!!.isEmpty())
-                animations = null
-            updateLayout()
-            components.forEach { it.requestUpdate() }
-        }
-    }
+//    override fun updateAnimation() {
+//        if (animations != null) {
+//            animations!!.forEach { it.value.update() }
+//            animations!!.entries.removeIf { it.value.isCompleted }
+//            if (animations!!.isEmpty()) {
+//                animations = null
+//            }
+////            updateParentLayout()
+//        }
+//    }
 
     override fun mousePressed(event: UIMouseEvent) {
         super.mousePressed(event)
@@ -157,8 +164,8 @@ open class UIContainer<T : UIContainerSheet> : UIFrameLayout<T>(), UIFocusable, 
         )
         style.verticalScrollbar.mouseMoved()
         style.horizontalScrollbar.mouseMoved()
-        if (style.verticalScrollbar.selected || style.horizontalScrollbar.selected)
-            requestUpdate()
+//        if (style.verticalScrollbar.selected || style.horizontalScrollbar.selected)
+//            requestUpdate()
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, scrollAmount: Float) {

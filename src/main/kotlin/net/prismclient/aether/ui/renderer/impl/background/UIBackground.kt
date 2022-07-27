@@ -49,6 +49,8 @@ open class UIBackground : UIShape<UIBackground>(), UIAnimatable<UIBackground> {
     }
 
     override fun render() {
+        if (cachedWidth == 0f || cachedHeight == 0f)
+            return
         renderer {
             color(backgroundColor)
             rect(cachedX, cachedY, cachedWidth, cachedHeight, radius)

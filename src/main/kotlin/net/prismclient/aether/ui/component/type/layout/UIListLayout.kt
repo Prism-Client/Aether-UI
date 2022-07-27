@@ -12,7 +12,7 @@ import net.prismclient.aether.ui.unit.UIUnit
  * @since 5/20/2022
  */
 open class UIListLayout @JvmOverloads constructor(
-    var layoutDirection: UILayoutDirection = net.prismclient.aether.ui.component.type.layout.UILayoutDirection.Horizontal,
+    var layoutDirection: UILayoutDirection = UILayoutDirection.Horizontal,
     var listOrder: ListOrder = Forward,
 ) : UIContainer<UIContainerSheet>() {
     /**

@@ -11,7 +11,7 @@ import net.prismclient.aether.ui.style.UIStyleSheet
  * @author sen
  * @since 1.0
  */
-class UILabel(text: String) : UIComponent<UIStyleSheet>() {
+open class UILabel(text: String) : UIComponent<UIStyleSheet>() {
     var text: String = text
         set(value) {
             field = value
@@ -20,12 +20,21 @@ class UILabel(text: String) : UIComponent<UIStyleSheet>() {
         }
 
     override fun update() {
-        super.update()
+        if (!hasStyle()) style = createsStyle()
+
+        calculateBounds()
+        updateSize()
+        updateAnchorPoint()
+        updatePosition()
+        updateBounds()
+        updateStyle()
         style.font?.actualText = text
         updateFont()
+
+        updateListeners?.forEach { it.value.accept(this) }
     }
 
-    fun updateFont() {
+    open fun updateFont() {
         width = width.coerceAtLeast(style.font?.cachedWidth ?: 0f)
         height = height.coerceAtLeast(style.font?.cachedHeight ?: 0f)
         updateAnchorPoint()
@@ -37,6 +46,12 @@ class UILabel(text: String) : UIComponent<UIStyleSheet>() {
 
     override fun renderComponent() {
         style.font?.render()
+    }
+
+    override fun updateAnimation() {
+        super.updateAnimation()
+        if (animations != null)
+            updateFont()
     }
 
     override fun createsStyle(): UIStyleSheet = UIStyleSheet()

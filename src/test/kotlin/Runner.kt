@@ -1,9 +1,12 @@
 import examples.Animations
 import examples.Default
 import examples.PathRendering
+import examples.prism.PrismScreen
 
 import net.prismclient.aether.ui.Aether
 import net.prismclient.aether.ui.Aether.Properties.updateMouse
+import net.prismclient.aether.ui.renderer.impl.font.UITextAlignment
+import net.prismclient.aether.ui.util.extensions.renderer
 import net.prismclient.aether.ui.util.input.UIKey
 import net.prismclient.aether.ui.util.input.UIModifierKey
 import org.lwjgl.glfw.Callbacks
@@ -142,7 +145,7 @@ object Runner {
         glfwMakeContextCurrent(window)
         GL.createCapabilities()
         glfwSetTime(0.0)
-        glfwSwapInterval(1)
+        glfwSwapInterval(0)
 
         core = Aether(Renderer)
 
@@ -167,6 +170,11 @@ object Runner {
 
         createScreen(args)
 
+
+        var actualFps: Int = 0
+        var fps: Int = 0
+        var time: Long = System.currentTimeMillis()
+
         while (!glfwWindowShouldClose(window)) {
             updateMouse(mouseX.toFloat(), mouseY.toFloat())
 
@@ -178,8 +186,24 @@ object Runner {
 
             core!!.render()
 
+            renderer {
+                beginFrame(framebufferWidth.toFloat(), framebufferHeight.toFloat(), 1f)
+                font("Montserrat-regular", 16f, UITextAlignment.CENTER, UITextAlignment.TOP, 0f)
+                fps.toString().render(framebufferWidth / 2f, 0f)
+                endFrame()
+            }
+
             glfwSwapBuffers(window)
             glfwPollEvents()
+
+            actualFps++
+            if (time + 1000L < System.currentTimeMillis()) {
+                println(actualFps)
+                fps = actualFps
+                actualFps = 0
+                time = System.currentTimeMillis()
+            }
+//            println(fps)
         }
         GL.setCapabilities(null)
         Callbacks.glfwFreeCallbacks(window)
@@ -196,6 +220,6 @@ object Runner {
                     else -> Default()
                 }
             )
-        } else Aether.displayScreen(Default())
+        } else Aether.displayScreen(PrismScreen())
     }
 }

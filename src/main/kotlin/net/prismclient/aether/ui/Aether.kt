@@ -81,9 +81,9 @@ open class Aether(renderer: UIRenderer) {
      */
     open fun update(width: Float, height: Float, devicePxRatio: Float) {
         updateSize(width, height, devicePxRatio)
-        updateListeners?.forEach { it.value.run() }
-        components?.forEach { it.update() }
-        frames?.forEach { it.update() }
+        components?.forEach(UIComponent<*>::update)
+        frames?.forEach(UIFrame<*>::update)
+        updateListeners?.values?.forEach(Runnable::run)
     }
 
     /**
@@ -92,12 +92,12 @@ open class Aether(renderer: UIRenderer) {
      */
     open fun renderFrames() {
         renderer {
-            val shouldUpdate = if (lastUpdate + 1000L < System.currentTimeMillis()) {
-                lastUpdate = System.currentTimeMillis()
-                true
-            } else false
+//            val shouldUpdate = if (lastUpdate + 1000L < System.currentTimeMillis()) {
+//                lastUpdate = System.currentTimeMillis()
+//                true
+//            } else false
             frames?.forEach {
-                if (shouldUpdate) it.requestUpdate()
+//                if (shouldUpdate) it.requestUpdate()
                 it.renderContent()
             }
         }
@@ -551,11 +551,27 @@ open class Aether(renderer: UIRenderer) {
          *
          * @throws NullPointerException If the components list of this is null
          */
+        @JvmStatic
         fun deallocateComponents() {
             UIProvider.resetStyles()
             instance.components!!.forEach { it.deallocate() }
             deallocationListeners?.forEach { it.value.run() }
             deallocationListeners?.clear()
+        }
+
+        @JvmStatic
+        fun removeComponent(component: UIComponent<*>) {
+            if (activeScreen != null) {
+                focusedComponent = null
+                instance.components!!.remove(component)
+                if (component is UIFrame) instance.frames!!.remove(component)
+                if (component.parent != null && component.parent is UIFrame) {
+                    (component.parent!! as UIFrame).removeComponent(component)
+                }
+                component.deallocate()
+                component.parent = null
+                instance.update(width, height, devicePxRatio)
+            }
         }
     }
 }

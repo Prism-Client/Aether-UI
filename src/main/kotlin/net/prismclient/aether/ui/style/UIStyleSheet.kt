@@ -13,13 +13,10 @@ import net.prismclient.aether.ui.renderer.impl.property.UIPadding
 import net.prismclient.aether.ui.renderer.impl.property.UIRadius
 import net.prismclient.aether.ui.style.util.UIAnchorPoint
 import net.prismclient.aether.ui.unit.UIUnit
-import net.prismclient.aether.ui.util.Block
-import net.prismclient.aether.ui.util.UIColor
+import net.prismclient.aether.ui.util.*
 import net.prismclient.aether.ui.util.extensions.*
 import net.prismclient.aether.ui.util.interfaces.UIAnimatable
 import net.prismclient.aether.ui.util.interfaces.UICopy
-import net.prismclient.aether.ui.util.name
-import net.prismclient.aether.ui.util.radiusOf
 
 /**
  * [UIStyleSheet] is the superclass of all styles. It holds the general
@@ -85,38 +82,53 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     ) {
         val component = animation.component
 
-        if (!component.overridden) {
-            component.x = previous?.x.lerp(current?.x, component, x, progress, false) + component.getParentX()
-            component.y = previous?.y.lerp(current?.y, component, y, progress, true) + component.getParentY()
+        // -- Calculate bounds -- //
+
+        // ---------------------- //
+
+        // -- Update size -- //
+
+        if (notnull(previous?.width, current?.height))
             component.width = previous?.width.lerp(current?.width, component, width, progress, false)
+        if (notnull(previous?.height, current?.height))
             component.height = previous?.height.lerp(current?.height, component, height, progress, true)
+
+        // -- Update anchor point -- //
+
+        // ------------------------ //
+
+        // -- Update position -- //
+        if (!component.overridden) {
+            if (notnull(previous?.x, current?.x))
+                component.x = previous?.x.lerp(current?.x, component, x, progress, false) +
+                        component.getParentX() +
+                        component.marginLeft -
+                        component.anchorX
+            if (notnull(previous?.y, current?.y))
+                component.y = previous?.y.lerp(current?.y, component, y, progress, true) +
+                        component.getParentY() +
+                        component.marginTop -
+                        component.anchorY
         }
 
-        if (previous?.background != null || current?.background != null) {
+        // -- Update bounds -- //
+        if (notnull(previous?.x, current?.x) || notnull(previous?.padding, current?.padding))
+            component.relX = component.x - component.paddingLeft
+        if (notnull(previous?.y, current?.y) || notnull(previous?.padding, current?.padding))
+            component.relY = component.y - component.paddingTop
+        if (notnull(previous?.width, current?.width) || notnull(previous?.padding, current?.padding))
+            component.relWidth = component.width + component.paddingLeft + component.paddingRight
+        if (notnull(previous?.height, current?.height) || notnull(previous?.padding, current?.padding))
+            component.relHeight = component.height + component.paddingTop + component.paddingBottom
+
+        // -- Update background -- //
+        if (notnull(previous?.background, current?.background)) {
             background = background ?: UIBackground()
             background!!.animate(animation, previous?.background, current?.background, progress)
         }
-        if (previous?.font != null || current?.font != null) {
-            font = font ?: UIFont()
-            font!!.animate(animation, previous?.font, current?.font, progress)
-        }
-        if (previous?.padding != null || current?.padding != null) {
-            padding = padding ?: UIPadding()
-            padding!!.animate(animation, previous?.padding, current?.padding, progress)
-        }
-        if (previous?.margin != null || current?.margin != null) {
-            margin = margin ?: UIMargin()
-            margin!!.animate(animation, previous?.margin, current?.margin, progress)
-        }
-        if (previous?.anchor != null || current?.anchor != null) {
-            anchor = anchor ?: UIAnchorPoint()
-            anchor!!.animate(animation, previous?.anchor, current?.anchor, progress)
-        }
-        if (!component.overridden) {
-            component.x += component.getParentX() + component.marginLeft - component.anchorX
-            component.y += component.getParentY() + component.marginTop - component.anchorY
-        }
-        component.updateBounds()
+
+        //component.updateBounds()
+
         component.updateStyle()
     }
 
@@ -243,11 +255,7 @@ open class UIStyleSheet : UICopy<UIStyleSheet>, UIAnimatable<UIStyleSheet> {
     }
 
     inline fun font(
-        x: UIUnit? = null,
-        y: UIUnit? = null,
-        width: UIUnit? = null,
-        height: UIUnit? = null,
-        block: Block<UIFont> = {}
+        x: UIUnit? = null, y: UIUnit? = null, width: UIUnit? = null, height: UIUnit? = null, block: Block<UIFont> = {}
     ) = font {
         this.x = x
         this.y = y
